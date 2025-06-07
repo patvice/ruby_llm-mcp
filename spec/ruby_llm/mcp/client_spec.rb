@@ -26,7 +26,7 @@ RSpec.describe RubyLLM::MCP::Client do
 
   before do
     allow(RubyLLM::MCP::Requests::Initialization).to receive(:new).and_return initialization
-    allow(initialization).to receive(:call)
+    allow(initialization).to receive(:call).and_return({ "result" => { "capabilities" => [] } })
 
     allow(RubyLLM::MCP::Requests::Notification).to receive(:new).and_return notification
     allow(notification).to receive(:call)
@@ -146,24 +146,25 @@ RSpec.describe RubyLLM::MCP::Client do
     it "calls transport#request and returns the result" do
       expect(request).to eq "result"
 
-      expect(stdio_transport).to have_received(:request).with("body", anything)
+      expect(stdio_transport).to have_received(:request).with("body")
     end
 
     it "waits for the response by default" do
       request
 
-      expect(stdio_transport).to have_received(:request).with(anything, wait_for_response: true)
+      expect(stdio_transport).to have_received(:request).with(anything)
     end
 
     context "with wait_for_response: false" do
       subject(:request) do
-        described_class.new(name: name, transport_type: transport_type).request("body", wait_for_response: false)
+        described_class.new(name: name, transport_type: transport_type).request("body", add_id: true,
+                                                                                        wait_for_response: false)
       end
 
       it "does not wait for the response" do
         request
 
-        expect(stdio_transport).to have_received(:request).with(anything, wait_for_response: false)
+        expect(stdio_transport).to have_received(:request).with(anything, add_id: true, wait_for_response: false)
       end
     end
   end

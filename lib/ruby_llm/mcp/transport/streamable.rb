@@ -35,9 +35,9 @@ module RubyLLM
           @connection = create_connection
         end
 
-        def request(body, wait_for_response: true)
+        def request(body, add_id: true, wait_for_response: true)
           # Generate a unique request ID for requests
-          if body.is_a?(Hash) && !body.key?("id")
+          if add_id && body.is_a?(Hash) && !body.key?("id")
             @id_mutex.synchronize { @id_counter += 1 }
             body["id"] = @id_counter
           end
@@ -162,6 +162,7 @@ module RubyLLM
           else
             # Process general SSE stream
             process_sse_stream(response.body)
+            nil
           end
         end
 

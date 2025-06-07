@@ -27,10 +27,12 @@ module RubyLLM
           start_process
         end
 
-        def request(body, wait_for_response: true)
-          @id_mutex.synchronize { @id_counter += 1 }
-          request_id = @id_counter
-          body["id"] = request_id
+        def request(body, add_id: true, wait_for_response: true)
+          if add_id
+            @id_mutex.synchronize { @id_counter += 1 }
+            request_id = @id_counter
+            body["id"] = request_id
+          end
 
           response_queue = Queue.new
           if wait_for_response

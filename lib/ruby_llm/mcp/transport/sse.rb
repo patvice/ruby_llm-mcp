@@ -41,11 +41,13 @@ module RubyLLM
         end
 
         # rubocop:disable Metrics/MethodLength
-        def request(body, wait_for_response: true)
+        def request(body, add_id: true, wait_for_response: true)
           # Generate a unique request ID
-          @id_mutex.synchronize { @id_counter += 1 }
-          request_id = @id_counter
-          body["id"] = request_id
+          if add_id
+            @id_mutex.synchronize { @id_counter += 1 }
+            request_id = @id_counter
+            body["id"] = request_id
+          end
 
           # Create a queue for this request's response
           response_queue = Queue.new
