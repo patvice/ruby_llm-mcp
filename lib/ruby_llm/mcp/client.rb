@@ -6,38 +6,25 @@ module RubyLLM
       PROTOCOL_VERSION = "2025-03-26"
       PV_2024_11_05 = "2024-11-05"
 
-      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version,
-                  :capabilities
+      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :protocol_version,
+                  :capabilities, :coordinator
 
-      def initialize(name:, transport_type:, request_timeout: 8000, reverse_proxy_url: nil, config: {})
+      def initialize(name:, transport_type:, request_timeout: 8000, config: {})
         @name = name
         @config = config
         @protocol_version = PROTOCOL_VERSION
-        @headers = config[:headers] || {}
 
         @transport_type = transport_type.to_sym
-
-        case @transport_type
-        when :sse
-          @transport = RubyLLM::MCP::Transport::SSE.new(@config[:url], headers: @headers)
-        when :stdio
-          @transport = RubyLLM::MCP::Transport::Stdio.new(@config[:command], args: @config[:args], env: @config[:env])
-        when :streamable
-          @transport = RubyLLM::MCP::Transport::Streamable.new(@config[:url], headers: @headers)
-        else
-          raise "Invalid transport type: #{transport_type}"
-        end
-        @capabilities = nil
-
-        @request_timeout = request_timeout
-        @reverse_proxy_url = reverse_proxy_url
-
-        initialize_request
-        notification_request
+        @coordinator = Coordinator.new(client: self, transport_type: transport_type, request_timeout: request_timeout,
+                                       config: config)
       end
 
-      def request(body, **options)
-        @transport.request(body, **options)
+      def start
+        @capabilities = coordinator.initialize_coordinator
+      end
+
+      def stop
+        coordinator.stop!
       end
 
       def tools(refresh: false)
@@ -60,51 +47,14 @@ module RubyLLM
         @prompts ||= fetch_and_create_prompts
       end
 
-      def execute_tool(**args)
-        RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
-      end
-
-      def resource_read_request(**args)
-        RubyLLM::MCP::Requests::ResourceRead.new(self, **args).call
-      end
-
-      def completion(**args)
-        RubyLLM::MCP::Requests::Completion.new(self, **args).call
-      end
-
-      def execute_prompt(**args)
-        RubyLLM::MCP::Requests::PromptCall.new(self, **args).call
+      def ping
+        coordinator.ping
       end
 
       private
 
-      def initialize_request
-        @initialize_response = RubyLLM::MCP::Requests::Initialization.new(self).call
-        @capabilities = RubyLLM::MCP::Capabilities.new(@initialize_response["result"]["capabilities"])
-      end
-
-      def notification_request
-        RubyLLM::MCP::Requests::Notification.new(self).call
-      end
-
-      def tool_list_request
-        RubyLLM::MCP::Requests::ToolList.new(self).call
-      end
-
-      def resources_list_request
-        RubyLLM::MCP::Requests::ResourceList.new(self).call
-      end
-
-      def resource_template_list_request
-        RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
-      end
-
-      def prompt_list_request
-        RubyLLM::MCP::Requests::PromptList.new(self).call
-      end
-
       def fetch_and_create_tools
-        tools_response = tool_list_request
+        tools_response = coordinator.tool_list_request
         tools_response = tools_response["result"]["tools"]
 
         @tools = tools_response.map do |tool|
@@ -113,7 +63,7 @@ module RubyLLM
       end
 
       def fetch_and_create_resources(set_as_template: false)
-        resources_response = resources_list_request
+        resources_response = coordinator.resources_list_request
         resources_response = resources_response["result"]["resources"]
 
         resources = {}
@@ -126,7 +76,7 @@ module RubyLLM
       end
 
       def fetch_and_create_prompts
-        prompts_response = prompt_list_request
+        prompts_response = coordinator.prompt_list_request
         prompts_response = prompts_response["result"]["prompts"]
 
         prompts = {}

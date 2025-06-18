@@ -12,8 +12,9 @@ module RubyLLM
       class Streamable
         attr_reader :headers, :id, :session_id
 
-        def initialize(url, headers: {})
+        def initialize(url, headers: {}, request_timeout: 30)
           @url = url
+          @request_timeout = request_timeout
           @client_id = SecureRandom.uuid
           @session_id = nil
           @base_headers = headers.merge({

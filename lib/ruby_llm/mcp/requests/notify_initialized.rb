@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RubyLLM::MCP::Requests::Notification < RubyLLM::MCP::Requests::Base
+class RubyLLM::MCP::Requests::NotifyInitialized < RubyLLM::MCP::Requests::Base
   def call
     client.request(notification_body, add_id: false, wait_for_response: false)
   end

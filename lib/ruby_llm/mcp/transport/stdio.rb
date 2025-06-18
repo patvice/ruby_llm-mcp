@@ -11,10 +11,11 @@ module RubyLLM
       class Stdio
         attr_reader :command, :stdin, :stdout, :stderr, :id
 
-        def initialize(command, args: [], env: {})
+        def initialize(command, args: [], env: {}, request_timeout: 30)
           @command = command
           @args = args
           @env = env || {}
+          @request_timeout = request_timeout
           @client_id = SecureRandom.uuid
 
           @id_counter = 0

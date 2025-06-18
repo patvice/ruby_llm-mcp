@@ -12,9 +12,10 @@ module RubyLLM
       class SSE
         attr_reader :headers, :id
 
-        def initialize(url, headers: {})
+        def initialize(url, request_timeout: 30, headers: {})
           @event_url = url
           @messages_url = nil
+          @request_timeout = request_timeout
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
@@ -202,13 +203,17 @@ module RubyLLM
           end
 
           @pending_mutex.synchronize do
-            if request_id && @pending_requests.key?(request_id)
-              response_queue = @pending_requests.delete(request_id)
-              response_queue&.push(event)
-            end
+            process_method_response(request_id, event)
           end
         rescue JSON::ParserError => e
           puts "Error parsing event data: #{e.message}"
+        end
+
+        def process_method_response(request_id, event)
+          if request_id && @pending_requests.key?(request_id)
+            response_queue = @pending_requests.delete(request_id)
+            response_queue&.push(event)
+          end
         end
 
         def extract_event(buffer)
