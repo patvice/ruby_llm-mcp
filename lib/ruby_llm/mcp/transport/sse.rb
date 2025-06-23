@@ -10,11 +10,13 @@ module RubyLLM
   module MCP
     module Transport
       class SSE
-        attr_reader :headers, :id
+        attr_reader :headers, :id, :coordinator
 
-        def initialize(url, headers: {})
+        def initialize(url, coordinator:, request_timeout:, headers: {})
           @event_url = url
           @messages_url = nil
+          @coordinator = coordinator
+          @request_timeout = request_timeout
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
@@ -206,7 +208,19 @@ module RubyLLM
           end
 
           @pending_mutex.synchronize do
-            if request_id && @pending_requests.key?(request_id)
+            result = RubyLLM::MCP::Result.new(event)
+
+            if result.notification?
+              coordinator.process_notification(result)
+              return
+            end
+
+            if result.ping?
+              coordinator.ping_response(id: result.id)
+              return
+            end
+
+            if result.matching_id?(request_id) && @pending_requests.key?(request_id)
               response_queue = @pending_requests.delete(request_id)
               response_queue&.push(event)
             end

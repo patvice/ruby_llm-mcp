@@ -15,17 +15,26 @@ module RubyLLM
       end
 
       def execute(**params)
-        response = @coordinator.execute_tool(
+        result = @coordinator.execute_tool(
           name: @name,
           parameters: params
         )
 
-        text_values = response.dig("result", "content").map { |content| content["text"] }.compact.join("\n")
+        text_values = result.value["content"].map { |content| content["text"] }.compact.join("\n")
+
+        if result.error?
+          error = result.to_error
+          return { error: error.to_s }
+        end
+
+        if result.is_execution_error?
+          return { error: text_values }
+        end
 
         if text_values.empty?
-          create_content_for_message(response.dig("result", "content", 0))
+          create_content_for_message(result.value.dig("content", 0))
         else
-          create_content_for_message({ "type" => "text", "text" => text_values })
+          create_content_for_message({ type: "text", text: text_values })
         end
       end
 

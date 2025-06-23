@@ -12,17 +12,38 @@ module RubyLLM
         end
       end
 
-      class CompletionNotAvailable < BaseError; end
-
-      class PromptArgumentError < BaseError; end
+      module Capabilities
+        class CompletionNotAvailable < BaseError; end
+        class ResourceSubscribeNotAvailable < BaseError; end
+      end
 
       class InvalidProtocolVersionError < BaseError; end
 
+      class InvalidTransportType < BaseError; end
+
+      class ProgressHandlerNotAvailable < BaseError; end
+
+      class PromptArgumentError < BaseError; end
+
+      class ResponseError < BaseError
+        attr_reader :error
+
+        def initialize(message:, error:)
+          @error = error
+          super(message: message)
+        end
+      end
+
       class SessionExpiredError < BaseError; end
 
-      class TimeoutError < BaseError; end
+      class TimeoutError < BaseError
+        attr_reader :request_id
 
-      class InvalidTransportType < BaseError; end
+        def initialize(message:, request_id:)
+          @request_id = request_id
+          super(message: message)
+        end
+      end
     end
   end
 end

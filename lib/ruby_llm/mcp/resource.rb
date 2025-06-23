@@ -3,7 +3,7 @@
 module RubyLLM
   module MCP
     class Resource
-      attr_reader :uri, :name, :description, :mime_type, :coordinator
+      attr_reader :uri, :name, :description, :mime_type, :coordinator, :subscribed
 
       def initialize(coordinator, resource)
         @coordinator = coordinator
@@ -15,14 +15,33 @@ module RubyLLM
           @content_response = resource["content_response"]
           @content = @content_response["text"] || @content_response["blob"]
         end
+
+        @subscribed = false
       end
 
       def content
         return @content unless @content.nil?
 
-        response = read_response
-        @content_response = response.dig("result", "contents", 0)
+        result = read_response
+        result.raise_error! if result.error?
+
+        @content_response = result.value.dig("contents", 0)
         @content = @content_response["text"] || @content_response["blob"]
+      end
+
+      def subscribe!
+        if @coordinator.capabilities.resource_subscribe?
+          @coordinator.resources_subscribe(uri: @uri)
+          @subscribed = true
+        else
+          message = "Resource subscribe is not available for this MCP server"
+          raise Errors::Capabilities::ResourceSubscribeNotAvailable.new(message: message)
+        end
+      end
+
+      def reset_content!
+        @content = nil
+        @content_response = nil
       end
 
       def include(chat, **args)
@@ -64,7 +83,7 @@ module RubyLLM
         when "http", "https"
           fetch_uri_content(uri)
         else # file:// or git://
-          @read_response ||= @coordinator.resource_read(uri: uri)
+          @coordinator.resource_read(uri: uri)
         end
       end
 

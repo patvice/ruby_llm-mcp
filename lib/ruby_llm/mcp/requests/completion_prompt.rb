@@ -4,15 +4,15 @@ module RubyLLM
   module MCP
     module Requests
       class CompletionPrompt
-        def initialize(client, name:, argument:, value:)
-          @client = client
+        def initialize(coordinator, name:, argument:, value:)
+          @coordinator = coordinator
           @name = name
           @argument = argument
           @value = value
         end
 
         def call
-          @client.request(request_body)
+          @coordinator.request(request_body)
         end
 
         private

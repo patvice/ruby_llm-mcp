@@ -15,8 +15,8 @@ module RubyLLM
 
       def fetch_resource(arguments: {})
         uri = apply_template(@uri, arguments)
-        response = read_response(uri)
-        content_response = response.dig("result", "contents", 0)
+        result = read_response(uri)
+        content_response = result.value.dig("contents", 0)
 
         Resource.new(coordinator, {
                        "uri" => uri,
@@ -33,12 +33,14 @@ module RubyLLM
 
       def complete(argument, value)
         if @coordinator.capabilities.completion?
-          response = @coordinator.completion_resource(uri: @uri, argument: argument, value: value)
-          response = response.dig("result", "completion")
+          result = @coordinator.completion_resource(uri: @uri, argument: argument, value: value)
+          result.raise_error! if result.error?
+
+          response = result.value["completion"]
 
           Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
         else
-          raise Errors::CompletionNotAvailable.new(message: "Completion is not available for this MCP server")
+          raise Errors::Capabilities::CompletionNotAvailable.new(message: "Completion is not available for this MCP server")
         end
       end
 

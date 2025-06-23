@@ -4,14 +4,14 @@ module RubyLLM
   module MCP
     module Requests
       class ToolCall
-        def initialize(client, name:, parameters: {})
-          @client = client
+        def initialize(coordinator, name:, parameters: {})
+          @coordinator = coordinator
           @name = name
           @parameters = parameters
         end
 
         def call
-          @client.request(request_body)
+          @coordinator.request(request_body)
         end
 
         private

@@ -3,24 +3,22 @@
 module RubyLLM
   module MCP
     module Requests
-      class ResourceRead
-        attr_reader :coordinator, :uri
-
-        def initialize(coordinator, uri:)
+      class LoggingSetLogging
+        def initialize(coordinator, level:)
           @coordinator = coordinator
-          @uri = uri
+          @level = level
         end
 
         def call
-          coordinator.request(reading_resource_body(uri))
+          coordinator.request(logging_set_logging_body)
         end
 
-        def reading_resource_body(uri)
+        def logging_set_logging_body
           {
             jsonrpc: "2.0",
-            method: "resources/read",
+            method: "logging/setLogging",
             params: {
-              uri: uri
+              level: @level
             }
           }
         end

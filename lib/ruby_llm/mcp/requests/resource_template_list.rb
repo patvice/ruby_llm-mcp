@@ -5,7 +5,7 @@ module RubyLLM
     module Requests
       class ResourceTemplateList < Base
         def call
-          client.request(resource_template_list_body)
+          coordinator.request(resource_template_list_body)
         end
 
         def resource_template_list_body

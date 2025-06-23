@@ -3,18 +3,15 @@
 module RubyLLM
   module MCP
     module Requests
-      class PromptList < Base
+      class Ping
         def call
-          coordinator.request(request_body)
+          coordinator.request(ping_body)
         end
 
-        private
-
-        def request_body
+        def ping_body
           {
             jsonrpc: "2.0",
-            method: "prompts/list",
-            params: {}
+            method: "ping"
           }
         end
       end

@@ -10,10 +10,11 @@ module RubyLLM
   module MCP
     module Transport
       class Streamable
-        attr_reader :headers, :id, :session_id
+        attr_reader :headers, :id, :session_id, :coordinator
 
-        def initialize(url, request_timeout:, headers: {})
+        def initialize(url, request_timeout:, coordinator:, headers: {})
           @url = url
+          @coordinator = coordinator
           @request_timeout = request_timeout
           @client_id = SecureRandom.uuid
           @session_id = nil
@@ -68,20 +69,6 @@ module RubyLLM
           end
           @connection&.close if @connection.respond_to?(:close)
           @connection = nil
-        end
-
-        def terminate_session
-          return unless @session_id
-
-          begin
-            response = @connection.delete do |req|
-              build_headers.each { |key, value| req.headers[key] = value }
-            end
-            @session_id = nil if response.status == 200
-          rescue StandardError => e
-            # Server may not support session termination (405), which is allowed
-            puts "Warning: Failed to terminate session: #{e.message}"
-          end
         end
 
         private
@@ -177,13 +164,13 @@ module RubyLLM
 
           begin
             json_response = JSON.parse(response.body)
+            result = RubyLLM::MCP::Result.new(json_response)
 
             if wait_for_response && request_id && response_queue
               @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-              return json_response
             end
 
-            json_response
+            result
           rescue JSON::ParserError => e
             raise "Invalid JSON response: #{e.message}"
           end
@@ -224,10 +211,21 @@ module RubyLLM
         def process_sse_for_request(sse_body, request_id, response_queue)
           Thread.new do
             process_sse_events(sse_body) do |event_data|
+              result = RubyLLM::MCP::Result.new(event_data)
+
+              if result.notification?
+                coordinator.process_notification(result)
+                next
+              end
+
+              if result.ping?
+                coordinator.ping_response(id: result.id)
+                next
+              end
+
               if event_data.is_a?(Hash) && event_data["id"]&.to_s == request_id
                 response_queue.push(event_data)
                 @pending_mutex.synchronize { @pending_requests.delete(request_id) }
-                break # Found our response, stop processing
               end
             end
           rescue StandardError => e

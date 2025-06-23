@@ -9,11 +9,12 @@ module RubyLLM
   module MCP
     module Transport
       class Stdio
-        attr_reader :command, :stdin, :stdout, :stderr, :id
+        attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command, request_timeout:, args: [], env: {})
+        def initialize(command, request_timeout:, coordinator:, args: [], env: {})
           @request_timeout = request_timeout
           @command = command
+          @coordinator = coordinator
           @args = args
           @env = env || {}
           @client_id = SecureRandom.uuid
@@ -194,11 +195,22 @@ module RubyLLM
         def process_response(line)
           response = JSON.parse(line)
           request_id = response["id"]&.to_s
+          result = RubyLLM::MCP::Result.new(response)
+
+          if result.notification?
+            coordinator.process_notification(result)
+            return
+          end
+
+          if result.ping?
+            coordinator.ping_response(id: result.id)
+            return
+          end
 
           @pending_mutex.synchronize do
-            if request_id && @pending_requests.key?(request_id)
+            if result.matching_id?(request_id) && @pending_requests.key?(request_id)
               response_queue = @pending_requests.delete(request_id)
-              response_queue&.push(response)
+              response_queue&.push(result)
             end
           end
         rescue JSON::ParserError => e

@@ -3,24 +3,24 @@
 module RubyLLM
   module MCP
     module Requests
-      class ResourceRead
-        attr_reader :coordinator, :uri
-
+      class ResourcesSubscribe
         def initialize(coordinator, uri:)
           @coordinator = coordinator
           @uri = uri
         end
 
         def call
-          coordinator.request(reading_resource_body(uri))
+          coordinator.request(resources_subscribe_body, wait_for_response: false)
         end
 
-        def reading_resource_body(uri)
+        private
+
+        def resources_subscribe_body
           {
             jsonrpc: "2.0",
-            method: "resources/read",
+            method: "resources/subscribe",
             params: {
-              uri: uri
+              uri: @uri
             }
           }
         end
