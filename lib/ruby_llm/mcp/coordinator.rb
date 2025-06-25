@@ -11,12 +11,12 @@ module RubyLLM
       attr_reader :client, :transport_type, :config, :request_timeout, :headers, :transport, :initialize_response,
                   :capabilities, :protocol_version, :handle_progress
 
-      def initialize(client, transport_type:, config: {})
+      def initialize(client, transport_type:, handle_progress:, config: {})
         @client = client
         @transport_type = transport_type
         @config = config
 
-        @handle_progress = config[:handle_progress]
+        @handle_progress = handle_progress
 
         @protocol_version = PROTOCOL_VERSION
         @headers = config[:headers] || {}
@@ -26,10 +26,13 @@ module RubyLLM
       end
 
       def request(body, **options)
-        @transport.request(body, **options)
+        RubyLLM::MCP.logger.info("Request #{client.name}: body: #{body} options: #{options}")
+        result = @transport.request(body, **options)
+        RubyLLM::MCP.logger.info("Response #{client.name}: result: #{result}")
+        result
       rescue RubyLLM::MCP::Errors::TimeoutError => e
         if @transport.alive?
-          cancelation_notification(reason: "Request timed out", request_id: e.request_id)
+          cancelled_notification(reason: "Request timed out", request_id: e.request_id)
         end
         raise e
       end
@@ -38,6 +41,7 @@ module RubyLLM
         build_transport
 
         initialize_response = initialize_request
+        puts "initialize_response: #{initialize_response.inspect}"
         initialize_response.raise_error! if initialize_response.error?
 
         @capabilities = RubyLLM::MCP::Capabilities.new(initialize_response.value["capabilities"])
@@ -58,7 +62,7 @@ module RubyLLM
         !!@transport&.alive?
       end
 
-      def ping?
+      def ping
         ping_request = RubyLLM::MCP::Requests::Ping.new(self)
         if alive?
           result = ping_request.call
@@ -69,15 +73,15 @@ module RubyLLM
           @transport = nil
         end
 
-        result.error?
-      rescue RubyLLM::MCP::Errors::TimeoutError
+        result.value == {}
+      rescue RubyLLM::MCP::Errors::TimeoutError, RubyLLM::MCP::Errors::TransportError
         false
       end
 
       def process_notification(result)
-        notification = result.nofitication
+        notification = result.notification
 
-        case type
+        case notification.type
         when "notifications/tools/list_changed"
           client.reset_tools!
         when "notifications/resources/list_changed"
@@ -112,6 +116,22 @@ module RubyLLM
       end
 
       def execute_tool(**args)
+        if client.human_in_the_loop?
+          name = args[:name]
+          params = args[:parameters]
+          unless client.on[:human_in_the_loop].call(name, params)
+            result = Result.new(
+              {
+                result: {
+                  isError: true,
+                  error: "Tool execution was cancelled by the client"
+                }
+              }
+            )
+            return result
+          end
+        end
+
         RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
       end
 
@@ -160,12 +180,16 @@ module RubyLLM
         RubyLLM::MCP::Requests::InitializeNotification.new(self).call
       end
 
-      def cancelation_notification(**args)
-        RubyLLM::MCP::Requests::CancelationNotification.new(self, **args).call
+      def cancelled_notification(**args)
+        RubyLLM::MCP::Requests::CancelledNotification.new(self, **args).call
       end
 
       def ping_response
         RubyLLM::MCP::Requests::PingResponse.new(self).call
+      end
+
+      def set_logging(level:)
+        RubyLLM::MCP::Requests::LoggingSetLevel.new(self, level: level).call
       end
 
       def build_transport
@@ -192,28 +216,40 @@ module RubyLLM
         end
       end
 
-      private
-
       def process_logging_message(notification)
+        if client.logging_handler_enabled?
+          client.on[:logging].call(notification)
+        else
+          default_process_logging_message(notification)
+        end
+      end
+
+      def default_process_logging_message(notification, logger: RubyLLM::MCP.logger)
         level = notification.params["level"]
-        logger = notification.params["logger"]
+        logger_message = notification.params["logger"]
         message = notification.params["data"]
 
-        message = ":MCP: #{logger}: #{message}"
+        message = "#{logger_message}: #{message}"
 
         case level
         when "debug"
-          RubyLLM.logger.debug(message["message"])
+          logger.debug(message["message"])
         when "info", "notice"
-          RubyLLM.logger.info(message["message"])
+          logger.info(message["message"])
         when "warning"
-          RubyLLM.logger.warn(message["message"])
+          logger.warn(message["message"])
         when "error", "critical"
-          RubyLLM.logger.error(message["message"])
+          logger.error(message["message"])
         when "alert", "emergency"
-          RubyLLM.logger.fatal(message["message"])
+          logger.fatal(message["message"])
         end
       end
+
+      def name
+        client.name
+      end
+
+      private
 
       def process_progress_message(notification)
         progress_obj = Progress.new(self, @handle_progress, notification["params"])

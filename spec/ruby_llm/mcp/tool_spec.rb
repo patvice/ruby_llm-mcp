@@ -115,7 +115,7 @@ RSpec.describe RubyLLM::MCP::Tool do
 
           # Test when tool returns an error
           result = error_tool.execute(shouldError: true)
-          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result).to eq({ error: "Error: Tool error" })
           expect(result.to_s).to include("Error: Tool error")
 
           # Test when tool doesn't return an error

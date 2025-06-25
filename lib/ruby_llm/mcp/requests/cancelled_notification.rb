@@ -4,14 +4,14 @@ module RubyLLM
   module MCP
     module Requests
       class CancelledNotification
-        def initialize(coordinator, id:, reason:)
+        def initialize(coordinator, request_id:, reason:)
           @coordinator = coordinator
-          @id = id
+          @request_id = request_id
           @reason = reason
         end
 
         def call
-          coordinator.request(cancelled_notification_body, add_id: false, wait_for_response: false)
+          @coordinator.request(cancelled_notification_body, add_id: false, wait_for_response: false)
         end
 
         private
@@ -21,7 +21,7 @@ module RubyLLM
             jsonrpc: "2.0",
             method: "notifications/cancelled",
             params: {
-              requestId: @id,
+              requestId: @request_id,
               reason: @reason
             }
           }

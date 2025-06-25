@@ -108,7 +108,7 @@ module RubyLLM
           end
         rescue StandardError => e
           @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
-          raise e
+          raise RubyLLM::MCP::Errors::TransportError.new(message: e.message)
         end
 
         def handle_response(response, request_id, response_queue, wait_for_response)
@@ -133,6 +133,7 @@ module RubyLLM
         def handle_200_response(response, request_id, response_queue, wait_for_response)
           content_type = response.headers["content-type"]
 
+          RubyLLM::MCP.logger.info("handle_200_response: #{content_type}")
           if content_type&.include?("text/event-stream")
             handle_sse_response(response, request_id, response_queue, wait_for_response)
           elsif content_type&.include?("application/json")
@@ -146,15 +147,10 @@ module RubyLLM
           # Extract session ID from initial response if present
           extract_session_id(response)
 
+          process_sse_for_request(response.body, request_id.to_s, response_queue)
+
           if wait_for_response && request_id
-            # Process SSE stream for this specific request
-            process_sse_for_request(response.body, request_id.to_s, response_queue)
-            # Wait for the response with timeout
             wait_for_response_with_timeout(request_id.to_s, response_queue)
-          else
-            # Process general SSE stream
-            process_sse_stream(response.body)
-            nil
           end
         end
 
@@ -209,39 +205,71 @@ module RubyLLM
         end
 
         def process_sse_for_request(sse_body, request_id, response_queue)
-          Thread.new do
-            process_sse_events(sse_body) do |event_data|
-              result = RubyLLM::MCP::Result.new(event_data)
-
-              if result.notification?
-                coordinator.process_notification(result)
-                next
-              end
-
-              if result.ping?
-                coordinator.ping_response(id: result.id)
-                next
-              end
-
-              if event_data.is_a?(Hash) && event_data["id"]&.to_s == request_id
-                response_queue.push(event_data)
-                @pending_mutex.synchronize { @pending_requests.delete(request_id) }
-              end
+          @sse_mutex.synchronize do
+            if @sse_streams[@session_id]
+              @sse_streams[@session_id].kill # or .close, depending on your design
+              @sse_streams.delete(@session_id)
             end
-          rescue StandardError => e
-            puts "Error processing SSE stream: #{e.message}"
-            response_queue.push({ "error" => { "message" => e.message } })
+
+            thread = Thread.new do
+              stream_events_from_server(sse_body, request_id.to_s, response_queue)
+            rescue StandardError => e
+              RubyLLM::MCP.logger.error "Error processing SSE stream: #{e.message}"
+              RubyLLM::MCP.logger.error "trace: #{e.backtrace.join("\n")}"
+              response_queue.push({ "error" => { "message" => e.message } })
+            end
+            @sse_streams[@session_id] = thread
           end
         end
 
-        def process_sse_stream(sse_body)
-          Thread.new do
-            process_sse_events(sse_body) do |event_data|
-              # Handle server-initiated requests/notifications
-              handle_server_message(event_data) if event_data.is_a?(Hash)
+        def process_sse_event_result(event_data, request_id, response_queue)
+          result = RubyLLM::MCP::Result.new(event_data)
+
+          if result.notification?
+            coordinator.process_notification(result)
+            return
+          end
+
+          if result.ping?
+            coordinator.ping_response(id: result.id)
+            return
+          end
+
+          if result.matching_id?(request_id)
+            response_queue.push(result)
+            @pending_mutex.synchronize { @pending_requests.delete(request_id) }
+          end
+        end
+
+        def stream_events_from_server(initial_request_body, request_id, response_queue)
+          buffer = initial_request_body
+          create_sse_connection.get(@url) do |req|
+            headers = build_headers
+            headers.each { |key, value| req.headers[key] = value }
+            setup_streaming_callback(req, buffer, request_id, response_queue)
+          end
+        end
+
+        def create_sse_connection
+          Faraday.new do |f|
+            f.options.timeout = @request_timeout / 1000
+            f.response :raise_error
+          end
+        end
+
+        def setup_streaming_callback(request, buffer, request_id, response_queue)
+          # Process the initial request body
+          process_sse_events(buffer) do |event_data|
+            process_sse_event_result(event_data, request_id, response_queue)
+          end
+
+          # Set up the streaming callback
+          request.options.on_data = proc do |chunk, _size, _env|
+            buffer << chunk
+            RubyLLM::MCP.logger.error("Processing SSE chunk: #{chunk}")
+            process_sse_events(buffer) do |event_data|
+              process_sse_event_result(event_data, request_id, response_queue)
             end
-          rescue StandardError => e
-            puts "Error processing SSE stream: #{e.message}"
           end
         end
 
@@ -259,7 +287,7 @@ module RubyLLM
                   event_data = JSON.parse(event_buffer)
                   yield event_data
                 rescue JSON::ParserError
-                  puts "Warning: Failed to parse SSE event data: #{event_buffer}"
+                  RubyLLM::MCP.logger.warn "Warning: Failed to parse SSE event data: #{event_buffer}"
                 end
                 event_buffer = ""
               end
@@ -275,12 +303,6 @@ module RubyLLM
           end
         end
 
-        def handle_server_message(message)
-          # Handle server-initiated requests and notifications
-          # This would typically be passed to a message handler
-          puts "Received server message: #{message.inspect}"
-        end
-
         def wait_for_response_with_timeout(request_id, response_queue)
           Timeout.timeout(@request_timeout / 1000) do
             response_queue.pop
@@ -288,7 +310,8 @@ module RubyLLM
         rescue Timeout::Error
           @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
           raise RubyLLM::MCP::Errors::TimeoutError.new(
-            message: "Request timed out after #{@request_timeout / 1000} seconds"
+            message: "Request timed out after #{@request_timeout / 1000} seconds",
+            request_id: request_id
           )
         end
       end

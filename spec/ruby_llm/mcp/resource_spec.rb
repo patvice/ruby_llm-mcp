@@ -138,6 +138,11 @@ RSpec.describe RubyLLM::MCP::Resource do
         end
       end
 
+      describe "resource_subscription" do
+        it "can subscribe to a resource and mark it as dirty if changed" do
+        end
+      end
+
       describe "refresh_functionality" do
         it "can refresh resource list" do
           resources1 = client.resources

@@ -15,7 +15,7 @@ module RubyLLM
             jsonrpc: "2.0",
             method: "initialize",
             params: {
-              protocolVersion: @client.protocol_version,
+              protocolVersion: coordinator.protocol_version,
               capabilities: {},
               clientInfo: {
                 name: "RubyLLM-MCP Client",

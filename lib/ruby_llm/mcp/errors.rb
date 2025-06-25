@@ -44,6 +44,8 @@ module RubyLLM
           super(message: message)
         end
       end
+
+      class TransportError < BaseError; end
     end
   end
 end

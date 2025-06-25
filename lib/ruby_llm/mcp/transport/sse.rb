@@ -90,7 +90,8 @@ module RubyLLM
           rescue Timeout::Error
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             raise RubyLLM::MCP::Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds"
+              message: "Request timed out after #{@request_timeout / 1000} seconds",
+              request_id: request_id
             )
           end
         end

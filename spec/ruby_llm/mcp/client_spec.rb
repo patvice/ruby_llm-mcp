@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "stringio"
+
 RSpec.describe RubyLLM::MCP::Client do
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
     ClientRunner.build_client_runners(CLIENT_OPTIONS)
@@ -50,6 +52,35 @@ RSpec.describe RubyLLM::MCP::Client do
           expect(client.alive?).to be(true)
           client.restart!
           expect(client.alive?).to be(true)
+        end
+      end
+
+      describe "ping" do
+        it "can ping the client that hasn't been started yet" do
+          new_options = { start: false }.merge(options[:options])
+          new_client = RubyLLM::MCP::Client.new(**new_options)
+
+          ping = new_client.ping
+          expect(ping).to be(true)
+        end
+
+        it "can ping the client that is already started" do
+          ping = client.ping
+          expect(ping).to be(true)
+        end
+
+        it "ping a fake client that is not alive" do
+          new_client = RubyLLM::MCP::Client.new(
+            name: "fake-client",
+            transport_type: :streamable,
+            start: false,
+            config: {
+              url: "http://localhost:5555/mcp"
+            }
+          )
+
+          ping = new_client.ping
+          expect(ping).to be(false)
         end
       end
 
@@ -114,6 +145,47 @@ RSpec.describe RubyLLM::MCP::Client do
         it "returns specific prompt by name if available" do
           prompt = client.prompt("nonexistent")
           expect(prompt).to be_nil
+        end
+      end
+
+      describe "on_logging" do
+        it "sets the logging level on the MCP" do
+          is_called = false
+          client.on_logging(level: RubyLLM::MCP::Logging::DEBUG) do |notification|
+            expect(notification.params["level"]).to eq(RubyLLM::MCP::Logging::DEBUG)
+            expect(notification.params["logger"]).to eq("mcp")
+            expect(notification.params["data"]["message"]).to eq("Hello, world!")
+            is_called = true
+          end
+
+          client.tool("log_message").execute(message: "Hello, world!", level: "debug")
+          sleep 1
+
+          expect(is_called).to be(true)
+        end
+
+        it "logger is at a different level and not will output" do
+          is_called = false
+          client.on_logging(level: RubyLLM::MCP::Logging::WARNING) do
+            is_called = true
+          end
+
+          client.tool("log_message").execute(message: "Hello, world!", level: "debug")
+
+          expect(is_called).to be(false)
+        end
+
+        it "sets the logging level to default" do
+          is_called = false
+          client.on_logging do |notification|
+            is_called = true
+            expect(notification.params["level"]).to eq(RubyLLM::MCP::Logging::WARNING)
+            expect(notification.params["logger"]).to eq("mcp")
+            expect(notification.params["data"]["message"]).to eq("This is a warning")
+          end
+
+          client.tool("log_message").execute(message: "This is a warning", level: "warning")
+          expect(is_called).to be(true)
         end
       end
     end

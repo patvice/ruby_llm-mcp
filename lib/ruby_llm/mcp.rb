@@ -23,5 +23,21 @@ module RubyLLM
       require_relative "mcp/providers/anthropic/complex_parameter_support"
       require_relative "mcp/providers/gemini/complex_parameter_support"
     end
+
+    def configure
+      yield config
+    end
+
+    def config
+      @config ||= Configuration.new
+    end
+
+    def logger
+      @logger ||= config.logger || Logger.new(
+        RubyLLM::MCP.config.log_file,
+        progname: "RubyLLM::MCP",
+        level: RubyLLM::MCP.config.log_level
+      )
+    end
   end
 end

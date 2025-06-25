@@ -1,7 +1,20 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { logger as log } from "../logging.ts";
 import { z } from "zod";
 
+type LogLevel =
+  | "info"
+  | "error"
+  | "debug"
+  | "notice"
+  | "warning"
+  | "critical"
+  | "alert"
+  | "emergency";
+
 export function setupUtilityTools(server: McpServer) {
+  const raw_server = server.server;
+
   server.tool(
     "add",
     "Addes two numbers together",
@@ -37,6 +50,37 @@ export function setupUtilityTools(server: McpServer) {
         },
       ],
     })
+  );
+
+  server.tool(
+    "log_message",
+    "Logs a message",
+    {
+      message: z.string(),
+      level: z.string(),
+      logger: z.string().optional(),
+    },
+    async ({ message, level, logger }) => {
+      const validLevels = [
+        "info",
+        "error",
+        "debug",
+        "notice",
+        "warning",
+        "critical",
+        "alert",
+        "emergency",
+      ];
+      const logLevel: LogLevel = validLevels.includes(level)
+        ? (level as LogLevel)
+        : "info";
+
+      log(raw_server).log(message, logLevel, logger || "mcp");
+
+      return {
+        content: [{ type: "text", text: "Success!" }],
+      };
+    }
   );
 
   server.tool(

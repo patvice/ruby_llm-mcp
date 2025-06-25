@@ -2,6 +2,18 @@
 
 module RubyLLM
   module MCP
+    class Annotation
+      attr_reader :title, :read_only_hint, :destructive_hint, :idempotent_hint, :open_world_hint
+
+      def initialize(annotation)
+        @title = annotation["title"] || ""
+        @read_only_hint = annotation["readOnlyHint"] || false
+        @destructive_hint = annotation["destructiveHint"] || true
+        @idempotent_hint = annotation["idempotentHint"] || false
+        @open_world_hint = annotation["openWorldHint"] || true
+      end
+    end
+
     class Tool < RubyLLM::Tool
       attr_reader :name, :description, :parameters, :coordinator, :tool_response
 
@@ -12,6 +24,11 @@ module RubyLLM
         @name = tool_response["name"]
         @description = tool_response["description"].to_s
         @parameters = create_parameters(tool_response["inputSchema"])
+        @annotations = tool_response["annotations"] ? Annotation.new(tool_response["annotations"]) : nil
+      end
+
+      def display_name
+        "#{@coordinator.name}: #{@name}"
       end
 
       def execute(**params)
@@ -27,14 +44,14 @@ module RubyLLM
           return { error: error.to_s }
         end
 
-        if result.is_execution_error?
+        if result.execution_error?
           return { error: text_values }
         end
 
         if text_values.empty?
           create_content_for_message(result.value.dig("content", 0))
         else
-          create_content_for_message({ type: "text", text: text_values })
+          create_content_for_message({ "type" => "text", "text" => text_values })
         end
       end
 

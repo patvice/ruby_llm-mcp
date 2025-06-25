@@ -3,7 +3,7 @@
 module RubyLLM
   module MCP
     module Requests
-      class Ping
+      class Ping < Base
         def call
           coordinator.request(ping_body)
         end

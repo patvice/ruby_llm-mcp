@@ -62,7 +62,8 @@ module RubyLLM
           rescue Timeout::Error
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             raise RubyLLM::MCP::Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds"
+              message: "Request timed out after #{@request_timeout / 1000} seconds",
+              request_id: request_id
             )
           end
         end
@@ -134,7 +135,7 @@ module RubyLLM
         end
 
         def restart_process
-          puts "Process connection lost. Restarting..."
+          RubyLLM::MCP.logger.error "Process connection lost. Restarting..."
           start_process
         end
 
@@ -153,11 +154,11 @@ module RubyLLM
 
                 process_response(line.strip)
               rescue IOError, Errno::EPIPE => e
-                puts "Reader error: #{e.message}. Restarting in 1 second..."
+                RubyLLM::MCP.logger.error "Reader error: #{e.message}. Restarting in 1 second..."
                 sleep 1
                 restart_process if @running
               rescue StandardError => e
-                puts "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
+                RubyLLM::MCP.logger.error "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
                 sleep 1
               end
             end
@@ -178,12 +179,12 @@ module RubyLLM
                 line = @stderr.gets
                 next unless line && !line.strip.empty?
 
-                puts "STDERR: #{line.strip}"
+                RubyLLM::MCP.logger.info(line.strip)
               rescue IOError, Errno::EPIPE => e
-                puts "Stderr reader error: #{e.message}"
+                RubyLLM::MCP.logger.error "Stderr reader error: #{e.message}"
                 sleep 1
               rescue StandardError => e
-                puts "Error in stderr thread: #{e.message}"
+                RubyLLM::MCP.logger.error "Error in stderr thread: #{e.message}"
                 sleep 1
               end
             end

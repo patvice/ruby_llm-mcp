@@ -8,6 +8,7 @@ import { setupTools } from "./tools/index.js";
 import { setupResources } from "./resources/index.js";
 import { setupNotifications } from "./notifications/index.js";
 import { setupPrompts } from "./prompts/index.js";
+import { registerLogging } from "./logging.js";
 
 // Check for silent flag
 const isSilent =
@@ -209,6 +210,7 @@ function createServer(): McpServer {
     {
       capabilities: {
         completions: {},
+        logging: {},
       },
     }
   );
@@ -217,7 +219,8 @@ function createServer(): McpServer {
   setupTools(server);
   setupResources(server);
   setupPrompts(server);
-  // setupNotifications(server);
+  registerLogging(server);
+  setupNotifications(server);
 
   return server;
 }

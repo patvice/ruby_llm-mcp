@@ -6,7 +6,7 @@ module RubyLLM
       module Meta
         def merge_meta(body)
           meta = {}
-          meta.merge!(progress_token) if @coordinator.progress
+          meta.merge!(progress_token) unless @coordinator.handle_progress.nil?
 
           if meta.empty?
             body

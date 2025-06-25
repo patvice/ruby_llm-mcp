@@ -33,7 +33,7 @@ RSpec.describe RubyLLM::MCP::Completion do
 
           expect do
             template.complete("name", "A")
-          end.to raise_error(RubyLLM::MCP::Errors::CompletionNotAvailable)
+          end.to raise_error(RubyLLM::MCP::Errors::Capabilities::CompletionNotAvailable)
 
           client.capabilities.capabilities["completions"] = {}
         end
@@ -107,7 +107,7 @@ RSpec.describe RubyLLM::MCP::Completion do
 
           expect do
             prompt.complete("language", "Korean")
-          end.to raise_error(RubyLLM::MCP::Errors::CompletionNotAvailable)
+          end.to raise_error(RubyLLM::MCP::Errors::Capabilities::CompletionNotAvailable)
 
           client.capabilities.capabilities["completions"] = {}
         end

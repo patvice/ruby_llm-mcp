@@ -3,20 +3,20 @@
 module RubyLLM
   module MCP
     module Requests
-      class LoggingSetLogging
+      class LoggingSetLevel
         def initialize(coordinator, level:)
           @coordinator = coordinator
           @level = level
         end
 
         def call
-          coordinator.request(logging_set_logging_body)
+          @coordinator.request(logging_set_body)
         end
 
-        def logging_set_logging_body
+        def logging_set_body
           {
             jsonrpc: "2.0",
-            method: "logging/setLogging",
+            method: "logging/setLevel",
             params: {
               level: @level
             }

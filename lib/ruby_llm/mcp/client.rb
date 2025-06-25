@@ -7,23 +7,25 @@ module RubyLLM
     class Client
       extend Forwardable
 
-      attr_reader :name, :config, :transport_type, :request_timeout, :progress
+      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on
 
-      def initialize(name:, transport_type:, start: true, handle_progress: nil, request_timeout: 8000, config: {}) # rubocop:disable Metrics/ParameterLists
+      def initialize(name:, transport_type:, start: true, request_timeout: MCP.config.request_timeout, config: {})
         @name = name
         @config = config.merge(request_timeout: request_timeout)
         @transport_type = transport_type.to_sym
         @request_timeout = request_timeout
-        @handle_progress = handle_progress
 
         @coordinator = setup_coordinator
 
+        @on = {}
         @tools = {}
         @resources = {}
         @resource_templates = {}
         @prompts = {}
 
-        start_transport if start
+        @log_level = nil
+
+        @coordinator.start_transport if start
       end
 
       def_delegators :@coordinator, :alive?, :capabilities, :ping
@@ -83,7 +85,7 @@ module RubyLLM
       end
 
       def resource_templates(refresh: false)
-        return [] unless capabilities.resource_list?
+        return [] unless capabilities.resources_list?
 
         fetch(:resource_templates, refresh) do
           resource_templates = @coordinator.resource_template_list
@@ -124,12 +126,43 @@ module RubyLLM
         @prompts = {}
       end
 
-      def set_logging(level:)
-        @coordinator.set_logging(level: level)
+      def tracking_progress?
+        @on.key?(:progress) && !@on[:progress].nil?
       end
 
-      def tracking_progress?
-        !@handle_progress.nil?
+      def on_progress(&block)
+        @on[:progress] = block
+        self
+      end
+
+      def human_in_the_loop?
+        @on.key?(:human_in_the_loop) && !@on[:human_in_the_loop].nil?
+      end
+
+      def on_human_in_the_loop(&block)
+        @on[:human_in_the_loop] = block
+        self
+      end
+
+      def logging_handler_enabled?
+        @on.key?(:logging) && !@on[:logging].nil?
+      end
+
+      def logging_enabled?
+        !@log_level.nil?
+      end
+
+      def on_logging(level: Logging::WARNING, logger: nil, &block)
+        @coordinator.set_logging(level: level)
+
+        @on[:logging] = if block_given?
+                          block
+                        else
+                          lambda do |notification|
+                            @coordinator.default_process_logging_message(notification, logger: logger)
+                          end
+                        end
+        self
       end
 
       private
@@ -142,8 +175,11 @@ module RubyLLM
       end
 
       def fetch(cache_key, refresh)
-        instance_variable_set("@#{cache_key}", nil) if refresh
-        instance_variable_get("@#{cache_key}") || instance_variable_set("@#{cache_key}", yield)
+        instance_variable_set("@#{cache_key}", {}) if refresh
+        if instance_variable_get("@#{cache_key}").empty?
+          instance_variable_set("@#{cache_key}", yield)
+        end
+        instance_variable_get("@#{cache_key}")
       end
 
       def build_map(raw_data, klass)

@@ -4,6 +4,8 @@ module RubyLLM
   module MCP
     module Requests
       class ToolCall
+        include Meta
+
         def initialize(coordinator, name:, parameters: {})
           @coordinator = coordinator
           @name = name
@@ -11,7 +13,8 @@ module RubyLLM
         end
 
         def call
-          @coordinator.request(request_body)
+          body = merge_meta(request_body)
+          @coordinator.request(body)
         end
 
         private

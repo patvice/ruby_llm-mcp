@@ -6,7 +6,7 @@ module RubyLLM
       attr_reader :type, :params
 
       def initialize(response)
-        @type = response["type"]
+        @type = response["method"]
         @params = response["params"]
       end
     end
@@ -14,14 +14,13 @@ module RubyLLM
     class Result
       attr_reader :result, :error, :params, :id, :next_cursor
 
-      def initialize(response, progress_handler:)
+      def initialize(response)
         @response = response
         @id = response["id"]
         @result = response["result"]
         @params = response["params"]
         @method = response["method"]
         @error = response["error"] || {}
-        @progress_handler = progress_handler
 
         @result_is_error = response.dig("result", "isError") || false
         @next_cursor = response.dig("result", "nextCursor")
@@ -37,6 +36,10 @@ module RubyLLM
         Error.new(@error)
       end
 
+      def execution_error?
+        @result_is_error
+      end
+
       def raise_error!
         error = to_error
         message = "Response error: #{error}"
@@ -44,7 +47,7 @@ module RubyLLM
       end
 
       def matching_id?(request_id)
-        @id == request_id
+        @id&.to_s == request_id
       end
 
       def next_cursor?
@@ -56,7 +59,7 @@ module RubyLLM
       end
 
       def notification?
-        @method.include?("notifications")
+        @method&.include?("notifications") || false
       end
 
       def success?
@@ -69,6 +72,14 @@ module RubyLLM
 
       def error?
         !@error.empty?
+      end
+
+      def to_s
+        inspect
+      end
+
+      def inspect
+        "#<#{self.class.name}:0x#{object_id.to_s(16)} id: #{@id}, result: #{@result}, error: #{@error}, method: #{@method}, params: #{@params}>"
       end
     end
   end

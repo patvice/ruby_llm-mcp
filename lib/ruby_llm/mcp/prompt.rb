@@ -53,7 +53,8 @@ module RubyLLM
 
           Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
         else
-          raise Errors::Capabilities::CompletionNotAvailable.new(message: "Completion is not available for this MCP server")
+          message = "Completion is not available for this MCP server"
+          raise Errors::Capabilities::CompletionNotAvailable.new(message: message)
         end
       end
 
