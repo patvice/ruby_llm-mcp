@@ -33,7 +33,6 @@ module RubyLLM
           @running = true
           @last_event_ids = {}
 
-          # Initialize HTTP connection
           @connection = create_connection
         end
 
@@ -47,13 +46,9 @@ module RubyLLM
           request_id = body.is_a?(Hash) ? body["id"] : nil
           is_initialization = body.is_a?(Hash) && body["method"] == "initialize"
 
-          # Create a queue for this request's response if needed
           response_queue = setup_response_queue(request_id, wait_for_response)
-
-          # Send the HTTP request
           response = send_http_request(body, request_id, is_initialization: is_initialization)
 
-          # Handle different response types based on content
           handle_response(response, request_id, response_queue, wait_for_response)
         end
 
@@ -67,7 +62,6 @@ module RubyLLM
           @connection = nil
         end
 
-        # Set the negotiated protocol version after initialization
         def set_protocol_version(version)
           @protocol_version = version
         end
@@ -84,13 +78,11 @@ module RubyLLM
         def build_headers
           headers = @base_headers.dup
           headers["Mcp-Session-Id"] = @session_id if @session_id
-          # Add MCP-Protocol-Version header for all subsequent requests after initialization
           headers["MCP-Protocol-Version"] = @protocol_version if @protocol_version
           headers
         end
 
         def build_initialization_headers
-          # Initialization request should not include MCP-Protocol-Version header
           @base_headers.dup
         end
 
@@ -108,13 +100,11 @@ module RubyLLM
           headers = is_initialization ? build_initialization_headers : build_headers
           is_ping = body.is_a?(Hash) && body[:method] == "ping"
 
-          # For requests that might return streaming responses, we need to handle streaming
           @connection.post do |req|
             headers.each { |key, value| req.headers[key] = value }
             req.body = JSON.generate(body)
+            RubyLLM::MCP.logger.debug "Sending Request: #{req.body}"
 
-            # Set up streaming callback only for requests that might return streaming responses
-            # Skip for initialization, ping, and other simple request/response operations
             unless is_initialization || is_ping
               setup_post_streaming_callback(req, request_id)
             end
@@ -127,11 +117,9 @@ module RubyLLM
         def setup_post_streaming_callback(request, request_id)
           buffer = +""
           request.options.on_data = proc do |chunk, _size, env|
-            # Only process streaming data if the response is SSE
             if env[:response_headers]["content-type"]&.include?("text/event-stream")
               buffer << chunk
 
-              # Get the response queue from pending requests
               response_queue = nil
               @pending_mutex.synchronize do
                 response_queue = @pending_requests[request_id.to_s]
@@ -174,18 +162,14 @@ module RubyLLM
         end
 
         def handle_sse_response(response, request_id, response_queue, wait_for_response)
-          # Extract session ID from initial response if present
           extract_session_id(response)
 
-          # For POST responses that are streaming, the streaming is handled in the callback
-          # We just need to wait for the response if requested
           if wait_for_response && request_id
             wait_for_response_with_timeout(request_id.to_s, response_queue)
           end
         end
 
         def handle_json_response(response, request_id, response_queue, wait_for_response)
-          # Extract session ID from response if present
           extract_session_id(response)
 
           begin
@@ -272,30 +256,26 @@ module RubyLLM
             event_data = JSON.parse(raw_event[:data])
             result = RubyLLM::MCP::Result.new(event_data)
 
+            RubyLLM::MCP.logger.debug "Result Received: #{result.inspect}"
+
             # Store event ID for resumability
             if raw_event[:id]
               @last_event_ids[request_id] = raw_event[:id]
             end
 
-            # Handle notifications (always process regardless of request matching)
             if result.notification?
               coordinator.process_notification(result)
               return
             end
-
-            # Handle ping responses
             if result.ping?
               coordinator.ping_response(id: result.id)
               return
             end
 
-            # Handle responses matching our request (for request streams)
             if response_queue && result.matching_id?(request_id)
               response_queue.push(result)
-              # Clean up the request from pending_requests once we get the final response
               @pending_mutex.synchronize { @pending_requests.delete(request_id) }
             elsif result.request?
-              # Server-initiated request during stream
               coordinator.process_request(result)
             end
           rescue JSON::ParserError => e
@@ -306,7 +286,6 @@ module RubyLLM
         def wait_for_response_with_timeout(request_id, response_queue)
           Timeout.timeout(@request_timeout / 1000) do
             result = response_queue.pop
-            # Request cleanup is handled in process_sse_event_data when we get the response
             result
           end
         rescue Timeout::Error

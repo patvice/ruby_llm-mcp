@@ -10,7 +10,7 @@ module RubyLLM
         end
 
         def call
-          coordinator.request(resources_subscribe_body, wait_for_response: false)
+          @coordinator.request(resources_subscribe_body, wait_for_response: false)
         end
 
         private

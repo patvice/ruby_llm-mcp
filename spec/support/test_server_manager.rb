@@ -14,13 +14,10 @@ class TestServerManager
       return if server_pid
 
       begin
-        puts "Starting test MCP server..."
         self.server_pid = spawn(COMMAND, ARGS, "--", *FLAGS)
         Process.detach(server_pid)
 
-        # Give the server a moment to start up
-        sleep 1
-        puts "Test MCP server started with PID: #{server_pid}"
+        sleep 0.5
       rescue StandardError => e
         puts "Failed to start test server: #{e.message}"
         raise
@@ -31,13 +28,11 @@ class TestServerManager
       return unless server_pid
 
       begin
-        puts "Stopping test MCP server with PID: #{server_pid}"
         Process.kill("TERM", server_pid)
         Process.wait(server_pid)
-        puts "Test MCP server stopped"
       rescue Errno::ESRCH, Errno::ECHILD
         # Process already dead or doesn't exist
-        puts "Test MCP server was already stopped"
+        # puts "Test MCP server was already stopped"
       rescue StandardError => e
         puts "Warning: Failed to cleanly shutdown test server: #{e.message}"
       ensure

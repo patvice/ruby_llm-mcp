@@ -42,6 +42,17 @@ RSpec.describe RubyLLM::MCP::Tool do
           expect(tools).to be_a(RubyLLM::MCP::Tool)
           expect(tools.name).to eq("add")
         end
+
+        it "listences to tool list updates notifications" do
+          tools_count = client.tools.count
+          tool = client.tool("upgrade_auth")
+          result = tool.execute(permission: "read")
+          puts result.inspect
+
+          client.resources
+
+          expect(client.tools.count).to eq(tools_count + 1)
+        end
       end
 
       describe "tool_call" do

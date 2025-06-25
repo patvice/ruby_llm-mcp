@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "securerandom"
+
 module RubyLLM
   module MCP
     module Requests
@@ -8,11 +10,9 @@ module RubyLLM
           meta = {}
           meta.merge!(progress_token) if @coordinator.client.tracking_progress?
 
-          if meta.empty?
-            body
-          else
-            body.merge({ "_meta" => meta })
-          end
+          body[:params] ||= {}
+          body[:params].merge!({ _meta: meta }) unless meta.empty?
+          body
         end
 
         private
@@ -22,7 +22,7 @@ module RubyLLM
         end
 
         def generate_progress_token
-          SecureRandom.hex(16)
+          SecureRandom.uuid
         end
       end
     end

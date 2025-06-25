@@ -45,7 +45,9 @@ module RubyLLM
           end
 
           begin
-            @stdin.puts(JSON.generate(body))
+            body = JSON.generate(body)
+            RubyLLM::MCP.logger.debug "Sending Request: #{body}"
+            @stdin.puts(body)
             @stdin.flush
           rescue IOError, Errno::EPIPE => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
@@ -198,20 +200,21 @@ module RubyLLM
           request_id = response["id"]&.to_s
           result = RubyLLM::MCP::Result.new(response)
 
+          RubyLLM::MCP.logger.debug "Result Received: #{result.inspect}"
+          # Handle notifications (process but don't return - continue processing other responses)
           if result.notification?
             coordinator.process_notification(result)
-            return
-          end
-
-          if result.ping?
+            # Don't return here - continue to process potential tool responses
+          elsif result.ping?
             coordinator.ping_response(id: result.id)
-            return
-          end
-
-          @pending_mutex.synchronize do
-            if result.matching_id?(request_id) && @pending_requests.key?(request_id)
-              response_queue = @pending_requests.delete(request_id)
-              response_queue&.push(result)
+            nil
+          else
+            # Handle regular responses (tool calls, etc.)
+            @pending_mutex.synchronize do
+              if result.matching_id?(request_id) && @pending_requests.key?(request_id)
+                response_queue = @pending_requests.delete(request_id)
+                response_queue&.push(result)
+              end
             end
           end
         rescue JSON::ParserError => e

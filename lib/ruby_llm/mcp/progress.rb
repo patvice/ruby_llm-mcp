@@ -3,10 +3,11 @@
 module RubyLLM
   module MCP
     class Progress
-      attr_reader :progress_token, :progress, :total, :message
+      attr_reader :progress_token, :progress, :total, :message, :client
 
       def initialize(coordinator, progress_handler, progress_data)
         @coordinator = coordinator
+        @client = coordinator.client
         @progress_handler = progress_handler
 
         @progress_token = progress_data["progressToken"]
@@ -16,7 +17,7 @@ module RubyLLM
       end
 
       def execute_progress_handler
-        @progress_handler.call(self, @coordinator)
+        @progress_handler&.call(self)
       end
 
       def to_h

@@ -211,6 +211,9 @@ function createServer(): McpServer {
       capabilities: {
         completions: {},
         logging: {},
+        resources: {
+          subscribe: true,
+        },
       },
     }
   );

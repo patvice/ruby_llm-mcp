@@ -363,6 +363,67 @@ prompt = client.prompt("daily_greeting", refresh: true)
 template = client.resource_template("user_logs", refresh: true)
 ```
 
+## Notifications
+
+MCPs can produce notifications that happen in an async nature outside normal calls to the MCP server.
+
+### Logging Notifications
+
+MCPs can produce logging notifications for long-running tool operations. Logging notifications allow tools to send real-time updates about their execution status.
+
+```ruby
+client.on_logging do |logging|
+  puts "Logging: #{logging.level} - #{logging.message}"
+end
+
+# Execute a tool that supports logging notifications
+tool = client.tool("long_running_operation")
+result = tool.execute(operation: "data_processing")
+
+# Logging: info - Processing data...
+# Logging: info - Processing data...
+# Logging: warning - Something went wrong but not major...
+```
+
+Different levels of logging are supported:
+
+```ruby
+client.on_logging(RubyLLM::MCP::Logging::WARNING) do |logging|
+  puts "Logging: #{logging.level} - #{logging.message}"
+end
+
+# Execute a tool that supports logging notifications
+tool = client.tool("long_running_operation")
+result = tool.execute(operation: "data_processing")
+
+# Logging: warning - Something went wrong but not major...
+```
+
+### Progress Notifications
+
+MCPs can produce progress notifications for long-running tool operations. Progress notifications allow tools to send real-time updates about their execution status.
+
+**Note:** that we only support progress notifications for tool calls today.
+
+```ruby
+# Set up progress tracking
+client.on_progress do |progress|
+  puts "Progress: #{progress.progress}% - #{progress.message}"
+end
+
+# Execute a tool that supports progress notifications
+tool = client.tool("long_running_operation")
+result = tool.execute(operation: "data_processing")
+
+# Progress 25% - Processing data...
+# Progress 50% - Processing data...
+# Progress 75% - Processing data...
+# Progress 100% - Processing data...
+puts result
+
+# Result: { status: "success", data: "Processed data" }
+```
+
 ## Transport Types
 
 ### SSE (Server-Sent Events)

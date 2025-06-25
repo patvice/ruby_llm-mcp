@@ -87,7 +87,7 @@ module RubyLLM
       end
 
       def inspect
-        "#<#{self.class.name}:0x#{object_id.to_s(16)} id: #{@id}, result: #{@result}, error: #{@error}, method: #{@method}, params: #{@params}>"
+        "#<#{self.class.name}:0x#{object_id.to_s(16)} id: #{@id}, result: #{@result}, error: #{@error}, method: #{@method}, params: #{@params}>" # rubocop:disable Layout/LineLength
       end
     end
   end

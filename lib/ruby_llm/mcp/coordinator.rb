@@ -24,10 +24,7 @@ module RubyLLM
       end
 
       def request(body, **options)
-        RubyLLM::MCP.logger.info("Request #{client.name}: body: #{body} options: #{options}")
-        result = @transport.request(body, **options)
-        RubyLLM::MCP.logger.info("Response #{client.name}: result: #{result}")
-        result
+        @transport.request(body, **options)
       rescue RubyLLM::MCP::Errors::TimeoutError => e
         if @transport.alive?
           cancelled_notification(reason: "Request timed out", request_id: e.request_id)
@@ -93,7 +90,7 @@ module RubyLLM
         when "notifications/resources/list_changed"
           client.reset_resources!
         when "notifications/resources/updated"
-          uri = notification["params"]["uri"]
+          uri = notification.params["uri"]
           resource = client.resources.find { |r| r.uri == uri }
           resource&.reset_content!
         when "notifications/prompts/list_changed"
@@ -112,12 +109,8 @@ module RubyLLM
 
       def process_request(result)
         # Handle server-initiated requests
-        # For now, log the request - in a full implementation you might
-        # want to route these to specific handlers based on the method
+        # Currently, we do not support any client operations but will
         RubyLLM::MCP.logger.info("Received server-initiated request: #{result.inspect}")
-
-        # TODO: Implement proper request handling based on method type
-        # This could include responding to server requests appropriately
       end
 
       def initialize_request

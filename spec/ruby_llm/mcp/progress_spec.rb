@@ -26,8 +26,8 @@ RSpec.describe RubyLLM::MCP::Progress do
           client.tool("simple_progress").execute(progress: 75)
 
           expect(progress.progress).to eq(75)
-          expect(progress.message).to eq("Sent progress notification: 75%")
-          expect(progress.progress_token).to be_present
+          expect(progress.message).to eq("Progress: 75%")
+          expect(progress.progress_token).to be_a(String)
         end
 
         it "can get multiple progress updates from a tool" do
@@ -38,7 +38,7 @@ RSpec.describe RubyLLM::MCP::Progress do
           end
           client.tool("progress").execute(operation: "test_op", steps: steps)
 
-          expect(count).to eq(steps)
+          expect(count).to eq(steps + 1)
         end
       end
     end

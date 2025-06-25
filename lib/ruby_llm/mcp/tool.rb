@@ -37,13 +37,12 @@ module RubyLLM
           parameters: params
         )
 
-        text_values = result.value["content"].map { |content| content["text"] }.compact.join("\n")
-
         if result.error?
           error = result.to_error
           return { error: error.to_s }
         end
 
+        text_values = result.value["content"].map { |content| content["text"] }.compact.join("\n")
         if result.execution_error?
           return { error: text_values }
         end

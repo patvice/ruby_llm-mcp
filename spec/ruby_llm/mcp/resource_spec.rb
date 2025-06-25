@@ -140,6 +140,18 @@ RSpec.describe RubyLLM::MCP::Resource do
 
       describe "resource_subscription" do
         it "can subscribe to a resource and mark it as dirty if changed" do
+          resource = client.resource("plain_text.txt")
+          expect(resource.content).to eq("Plan text information")
+
+          resource.subscribe!
+
+          tool = client.tool("changes_plain_text_resource")
+          tool.execute
+
+          expect(resource.content).to eq("New text information")
+
+          tool = client.tool("changes_plain_text_resource")
+          tool.execute
         end
       end
 
