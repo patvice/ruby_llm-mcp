@@ -62,6 +62,14 @@ module RubyLLM
         @method&.include?("notifications") || false
       end
 
+      def request?
+        @method && !@method.include?("notifications") && !@result && @error.none?
+      end
+
+      def response?
+        @id && (@result || @error.any?) && !@method
+      end
+
       def success?
         !@result.empty?
       end

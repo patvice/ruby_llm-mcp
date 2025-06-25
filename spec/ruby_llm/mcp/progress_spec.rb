@@ -1,12 +1,46 @@
 # frozen_string_literal: true
 
 RSpec.describe RubyLLM::MCP::Progress do
-  let(:coordinator) { RubyLLM::MCP::Coordinator.new(client, transport_type: :stdio, handle_progress: nil) }
-  let(:client) { RubyLLM::MCP::Client.new(coordinator) }
+  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    ClientRunner.build_client_runners(CLIENT_OPTIONS)
+    ClientRunner.start_all
+  end
 
-  describe "#initialize" do
-    it "can initialize a progress object" do
-      progress = RubyLLM::MCP::Progress.new(coordinator, handle_progress: nil)
+  after(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    ClientRunner.stop_all
+  end
+
+  CLIENT_OPTIONS.each do |options|
+    context "with #{options[:name]}" do
+      let(:client) do
+        ClientRunner.client_runners[options[:name]].client
+      end
+
+      describe "basic tool execution" do
+        it "can get progress from a tool" do
+          progress = nil
+          client.on_progress do |progress_update|
+            progress = progress_update
+          end
+
+          client.tool("simple_progress").execute(progress: 75)
+
+          expect(progress.progress).to eq(75)
+          expect(progress.message).to eq("Sent progress notification: 75%")
+          expect(progress.progress_token).to be_present
+        end
+
+        it "can get multiple progress updates from a tool" do
+          steps = 3
+          count = 0
+          client.on_progress do
+            count += 1
+          end
+          client.tool("progress").execute(operation: "test_op", steps: steps)
+
+          expect(count).to eq(steps)
+        end
+      end
     end
   end
 end

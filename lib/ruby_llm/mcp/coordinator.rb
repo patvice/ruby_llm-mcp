@@ -9,14 +9,12 @@ module RubyLLM
       PV_2024_11_05 = "2024-11-05"
 
       attr_reader :client, :transport_type, :config, :request_timeout, :headers, :transport, :initialize_response,
-                  :capabilities, :protocol_version, :handle_progress
+                  :capabilities, :protocol_version
 
-      def initialize(client, transport_type:, handle_progress:, config: {})
+      def initialize(client, transport_type:, config: {})
         @client = client
         @transport_type = transport_type
         @config = config
-
-        @handle_progress = handle_progress
 
         @protocol_version = PROTOCOL_VERSION
         @headers = config[:headers] || {}
@@ -41,8 +39,16 @@ module RubyLLM
         build_transport
 
         initialize_response = initialize_request
-        puts "initialize_response: #{initialize_response.inspect}"
         initialize_response.raise_error! if initialize_response.error?
+
+        # Extract and store the negotiated protocol version
+        negotiated_version = initialize_response.value["protocolVersion"]
+        @protocol_version = negotiated_version if negotiated_version
+
+        # Set the protocol version on the transport for subsequent requests
+        if @transport.respond_to?(:set_protocol_version)
+          @transport.set_protocol_version(@protocol_version)
+        end
 
         @capabilities = RubyLLM::MCP::Capabilities.new(initialize_response.value["capabilities"])
         initialize_notification
@@ -102,6 +108,16 @@ module RubyLLM
           message = "Unknown notification type: #{notification.type} params:#{notification.params.to_h}"
           raise Errors::UnknownNotification.new(message: message)
         end
+      end
+
+      def process_request(result)
+        # Handle server-initiated requests
+        # For now, log the request - in a full implementation you might
+        # want to route these to specific handlers based on the method
+        RubyLLM::MCP.logger.info("Received server-initiated request: #{result.inspect}")
+
+        # TODO: Implement proper request handling based on method type
+        # This could include responding to server requests appropriately
       end
 
       def initialize_request
@@ -184,8 +200,8 @@ module RubyLLM
         RubyLLM::MCP::Requests::CancelledNotification.new(self, **args).call
       end
 
-      def ping_response
-        RubyLLM::MCP::Requests::PingResponse.new(self).call
+      def ping_response(id: nil)
+        RubyLLM::MCP::Requests::PingResponse.new(self, id: id).call
       end
 
       def set_logging(level:)
@@ -252,12 +268,9 @@ module RubyLLM
       private
 
       def process_progress_message(notification)
-        progress_obj = Progress.new(self, @handle_progress, notification["params"])
-        if progress
+        progress_obj = RubyLLM::MCP::Progress.new(self, client.on[:progress], notification.params)
+        if client.tracking_progress?
           progress_obj.execute_progress_handler
-        else
-          message = "No progress handler configured, but received progress notification. progress: #{progress_obj.to_h}"
-          raise Errors::ProgressHandlerNotAvailable.new(message: message)
         end
       end
     end

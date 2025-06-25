@@ -72,15 +72,6 @@ export function logger(server: Server) {
   return {
     logLevel,
     log: (message: string, level: LogLevel, logger: string) => {
-      console.error(
-        "Sending logging message",
-        "shouldLog",
-        shouldLog(level),
-        level,
-        logger,
-        message
-      );
-
       if (shouldLog(level)) {
         server.sendLoggingMessage({
           level: level,
@@ -95,4 +86,62 @@ export function logger(server: Server) {
       logLevel = level as LogLevel;
     },
   };
+}
+
+/**
+ * Unified logging function that works for both stdio and streamable transports
+ * @param server - The raw MCP server instance
+ * @param message - The message to log
+ * @param level - The log level
+ * @param loggerName - The logger name (defaults to "mcp")
+ * @param sendNotification - Optional sendNotification function from tool execution context (for streamable transport)
+ */
+export async function logMessage(
+  server: Server,
+  message: string,
+  level: LogLevel,
+  loggerName: string = "mcp",
+  sendNotification?: (notification: any) => Promise<void>
+) {
+  // Only log if the level meets the threshold
+  if (!shouldLog(level)) {
+    return;
+  }
+
+  if (sendNotification) {
+    // For Streamable HTTP transport, send notification through tool execution context
+    await sendNotification({
+      method: "notifications/message",
+      params: {
+        level: level,
+        logger: loggerName,
+        data: {
+          message: message,
+        },
+      },
+    });
+  } else {
+    // For stdio transport, use the regular server logging
+    server.sendLoggingMessage({
+      level: level,
+      logger: loggerName,
+      data: {
+        message: message,
+      },
+    });
+  }
+}
+
+/**
+ * Get the current log level
+ */
+export function getCurrentLogLevel(): LogLevel {
+  return logLevel;
+}
+
+/**
+ * Check if a message should be logged at the given level
+ */
+export function shouldLogLevel(level: LogLevel): boolean {
+  return shouldLog(level);
 }

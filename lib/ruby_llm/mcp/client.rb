@@ -170,7 +170,6 @@ module RubyLLM
       def setup_coordinator
         Coordinator.new(self,
                         transport_type: @transport_type,
-                        handle_progress: @handle_progress,
                         config: @config)
       end
 

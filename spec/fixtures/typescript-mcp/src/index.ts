@@ -227,6 +227,26 @@ function createServer(): McpServer {
 
 // Main MCP endpoint - handles all HTTP methods (GET, POST, DELETE)
 app.all("/mcp", async (req, res) => {
+  // WORKAROUND: Custom ping handling required due to TypeScript SDK limitation
+  // The MCP specification states that ping should work before initialization,
+  // but the SDK's Streamable HTTP transport requires session management which
+  // blocks ping requests without a session. This is a known issue similar to
+  // Python SDK issue #423: https://github.com/modelcontextprotocol/python-sdk/issues/423
+  //
+  // VERIFIED: TypeScript SDK shows "Server not initialized" error (same issue)
+  if (req.method === "POST" && req.body && req.body.method === "ping") {
+    log(`🏓 Processing ping request (SDK workaround) - ID: ${req.body.id}`);
+
+    const pingResponse = {
+      jsonrpc: "2.0",
+      id: req.body.id,
+      result: {},
+    };
+
+    res.status(200).json(pingResponse);
+    return;
+  }
+
   const sessionId = req.headers["mcp-session-id"] as string;
 
   let transport = transports[sessionId];

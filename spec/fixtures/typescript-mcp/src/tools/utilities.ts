@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { logger as log } from "../logging.ts";
+import { logMessage } from "../logging.ts";
 import { z } from "zod";
 
 type LogLevel =
@@ -29,11 +29,9 @@ export function setupUtilityTools(server: McpServer) {
     "Returns the set environment variable",
     {},
     async () => {
-      const env = process.env;
-
-      const test_env = env.TEST_ENV;
+      const testEnv = process.env.TEST_ENV || "Not set";
       return {
-        content: [{ type: "text", text: `Test Env = ${test_env}` }],
+        content: [{ type: "text", text: `Test Env = ${testEnv}` }],
       };
     }
   );
@@ -60,7 +58,7 @@ export function setupUtilityTools(server: McpServer) {
       level: z.string(),
       logger: z.string().optional(),
     },
-    async ({ message, level, logger }) => {
+    async ({ message, level, logger }, { sendNotification }) => {
       const validLevels = [
         "info",
         "error",
@@ -75,7 +73,14 @@ export function setupUtilityTools(server: McpServer) {
         ? (level as LogLevel)
         : "info";
 
-      log(raw_server).log(message, logLevel, logger || "mcp");
+      // Use the centralized logging function that handles both transports
+      await logMessage(
+        raw_server,
+        message,
+        logLevel,
+        logger || "mcp",
+        sendNotification
+      );
 
       return {
         content: [{ type: "text", text: "Success!" }],
