@@ -70,7 +70,7 @@ end
 
 RubyLLM::MCP.configure do |config|
   config.log_file = $stdout
-  config.log_level = Logger::DEBUG
+  config.log_level = Logger::ERROR
   config.support_complex_parameters!
 end
 
@@ -87,23 +87,23 @@ FILESYSTEM_CLIENT = {
 }.freeze
 
 CLIENT_OPTIONS = [
-  # {
-  #   name: "stdio",
-  #   options: {
-  #     name: "stdio-server",
-  #     transport_type: :stdio,
-  #     config: {
-  #       command: "bun",
-  #       args: [
-  #         "spec/fixtures/typescript-mcp/index.ts",
-  #         "--stdio"
-  #       ],
-  #       env: {
-  #         "TEST_ENV" => "this_is_a_test"
-  #       }
-  #     }
-  #   }
-  # }
+  {
+    name: "stdio",
+    options: {
+      name: "stdio-server",
+      transport_type: :stdio,
+      config: {
+        command: "bun",
+        args: [
+          "spec/fixtures/typescript-mcp/index.ts",
+          "--stdio"
+        ],
+        env: {
+          "TEST_ENV" => "this_is_a_test"
+        }
+      }
+    }
+  },
   { name: "streamable",
     options: {
       name: "streamable-server",

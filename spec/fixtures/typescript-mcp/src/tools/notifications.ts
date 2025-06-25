@@ -2,7 +2,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { logMessage } from "../logging.ts";
 import { z } from "zod";
 
-import { data as textData } from "../resources/text.ts";
+import { data as resourceData } from "../resources/text.ts";
+import { data as promptData } from "../prompts/simple.ts";
 
 // Helper function to create a delay
 function sleep(ms: number): Promise<void> {
@@ -161,7 +162,7 @@ export function setupNotificationTools(server: McpServer) {
     "Reference a resource",
     {},
     async ({}, { sendNotification }) => {
-      textData.update();
+      resourceData.update();
 
       sendNotification({
         method: "notifications/resources/updated",
@@ -170,6 +171,42 @@ export function setupNotificationTools(server: McpServer) {
           title: "plain_text.txt",
         },
       });
+      return {
+        content: [{ type: "text", text: "Success!" }],
+      };
+    }
+  );
+
+  let tool = server.tool(
+    "enable_resource",
+    "Enable a resource",
+    {},
+    async ({}) => {
+      return {
+        content: [{ type: "text", text: "Success!" }],
+      };
+    }
+  );
+  tool.remove();
+
+  server.tool(
+    "send_list_changed",
+    "List changed",
+    { type: z.enum(["tools", "resources", "prompts"]) },
+    async ({ type }, { sendNotification }) => {
+      sendNotification({
+        method: `notifications/${type}/list_changed`,
+        params: {},
+      });
+
+      if (type === "tools") {
+        tool.enable();
+      } else if (type === "resources") {
+        resourceData.enable();
+      } else if (type === "prompts") {
+        promptData.enable();
+      }
+
       return {
         content: [{ type: "text", text: "Success!" }],
       };

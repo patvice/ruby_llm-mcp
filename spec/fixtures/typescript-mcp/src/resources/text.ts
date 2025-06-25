@@ -30,16 +30,16 @@ export let data = {
       toggle = 0;
     }
   },
-  updateResource: () => {
+  enable: () => {
     if (resource) {
-      resource.update({});
+      resource.enable();
     }
   },
   get: () => text,
 };
 
 export function setupTextResources(server: McpServer) {
-  resource = server.resource(
+  server.resource(
     "plain_text.txt",
     "file://plain_text.txt/",
     {
@@ -132,4 +132,19 @@ export function setupTextResources(server: McpServer) {
       };
     }
   );
+
+  resource = server.resource(
+    "disabled_resource",
+    "file://disabled_resource.txt/",
+    {
+      name: "resource_with_template.txt",
+    },
+    async (uri) => {
+      return {
+        contents: [{ uri: uri.href, text: "Disabled resource" }],
+      };
+    }
+  );
+
+  resource.disable();
 }

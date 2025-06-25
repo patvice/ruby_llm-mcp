@@ -1,4 +1,13 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import {
+  McpServer,
+  type RegisteredPrompt,
+} from "@modelcontextprotocol/sdk/server/mcp.js";
+
+let prompt: RegisteredPrompt;
+
+export const data = {
+  enable: () => prompt.enable(),
+};
 
 export function setupSimplePrompts(server: McpServer) {
   server.prompt(
@@ -51,4 +60,19 @@ export function setupSimplePrompts(server: McpServer) {
       },
     ],
   }));
+
+  prompt = server.prompt(
+    "disabled_prompt",
+    "This is a disabled prompt",
+    async () => ({
+      messages: [
+        {
+          role: "user",
+          content: { type: "text", text: "This is a disabled prompt" },
+        },
+      ],
+    })
+  );
+
+  prompt.disable();
 }

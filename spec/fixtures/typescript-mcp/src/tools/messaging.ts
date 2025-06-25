@@ -67,13 +67,17 @@ export function setupMessagingTools(server: McpServer) {
     "Upgrade authentication permissions",
     { permission: z.enum(["read", "write"]) },
     // Any mutations here will automatically emit `listChanged` notifications
-    async ({ permission }) => {
+    async ({ permission }, { sendNotification }) => {
       const { ok, err, previous } = await upgradeAuthAndStoreToken(permission);
       if (!ok) return { content: [{ type: "text", text: `Error: ${err}` }] };
 
       // If we previously had read-only access, 'putMessage' is now available
       if (previous === "read") {
         putMessageTool.enable();
+        sendNotification({
+          method: "notifications/tools/list_changed",
+          params: {},
+        });
       } else if (previous === "write") {
         // If we've just upgraded to 'write' permissions, we can still call 'upgradeAuth'
         // but can only upgrade to 'admin'.

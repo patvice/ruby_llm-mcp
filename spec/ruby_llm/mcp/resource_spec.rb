@@ -30,6 +30,14 @@ RSpec.describe RubyLLM::MCP::Resource do
           expect(resource.name).to eq("test.txt")
           expect(resource.uri).to eq("file://test.txt/")
         end
+
+        it "refreshes prompts when requested" do
+          tool = client.tool("send_list_changed")
+          resource_count = client.resources.count
+          tool.execute(type: "resources")
+
+          expect(client.resources.count).to eq(resource_count + 1)
+        end
       end
 
       describe "resource_content" do

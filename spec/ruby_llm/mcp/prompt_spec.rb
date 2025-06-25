@@ -16,6 +16,21 @@ RSpec.describe RubyLLM::MCP::Prompt do
         ClientRunner.client_runners[options[:name]].client
       end
 
+      describe "prompts" do
+        it "returns array of prompts" do
+          prompts = client.prompts
+          expect(prompts).to be_a(Array)
+        end
+
+        it "refreshes prompts when requested" do
+          tool = client.tool("send_list_changed")
+          prompt_count = client.prompts.count
+          tool.execute(type: "prompts")
+
+          expect(client.prompts.count).to eq(prompt_count + 1)
+        end
+      end
+
       describe "#execute_prompt" do
         it "returns prompt messages" do
           prompt = client.prompt("say_hello")
