@@ -6,7 +6,6 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 
 import { setupTools } from "./tools/index.js";
 import { setupResources } from "./resources/index.js";
-import { setupNotifications } from "./notifications/index.js";
 import { setupPrompts } from "./prompts/index.js";
 import { registerLogging } from "./logging.js";
 
@@ -223,7 +222,6 @@ function createServer(): McpServer {
   setupResources(server);
   setupPrompts(server);
   registerLogging(server);
-  setupNotifications(server);
 
   return server;
 }

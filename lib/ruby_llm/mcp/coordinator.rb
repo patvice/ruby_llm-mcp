@@ -131,9 +131,9 @@ module RubyLLM
           unless client.on[:human_in_the_loop].call(name, params)
             result = Result.new(
               {
-                result: {
-                  isError: true,
-                  error: "Tool execution was cancelled by the client"
+                "result" => {
+                  "isError" => true,
+                  "content" => [{ "type" => "text", "text" => "Tool call was cancelled by the client" }]
                 }
               }
             )

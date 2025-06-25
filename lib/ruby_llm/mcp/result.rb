@@ -12,7 +12,7 @@ module RubyLLM
     end
 
     class Result
-      attr_reader :result, :error, :params, :id, :next_cursor
+      attr_reader :result, :error, :params, :id, :next_cursor, :response
 
       def initialize(response)
         @response = response

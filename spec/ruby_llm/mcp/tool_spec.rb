@@ -123,7 +123,7 @@ RSpec.describe RubyLLM::MCP::Tool do
 
           # Test when tool returns an error
           result = error_tool.execute(shouldError: true)
-          expect(result).to eq({ error: "Error: Tool error" })
+          expect(result).to eq({ error: "Tool execution error: Error: Tool error" })
           expect(result.to_s).to include("Error: Tool error")
 
           # Test when tool doesn't return an error
@@ -144,6 +144,35 @@ RSpec.describe RubyLLM::MCP::Tool do
 
           expect(result).to be_a(RubyLLM::MCP::Content)
           expect(result.to_s).to include("Google")
+        end
+      end
+
+      describe "on_human_in_the_loop" do
+        it "calls a human in the loop and cancels the tool call if returns false" do
+          called = false
+          client.on_human_in_the_loop do |name, params|
+            called = true
+            name == "add" && params[:a] == 1 && params[:b] == 2
+          end
+
+          tool = client.tool("add")
+          result = tool.execute(a: 1, b: 2)
+          expect(result.to_s).to eq("3")
+          expect(called).to be(true)
+        end
+
+        it "calls a human in the loop and calls the tool if returns true" do
+          called = false
+          client.on_human_in_the_loop do |name, params|
+            called = true
+            name == "add" && params[:a] == 1 && params[:b] == 2
+          end
+
+          tool = client.tool("add")
+          result = tool.execute(a: 2, b: 2)
+          message = "Tool execution error: Tool call was cancelled by the client"
+          expect(result).to eq({ error: message })
+          expect(called).to be(true)
         end
       end
     end

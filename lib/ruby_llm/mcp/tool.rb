@@ -44,7 +44,7 @@ module RubyLLM
 
         text_values = result.value["content"].map { |content| content["text"] }.compact.join("\n")
         if result.execution_error?
-          return { error: text_values }
+          return { error: "Tool execution error: #{text_values}" }
         end
 
         if text_values.empty?
