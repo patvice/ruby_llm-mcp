@@ -12,9 +12,13 @@ module RubyLLM
         # Logging configuration
         @log_file = $stdout
         @log_level = ENV["RUBYLLM_MCP_DEBUG"] ? Logger::DEBUG : Logger::INFO
+        @has_support_complex_parameters = false
       end
 
       def support_complex_parameters!
+        return if @has_support_complex_parameters
+
+        @has_support_complex_parameters = true
         RubyLLM::MCP.support_complex_parameters!
       end
 
