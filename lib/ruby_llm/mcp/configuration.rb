@@ -3,7 +3,7 @@
 module RubyLLM
   module MCP
     class Configuration
-      attr_accessor :request_timeout, :logger, :log_file, :log_level
+      attr_accessor :request_timeout, :logger, :log_file, :log_level, :has_support_complex_parameters
 
       def initialize
         # Connection configuration

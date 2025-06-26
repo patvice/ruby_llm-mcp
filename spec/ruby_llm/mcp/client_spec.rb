@@ -22,6 +22,16 @@ RSpec.describe RubyLLM::MCP::Client do
       expect(first).to be_a(RubyLLM::MCP::Tool)
       client.stop
     end
+
+    it "calls start twice does not raise an error" do
+      options = { start: false }.merge(FILESYSTEM_CLIENT)
+      client = RubyLLM::MCP::Client.new(**options)
+      client.start
+
+      expect { client.start }.not_to raise_error
+
+      client.stop
+    end
   end
 
   CLIENT_OPTIONS.each do |options|
@@ -55,7 +65,7 @@ RSpec.describe RubyLLM::MCP::Client do
         end
       end
 
-      describe "ping" do
+      describe "ping server" do
         it "can ping the client that hasn't been started yet" do
           new_options = { start: false }.merge(options[:options])
           new_client = RubyLLM::MCP::Client.new(**new_options)
@@ -70,17 +80,16 @@ RSpec.describe RubyLLM::MCP::Client do
         end
 
         it "ping a fake client that is not alive" do
-          new_client = RubyLLM::MCP::Client.new(
-            name: "fake-client",
-            transport_type: :streamable,
-            start: false,
-            config: {
-              url: "http://localhost:5555/mcp"
-            }
-          )
-
           ping = new_client.ping
           expect(ping).to be(false)
+        end
+      end
+
+      describe "ping client" do
+        it "Server can ping the client to see if it's alive" do
+          tool = client.tool("ping_client")
+          result = tool.execute
+          expect(result.to_s).to eq("Ping successful")
         end
       end
 

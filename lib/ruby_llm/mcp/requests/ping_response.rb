@@ -10,7 +10,7 @@ module RubyLLM
         end
 
         def call
-          coordinator.request(ping_response_body, add_id: false, wait_for_response: false)
+          @coordinator.request(ping_response_body, add_id: false, wait_for_response: false)
         end
 
         private

@@ -32,6 +32,9 @@ module RubyLLM
       @config ||= Configuration.new
     end
 
+    alias configuration config
+    module_function :configuration
+
     def logger
       @logger ||= config.logger || Logger.new(
         RubyLLM::MCP.config.log_file,
