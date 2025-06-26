@@ -33,6 +33,14 @@ RSpec.describe RubyLLM::MCP::Client do
           expect(client.transport_type).to eq(options[:options][:transport_type])
           expect(client.capabilities).to be_a(RubyLLM::MCP::Capabilities)
         end
+
+        it "initializes with a custom request_timeout" do
+          merged_options = options[:options].merge(request_timeout: 15_000)
+          client = RubyLLM::MCP::Client.new(**merged_options)
+          expect(client.request_timeout).to eq(15_000)
+          expect(client.instance_variable_get(:@coordinator).transport.instance_variable_get(:@request_timeout)).to eq(15_000)
+          client.stop
+        end
       end
 
       describe "stop" do

@@ -12,9 +12,10 @@ module RubyLLM
       class SSE
         attr_reader :headers, :id
 
-        def initialize(url, headers: {})
+        def initialize(url, headers: {}, request_timeout: 8000)
           @event_url = url
           @messages_url = nil
+          @request_timeout = request_timeout
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
