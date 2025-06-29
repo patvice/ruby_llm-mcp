@@ -52,7 +52,7 @@ module RubyLLM
           rescue IOError, Errno::EPIPE => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             restart_process
-            raise "Failed to send request: #{e.message}"
+            raise RubyLLM::MCP::Errors::TransportError.new(message: e.message)
           end
 
           return unless wait_for_response
@@ -205,8 +205,8 @@ module RubyLLM
           if result.notification?
             coordinator.process_notification(result)
             # Don't return here - continue to process potential tool responses
-          elsif result.ping?
-            coordinator.ping_response(id: result.id)
+          elsif result.request?
+            coordinator.process_request(result)
             nil
           else
             # Handle regular responses (tool calls, etc.)

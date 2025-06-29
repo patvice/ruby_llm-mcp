@@ -42,5 +42,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "faraday-retry", ">= 1"
   spec.add_dependency "ruby_llm", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2"
+
+  # Optional dependency for enhanced HTTP performance
+  spec.add_dependency "httpx", "~> 1.5", ">= 1.5.1"
 end
 # rubocop:enable Metrics/BlockLength

@@ -108,9 +108,14 @@ module RubyLLM
       end
 
       def process_request(result)
+        if result.ping?
+          ping_response(id: result.id)
+          return
+        end
+
         # Handle server-initiated requests
         # Currently, we do not support any client operations but will
-        RubyLLM::MCP.logger.info("Received server-initiated request: #{result.inspect}")
+        raise RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type: #{result.inspect}")
       end
 
       def initialize_request
@@ -215,10 +220,10 @@ module RubyLLM
                                                           env: @config[:env],
                                                           coordinator: self)
         when :streamable
-          @transport = RubyLLM::MCP::Transport::Streamable.new(@config[:url],
-                                                               request_timeout: @config[:request_timeout],
-                                                               headers: @headers,
-                                                               coordinator: self)
+          @transport = RubyLLM::MCP::Transport::StreamableHTTP.new(@config[:url],
+                                                                   request_timeout: @config[:request_timeout],
+                                                                   headers: @headers,
+                                                                   coordinator: self)
         else
           message = "Invalid transport type: :#{transport_type}. Supported types are :sse, :stdio, :streamable"
           raise Errors::InvalidTransportType.new(message: message)

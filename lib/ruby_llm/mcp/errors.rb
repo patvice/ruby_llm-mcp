@@ -46,6 +46,8 @@ module RubyLLM
       end
 
       class TransportError < BaseError; end
+
+      class UnknownRequest < BaseError; end
     end
   end
 end

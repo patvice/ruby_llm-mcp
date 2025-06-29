@@ -79,7 +79,30 @@ RSpec.describe RubyLLM::MCP::Client do
           expect(ping).to be(true)
         end
 
-        it "ping a fake client that is not alive" do
+        it "ping a fake client that is not alive" do # rubocop:disable RSpec/ExampleLength
+          new_client = if options[:options][:transport_type] == :streamable
+                         RubyLLM::MCP::Client.new(
+                           start: false,
+                           name: "fake_client",
+                           transport_type: :streamable,
+                           config: {
+                             url: "http://localhost:12345"
+                           },
+                           request_timeout: 1000
+                         )
+                       else
+                         RubyLLM::MCP::Client.new(
+                           start: false,
+                           name: "fake_client",
+                           transport_type: :stdio,
+                           config: {
+                             command: "echo",
+                             args: ["Hello, world!"]
+                           },
+                           request_timeout: 1000
+                         )
+                       end
+
           ping = new_client.ping
           expect(ping).to be(false)
         end

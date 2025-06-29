@@ -17,9 +17,9 @@ module RubyLLM
       def initialize(response)
         @response = response
         @id = response["id"]
-        @result = response["result"]
-        @params = response["params"]
         @method = response["method"]
+        @result = response["result"] || {}
+        @params = response["params"] || {}
         @error = response["error"] || {}
 
         @result_is_error = response.dig("result", "isError") || false
@@ -63,7 +63,7 @@ module RubyLLM
       end
 
       def request?
-        @method && !@method.include?("notifications") && !@result && @error.none?
+        @method && !notification? && @result.none? && @error.none?
       end
 
       def response?

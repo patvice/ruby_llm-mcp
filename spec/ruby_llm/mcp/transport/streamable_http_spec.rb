@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RubyLLM::MCP::Transport::Streamable do
+RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
   let(:client) do
     RubyLLM::MCP::Client.new(
       name: "test-client",
@@ -21,6 +21,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       # If protocol version negotiation succeeds, the client should be alive
       expect(client).to be_alive
       expect(client.capabilities).to be_a(RubyLLM::MCP::Capabilities)
+
+      client.stop
     end
 
     it "can access protocol version through private coordinator for verification" do
@@ -31,6 +33,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       expect(coordinator.protocol_version).to be_a(String)
       expect(coordinator.protocol_version).to match(/\d{4}-\d{2}-\d{2}/)
       expect(coordinator.protocol_version).to eq("2025-03-26")
+
+      client.stop
     end
   end
 
@@ -48,6 +52,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
 
       prompts = client.prompts
       expect(prompts).to be_an(Array)
+
+      client.stop
     end
 
     it "can execute tools successfully with proper headers" do
@@ -60,6 +66,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       result = tool.execute(a: 5, b: 3)
       expect(result).to be_a(RubyLLM::MCP::Content)
       expect(result.to_s).to eq("8")
+
+      client.stop
     end
 
     it "maintains consistent communication across multiple operations" do
@@ -75,6 +83,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       result = add_tool.execute(a: 10, b: 20)
       expect(result).to be_a(RubyLLM::MCP::Content)
       expect(result.to_s).to eq("30")
+
+      client.stop
     end
   end
 
@@ -86,6 +96,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       coordinator = client.instance_variable_get(:@coordinator)
       transport = coordinator.transport
       expect(transport).to respond_to(:set_protocol_version)
+
+      client.stop
     end
 
     it "protocol version is correctly set on transport" do
@@ -97,6 +109,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
 
       # The transport should have a protocol version set
       expect(transport.instance_variable_get(:@protocol_version)).to eq("2025-03-26")
+
+      client.stop
     end
   end
 
@@ -107,6 +121,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       # Basic functionality should work indicating proper header handling
       expect(client).to be_alive
       expect(client.ping).to be(true)
+
+      client.stop
     end
 
     it "supports the negotiated protocol version features" do
@@ -115,6 +131,8 @@ RSpec.describe RubyLLM::MCP::Transport::Streamable do
       # Test capabilities that should be available with the protocol version
       expect(client.capabilities.tools_list?).to be(true)
       expect(client.capabilities.resources_list?).to be(true)
+
+      client.stop
     end
   end
 end
