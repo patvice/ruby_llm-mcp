@@ -42,7 +42,7 @@ RSpec.describe RubyLLM::MCP::Prompt do
           expect(messages.first.content).to eq("Hello, how are you? Can you also say Hello back?")
         end
 
-        it "returns multiple messages" do # rubocop:disable RSpec/MultipleExpectations,RSpec/ExampleLength
+        it "returns multiple messages" do # rubocop:disable RSpec/MultipleExpectations
           prompt = client.prompt("multiple_messages")
           messages = prompt.fetch
 

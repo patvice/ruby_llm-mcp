@@ -218,7 +218,7 @@ module RubyLLM
             end
           end
         rescue JSON::ParserError => e
-          RubyLLM.logger.error("Error parsing response as JSON: #{e.message}\nRaw response: #{line}")
+          RubyLLM::MCP.logger.error("Error parsing response as JSON: #{e.message}\nRaw response: #{line}")
         end
       end
     end

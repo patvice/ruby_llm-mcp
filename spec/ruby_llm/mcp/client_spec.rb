@@ -79,7 +79,11 @@ RSpec.describe RubyLLM::MCP::Client do
           expect(ping).to be(true)
         end
 
-        it "ping a fake client that is not alive" do # rubocop:disable RSpec/ExampleLength
+        it "ping a fake client that is not alive" do
+          buffer = StringIO.new
+          old_logger = RubyLLM::MCP.config.logger
+          RubyLLM::MCP.config.logger = Logger.new(buffer)
+
           new_client = if options[:options][:transport_type] == :streamable
                          RubyLLM::MCP::Client.new(
                            start: false,
@@ -104,6 +108,7 @@ RSpec.describe RubyLLM::MCP::Client do
                        end
 
           ping = new_client.ping
+          RubyLLM::MCP.config.logger = old_logger
           expect(ping).to be(false)
         end
       end
@@ -128,6 +133,20 @@ RSpec.describe RubyLLM::MCP::Client do
           tools2 = client.tools(refresh: true)
           expect(tools1.map(&:name)).to eq(tools2.map(&:name))
         end
+
+        context "with capabilities" do
+          it "returns empty array when tools_list capability is disabled" do
+            allow(client.capabilities).to receive(:tools_list?).and_return(false)
+            expect(client.tools).to eq([])
+          end
+
+          it "returns tools when tools_list capability is enabled" do
+            allow(client.capabilities).to receive(:tools_list?).and_return(true)
+            tools = client.tools
+            expect(tools).to be_a(Array)
+            expect(tools).not_to be_empty
+          end
+        end
       end
 
       describe "tool" do
@@ -150,6 +169,20 @@ RSpec.describe RubyLLM::MCP::Client do
           resources2 = client.resources(refresh: true)
           expect(resources1.map(&:name)).to eq(resources2.map(&:name))
         end
+
+        context "with capabilities" do
+          it "returns empty array when resources_list capability is disabled" do
+            allow(client.capabilities).to receive(:resources_list?).and_return(false)
+            expect(client.resources).to eq([])
+          end
+
+          it "returns resources when resources_list capability is enabled" do
+            allow(client.capabilities).to receive(:resources_list?).and_return(true)
+            resources = client.resources
+            expect(resources).to be_a(Array)
+            expect(resources).not_to be_empty
+          end
+        end
       end
 
       describe "resource" do
@@ -157,6 +190,21 @@ RSpec.describe RubyLLM::MCP::Client do
           resource = client.resource("test.txt")
           expect(resource).to be_a(RubyLLM::MCP::Resource)
           expect(resource.name).to eq("test.txt")
+        end
+      end
+
+      describe "resource_templates" do
+        context "with capabilities" do
+          it "returns empty array when resources_list capability is disabled" do
+            allow(client.capabilities).to receive(:resources_list?).and_return(false)
+            expect(client.resource_templates).to eq([])
+          end
+
+          it "returns resource templates when resources_list capability is enabled" do
+            allow(client.capabilities).to receive(:resources_list?).and_return(true)
+            resource_templates = client.resource_templates
+            expect(resource_templates).to be_a(Array)
+          end
         end
       end
 
@@ -171,6 +219,19 @@ RSpec.describe RubyLLM::MCP::Client do
           prompts2 = client.prompts(refresh: true)
           expect(prompts1.size).to eq(prompts2.size)
         end
+
+        context "with capabilities" do
+          it "returns empty array when prompt_list capability is disabled" do
+            allow(client.capabilities).to receive(:prompt_list?).and_return(false)
+            expect(client.prompts).to eq([])
+          end
+
+          it "returns prompts when prompt_list capability is enabled" do
+            allow(client.capabilities).to receive(:prompt_list?).and_return(true)
+            prompts = client.prompts
+            expect(prompts).to be_a(Array)
+          end
+        end
       end
 
       describe "prompt" do
@@ -180,7 +241,89 @@ RSpec.describe RubyLLM::MCP::Client do
         end
       end
 
+      describe "reset_resource_templates!" do
+        it "clears the resource templates cache" do
+          # First load resource templates to populate cache
+          client.resource_templates
+          expect(client.instance_variable_get(:@resource_templates)).not_to be_empty
+
+          # Reset the cache
+          client.reset_resource_templates!
+          expect(client.instance_variable_get(:@resource_templates)).to eq({})
+        end
+
+        it "forces refresh on next resource_templates call" do
+          # Load resource templates to populate cache
+          client.resource_templates
+          cache_before_reset = client.instance_variable_get(:@resource_templates)
+          expect(cache_before_reset).not_to be_empty
+
+          # Mock the coordinator to verify fresh call is made
+          allow(client.instance_variable_get(:@coordinator)).to receive(:resource_template_list).and_call_original
+
+          # Reset and reload
+          client.reset_resource_templates!
+          expect(client.instance_variable_get(:@resource_templates)).to eq({})
+
+          # Load again - should make fresh call to coordinator
+          client.resource_templates
+          expect(client.instance_variable_get(:@coordinator)).to have_received(:resource_template_list)
+        end
+      end
+
+      describe "logging_enabled?" do
+        it "returns false when log_level is nil" do
+          expect(client.instance_variable_get(:@log_level)).to be_nil
+          expect(client.logging_enabled?).to be(false)
+        end
+
+        it "returns true when log_level is set" do
+          client.instance_variable_set(:@log_level, RubyLLM::MCP::Logging::DEBUG)
+          expect(client.logging_enabled?).to be(true)
+        end
+      end
+
       describe "on_logging" do
+        it "sets up a default lambda when no block is given" do
+          allow(client.instance_variable_get(:@coordinator)).to receive(:set_logging)
+          allow(client.instance_variable_get(:@coordinator)).to receive(:default_process_logging_message)
+
+          client.on_logging(level: RubyLLM::MCP::Logging::DEBUG, logger: "test_logger")
+
+          # Check that the logging handler is set and is a Proc
+          logging_handler = client.instance_variable_get(:@on)[:logging]
+          expect(logging_handler).to be_a(Proc)
+
+          # Test that the lambda calls the coordinator's default_process_logging_message
+          mock_notification = instance_double(Object)
+          logging_handler.call(mock_notification)
+
+          expect(client.instance_variable_get(:@coordinator)).to have_received(:default_process_logging_message)
+            .with(mock_notification, logger: "test_logger")
+        end
+
+        it "uses provided block when given" do
+          custom_handler_called = false
+
+          client.on_logging(level: RubyLLM::MCP::Logging::DEBUG) do |_notification|
+            custom_handler_called = true
+          end
+
+          # Check that the logging handler is the provided block
+          logging_handler = client.instance_variable_get(:@on)[:logging]
+          expect(logging_handler).to be_a(Proc)
+
+          # Test that the custom handler is called
+          mock_notification = instance_double(Object)
+          logging_handler.call(mock_notification)
+          expect(custom_handler_called).to be(true)
+        end
+
+        it "returns self for method chaining" do
+          result = client.on_logging(level: RubyLLM::MCP::Logging::DEBUG)
+          expect(result).to eq(client)
+        end
+
         it "sets the logging level on the MCP" do
           is_called = false
           client.on_logging(level: RubyLLM::MCP::Logging::DEBUG) do |notification|

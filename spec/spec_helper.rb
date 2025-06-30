@@ -10,6 +10,7 @@ Dotenv.load
 
 require_relative "support/client_runner"
 require_relative "support/test_server_manager"
+require_relative "support/mcp_test_configuration"
 
 SimpleCov.start do
   add_filter "/spec/"
@@ -68,11 +69,7 @@ VCR.configure do |config|
   end
 end
 
-RubyLLM::MCP.configure do |config|
-  config.log_file = $stdout
-  config.log_level = Logger::ERROR
-  config.support_complex_parameters!
-end
+MCPTestConfiguration.configure!
 
 FILESYSTEM_CLIENT = {
   name: "filesystem",

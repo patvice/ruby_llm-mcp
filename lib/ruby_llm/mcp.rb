@@ -9,7 +9,9 @@ loader.inflector.inflect("mcp" => "MCP")
 loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
+
 loader.setup
+loader.eager_load
 
 module RubyLLM
   module MCP
@@ -37,11 +39,7 @@ module RubyLLM
     module_function :configuration
 
     def logger
-      @logger ||= config.logger || Logger.new(
-        RubyLLM::MCP.config.log_file,
-        progname: "RubyLLM::MCP",
-        level: RubyLLM::MCP.config.log_level
-      )
+      config.logger
     end
   end
 end
