@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 export function setupUtilityTools(server: McpServer) {
+  const rawServer = server.server;
+
   server.tool(
     "add",
     "Addes two numbers together",
@@ -16,11 +18,9 @@ export function setupUtilityTools(server: McpServer) {
     "Returns the set environment variable",
     {},
     async () => {
-      const env = process.env;
-
-      const test_env = env.TEST_ENV;
+      const testEnv = process.env.TEST_ENV || "Not set";
       return {
-        content: [{ type: "text", text: `Test Env = ${test_env}` }],
+        content: [{ type: "text", text: `Test Env = ${testEnv}` }],
       };
     }
   );
@@ -61,6 +61,18 @@ export function setupUtilityTools(server: McpServer) {
 
       return {
         content: [{ type: "text", text: "No error" }],
+      };
+    }
+  );
+
+  server.tool(
+    "timeout_tool",
+    "Sleeps for a given number of seconds",
+    { seconds: z.number() },
+    async ({ seconds }) => {
+      await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+      return {
+        content: [{ type: "text", text: "Succesfull executed timeout tool" }],
       };
     }
   );
@@ -158,6 +170,26 @@ export function setupUtilityTools(server: McpServer) {
           isError: true,
         };
       }
+    }
+  );
+
+  server.tool(
+    "ping_client",
+    "Sends a ping to the client to test connectivity",
+    {},
+    async ({}) => {
+      const result = await server.server.ping();
+
+      if (result) {
+        return {
+          content: [{ type: "text", text: "Ping successful" }],
+        };
+      }
+
+      return {
+        content: [{ type: "text", text: "Ping failed" }],
+        isError: true,
+      };
     }
   );
 }

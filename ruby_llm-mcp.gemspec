@@ -36,10 +36,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir.glob("lib/**/*") + ["README.md", "LICENSE"]
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "faraday", ENV["FARADAY_VERSION"] || ">= 1.10.0"
-  spec.add_dependency "faraday-multipart", ">= 1"
-  spec.add_dependency "faraday-net_http", ">= 1"
-  spec.add_dependency "faraday-retry", ">= 1"
+  spec.add_dependency "httpx", "~> 1.4"
   spec.add_dependency "ruby_llm", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2"
 end

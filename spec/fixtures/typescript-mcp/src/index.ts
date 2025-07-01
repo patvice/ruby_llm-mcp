@@ -6,8 +6,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 
 import { setupTools } from "./tools/index.js";
 import { setupResources } from "./resources/index.js";
-import { setupNotifications } from "./notifications/index.js";
 import { setupPrompts } from "./prompts/index.js";
+import { registerLogging } from "./logging.js";
 
 // Check for silent flag
 const isSilent =
@@ -209,6 +209,10 @@ function createServer(): McpServer {
     {
       capabilities: {
         completions: {},
+        logging: {},
+        resources: {
+          subscribe: true,
+        },
       },
     }
   );
@@ -217,13 +221,33 @@ function createServer(): McpServer {
   setupTools(server);
   setupResources(server);
   setupPrompts(server);
-  // setupNotifications(server);
+  registerLogging(server);
 
   return server;
 }
 
 // Main MCP endpoint - handles all HTTP methods (GET, POST, DELETE)
 app.all("/mcp", async (req, res) => {
+  // WORKAROUND: Custom ping handling required due to TypeScript SDK limitation
+  // The MCP specification states that ping should work before initialization,
+  // but the SDK's Streamable HTTP transport requires session management which
+  // blocks ping requests without a session. This is a known issue similar to
+  // Python SDK issue #423: https://github.com/modelcontextprotocol/python-sdk/issues/423
+  //
+  // VERIFIED: TypeScript SDK shows "Server not initialized" error (same issue)
+  if (req.method === "POST" && req.body && req.body.method === "ping") {
+    log(`🏓 Processing ping request (SDK workaround) - ID: ${req.body.id}`);
+
+    const pingResponse = {
+      jsonrpc: "2.0",
+      id: req.body.id,
+      result: {},
+    };
+
+    res.status(200).json(pingResponse);
+    return;
+  }
+
   const sessionId = req.headers["mcp-session-id"] as string;
 
   let transport = transports[sessionId];
@@ -262,7 +286,9 @@ async function stdioServer() {
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Secure MCP Server running on stdio");
+  if (!isSilent) {
+    console.error("Secure MCP Server running on stdio");
+  }
 }
 
 if (process.argv.includes("--stdio")) {

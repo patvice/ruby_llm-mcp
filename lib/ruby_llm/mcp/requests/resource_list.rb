@@ -5,7 +5,7 @@ module RubyLLM
     module Requests
       class ResourceList < Base
         def call
-          client.request(resource_list_body)
+          coordinator.request(resource_list_body)
         end
 
         def resource_list_body

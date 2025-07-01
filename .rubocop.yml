@@ -56,17 +56,19 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
 
+
 RSpec/DescribedClass:
   Enabled: false
+
+RSpec/ExampleLength:
+  Max: 30
+
 
 RSpec/MultipleExpectations:
   Max: 5
 
 RSpec/MultipleMemoizedHelpers:
   Max: 15
-
-RSpec/ExampleLength:
-  Max: 10
 
 RSpec/NestedGroups:
   Max: 10

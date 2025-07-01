@@ -44,24 +44,31 @@ module RubyLLM
 
       def complete(argument, value)
         if @coordinator.capabilities.completion?
-          response = @coordinator.completion_prompt(name: @name, argument: argument, value: value)
-          response = response.dig("result", "completion")
+          result = @coordinator.completion_prompt(name: @name, argument: argument, value: value)
+          if result.error?
+            return result.to_error
+          end
+
+          response = result.value["completion"]
 
           Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
         else
-          raise Errors::CompletionNotAvailable.new(message: "Completion is not available for this MCP server")
+          message = "Completion is not available for this MCP server"
+          raise Errors::Capabilities::CompletionNotAvailable.new(message: message)
         end
       end
 
       private
 
       def fetch_prompt_messages(arguments)
-        response = @coordinator.execute_prompt(
+        result = @coordinator.execute_prompt(
           name: @name,
           arguments: arguments
         )
 
-        response["result"]["messages"].map do |message|
+        result.raise_error! if result.error?
+
+        result.value["messages"].map do |message|
           content = create_content_for_message(message["content"])
 
           RubyLLM::Message.new(

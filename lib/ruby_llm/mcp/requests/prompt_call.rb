@@ -4,14 +4,14 @@ module RubyLLM
   module MCP
     module Requests
       class PromptCall
-        def initialize(client, name:, arguments: {})
-          @client = client
+        def initialize(coordinator, name:, arguments: {})
+          @coordinator = coordinator
           @name = name
           @arguments = arguments
         end
 
         def call
-          @client.request(request_body)
+          @coordinator.request(request_body)
         end
 
         private

@@ -1,56 +1,111 @@
 # frozen_string_literal: true
 
 class TestServerManager
-  @server_pid = nil
+  @stdio_server_pid = nil
+  @http_server_pid = nil
 
   COMMAND = "bun"
-  ARGS = "spec/fixtures/typescript-mcp/index.ts"
+  STDIO_ARGS = "spec/fixtures/typescript-mcp/index.ts"
+  HTTP_ARGS = "spec/fixtures/typescript-mcp/index.ts"
   FLAGS = ["--silent"].freeze
 
+  SSE_COMMAND = "ruby"
+  SSE_ARGS = "lib/app.rb"
+  SSE_DIR = "spec/fixtures/fast-mcp-ruby"
+
   class << self
-    attr_accessor :server_pid
+    attr_accessor :stdio_server_pid, :http_server_pid, :sse_server_pid
 
     def start_server
-      return if server_pid
+      return if stdio_server_pid && http_server_pid && sse_server_pid
 
       begin
-        puts "Starting test MCP server..."
-        self.server_pid = spawn(COMMAND, ARGS, "--", *FLAGS)
-        Process.detach(server_pid)
+        # Start stdio server
+        unless stdio_server_pid
+          self.stdio_server_pid = spawn(COMMAND, STDIO_ARGS, "--", *FLAGS, "--stdio")
+          Process.detach(stdio_server_pid)
+        end
 
-        # Give the server a moment to start up
-        sleep 1
-        puts "Test MCP server started with PID: #{server_pid}"
+        # Start HTTP streamable server
+        unless http_server_pid
+          self.http_server_pid = spawn(COMMAND, HTTP_ARGS, "--", *FLAGS)
+          Process.detach(http_server_pid)
+        end
+
+        # Start SSE server
+        unless sse_server_pid
+          self.sse_server_pid = spawn(SSE_COMMAND, SSE_ARGS, *FLAGS, chdir: SSE_DIR)
+          Process.detach(sse_server_pid)
+        end
+
+        # Give servers time to start
+        sleep 1.0
       rescue StandardError => e
         puts "Failed to start test server: #{e.message}"
+        stop_server
         raise
       end
     end
 
     def stop_server
-      return unless server_pid
+      stop_stdio_server
+      stop_http_server
+      stop_sse_server
+    end
+
+    def stop_stdio_server
+      return unless stdio_server_pid
 
       begin
-        puts "Stopping test MCP server with PID: #{server_pid}"
-        Process.kill("TERM", server_pid)
-        Process.wait(server_pid)
-        puts "Test MCP server stopped"
+        Process.kill("TERM", stdio_server_pid)
+        Process.wait(stdio_server_pid)
       rescue Errno::ESRCH, Errno::ECHILD
         # Process already dead or doesn't exist
-        puts "Test MCP server was already stopped"
       rescue StandardError => e
-        puts "Warning: Failed to cleanly shutdown test server: #{e.message}"
+        puts "Warning: Failed to cleanly shutdown stdio server: #{e.message}"
       ensure
-        self.server_pid = nil
+        self.stdio_server_pid = nil
+      end
+    end
+
+    def stop_http_server
+      return unless http_server_pid
+
+      begin
+        Process.kill("TERM", http_server_pid)
+        Process.wait(http_server_pid)
+      rescue Errno::ESRCH, Errno::ECHILD
+        # Process already dead or doesn't exist
+      rescue StandardError => e
+        puts "Warning: Failed to cleanly shutdown HTTP server: #{e.message}"
+      ensure
+        self.http_server_pid = nil
+      end
+    end
+
+    def stop_sse_server
+      return unless sse_server_pid
+
+      begin
+        Process.kill("TERM", sse_server_pid)
+        Process.wait(sse_server_pid)
+      rescue Errno::ESRCH, Errno::ECHILD
+        # Process already dead or doesn't exist
+      rescue StandardError => e
+        puts "Warning: Failed to cleanly shutdown SSE server: #{e.message}"
+      ensure
+        self.sse_server_pid = nil
       end
     end
 
     def ensure_cleanup
-      stop_server if server_pid
+      stop_server if stdio_server_pid || http_server_pid || sse_server_pid
     end
 
     def running?
-      server_pid && process_exists?(server_pid)
+      stdio_server_pid && process_exists?(stdio_server_pid) &&
+        http_server_pid && process_exists?(http_server_pid) &&
+        sse_server_pid && process_exists?(sse_server_pid)
     end
 
     private

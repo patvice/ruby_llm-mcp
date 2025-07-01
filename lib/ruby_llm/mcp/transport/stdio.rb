@@ -9,11 +9,12 @@ module RubyLLM
   module MCP
     module Transport
       class Stdio
-        attr_reader :command, :stdin, :stdout, :stderr, :id
+        attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command, request_timeout:, args: [], env: {})
+        def initialize(command, request_timeout:, coordinator:, args: [], env: {})
           @request_timeout = request_timeout
           @command = command
+          @coordinator = coordinator
           @args = args
           @env = env || {}
           @client_id = SecureRandom.uuid
@@ -44,12 +45,14 @@ module RubyLLM
           end
 
           begin
-            @stdin.puts(JSON.generate(body))
+            body = JSON.generate(body)
+            RubyLLM::MCP.logger.debug "Sending Request: #{body}"
+            @stdin.puts(body)
             @stdin.flush
           rescue IOError, Errno::EPIPE => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             restart_process
-            raise "Failed to send request: #{e.message}"
+            raise RubyLLM::MCP::Errors::TransportError.new(message: e.message, error: e)
           end
 
           return unless wait_for_response
@@ -61,7 +64,8 @@ module RubyLLM
           rescue Timeout::Error
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             raise RubyLLM::MCP::Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds"
+              message: "Request timed out after #{@request_timeout / 1000} seconds",
+              request_id: request_id
             )
           end
         end
@@ -133,7 +137,7 @@ module RubyLLM
         end
 
         def restart_process
-          puts "Process connection lost. Restarting..."
+          RubyLLM::MCP.logger.error "Process connection lost. Restarting..."
           start_process
         end
 
@@ -152,11 +156,11 @@ module RubyLLM
 
                 process_response(line.strip)
               rescue IOError, Errno::EPIPE => e
-                puts "Reader error: #{e.message}. Restarting in 1 second..."
+                RubyLLM::MCP.logger.error "Reader error: #{e.message}. Restarting in 1 second..."
                 sleep 1
                 restart_process if @running
               rescue StandardError => e
-                puts "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
+                RubyLLM::MCP.logger.error "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
                 sleep 1
               end
             end
@@ -177,12 +181,12 @@ module RubyLLM
                 line = @stderr.gets
                 next unless line && !line.strip.empty?
 
-                puts "STDERR: #{line.strip}"
+                RubyLLM::MCP.logger.info(line.strip)
               rescue IOError, Errno::EPIPE => e
-                puts "Stderr reader error: #{e.message}"
+                RubyLLM::MCP.logger.error "Stderr reader error: #{e.message}"
                 sleep 1
               rescue StandardError => e
-                puts "Error in stderr thread: #{e.message}"
+                RubyLLM::MCP.logger.error "Error in stderr thread: #{e.message}"
                 sleep 1
               end
             end
@@ -194,15 +198,27 @@ module RubyLLM
         def process_response(line)
           response = JSON.parse(line)
           request_id = response["id"]&.to_s
+          result = RubyLLM::MCP::Result.new(response)
 
-          @pending_mutex.synchronize do
-            if request_id && @pending_requests.key?(request_id)
-              response_queue = @pending_requests.delete(request_id)
-              response_queue&.push(response)
+          RubyLLM::MCP.logger.debug "Result Received: #{result.inspect}"
+          # Handle notifications (process but don't return - continue processing other responses)
+          if result.notification?
+            coordinator.process_notification(result)
+            # Don't return here - continue to process potential tool responses
+          elsif result.request?
+            coordinator.process_request(result)
+            nil
+          else
+            # Handle regular responses (tool calls, etc.)
+            @pending_mutex.synchronize do
+              if result.matching_id?(request_id) && @pending_requests.key?(request_id)
+                response_queue = @pending_requests.delete(request_id)
+                response_queue&.push(result)
+              end
             end
           end
         rescue JSON::ParserError => e
-          RubyLLM.logger.error("Error parsing response as JSON: #{e.message}\nRaw response: #{line}")
+          RubyLLM::MCP.logger.error("Error parsing response as JSON: #{e.message}\nRaw response: #{line}")
         end
       end
     end

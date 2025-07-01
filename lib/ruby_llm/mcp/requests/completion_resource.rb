@@ -4,15 +4,15 @@ module RubyLLM
   module MCP
     module Requests
       class CompletionResource
-        def initialize(client, uri:, argument:, value:)
-          @client = client
+        def initialize(coordinator, uri:, argument:, value:)
+          @coordinator = coordinator
           @uri = uri
           @argument = argument
           @value = value
         end
 
         def call
-          @client.request(request_body)
+          @coordinator.request(request_body)
         end
 
         private

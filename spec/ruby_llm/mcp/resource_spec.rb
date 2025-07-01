@@ -30,6 +30,14 @@ RSpec.describe RubyLLM::MCP::Resource do
           expect(resource.name).to eq("test.txt")
           expect(resource.uri).to eq("file://test.txt/")
         end
+
+        it "refreshes prompts when requested" do
+          tool = client.tool("send_list_changed")
+          resource_count = client.resources.count
+          tool.execute(type: "resources")
+
+          expect(client.resources.count).to eq(resource_count + 1)
+        end
       end
 
       describe "resource_content" do
@@ -135,6 +143,23 @@ RSpec.describe RubyLLM::MCP::Resource do
           expect(content.attachments.first.mime_type).to eq("audio/wav")
           expect(content.attachments.first.content).not_to be_nil
           expect(content.text).to include("jackhammer.wav")
+        end
+      end
+
+      describe "resource_subscription" do
+        it "can subscribe to a resource and mark it as dirty if changed" do
+          resource = client.resource("plain_text.txt")
+          expect(resource.content).to eq("Plan text information")
+
+          resource.subscribe!
+
+          tool = client.tool("changes_plain_text_resource")
+          tool.execute
+
+          expect(resource.content).to eq("New text information")
+
+          tool = client.tool("changes_plain_text_resource")
+          tool.execute
         end
       end
 

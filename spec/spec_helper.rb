@@ -10,6 +10,7 @@ Dotenv.load
 
 require_relative "support/client_runner"
 require_relative "support/test_server_manager"
+require_relative "support/mcp_test_configuration"
 
 SimpleCov.start do
   add_filter "/spec/"
@@ -68,8 +69,6 @@ VCR.configure do |config|
   end
 end
 
-RubyLLM::MCP.support_complex_parameters!
-
 FILESYSTEM_CLIENT = {
   name: "filesystem",
   transport_type: :stdio,
@@ -116,6 +115,8 @@ COMPLEX_FUNCTION_MODELS = [
   { provider: :gemini, model: "gemini-2.0-flash" },
   { provider: :openai, model: "gpt-4.1" }
 ].freeze
+
+MCPTestConfiguration.configure!
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

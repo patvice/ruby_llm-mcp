@@ -103,13 +103,39 @@ response = chat.ask("Can you help me search for recent files in my project?")
 puts response
 ```
 
+### Human in the Loop
+
+You can use the `on_human_in_the_loop` callback to allow the human to intervene in the tool call. This is useful for tools that require human input or programic input to verify if the tool should be executed.
+
+For tool calls that have access to do important operations, there SHOULD always be a human in the loop with the ability to deny tool invocations.
+
+```ruby
+client.on_human_in_the_loop do |name, params|
+  name == "add" && params[:a] == 1 && params[:b] == 2
+end
+
+tool = client.tool("add")
+result = tool.execute(a: 1, b: 2)
+puts result # 3
+
+# If the human in the loop returns false, the tool call will be cancelled
+result = tool.execute(a: 2, b: 2)
+puts result # Tool execution error: Tool call was cancelled by the client
+```
+
+tool = client.tool("add")
+result = tool.execute(a: 1, b: 2)
+puts result
+
+````
+
 ### Support Complex Parameters
 
 If you want to support complex parameters, like an array of objects it currently requires a patch to RubyLLM itself. This is planned to be temporary until the RubyLLM is updated.
 
 ```ruby
 RubyLLM::MCP.support_complex_parameters!
-```
+````
 
 ### Streaming Responses with Tool Calls
 
@@ -341,6 +367,14 @@ client.restart!
 client.stop
 ```
 
+### Ping
+
+You can ping the MCP server to check if it is alive:
+
+```ruby
+client.ping # => true or false
+```
+
 ## Refreshing Cached Data
 
 The client caches tools, resources, prompts, and resource templates list calls are cached to reduce round trips back to the MCP server. You can refresh this cache:
@@ -361,6 +395,71 @@ templates = client.resource_templates(refresh: true)
 resource = client.resource("project_readme", refresh: true)
 prompt = client.prompt("daily_greeting", refresh: true)
 template = client.resource_template("user_logs", refresh: true)
+```
+
+## Notifications
+
+MCPs can produce notifications that happen in an async nature outside normal calls to the MCP server.
+
+### Subscribing to a Resource Update
+
+By default, the client will look for any resource cha to resource updates and refresh the resource content when it changes.
+
+### Logging Notifications
+
+MCPs can produce logging notifications for long-running tool operations. Logging notifications allow tools to send real-time updates about their execution status.
+
+```ruby
+client.on_logging do |logging|
+  puts "Logging: #{logging.level} - #{logging.message}"
+end
+
+# Execute a tool that supports logging notifications
+tool = client.tool("long_running_operation")
+result = tool.execute(operation: "data_processing")
+
+# Logging: info - Processing data...
+# Logging: info - Processing data...
+# Logging: warning - Something went wrong but not major...
+```
+
+Different levels of logging are supported:
+
+```ruby
+client.on_logging(RubyLLM::MCP::Logging::WARNING) do |logging|
+  puts "Logging: #{logging.level} - #{logging.message}"
+end
+
+# Execute a tool that supports logging notifications
+tool = client.tool("long_running_operation")
+result = tool.execute(operation: "data_processing")
+
+# Logging: warning - Something went wrong but not major...
+```
+
+### Progress Notifications
+
+MCPs can produce progress notifications for long-running tool operations. Progress notifications allow tools to send real-time updates about their execution status.
+
+**Note:** that we only support progress notifications for tool calls today.
+
+```ruby
+# Set up progress tracking
+client.on_progress do |progress|
+  puts "Progress: #{progress.progress}% - #{progress.message}"
+end
+
+# Execute a tool that supports progress notifications
+tool = client.tool("long_running_operation")
+result = tool.execute(operation: "data_processing")
+
+# Progress 25% - Processing data...
+# Progress 50% - Processing data...
+# Progress 75% - Processing data...
+# Progress 100% - Processing data...
+puts result
+
+# Result: { status: "success", data: "Processed data" }
 ```
 
 ## Transport Types
@@ -411,7 +510,27 @@ client = RubyLLM::MCP.client(
 )
 ```
 
-## Configuration Options
+## RubyLLM::MCP and Client Configuration Options
+
+MCP comes with some common configuration options that can be set on the client.
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Set the progress handler
+  config.support_complex_parameters!
+
+  # Set parameters on the built in logger
+  config.log_file = $stdout
+  config.log_level = Logger::ERROR
+
+  # Or add a custom logger
+  config.logger = Logger.new(STDOUT)
+end
+```
+
+### MCP Client Options
+
+MCP client options are set on the client itself.
 
 - `name`: A unique identifier for your MCP client
 - `transport_type`: Either `:sse`, `:streamable`, or `:stdio`

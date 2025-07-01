@@ -5,7 +5,7 @@ module RubyLLM
     module Requests
       class PromptList < Base
         def call
-          client.request(request_body)
+          coordinator.request(request_body)
         end
 
         private

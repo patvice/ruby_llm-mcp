@@ -6,10 +6,10 @@ module RubyLLM
   module MCP
     module Requests
       class Base
-        attr_reader :client
+        attr_reader :coordinator
 
-        def initialize(client)
-          @client = client
+        def initialize(coordinator)
+          @coordinator = coordinator
         end
 
         def call

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "ruby_llm/tool"
+
 module RubyLLM
   module MCP
     class Parameter < RubyLLM::Parameter

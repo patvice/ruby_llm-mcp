@@ -1,17 +1,23 @@
 # frozen_string_literal: true
 
-class RubyLLM::MCP::Requests::ToolList < RubyLLM::MCP::Requests::Base
-  def call
-    client.request(tool_list_body)
-  end
+module RubyLLM
+  module MCP
+    module Requests
+      class ToolList < RubyLLM::MCP::Requests::Base
+        def call
+          coordinator.request(tool_list_body)
+        end
 
-  private
+        private
 
-  def tool_list_body
-    {
-      jsonrpc: "2.0",
-      method: "tools/list",
-      params: {}
-    }
+        def tool_list_body
+          {
+            jsonrpc: "2.0",
+            method: "tools/list",
+            params: {}
+          }
+        end
+      end
+    end
   end
 end

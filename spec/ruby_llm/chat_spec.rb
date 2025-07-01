@@ -186,6 +186,34 @@ RSpec.describe RubyLLM::Chat do
               expect(response.content).to include("John")
             end
           end
+
+          describe "with_prompt" do
+            it "adds prompt to the chat when available" do
+              chat = RubyLLM.chat(model: config[:model])
+              prompts = client.prompts
+
+              prompt = prompts.first
+              chat.with_prompt(prompt)
+              response = chat.ask("Please respond based on the prompt provided.")
+              expect(response.content.downcase).to include("hello")
+            end
+
+            it "adds one prompt by name to the chat" do
+              chat = RubyLLM.chat(model: config[:model])
+              prompt = client.prompt("poem_of_the_day")
+              chat.with_prompt(prompt)
+              response = chat.ask("Please provide the content from the prompt.")
+              expect(response.content).to include("poem")
+            end
+
+            it "adds prompt with arguments to the chat" do
+              chat = RubyLLM.chat(model: config[:model])
+              prompt = client.prompt("specific_language_greeting")
+              chat.with_prompt(prompt, arguments: { name: "Alice", language: "French" })
+              response = chat.ask("Please use the prompt to create a greeting.")
+              expect(response.content).to include("Alice")
+            end
+          end
         end
       end
     end

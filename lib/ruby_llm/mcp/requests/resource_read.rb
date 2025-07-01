@@ -4,15 +4,15 @@ module RubyLLM
   module MCP
     module Requests
       class ResourceRead
-        attr_reader :client, :uri
+        attr_reader :coordinator, :uri
 
-        def initialize(client, uri:)
-          @client = client
+        def initialize(coordinator, uri:)
+          @coordinator = coordinator
           @uri = uri
         end
 
         def call
-          client.request(reading_resource_body(uri))
+          coordinator.request(reading_resource_body(uri))
         end
 
         def reading_resource_body(uri)

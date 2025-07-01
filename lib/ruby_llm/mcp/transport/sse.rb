@@ -2,7 +2,7 @@
 
 require "json"
 require "uri"
-require "faraday"
+require "httpx"
 require "timeout"
 require "securerandom"
 
@@ -10,11 +10,12 @@ module RubyLLM
   module MCP
     module Transport
       class SSE
-        attr_reader :headers, :id
+        attr_reader :headers, :id, :coordinator
 
-        def initialize(url, headers: {}, request_timeout: 8000)
+        def initialize(url, coordinator:, request_timeout:, headers: {})
           @event_url = url
           @messages_url = nil
+          @coordinator = coordinator
           @request_timeout = request_timeout
 
           uri = URI.parse(url)
@@ -24,6 +25,7 @@ module RubyLLM
           @client_id = SecureRandom.uuid
           @headers = headers.merge({
                                      "Accept" => "text/event-stream",
+                                     "Content-Type" => "application/json",
                                      "Cache-Control" => "no-cache",
                                      "Connection" => "keep-alive",
                                      "X-CLIENT-ID" => @client_id
@@ -37,19 +39,19 @@ module RubyLLM
           @running = true
           @sse_thread = nil
 
+          RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
+
           # Start the SSE listener thread
           start_sse_listener
         end
 
         def request(body, add_id: true, wait_for_response: true) # rubocop:disable Metrics/MethodLength
-          # Generate a unique request ID
           if add_id
             @id_mutex.synchronize { @id_counter += 1 }
             request_id = @id_counter
             body["id"] = request_id
           end
 
-          # Create a queue for this request's response
           response_queue = Queue.new
           if wait_for_response
             @pending_mutex.synchronize do
@@ -57,28 +59,26 @@ module RubyLLM
             end
           end
 
-          # Send the request using Faraday
           begin
-            conn = Faraday.new do |f|
-              f.options.timeout = @request_timeout / 1000
-              f.options.open_timeout = 5
-            end
-
-            response = conn.post(@messages_url) do |req|
-              @headers.each do |key, value|
-                req.headers[key] = value
-              end
-              req.headers["Content-Type"] = "application/json"
-              req.body = JSON.generate(body)
-            end
+            http_client = HTTPX.with(timeout: { request_timeout: @request_timeout / 1000 }, headers: @headers)
+            response = http_client.post(@messages_url, body: JSON.generate(body))
 
             unless response.status == 200
               @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-              raise "Failed to request #{@messages_url}: #{response.status} - #{response.body}"
+              RubyLLM::MCP.logger.error "SSE request failed: #{response.status} - #{response.body}"
+              raise Errors::TransportError.new(
+                message: "Failed to request #{@messages_url}: #{response.status} - #{response.body}",
+                code: response.status
+              )
             end
           rescue StandardError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise e
+            RubyLLM::MCP.logger.error "SSE request error (ID: #{request_id}): #{e.message}"
+            raise RubyLLM::MCP::Errors::TransportError.new(
+              message: e.message,
+              code: -1,
+              error: e
+            )
           end
           return unless wait_for_response
 
@@ -88,8 +88,10 @@ module RubyLLM
             end
           rescue Timeout::Error
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise RubyLLM::MCP::Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds"
+            RubyLLM::MCP.logger.error "SSE request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
+            raise Errors::TimeoutError.new(
+              message: "Request timed out after #{@request_timeout / 1000} seconds",
+              request_id: request_id
             )
           end
         end
@@ -99,6 +101,7 @@ module RubyLLM
         end
 
         def close
+          RubyLLM::MCP.logger.info "Closing SSE transport connection"
           @running = false
           @sse_thread&.join(1) # Give the thread a second to clean up
           @sse_thread = nil
@@ -110,6 +113,8 @@ module RubyLLM
           @connection_mutex.synchronize do
             return if sse_thread_running?
 
+            RubyLLM::MCP.logger.info "Starting SSE listener thread"
+
             response_queue = Queue.new
             @pending_mutex.synchronize do
               @pending_requests["endpoint"] = response_queue
@@ -120,10 +125,10 @@ module RubyLLM
             end
             @sse_thread.abort_on_exception = true
 
-            endpoint = response_queue.pop
-            set_message_endpoint(endpoint)
-
-            @pending_mutex.synchronize { @pending_requests.delete("endpoint") }
+            Timeout.timeout(100) do
+              endpoint = response_queue.pop
+              set_message_endpoint(endpoint)
+            end
           end
         end
 
@@ -135,6 +140,8 @@ module RubyLLM
                           else
                             endpoint
                           end
+
+          RubyLLM::MCP.logger.info "SSE message endpoint set to: #{@messages_url}"
         end
 
         def sse_thread_running?
@@ -143,84 +150,83 @@ module RubyLLM
 
         def listen_for_events
           stream_events_from_server
-        rescue Faraday::Error => e
-          handle_connection_error("SSE connection failed", e)
         rescue StandardError => e
           handle_connection_error("SSE connection error", e)
         end
 
         def stream_events_from_server
-          buffer = +""
-          create_sse_connection.get(@event_url) do |req|
-            setup_request_headers(req)
-            setup_streaming_callback(req, buffer)
-          end
-        end
+          sse_client = HTTPX.plugin(:stream)
+          sse_client = sse_client.with(
+            headers: @headers
+          )
+          response = sse_client.get(@event_url, stream: true)
+          response.each_line do |event_line|
+            unless @running
+              response.body.close
+              next
+            end
 
-        def create_sse_connection
-          Faraday.new do |f|
-            f.options.timeout = 300 # 5 minutes
-            f.response :raise_error # raise errors on non-200 responses
-          end
-        end
-
-        def setup_request_headers(request)
-          @headers.each do |key, value|
-            request.headers[key] = value
-          end
-        end
-
-        def setup_streaming_callback(request, buffer)
-          request.options.on_data = proc do |chunk, _size, _env|
-            buffer << chunk
-            process_buffer_events(buffer)
-          end
-        end
-
-        def process_buffer_events(buffer)
-          while (event = extract_event(buffer))
-            event_data, buffer = event
-            process_event(event_data) if event_data
+            event = parse_event(event_line)
+            process_event(event)
           end
         end
 
         def handle_connection_error(message, error)
-          puts "#{message}: #{error.message}. Reconnecting in 3 seconds..."
-          sleep 3
+          return unless @running
+
+          error_message = "#{message}: #{error.message}"
+          RubyLLM::MCP.logger.error "#{error_message}. Reconnecting in 1 seconds..."
+          sleep 1
         end
 
-        def process_event(raw_event)
+        def process_event(raw_event) # rubocop:disable Metrics/MethodLength
+          # Return if we believe that are getting a partial event
           return if raw_event[:data].nil?
 
           if raw_event[:event] == "endpoint"
             request_id = "endpoint"
             event = raw_event[:data]
+            return if event.nil?
+
+            RubyLLM::MCP.logger.debug "Received endpoint event: #{event}"
+            @pending_mutex.synchronize do
+              response_queue = @pending_requests.delete(request_id)
+              response_queue&.push(event)
+            end
           else
             event = begin
               JSON.parse(raw_event[:data])
-            rescue StandardError
+            rescue JSON::ParserError => e
+              # We can sometimes get partial endpoint events, so we will ignore them
+              unless @endpoint.nil?
+                RubyLLM::MCP.logger.info "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
+              end
+
               nil
             end
             return if event.nil?
 
             request_id = event["id"]&.to_s
-          end
+            result = RubyLLM::MCP::Result.new(event)
 
-          @pending_mutex.synchronize do
-            if request_id && @pending_requests.key?(request_id)
-              response_queue = @pending_requests.delete(request_id)
-              response_queue&.push(event)
+            if result.notification?
+              coordinator.process_notification(result)
+              return
+            end
+
+            if result.request?
+              coordinator.process_request(result) if coordinator.alive?
+              return
+            end
+
+            @pending_mutex.synchronize do
+              # You can receieve duplicate events for the same request id, and we will ignore thoses
+              if result.matching_id?(request_id) && @pending_requests.key?(request_id)
+                response_queue = @pending_requests.delete(request_id)
+                response_queue&.push(result)
+              end
             end
           end
-        rescue JSON::ParserError => e
-          puts "Error parsing event data: #{e.message}"
-        end
-
-        def extract_event(buffer)
-          return nil unless buffer.include?("\n\n")
-
-          raw, rest = buffer.split("\n\n", 2)
-          [parse_event(raw), rest]
         end
 
         def parse_event(raw)
