@@ -17,7 +17,7 @@ class TestServerManager
     attr_accessor :stdio_server_pid, :http_server_pid, :sse_server_pid
 
     def start_server
-      return if stdio_server_pid && http_server_pid && sse_server_pid
+      return if stdio_server_pid && http_server_pid
 
       begin
         # Start stdio server
@@ -32,12 +32,6 @@ class TestServerManager
           Process.detach(http_server_pid)
         end
 
-        # Start SSE server
-        unless sse_server_pid
-          self.sse_server_pid = spawn(SSE_COMMAND, SSE_ARGS, *FLAGS, chdir: SSE_DIR)
-          Process.detach(sse_server_pid)
-        end
-
         # Give servers time to start
         sleep 1.0
       rescue StandardError => e
@@ -47,10 +41,16 @@ class TestServerManager
       end
     end
 
+    def start_sse_server
+      unless sse_server_pid
+        self.sse_server_pid = spawn(SSE_COMMAND, SSE_ARGS, *FLAGS, chdir: SSE_DIR)
+        Process.detach(sse_server_pid)
+      end
+    end
+
     def stop_server
       stop_stdio_server
       stop_http_server
-      stop_sse_server
     end
 
     def stop_stdio_server
@@ -99,7 +99,8 @@ class TestServerManager
     end
 
     def ensure_cleanup
-      stop_server if stdio_server_pid || http_server_pid || sse_server_pid
+      stop_server if stdio_server_pid || http_server_pid
+      stop_sse_server if sse_server_pid
     end
 
     def running?
