@@ -31,7 +31,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:19:56 GMT
+      - Tue, 01 Jul 2025 15:45:51 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -43,11 +43,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '3273'
+      - '2614'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '3276'
+      - '2639'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -79,7 +79,42 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        ewogICJpZCI6ICJjaGF0Y21wbC1Ca3RNUFVHRjJqMzRlNVVvajV3RkJUSmdVenRCVSIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc1MDUxNTU5MywKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJIZXJl4oCZcyBhIHN1bW1hcnkgb2YgdGhlIGluZm9ybWF0aW9uIGZyb20gdGhlIHJlc291cmNlcyB5b3UgcHJvdmlkZWQ6XG5cbi0tLVxuXG4qKjEuIHRlc3QudHh0KiogIFxuKkEgdGV4dCBmaWxlKiAgXG4tIENvbnRlbnQ6XG4gIGBgYFxuICBIZWxsbywgdGhpcyBpcyBhIHRlc3QgZmlsZSFcbiAgVGhpcyBjb250ZW50IHdpbGwgYmUgc2VydmVkIGJ5IHRoZSBNQ1AgcmVzb3VyY2UuXG4gIFlvdSBjYW4gbW9kaWZ5IHRoaXMgZmlsZSBhbmQgaXQgd2lsbCBiZSBjYWNoZWQgZm9yIDUgbWludXRlcy5cbiAgYGBgXG4tIE5vdGVzOiBUaGUgZmlsZSBtZW50aW9ucyBpdCB3aWxsIGJlIHNlcnZlZCBhcyBhIHJlc291cmNlIGFuZCBjYWNoZWQgZm9yIDUgbWludXRlcy5cblxuLS0tXG5cbioqMi4gc2Vjb25kX2ZpbGUudHh0KiogIFxuKkEgc2Vjb25kIHRleHQgZmlsZSogIFxuLSBDb250ZW50OlxuICBgYGBcbiAgVGhpcyBpcyB0aGUgc2Vjb25kIGZpbGUgdGhhdCBJIHdhbnQgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSByZXNvdXJjZVxuICBgYGBcblxuLS0tXG5cbioqMy4gbXkubWQqKiAgXG4qQSBtYXJrZG93biBmaWxlKiAgXG4tIENvbnRlbnQ6XG4gIGBgYFxuICAjIE15IE1hcmtkb3duIEZpbGVcblxuICBUaGlzIGlzIGEgbWFya2Rvd24gZmlsZSB0aGF0IEkgd2FudCB0byBiZSBhYmxlIHRvIHVzZSBhcyBhIHJlc291cmNlXG5cbiAgIyMgU2VjdGlvbiAxXG5cbiAgVGhpcyBpcyBhIHNlY3Rpb24gaW4gbXkgbWFya2Rvd24gZmlsZVxuXG4gICMjIFNlY3Rpb24gMlxuXG4gIFRoaXMgaXMgYW5vdGhlciBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcbiAgYGBgXG4tIFN0cnVjdHVyZTpcbiAgLSBUaXRsZTogTXkgTWFya2Rvd24gRmlsZVxuICAtIEludHJvOiBEZXNjcmliZXMgaXQgYXMgYSBtYXJrZG93biByZXNvdXJjZS5cbiAgLSBTZWN0aW9uIDE6IENvbnRhaW5zIGEgYnJpZWYgc2VjdGlvbi5cbiAgLSBTZWN0aW9uIDI6IEFub3RoZXIgYnJpZWYgc2VjdGlvbi5cblxuLS0tXG5cbioqSW4gc3VtbWFyeToqKiAgXG5Zb3UgaGF2ZSBwcm92aWRlZCB0d28gdGV4dCBmaWxlcyBhbmQgb25lIG1hcmtkb3duIGZpbGUsIGFsbCBpbnRlbmRlZCB0byBiZSB1c2VkIGFzIHJlc291cmNlcywgcG9zc2libHkgZm9yIHNlcnZpbmcgb3IgY2FjaGluZy4gRWFjaCBmaWxlIGNvbnRhaW5zIGEgc2hvcnQgZGVzY3JpcHRpb24gb3Igc2FtcGxlIGNvbnRlbnQuIFRoZSBtYXJrZG93biBmaWxlIGlzIG9yZ2FuaXplZCBpbnRvIHNlY3Rpb25zLCB3aGlsZSB0aGUgdGV4dCBmaWxlcyBhcmUgc2hvcnQgYW5kIGRpcmVjdC4iLAogICAgICAgICJyZWZ1c2FsIjogbnVsbCwKICAgICAgICAiYW5ub3RhdGlvbnMiOiBbXQogICAgICB9LAogICAgICAibG9ncHJvYnMiOiBudWxsLAogICAgICAiZmluaXNoX3JlYXNvbiI6ICJzdG9wIgogICAgfQogIF0sCiAgInVzYWdlIjogewogICAgInByb21wdF90b2tlbnMiOiAxNTIsCiAgICAiY29tcGxldGlvbl90b2tlbnMiOiAzMDgsCiAgICAidG90YWxfdG9rZW5zIjogNDYwLAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfYTExMDJjZjk3OCIKfQo=
-  recorded_at: Sat, 21 Jun 2025 14:19:56 GMT
+      string: |
+        {
+          "id": "chatcmpl-BoXT28tyI0FNi7xUIjM6sXINJ7EMF",
+          "object": "chat.completion",
+          "created": 1751384748,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Here is a summary of the information provided from your resources:\n\n---\n\n### 1. `test.txt`\n- **Type:** Text file\n- **Content:**\n  ```\n  Hello, this is a test file!\n  This content will be served by the MCP resource.\n  You can modify this file and it will be cached for 5 minutes.\n  ```\n\n---\n\n### 2. `second_file.txt`\n- **Type:** Text file\n- **Content:**\n  ```\n  This is the second file that I want to be able to use as a resource\n  ```\n\n---\n\n### 3. `my.md`\n- **Type:** Markdown file\n- **Content (structured):**\n  ```\n  # My Markdown File\n\n  This is a markdown file that I want to be able to use as a resource\n\n  ## Section 1\n\n  This is a section in my markdown file\n\n  ## Section 2\n\n  This is another section in my markdown file\n  ```\n  - **Sections:**\n    - **Section 1:** \"This is a section in my markdown file\"\n    - **Section 2:** \"This is another section in my markdown file\"\n\n---\n\nIf you need the exact content, summaries, or extraction of particular sections from any of these files, let me know!",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 152,
+            "completion_tokens": 267,
+            "total_tokens": 419,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_51e1070cf2"
+        }
+  recorded_at: Tue, 01 Jul 2025 15:45:50 GMT
 recorded_with: VCR 6.3.1

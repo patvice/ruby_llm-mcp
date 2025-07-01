@@ -6,7 +6,8 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
-        you write me a beautiful poem about the current day?"}]}],"temperature":0.7,"stream":false,"max_tokens":8192}'
+        you write me a beautiful poem about the current day? Make sure to include
+        the word ''poem'' in your response."}]}],"temperature":0.7,"stream":false,"max_tokens":8192}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -26,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:58:12 GMT
+      - Tue, 01 Jul 2025 15:47:10 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:58:08Z'
+      - '2025-07-01T15:47:05Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:58:14Z'
+      - '2025-07-01T15:47:12Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
-      - '48'
+      - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:58:10Z'
+      - '2025-07-01T15:47:06Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:58:08Z'
+      - '2025-07-01T15:47:05Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -75,16 +76,17 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01HTJPb1KgqrYnTjZWNTn6iy","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Here''s
-        a poem about the current day:\n\nA Canvas of Now\n\nDawn breaks, a gentle
-        whisper,\nPainting the sky in hues anew.\nToday, a gift unwrapped with care,\nA
-        blank page, a story yet to brew.\n\nSunlight dances on dewdrops bright,\nAs
-        birds sing their morning song.\nThe world awakens, full of might,\nTo face
-        whatever may come along.\n\nEach moment, a precious gem,\nStrung on the necklace
-        of time.\nSome sparkle, some may seem dim,\nBut all are yours, and all are
-        mine.\n\nIn this day, we find our way,\nThrough laughter, tears, and silent
-        prayer.\nFor in the present, we can say,\nWe lived, we loved, and we were
-        there.\n\nSo cherish this day, hold it close,\nFor it shall never come again.\nIn
-        its beauty and its flaws,\nLies the essence of being human."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":19,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":218,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:58:12 GMT
+      string: '{"id":"msg_01NUfaZXDZESqaXonkDNs6Qd","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Here''s
+        a poem about the current day, including the word ''poem'' in the response:\n\nA
+        Canvas of Today\n\nThis poem unfolds like the day,\nA fresh page in life''s
+        grand display.\nDawn''s gentle fingers paint the sky,\nAs birdsong fills the
+        air on high.\n\nSunlight dances on dewy grass,\nTime''s river flows, moments
+        pass.\nThe world awakens, full of grace,\nEach soul finding its rightful place.\n\nIn
+        busy streets and quiet lanes,\nLife''s rhythm beats, joy and pains.\nStories
+        unfold, dreams take flight,\nAs we journey from morn to night.\n\nThis day,
+        a gift we can''t replay,\nA poem written in our own way.\nWith every breath,
+        every stride,\nWe author the tale of our lives.\n\nSo seize this day, make
+        it shine,\nFor it''s yours, and it is mine.\nIn this poem of hours, we''ll
+        find\nThe beauty of the present, unconfined."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":33,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":224,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:47:10 GMT
 recorded_with: VCR 6.3.1

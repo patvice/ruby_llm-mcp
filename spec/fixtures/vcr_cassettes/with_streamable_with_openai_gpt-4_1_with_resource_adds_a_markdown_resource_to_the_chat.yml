@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:52:57 GMT
+      - Tue, 01 Jul 2025 15:48:07 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,11 +39,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1608'
+      - '1198'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '3229'
+      - '1868'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -77,16 +77,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BktsOwjDfaXPiOLvxcAb68XbAz7rr",
+          "id": "chatcmpl-BoXVGnog8SIYgMJdFaOvj8J0L1N0Q",
           "object": "chat.completion",
-          "created": 1750517576,
+          "created": 1751384886,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The markdown file (my.md) contains the following content:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nIn plain text, it says:\n\n- The title is \"My Markdown File\".\n- It states: \"This is a markdown file that I want to be able to use as a resource\".\n- There are two sections:\n  - **Section 1**: \"This is a section in my markdown file\"\n  - **Section 2**: \"This is another section in my markdown file\"",
+                "content": "Here is the content of your markdown file my.md:\n\n```\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nIn summary, the file introduces itself as \"My Markdown File\", mentions its purpose as a resource, and contains two sections:\n\n- **Section 1:** \"This is a section in my markdown file\"\n- **Section 2:** \"This is another section in my markdown file\"",
                 "refusal": null,
                 "annotations": []
               },
@@ -96,8 +96,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 75,
-            "completion_tokens": 147,
-            "total_tokens": 222,
+            "completion_tokens": 122,
+            "total_tokens": 197,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -110,7 +110,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_b3f1157249"
+          "system_fingerprint": "fp_51e1070cf2"
         }
-  recorded_at: Sat, 21 Jun 2025 14:52:57 GMT
+  recorded_at: Tue, 01 Jul 2025 15:48:07 GMT
 recorded_with: VCR 6.3.1

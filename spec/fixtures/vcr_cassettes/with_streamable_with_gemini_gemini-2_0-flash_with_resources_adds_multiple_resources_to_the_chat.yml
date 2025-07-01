@@ -37,7 +37,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:01:44 GMT
+      - Tue, 01 Jul 2025 15:47:20 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -47,7 +47,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1613
+      - gfet4t7; dur=1639
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -61,19 +61,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have the following information from the provided resources:\n\n*   **test.txt:**\n    *   It's a text file used as a test.\n    *   Its content is \"Hello, this is a test file!\\nThis content will be served by the MCP resource.\\nYou can modify this file and it will be cached for 5 minutes.\"\n    *   It is served by an \"MCP resource\".\n    *   Modifications to the file will be cached for 5 minutes.\n\n*   **second_file.txt:**\n    *   It's a second text file.\n    *   Its content is \"This is the second file that I want to be able to use as a resource\"\n    *   It is intended to be used as a resource.\n\n*   **my.md:**\n    *   It's a markdown file.\n    *   Its content is a simple markdown document with a title \"My Markdown File\", an introduction, and two sections.\n    *   It is intended to be used as a resource.\n    *   Contains two sections: \"Section 1\" and \"Section 2\".\n"
+                    "text": "I have the following information from the provided resources:\n\n*   **test.txt:** This file contains a simple text message: \"Hello, this is a test file! This content will be served by the MCP resource. You can modify this file and it will be cached for 5 minutes.\" This suggests that this file is being used as a resource that is served by a \"MCP resource\" and that the content is cached for 5 minutes.\n\n*   **second_file.txt:** This file contains the text: \"This is the second file that I want to be able to use as a resource\". This suggests that this file is intended to be used as a resource.\n\n*   **my.md:** This is a markdown file. It contains a main heading \"My Markdown File\", a brief introductory paragraph, and two sections (\"Section 1\" and \"Section 2\") each with their own headings and content. This suggests that this file is intended to be used as a resource.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.14766211996273118
+              "avgLogprobs": -0.26490731588224087
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 140,
-            "candidatesTokenCount": 245,
-            "totalTokenCount": 385,
+            "candidatesTokenCount": 205,
+            "totalTokenCount": 345,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -83,12 +83,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 245
+                "tokenCount": 205
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "t_5XaOrzIfmSmNAP-sXGiQU"
+          "responseId": "BwNkaNLgCJmBmNAP8YDO2QI"
         }
-  recorded_at: Sun, 22 Jun 2025 13:01:44 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:20 GMT
 recorded_with: VCR 6.3.1

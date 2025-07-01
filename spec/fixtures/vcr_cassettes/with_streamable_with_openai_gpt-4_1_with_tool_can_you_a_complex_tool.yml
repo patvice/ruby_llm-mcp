@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:51:54 GMT
+      - Tue, 01 Jul 2025 15:47:41 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '487'
+      - '852'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '493'
+      - '859'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -49,11 +49,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29976'
+      - '29973'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 48ms
+      - 53ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
       Strict-Transport-Security:
@@ -75,9 +75,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BktrO8KyWGLRDKtwYFjxZEbf9MdGJ",
+          "id": "chatcmpl-BoXUqvunwvl18VcdzoELcHPrEngcM",
           "object": "chat.completion",
-          "created": 1750517514,
+          "created": 1751384860,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -87,7 +87,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_tUvfMnpTBru9WjGWVPGdOe2r",
+                    "id": "call_4vOpr4z8SfKsBpFNFyTM6egf",
                     "type": "function",
                     "function": {
                       "name": "fetch_site",
@@ -120,19 +120,19 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_51e1070cf2"
         }
-  recorded_at: Sat, 21 Jun 2025 14:51:54 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:41 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you fetch
-        the website http://www.google.com and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_tUvfMnpTBru9WjGWVPGdOe2r","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"http://www.google.com\"}"}}]},{"role":"tool","content":"Website
+        the website http://www.google.com and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_4vOpr4z8SfKsBpFNFyTM6egf","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"http://www.google.com\"}"}}]},{"role":"tool","content":"Website
         content from http://www.google.com:\n\nGoogle Search Images Maps Play YouTube
         News Gmail Drive More Calendar Translate Books Shopping Blogger Finance Photos
         Docs Even more &raquo; Account Options Sign in Search settings Web History
         &nbsp; Advanced search Google offered in: Français Advertising Business Solutions
-        About Google Google.ca &copy; 2025 - Privacy - Terms","tool_call_id":"call_tUvfMnpTBru9WjGWVPGdOe2r"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
+        About Google Google.ca &copy; 2025 - Privacy - Terms","tool_call_id":"call_4vOpr4z8SfKsBpFNFyTM6egf"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}}],"tool_choice":"auto"}'
     headers:
       User-Agent:
@@ -151,7 +151,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:51:56 GMT
+      - Tue, 01 Jul 2025 15:47:45 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -163,11 +163,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1167'
+      - '3878'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '1170'
+      - '3886'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -201,16 +201,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BktrP3qxMXvNEjWJpeet73gJZLjO7",
+          "id": "chatcmpl-BoXUrvu7PL60wib4JfVRnaJsMiu4h",
           "object": "chat.completion",
-          "created": 1750517515,
+          "created": 1751384861,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The homepage of Google (http://www.google.com) does not explicitly state what they do. However, it features links to various services such as Search, Images, Maps, Play, YouTube, News, Gmail, and others, indicating that Google offers a variety of online tools and services. There is no detailed description or mission statement about what Google does directly on the landing page.",
+                "content": "I fetched the homepage of http://www.google.com. The site does not have a clear statement directly saying what they do on the main page. Instead, it displays links to their different services such as Search, Images, Maps, YouTube, News, Gmail, and more.\n\nWhile it's implied that Google is a search engine and offers various other digital services, the homepage itself does not contain an explicit description of what Google does. If you want more detailed information about Google's purpose or company overview, you may need to visit their \"About Google\" page or similar sections.",
                 "refusal": null,
                 "annotations": []
               },
@@ -220,8 +220,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 180,
-            "completion_tokens": 78,
-            "total_tokens": 258,
+            "completion_tokens": 115,
+            "total_tokens": 295,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -236,5 +236,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_51e1070cf2"
         }
-  recorded_at: Sat, 21 Jun 2025 14:51:56 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:45 GMT
 recorded_with: VCR 6.3.1

@@ -13,7 +13,7 @@ http_interactions:
         an error","input_schema":{"type":"object","properties":{"shouldError":{"type":"boolean"}},"required":[]}},{"name":"fetch_site","description":"Fetches
         website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}},{"name":"get_jackhammer_audio","description":"Returns
         the jackhammer audio file as a base64-encoded WAV","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded JPEG","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"get_file_resource","description":"Returns
+        the dog image as a base64-encoded PNG","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"get_file_resource","description":"Returns
         a file resource reference","input_schema":{"type":"object","properties":{"filename":{"type":"string"}},"required":[]}},{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}},{"name":"upgrade_auth","description":"Upgrade
         authentication permissions","input_schema":{"type":"object","properties":{"permission":{"type":"string"}},"required":[]}},{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
@@ -37,7 +37,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:56:38 GMT
+      - Tue, 01 Jul 2025 15:46:11 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -49,25 +49,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '39000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:56:38Z'
+      - '2025-07-01T15:46:11Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:56:39Z'
+      - '2025-07-01T15:46:12Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:56:38Z'
+      - '2025-07-01T15:46:11Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '47000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:56:38Z'
+      - '2025-07-01T15:46:11Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -86,9 +86,9 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01T5BPfoxM1QDBSA7bhCi4sb","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
-        I can use the \"add\" function to add 1 and 2 for you. Let me do that now."},{"type":"tool_use","id":"toolu_01WEztEakWanvJ8geWex1h11","name":"add","input":{"a":1,"b":2}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":1052,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":98,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:56:38 GMT
+      string: '{"id":"msg_01ByVtKnpgHPPqQEcSQawapQ","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+        I can use the \"add\" function to add 1 and 2 for you. Let me do that now."},{"type":"tool_use","id":"toolu_01Cy8QTYyfbzbgBNKfjmBmAm","name":"add","input":{"a":1,"b":2}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":1051,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":98,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:11 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -96,14 +96,14 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you add 1 and 2?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly!
-        I can use the \"add\" function to add 1 and 2 for you. Let me do that now."},{"type":"tool_use","id":"toolu_01WEztEakWanvJ8geWex1h11","name":"add","input":{"a":1,"b":2}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01WEztEakWanvJ8geWex1h11","content":"3"}]}],"temperature":0.7,"stream":false,"max_tokens":8192,"tools":[{"name":"add","description":"Addes
+        I can use the \"add\" function to add 1 and 2 for you. Let me do that now."},{"type":"tool_use","id":"toolu_01Cy8QTYyfbzbgBNKfjmBmAm","name":"add","input":{"a":1,"b":2}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01Cy8QTYyfbzbgBNKfjmBmAm","content":"3"}]}],"temperature":0.7,"stream":false,"max_tokens":8192,"tools":[{"name":"add","description":"Addes
         two numbers together","input_schema":{"type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":[]}},{"name":"return_set_evn","description":"Returns
         the set environment variable","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"malformed_tool","description":"A
         malformed tool","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"tool_error","description":"Returns
         an error","input_schema":{"type":"object","properties":{"shouldError":{"type":"boolean"}},"required":[]}},{"name":"fetch_site","description":"Fetches
         website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}},{"name":"get_jackhammer_audio","description":"Returns
         the jackhammer audio file as a base64-encoded WAV","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded JPEG","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"get_file_resource","description":"Returns
+        the dog image as a base64-encoded PNG","input_schema":{"type":"object","properties":{},"required":[]}},{"name":"get_file_resource","description":"Returns
         a file resource reference","input_schema":{"type":"object","properties":{"filename":{"type":"string"}},"required":[]}},{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}},{"name":"upgrade_auth","description":"Upgrade
         authentication permissions","input_schema":{"type":"object","properties":{"permission":{"type":"string"}},"required":[]}},{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
@@ -127,7 +127,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:56:40 GMT
+      - Tue, 01 Jul 2025 15:46:13 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -139,25 +139,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '39000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:56:41Z'
+      - '2025-07-01T15:46:13Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:56:40Z'
+      - '2025-07-01T15:46:13Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:56:41Z'
+      - '2025-07-01T15:46:13Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '47000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:56:40Z'
+      - '2025-07-01T15:46:13Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -176,8 +176,8 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_019HGFNTy9WvCTXrReRY2NkJ","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"The
+      string: '{"id":"msg_01CW9exFpHhpNoQD6L1qXDRq","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"The
         result of adding 1 and 2 is 3. \n\nIs there anything else you''d like me to
-        calculate or help you with?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":1162,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":36,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:56:40 GMT
+        calculate or help you with?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":1161,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":36,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:13 GMT
 recorded_with: VCR 6.3.1

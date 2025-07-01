@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:52:53 GMT
+      - Tue, 01 Jul 2025 15:48:05 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,11 +38,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '684'
+      - '387'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '690'
+      - '391'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -50,11 +50,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29547'
+      - '29948'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 905ms
+      - 104ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,16 +76,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BktsLAi4hWiTjBTWjZbRfYmh4jJQC",
+          "id": "chatcmpl-BoXVFk5cSf0NbUYk10HtaRuTOeqPj",
           "object": "chat.completion",
-          "created": 1750517573,
+          "created": 1751384885,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The file **test.txt** contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```",
+                "content": "The `test.txt` file contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```",
                 "refusal": null,
                 "annotations": []
               },
@@ -111,5 +111,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_51e1070cf2"
         }
-  recorded_at: Sat, 21 Jun 2025 14:52:53 GMT
+  recorded_at: Tue, 01 Jul 2025 15:48:05 GMT
 recorded_with: VCR 6.3.1

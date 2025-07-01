@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:37 GMT
+      - Tue, 01 Jul 2025 15:46:15 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,25 +40,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:36Z'
+      - '2025-07-01T15:46:14Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:37Z'
+      - '2025-07-01T15:46:16Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:36Z'
+      - '2025-07-01T15:46:14Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:36Z'
+      - '2025-07-01T15:46:14Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -77,12 +77,12 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01XKoyekHNFWfN7Zvap9XQqx","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+      string: '{"id":"msg_01BuW71P1sTFHqYcc9RBpDix","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
         I''d be happy to provide you with the weather information for both Ottawa
         and San Francisco. To get this information, I''ll use the available tool to
-        fetch the weather data for these locations."},{"type":"tool_use","id":"toolu_015ASd4cdnQ6wkY8BmkYj1yk","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+        fetch the weather data for these locations."},{"type":"tool_use","id":"toolu_01Wi2d2QjeXjVVqi3cNXyDTP","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
         Francisco"]}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":471,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":105,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:37 GMT
+  recorded_at: Tue, 01 Jul 2025 15:46:15 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -92,8 +92,8 @@ http_interactions:
         you tell me the weather for Ottawa and San Francisco?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly!
         I''d be happy to provide you with the weather information for both Ottawa
         and San Francisco. To get this information, I''ll use the available tool to
-        fetch the weather data for these locations."},{"type":"tool_use","id":"toolu_015ASd4cdnQ6wkY8BmkYj1yk","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
-        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_015ASd4cdnQ6wkY8BmkYj1yk","content":"Weather
+        fetch the weather data for these locations."},{"type":"tool_use","id":"toolu_01Wi2d2QjeXjVVqi3cNXyDTP","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01Wi2d2QjeXjVVqi3cNXyDTP","content":"Weather
         for Ottawa, San Francisco is great!"}]}],"temperature":0.7,"stream":false,"max_tokens":8192,"tools":[{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":[]}},"required":["geocode"]}}]}'
@@ -116,7 +116,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:39 GMT
+      - Tue, 01 Jul 2025 15:46:18 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -128,25 +128,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:38Z'
+      - '2025-07-01T15:46:17Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:40Z'
+      - '2025-07-01T15:46:19Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:38Z'
+      - '2025-07-01T15:46:17Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:38Z'
+      - '2025-07-01T15:46:17Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -165,14 +165,15 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_0119bf6zsYnk4KyFG9f5buir","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
+      string: '{"id":"msg_01StyHqLZR66Sa16Y91X4ym6","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
         on the information provided by the weather tool, I can tell you that the weather
-        for both Ottawa and San Francisco is great!\n\nUnfortunately, the tool didn''t
+        for both Ottawa and San Francisco is great! \n\nUnfortunately, the tool didn''t
         provide specific details about temperature, humidity, or other weather conditions.
-        However, the general assessment is positive for both cities.\n\nIf you''d
-        like more detailed information about specific aspects of the weather in these
-        cities, such as temperature, precipitation, or wind conditions, please let
-        me know, and I''ll try to find out if there''s a way to get more specific
-        data."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":595,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":112,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:39 GMT
+        If you''d like more detailed information about the weather in these cities,
+        such as temperature ranges, precipitation chances, or wind conditions, you
+        might need to check a more comprehensive weather service or ask for a more
+        detailed weather report.\n\nIs there anything else you''d like to know about
+        the weather in Ottawa or San Francisco, or any other locations you''re interested
+        in?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":595,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":124,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:18 GMT
 recorded_with: VCR 6.3.1

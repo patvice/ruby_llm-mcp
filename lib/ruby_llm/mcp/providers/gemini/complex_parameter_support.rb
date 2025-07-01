@@ -16,20 +16,22 @@ module RubyLLM
             }
           end
 
-          def build_properties(param)
+          def build_properties(param) # rubocop:disable Metrics/MethodLength
             properties = case param.type
                          when :array
                            if param.item_type == :object
                              {
                                type: param_type_for_gemini(param.type),
+                               description: param.description,
                                items: {
                                  type: param_type_for_gemini(param.item_type),
                                  properties: param.properties.transform_values { |value| build_properties(value) }
                                }
-                             }
+                             }.compact
                            else
                              {
                                type: param_type_for_gemini(param.type),
+                               description: param.description,
                                default: param.default,
                                items: { type: param_type_for_gemini(param.item_type), enum: param.enum }.compact
                              }.compact
@@ -37,9 +39,10 @@ module RubyLLM
                          when :object
                            {
                              type: param_type_for_gemini(param.type),
+                             description: param.description,
                              properties: param.properties.transform_values { |value| build_properties(value) },
                              required: param.properties.select { |_, p| p.required }.keys
-                           }
+                           }.compact
                          when :union
                            {
                              param.union_type => param.properties.map { |properties| build_properties(properties) }

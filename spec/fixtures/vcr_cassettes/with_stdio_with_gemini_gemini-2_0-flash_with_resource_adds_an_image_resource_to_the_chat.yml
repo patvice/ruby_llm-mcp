@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:01:40 GMT
+      - Tue, 01 Jul 2025 15:45:28 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1324
+      - gfet4t7; dur=974
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,38 +55,38 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have an image of a light-colored dog (possibly a golden retriever puppy) with its mouth open. It appears to be yawning or perhaps even making a vocalization. The background is white.\n"
+                    "text": "I have an image of a light-colored dog, likely a puppy, with its mouth wide open as if yawning or barking. It's standing on a white background.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.48831079064345939
+              "avgLogprobs": -0.28053757879469132
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 273,
-            "candidatesTokenCount": 41,
-            "totalTokenCount": 314,
+            "candidatesTokenCount": 36,
+            "totalTokenCount": 309,
             "promptTokensDetails": [
-              {
-                "modality": "IMAGE",
-                "tokenCount": 258
-              },
               {
                 "modality": "TEXT",
                 "tokenCount": 15
+              },
+              {
+                "modality": "IMAGE",
+                "tokenCount": 258
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 41
+                "tokenCount": 36
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "s_5XaPu9BLmFmNAPxPbFyQY"
+          "responseId": "lwJkaN7bJ6izxfcPvo3h8QI"
         }
-  recorded_at: Sun, 22 Jun 2025 13:01:40 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:28 GMT
 recorded_with: VCR 6.3.1

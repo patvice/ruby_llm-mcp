@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:01:50 GMT
+      - Tue, 01 Jul 2025 15:47:28 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1117
+      - gfet4t7; dur=1083
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have an image of a light-colored dog, possibly a golden retriever puppy, with its mouth wide open, likely yawning.\n"
+                    "text": "I have an image of a light-colored dog (likely a golden retriever puppy) with its mouth wide open, possibly yawning. It's standing on a white background.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.30574092158564814
+              "avgLogprobs": -0.43860472573174369
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 273,
-            "candidatesTokenCount": 27,
-            "totalTokenCount": 300,
+            "candidatesTokenCount": 36,
+            "totalTokenCount": 309,
             "promptTokensDetails": [
               {
                 "modality": "IMAGE",
@@ -81,12 +81,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 27
+                "tokenCount": 36
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "vf5XaOjMGPmSmNAP-sXGiQU"
+          "responseId": "DwNkaLepEPLhmNAPpebBuQM"
         }
-  recorded_at: Sun, 22 Jun 2025 13:01:50 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:28 GMT
 recorded_with: VCR 6.3.1

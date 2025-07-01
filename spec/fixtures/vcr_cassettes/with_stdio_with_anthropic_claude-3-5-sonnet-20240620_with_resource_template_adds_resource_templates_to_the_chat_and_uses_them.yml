@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:28 GMT
+      - Tue, 01 Jul 2025 15:44:59 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:27Z'
+      - '2025-07-01T15:44:58Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:28Z'
+      - '2025-07-01T15:44:59Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:27Z'
+      - '2025-07-01T15:44:59Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:27Z'
+      - '2025-07-01T15:44:58Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,11 +76,9 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01R5sPwZC8BcLKvUC5XrEoTD","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
-        I''d be happy to greet Alice using the greeting template. Here''s the greeting:\n\ngreeting
-        (greeting://Alice): A greeting resource\n\nHello, Alice!\n\nThis follows the
-        template you provided, with \"Alice\" as the recipient of the greeting. The
-        greeting includes a resource identifier (greeting://Alice) and a brief description,
-        followed by the actual greeting message."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":32,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":81,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:28 GMT
+      string: '{"id":"msg_01FonPFvTtLZ2Rxhm8PyGmD8","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+        I''ll use the greeting template to greet Alice. Here''s the greeting:\n\ngreeting
+        (greeting://Alice): A greeting resource\n\nHello, Alice!\n\nI hope you''re
+        having a wonderful day. It''s great to see you!"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":32,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":54,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:44:59 GMT
 recorded_with: VCR 6.3.1

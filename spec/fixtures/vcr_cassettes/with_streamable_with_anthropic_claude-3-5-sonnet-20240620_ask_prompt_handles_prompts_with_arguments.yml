@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:58:14 GMT
+      - Tue, 01 Jul 2025 15:49:16 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,25 +38,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:58:13Z'
+      - '2025-07-01T15:49:14Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:58:15Z'
+      - '2025-07-01T15:49:16Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:58:13Z'
+      - '2025-07-01T15:49:15Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:58:13Z'
+      - '2025-07-01T15:49:14Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,6 +76,6 @@ http_interactions:
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        eyJpZCI6Im1zZ18wMTNSN3JDb3l1SHJhaThtWXhBdXg2TFIiLCJ0eXBlIjoibWVzc2FnZSIsInJvbGUiOiJhc3Npc3RhbnQiLCJtb2RlbCI6ImNsYXVkZS0zLTUtc29ubmV0LTIwMjQwNjIwIiwiY29udGVudCI6W3sidHlwZSI6InRleHQiLCJ0ZXh0IjoiQ2VydGFpbmx5ISBIZXJlJ3MgYSBncmVldGluZyBmb3IgSm9obiBpbiBTcGFuaXNoOlxuXG7CoUhvbGEgSm9obiEgwr9Dw7NtbyBlc3TDoXM/XG5cblRoaXMgdHJhbnNsYXRlcyB0bzpcblxuXCJIZWxsbyBKb2huISBIb3cgYXJlIHlvdT9cIlxuXG5JZiB5b3UnZCBsaWtlIGEgbW9yZSBmb3JtYWwgZ3JlZXRpbmcsIHlvdSBjb3VsZCB1c2U6XG5cbkJ1ZW5vcyBkw61hcywgSm9obi4gwr9Dw7NtbyBzZSBlbmN1ZW50cmEgdXN0ZWQ/XG5cbldoaWNoIG1lYW5zOlxuXG5cIkdvb2QgZGF5LCBKb2huLiBIb3cgYXJlIHlvdSBkb2luZz9cIiJ9XSwic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGwsInVzYWdlIjp7ImlucHV0X3Rva2VucyI6MTcsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsIm91dHB1dF90b2tlbnMiOjk2LCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCJ9fQ==
-  recorded_at: Sun, 22 Jun 2025 12:58:14 GMT
+        eyJpZCI6Im1zZ18wMVFtNlpBRWZWWTltTTg4ellVTlczaUciLCJ0eXBlIjoibWVzc2FnZSIsInJvbGUiOiJhc3Npc3RhbnQiLCJtb2RlbCI6ImNsYXVkZS0zLTUtc29ubmV0LTIwMjQwNjIwIiwiY29udGVudCI6W3sidHlwZSI6InRleHQiLCJ0ZXh0IjoiQ2VydGFpbmx5ISBIZXJlJ3MgYSBncmVldGluZyBmb3IgSm9obiBpbiBTcGFuaXNoOlxuXG7CoUhvbGEgSm9obiEgwr9Dw7NtbyBlc3TDoXM/XG5cblRoaXMgdHJhbnNsYXRlcyB0byBcIkhlbGxvIEpvaG4hIEhvdyBhcmUgeW91P1wiIGluIEVuZ2xpc2guXG5cbklmIHlvdSdkIGxpa2UgYSBtb3JlIGZvcm1hbCBncmVldGluZywgeW91IGNvdWxkIHVzZTpcblxuQnVlbm9zIGTDrWFzLCBKb2huLiDCv0PDs21vIHNlIGVuY3VlbnRyYSB1c3RlZD9cblxuVGhpcyBtZWFucyBcIkdvb2QgZGF5LCBKb2huLiBIb3cgYXJlIHlvdSBkb2luZz9cIiBhbmQgaXMgbW9yZSBmb3JtYWwuIn1dLCJzdG9wX3JlYXNvbiI6ImVuZF90dXJuIiwic3RvcF9zZXF1ZW5jZSI6bnVsbCwidXNhZ2UiOnsiaW5wdXRfdG9rZW5zIjoxNywiY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zIjowLCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6MCwib3V0cHV0X3Rva2VucyI6MTAwLCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCJ9fQ==
+  recorded_at: Tue, 01 Jul 2025 15:49:16 GMT
 recorded_with: VCR 6.3.1

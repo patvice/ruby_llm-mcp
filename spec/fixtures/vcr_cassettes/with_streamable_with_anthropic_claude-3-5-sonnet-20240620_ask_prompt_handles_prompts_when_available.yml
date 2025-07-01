@@ -6,7 +6,7 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Hello,
-        how are you?"}]}],"temperature":0.7,"stream":false,"max_tokens":8192}'
+        how are you? Can you also say Hello back?"}]}],"temperature":0.7,"stream":false,"max_tokens":8192}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:58:08 GMT
+      - Tue, 01 Jul 2025 15:47:05 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,25 +38,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:58:07Z'
+      - '2025-07-01T15:47:04Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:58:08Z'
+      - '2025-07-01T15:47:05Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
-      - '48'
+      - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:58:08Z'
+      - '2025-07-01T15:47:05Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:58:07Z'
+      - '2025-07-01T15:47:04Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -75,8 +75,7 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01MDt3MDP7Q7oKJewziBshVY","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Hello!
-        I''m doing well, thank you for asking. How can I assist you today? Is there
-        any particular topic you''d like to discuss or any questions you have?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":13,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":38,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:58:08 GMT
+      string: '{"id":"msg_0149LmmA3NM4NuLo6uDTi5WF","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Hello!
+        I''m doing well, thank you for asking. How are you doing today?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":20,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":21,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:47:05 GMT
 recorded_with: VCR 6.3.1

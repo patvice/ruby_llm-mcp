@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:07 GMT
+      - Tue, 01 Jul 2025 15:44:32 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,25 +40,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:06Z'
+      - '2025-07-01T15:44:30Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:08Z'
+      - '2025-07-01T15:44:32Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:06Z'
+      - '2025-07-01T15:44:28Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:06Z'
+      - '2025-07-01T15:44:30Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -77,11 +77,11 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01CpnRhtp6NT9EBfiNnv1e1v","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
-        I''ll use the fetch_site function to retrieve the content from http://www.google.com
-        and then analyze it to see if the site explicitly states what they do. Let
-        me fetch the content for you."},{"type":"tool_use","id":"toolu_01S2iUseMxtBmaheHRmZBTU3","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":454,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":106,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:07 GMT
+      string: '{"id":"msg_01N8P7VkrnDTcdmZ4MiZdJBr","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+        I''ll fetch the content of http://www.google.com for you using the available
+        tool and then analyze it to see if the site explicitly states what they do.
+        Let me do that for you now."},{"type":"tool_use","id":"toolu_01AR35SF7szsY9KAe6ugJ1cu","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":454,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":105,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:44:32 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -90,9 +90,9 @@ http_interactions:
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you fetch the website http://www.google.com and see if the site say what they
         do?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly! I''ll
-        use the fetch_site function to retrieve the content from http://www.google.com
+        fetch the content of http://www.google.com for you using the available tool
         and then analyze it to see if the site explicitly states what they do. Let
-        me fetch the content for you."},{"type":"tool_use","id":"toolu_01S2iUseMxtBmaheHRmZBTU3","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01S2iUseMxtBmaheHRmZBTU3","content":"Website
+        me do that for you now."},{"type":"tool_use","id":"toolu_01AR35SF7szsY9KAe6ugJ1cu","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01AR35SF7szsY9KAe6ugJ1cu","content":"Website
         content from http://www.google.com:\n\nGoogle Search Images Maps Play YouTube
         News Gmail Drive More Calendar Translate Books Shopping Blogger Finance Photos
         Docs Even more &raquo; Account Options Sign in Search settings Web History
@@ -118,7 +118,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:14 GMT
+      - Tue, 01 Jul 2025 15:44:39 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -130,25 +130,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:08Z'
+      - '2025-07-01T15:44:34Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:16Z'
+      - '2025-07-01T15:44:42Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:09Z'
+      - '2025-07-01T15:44:34Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:08Z'
+      - '2025-07-01T15:44:34Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -167,29 +167,7 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_012wFmxxpiT6oRZeNUutRNys","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"After
-        analyzing the content fetched from http://www.google.com, I can provide you
-        with the following information:\n\nThe website doesn''t explicitly state what
-        Google does in a comprehensive manner on its homepage. However, we can infer
-        some information about Google''s services from the content:\n\n1. Google''s
-        primary function appears to be a search engine, as evidenced by the prominent
-        search bar and \"Search settings\" option.\n\n2. The site lists various other
-        services and products offered by Google, including:\n   - Images\n   - Maps\n   -
-        Play (likely referring to Google Play store)\n   - YouTube\n   - News\n   -
-        Gmail\n   - Drive\n   - Calendar\n   - Translate\n   - Books\n   - Shopping\n   -
-        Blogger\n   - Finance\n   - Photos\n   - Docs\n\n3. The homepage also mentions
-        \"Advanced search\" and \"Web History,\" further emphasizing its role as a
-        search engine.\n\n4. There are links to \"Advertising\" and \"Business Solutions,\"
-        suggesting that Google offers services for businesses and advertisers.\n\n5.
-        The presence of \"Account Options\" and \"Sign in\" indicates that Google
-        provides personalized services to users with accounts.\n\nWhile the homepage
-        doesn''t provide a detailed description of what Google does, it''s clear that
-        Google is primarily a search engine that also offers a wide range of other
-        internet-based services and products. The homepage is designed to be a simple
-        entry point to these various services rather than a detailed explanation of
-        the company''s functions.\n\nIf you''d like more specific information about
-        what Google does, we might need to look at their \"About\" page or other sections
-        of their website. Would you like me to fetch any other pages for more detailed
-        information?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":650,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":369,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:14 GMT
+      string: !binary |-
+        eyJpZCI6Im1zZ18wMVRoNXZacjNtWnpldWd3WXpNRnl0Q2UiLCJ0eXBlIjoibWVzc2FnZSIsInJvbGUiOiJhc3Npc3RhbnQiLCJtb2RlbCI6ImNsYXVkZS0zLTUtc29ubmV0LTIwMjQwNjIwIiwiY29udGVudCI6W3sidHlwZSI6InRleHQiLCJ0ZXh0IjoiQWZ0ZXIgYW5hbHl6aW5nIHRoZSBjb250ZW50IGZldGNoZWQgZnJvbSBodHRwOi8vd3d3Lmdvb2dsZS5jb20sIEkgY2FuIHByb3ZpZGUgeW91IHdpdGggdGhlIGZvbGxvd2luZyBpbmZvcm1hdGlvbjpcblxuVGhlIGhvbWVwYWdlIG9mIEdvb2dsZS5jb20gZG9lc24ndCBleHBsaWNpdGx5IHN0YXRlIHdoYXQgdGhleSBkbyBpbiBhIGRldGFpbGVkIG1hbm5lci4gSG93ZXZlciwgZnJvbSB0aGUgY29udGVudCB3ZSBjYW4gaW5mZXIgc2V2ZXJhbCBrZXkgYXNwZWN0cyBvZiBHb29nbGUncyBzZXJ2aWNlczpcblxuMS4gU2VhcmNoOiBUaGUgbW9zdCBwcm9taW5lbnQgZmVhdHVyZSBpcyB0aGUgc2VhcmNoIGZ1bmN0aW9uYWxpdHksIHdoaWNoIGlzIEdvb2dsZSdzIHByaW1hcnkgc2VydmljZS5cblxuMi4gVmFyaW91cyBQcm9kdWN0czogVGhlIGhvbWVwYWdlIGxpc3RzIHNldmVyYWwgb2YgR29vZ2xlJ3MgcG9wdWxhciBwcm9kdWN0cyBhbmQgc2VydmljZXMsIGluY2x1ZGluZzpcbiAgIC0gSW1hZ2VzXG4gICAtIE1hcHNcbiAgIC0gUGxheSAobGlrZWx5IHJlZmVycmluZyB0byBHb29nbGUgUGxheSBTdG9yZSlcbiAgIC0gWW91VHViZVxuICAgLSBOZXdzXG4gICAtIEdtYWlsXG4gICAtIERyaXZlXG4gICAtIENhbGVuZGFyXG4gICAtIFRyYW5zbGF0ZVxuICAgLSBCb29rc1xuICAgLSBTaG9wcGluZ1xuICAgLSBCbG9nZ2VyXG4gICAtIEZpbmFuY2VcbiAgIC0gUGhvdG9zXG4gICAtIERvY3NcblxuMy4gQWNjb3VudCBGZWF0dXJlczogVGhlcmUgYXJlIG9wdGlvbnMgZm9yIHNpZ25pbmcgaW4gYW5kIG1hbmFnaW5nIGFjY291bnQgc2V0dGluZ3MuXG5cbjQuIEFkZGl0aW9uYWwgRmVhdHVyZXM6IFRoZSBwYWdlIG1lbnRpb25zIFwiQWR2YW5jZWQgc2VhcmNoXCIgYW5kIFwiV2ViIEhpc3RvcnkuXCJcblxuNS4gQnVzaW5lc3MgU2VydmljZXM6IFRoZXJlJ3MgYSBtZW50aW9uIG9mIFwiQWR2ZXJ0aXNpbmdcIiBhbmQgXCJCdXNpbmVzcyBTb2x1dGlvbnMsXCIgaW5kaWNhdGluZyB0aGF0IEdvb2dsZSBvZmZlcnMgc2VydmljZXMgZm9yIGJ1c2luZXNzZXMgYXMgd2VsbC5cblxuNi4gTXVsdGlwbGUgTGFuZ3VhZ2VzOiBUaGUgc2l0ZSBtZW50aW9ucyB0aGF0IEdvb2dsZSBpcyBvZmZlcmVkIGluIEZyZW5jaCAoRnJhbsOnYWlzKSwgc3VnZ2VzdGluZyBtdWx0aWxpbmd1YWwgc3VwcG9ydC5cblxuNy4gUHJpdmFjeSBhbmQgVGVybXM6IExpbmtzIHRvIFByaXZhY3kgYW5kIFRlcm1zIHBhZ2VzIGFyZSBwcm92aWRlZC5cblxuV2hpbGUgdGhlIGhvbWVwYWdlIGRvZXNuJ3QgcHJvdmlkZSBhIGV4cGxpY2l0IHN0YXRlbWVudCBsaWtlIFwiR29vZ2xlIGlzIGEgY29tcGFueSB0aGF0IGRvZXMgWCwgWSwgYW5kIFosXCIgaXQncyBjbGVhciBmcm9tIHRoZSBjb250ZW50IHRoYXQgR29vZ2xlIGlzIHByaW1hcmlseSBhIHNlYXJjaCBlbmdpbmUgdGhhdCBhbHNvIG9mZmVycyBhIHdpZGUgcmFuZ2Ugb2YgaW50ZXJuZXQtYmFzZWQgc2VydmljZXMgYW5kIHByb2R1Y3RzIGZvciBib3RoIGluZGl2aWR1YWwgdXNlcnMgYW5kIGJ1c2luZXNzZXMuXG5cbklmIHlvdSdyZSBsb29raW5nIGZvciBhIG1vcmUgZGV0YWlsZWQgZGVzY3JpcHRpb24gb2Ygd2hhdCBHb29nbGUgZG9lcywgd2UgbWlnaHQgbmVlZCB0byBsb29rIGF0IHRoZWlyIFwiQWJvdXRcIiBwYWdlIG9yIG90aGVyIHNlY3Rpb25zIG9mIHRoZWlyIHdlYnNpdGUuIFdvdWxkIHlvdSBsaWtlIG1lIHRvIGZldGNoIGFueSBvdGhlciBzcGVjaWZpYyBwYWdlcyBmcm9tIEdvb2dsZSdzIHNpdGUgZm9yIG1vcmUgaW5mb3JtYXRpb24/In1dLCJzdG9wX3JlYXNvbiI6ImVuZF90dXJuIiwic3RvcF9zZXF1ZW5jZSI6bnVsbCwidXNhZ2UiOnsiaW5wdXRfdG9rZW5zIjo2NDksImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsIm91dHB1dF90b2tlbnMiOjM5MCwic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0=
+  recorded_at: Tue, 01 Jul 2025 15:44:39 GMT
 recorded_with: VCR 6.3.1

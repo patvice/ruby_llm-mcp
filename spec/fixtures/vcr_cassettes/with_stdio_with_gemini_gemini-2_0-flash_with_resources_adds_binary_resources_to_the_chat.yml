@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 21 Jun 2025 16:45:01 GMT
+      - Tue, 01 Jul 2025 15:45:25 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=3537
+      - gfet4t7; dur=2506
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,38 +55,38 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have access to a vast amount of information and can perform a wide range of tasks. Here's a general overview of my capabilities:\n\n*   **Vast Knowledge Base:** I've been trained on a massive dataset of text and code, allowing me to understand and generate human-like text on a wide variety of topics.\n*   **Information Retrieval:** I can search for and retrieve information from the real world through Google Search and keep my response consistent with search results.\n*   **Text Generation:** I can generate different creative text formats, like poems, code, scripts, musical pieces, email, letters, etc. I will try my best to fulfill all your requirements.\n*   **Language Translation:** I can translate languages.\n*   **Question Answering:** I can answer questions in an informative way, even if they are open ended, challenging, or strange.\n*   **Code Generation:** I can generate code in various programming languages.\n*   **Image Understanding:** I can understand and describe images, as demonstrated in my response to your prompt.\n*   **Following Instructions:** I can follow your instructions and complete your requests.\n\nIt's important to remember that I am an AI and have certain limitations:\n\n*   **I am not sentient:** I do not have feelings, emotions, or consciousness.\n*   **I am not a human:** I am an artificial intelligence and should not be mistaken for a human.\n*   **I am not always accurate:** While I strive to provide accurate information, errors can occur. It's always a good idea to verify information from multiple sources.\n*   **I am constantly learning:** My knowledge is constantly being updated, but I may not have information on events that occurred very recently.\n\nI am here to help you with a wide range of tasks. Just let me know what you need!"
+                    "text": "I have access to a vast amount of information and resources, including:\n\n*   **A massive dataset of text and code:** This is the foundation of my knowledge. I have been trained on a huge amount of data, allowing me to understand and generate text in a variety of styles and formats.\n*   **Google Search:** I can use Google Search to access real-time information and up-to-date knowledge on a wide range of topics. This allows me to provide you with current events, facts, and answers to questions that require the latest information.\n*   **Internal Knowledge and Reasoning Abilities:** I can use the information I have been trained on, along with my reasoning abilities, to answer your questions, generate creative content, translate languages, and much more.\n*   **Image Understanding:** As demonstrated in this conversation, I can understand the content of images and respond accordingly.\n\nIn short, I have access to a very wide range of resources that I can use to help you with your requests."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.18804891800444681
+              "avgLogprobs": -0.38227347957277763
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 275,
-            "candidatesTokenCount": 383,
-            "totalTokenCount": 658,
+            "candidatesTokenCount": 206,
+            "totalTokenCount": 481,
             "promptTokensDetails": [
-              {
-                "modality": "IMAGE",
-                "tokenCount": 258
-              },
               {
                 "modality": "TEXT",
                 "tokenCount": 17
+              },
+              {
+                "modality": "IMAGE",
+                "tokenCount": 258
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 383
+                "tokenCount": 206
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "iuFWaKOXGP2R7dcPy-Ka6Qw"
+          "responseId": "kwJkaJbrCvLhmNAPpebBuQM"
         }
-  recorded_at: Sat, 21 Jun 2025 16:45:01 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:25 GMT
 recorded_with: VCR 6.3.1

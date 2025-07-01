@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:07:20 GMT
+      - Tue, 01 Jul 2025 15:45:33 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=2043
+      - gfet4t7; dur=2640
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The clock ticks soft, a gentle chime,\nUpon the canvas of this time,\nA day unfurls, a brand new scroll,\nTo paint with moments, take control.\n\nThe sun, a painter, starts his quest,\nTo gild the clouds in hues of blessed\nAnd fleeting gold, then washes clean\nThe world below, a vibrant scene.\n\nThe wind, a whisper through the trees,\nA rustling song, a gentle breeze,\nCarries the scent of earth and dew,\nA promise whispered, fresh and new.\n\nThe city wakes, a hum and stir,\nA million dreams begin to blur,\nEach soul a story, yet untold,\nIn silver, bronze, and shades of gold.\n\nA robin sings a morning trill,\nUpon the window's dusty sill,\nA tiny spark of vibrant glee,\nA joyful, simple melody.\n\nSo breathe it in, this present day,\nLet worries gently drift away,\nEmbrace the beauty, big and small,\nAnd find the magic in it all.\n\nFor in this moment, bright and clear,\nA living, breathing **poem** is here,\nWritten in light, in sound, in air,\nA masterpiece beyond compare.\n"
+                    "text": "The sun, a painter, splashed the eastern sky\nWith hues of apricot and blushing rose,\nA canvas new, where shadows gently lie,\nBefore the waking world begins to doze.\n\nThe air is crisp, a whisper on the breeze,\nThat stirs the leaves, a silver, rustling sound,\nAnd birdsong rises through the budding trees,\nA symphony on consecrated ground.\n\nThe coffee steams, a promise in the cup,\nOf focused thought and energy reborn,\nA gentle nudge to lift our spirits up,\nAnd greet the tasks that wait until the morn.\n\nThe ordinary blooms with grace unseen,\nA smile exchanged, a kindness softly given,\nA moment caught, a tapestry of green,\nA quiet joy, a blessing from above.\n\nThis very day, a precious, fleeting thing,\nA chance to write a vibrant, living **poem**,\nTo let our hearts take flight and truly sing,\nAnd carry beauty onward, towards our home.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.53235836993859431
+              "avgLogprobs": -0.57058411396195741
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 25,
-            "candidatesTokenCount": 257,
-            "totalTokenCount": 282,
+            "candidatesTokenCount": 203,
+            "totalTokenCount": 228,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 257
+                "tokenCount": 203
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BgBYaOzkO4WT1dkP_cOosQU"
+          "responseId": "mwJkaI-6CvCchMIPorGGiAk"
         }
-  recorded_at: Sun, 22 Jun 2025 13:07:20 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:33 GMT
 recorded_with: VCR 6.3.1
