@@ -3,10 +3,20 @@
 module RubyLLM
   module MCP
     module Requests
-      class ResourceList < Base
-        def call
-          coordinator.request(resource_list_body)
+      class ResourceList
+        include Shared::Pagination
+
+        def initialize(coordinator, cursor: nil)
+          @coordinator = coordinator
+          @cursor = cursor
         end
+
+        def call
+          body = merge_pagination(resource_list_body)
+          @coordinator.request(body)
+        end
+
+        private
 
         def resource_list_body
           {

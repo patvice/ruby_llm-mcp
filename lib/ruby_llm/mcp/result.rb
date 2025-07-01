@@ -12,7 +12,7 @@ module RubyLLM
     end
 
     class Result
-      attr_reader :result, :error, :params, :id, :response, :session_id
+      attr_reader :result, :error, :params, :id, :response, :session_id, :next_cursor
 
       def initialize(response, session_id: nil)
         @response = response
@@ -24,6 +24,7 @@ module RubyLLM
         @error = response["error"] || {}
 
         @result_is_error = response.dig("result", "isError") || false
+        @next_cursor = response.dig("result", "nextCursor")
       end
 
       alias value result
@@ -56,6 +57,10 @@ module RubyLLM
 
       def notification?
         @method&.include?("notifications") || false
+      end
+
+      def next_cursor?
+        @next_cursor.present?
       end
 
       def request?

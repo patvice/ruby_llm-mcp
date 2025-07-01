@@ -3,9 +3,17 @@
 module RubyLLM
   module MCP
     module Requests
-      class ToolList < RubyLLM::MCP::Requests::Base
+      class ToolList
+        include Shared::Pagination
+
+        def initialize(coordinator, cursor: nil)
+          @coordinator = coordinator
+          @cursor = cursor
+        end
+
         def call
-          coordinator.request(tool_list_body)
+          body = merge_pagination(tool_list_body)
+          @coordinator.request(body)
         end
 
         private

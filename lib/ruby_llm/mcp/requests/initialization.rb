@@ -3,9 +3,13 @@
 module RubyLLM
   module MCP
     module Requests
-      class Initialization < RubyLLM::MCP::Requests::Base
+      class Initialization
+        def initialize(coordinator)
+          @coordinator = coordinator
+        end
+
         def call
-          coordinator.request(initialize_body)
+          @coordinator.request(initialize_body)
         end
 
         private
