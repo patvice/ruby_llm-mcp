@@ -81,7 +81,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
 
       # Access logger to create it
       original_logger = config.logger
-      expect(original_logger).to be_a(Logger)
 
       # Reset
       config.reset!

@@ -45,7 +45,15 @@ module RubyLLM
         end
       end
 
-      class TransportError < BaseError; end
+      class TransportError < BaseError
+        attr_reader :code, :error
+
+        def initialize(message:, code: nil, error: nil)
+          @code = code
+          @error = error
+          super(message: message)
+        end
+      end
 
       class UnknownRequest < BaseError; end
     end

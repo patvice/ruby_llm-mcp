@@ -17,6 +17,10 @@ RSpec.describe RubyLLM::MCP::Progress do
       end
 
       describe "basic tool execution" do
+        it "if progress is given but no handler, no error will be raised" do
+          expect { client.tool("simple_progress").execute(progress: 75) }.not_to raise_error
+        end
+
         it "can get progress from a tool" do
           progress = nil
           client.on_progress do |progress_update|
@@ -28,6 +32,16 @@ RSpec.describe RubyLLM::MCP::Progress do
           expect(progress.progress).to eq(75)
           expect(progress.message).to eq("Progress: 75%")
           expect(progress.progress_token).to be_a(String)
+        end
+
+        it "progress will contain a progress token" do
+          progress = nil
+          client.on_progress do |progress_update|
+            progress = progress_update
+          end
+
+          client.tool("simple_progress").execute(progress: 75)
+          expect(progress.to_h[:progress_token]).to be_a(String)
         end
 
         it "can get multiple progress updates from a tool" do

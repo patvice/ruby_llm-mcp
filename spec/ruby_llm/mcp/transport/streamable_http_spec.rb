@@ -234,7 +234,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         expect do
           transport.request({ "method" => "tools/list", "id" => 1 })
-        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Session expired/)
+        end.to raise_error(RubyLLM::MCP::Errors::SessionExpiredError)
       end
 
       it "handles 405 Method Not Allowed" do
@@ -311,7 +311,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         expect do
           transport.send(:start_sse, options)
-        end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Failed to open SSE stream: 400/)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Failed to open SSE stream: 400/)
       end
 
       it "handles SSE 405 Method Not Allowed gracefully" do
@@ -410,7 +410,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         expect do
           transport.send(:terminate_session)
-        end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Failed to terminate session: 500/)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Failed to terminate session: 500/)
       end
 
       it "handles session termination connection error" do
@@ -421,7 +421,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         expect do
           transport.send(:terminate_session)
-        end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Failed to terminate session/)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Failed to terminate session/)
       end
 
       it "accepts 405 status for session termination" do
@@ -458,7 +458,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         it "raises appropriate error" do
           expect do
             transport.send(:terminate_session)
-          end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Failed to terminate session: 400/)
+          end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Failed to terminate session: 400/)
         end
       end
     end
@@ -610,7 +610,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
           expect do
             transport_with_options.send(:start_sse, options)
-          end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Connection refused/)
+          end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Connection refused/)
         end
       end
 
@@ -625,7 +625,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         expect do
           transport.send(:start_sse, options)
-        end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Connection refused/)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Connection refused/)
       end
 
       it "stops retrying when abort controller is set" do
@@ -639,12 +639,12 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         expect do
           transport.send(:start_sse, options)
-        end.to raise_error(RubyLLM::MCP::Transport::StreamableHTTPError, /Connection refused/)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Connection refused/)
       end
     end
 
     describe "edge cases and boundary conditions" do
-      it "handles empty request body gracefully" do
+      it "handles bad JSON format request body gracefully" do
         stub_request(:post, "http://localhost:3005/mcp")
           .to_return(
             status: 200,
@@ -659,33 +659,33 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles request without ID gracefully" do
+        session_id = SecureRandom.uuid
+
         stub_request(:post, "http://localhost:3005/mcp")
           .to_return(
             status: 200,
-            headers: { "Content-Type" => "application/json" },
-            body: '{"result": "ok"}'
+            headers: { "Content-Type" => "application/json", "mcp-session-id" => session_id },
+            body: { "result" => { "content" => [{ "type" => "text", "value" => "ok" }] } }.to_json
           )
 
         # Request without ID should be handled properly
-        expect do
-          transport.request({ "method" => "test" }, add_id: false, wait_for_response: false)
-        end.to raise_error(RubyLLM::MCP::Errors::TransportError)
+        result = transport.request({ "method" => "test" }, add_id: false, wait_for_response: false)
+        expect(result.session_id).to eq(session_id)
       end
 
       it "handles very large response gracefully" do
-        large_response = "{\"result\": \"#{'x' * 10_000}\"}"
+        large_response = { "result" => { "content" => [{ "type" => "text", "value" => "x" * 10_000 }] } }
 
         stub_request(:post, "http://localhost:3005/mcp")
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json" },
-            body: large_response
+            body: large_response.to_json
           )
 
         # Very large response should be handled properly
-        expect do
-          transport.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
-        end.to raise_error(RubyLLM::MCP::Errors::TransportError)
+        result = transport.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        expect(result.result["content"][0]["value"]).to eq("x" * 10_000)
       end
 
       it "handles response with event-stream content type" do
@@ -712,14 +712,13 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
                 "Content-Type" => "application/json",
                 "mcp-session-id" => "new-session-123"
               },
-              body: '{"result": "ok"}'
+              body: { "result" => { "content" => [{ "type" => "text", "value" => "ok" }] } }.to_json
             )
         end
 
         it "extracts session ID correctly" do
-          expect do
-            transport.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
-          end.to raise_error(RubyLLM::MCP::Errors::TransportError)
+          result = transport.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+          expect(result.session_id).to eq("new-session-123")
         end
       end
 

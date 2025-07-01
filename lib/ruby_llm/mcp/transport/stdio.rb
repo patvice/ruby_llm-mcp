@@ -52,7 +52,7 @@ module RubyLLM
           rescue IOError, Errno::EPIPE => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             restart_process
-            raise RubyLLM::MCP::Errors::TransportError.new(message: e.message)
+            raise RubyLLM::MCP::Errors::TransportError.new(message: e.message, error: e)
           end
 
           return unless wait_for_response

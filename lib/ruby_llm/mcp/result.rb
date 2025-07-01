@@ -12,10 +12,11 @@ module RubyLLM
     end
 
     class Result
-      attr_reader :result, :error, :params, :id, :next_cursor, :response
+      attr_reader :result, :error, :params, :id, :response, :session_id
 
-      def initialize(response)
+      def initialize(response, session_id: nil)
         @response = response
+        @session_id = session_id
         @id = response["id"]
         @method = response["method"]
         @result = response["result"] || {}
@@ -23,7 +24,6 @@ module RubyLLM
         @error = response["error"] || {}
 
         @result_is_error = response.dig("result", "isError") || false
-        @next_cursor = response.dig("result", "nextCursor")
       end
 
       alias value result
@@ -48,10 +48,6 @@ module RubyLLM
 
       def matching_id?(request_id)
         @id&.to_s == request_id
-      end
-
-      def next_cursor?
-        !@next_cursor.nil?
       end
 
       def ping?

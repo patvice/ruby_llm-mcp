@@ -22,7 +22,7 @@ module RubyLLM
 
       def to_h
         {
-          progressToken: @progress_token,
+          progress_token: @progress_token,
           progress: @progress,
           total: @total,
           message: @message

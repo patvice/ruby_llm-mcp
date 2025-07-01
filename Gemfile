@@ -18,6 +18,10 @@ group :development do
   gem "rubocop-rspec", ">= 3.6"
   gem "simplecov"
   gem "vcr"
-end
+  gem "webmock", "~> 3.25"
 
-gem "webmock", "~> 3.25"
+  # For another MCP server test
+  gem "fast-mcp"
+  gem "puma"
+  gem "rack"
+end

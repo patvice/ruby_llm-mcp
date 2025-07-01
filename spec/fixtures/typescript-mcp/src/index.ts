@@ -286,7 +286,9 @@ async function stdioServer() {
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Secure MCP Server running on stdio");
+  if (!isSilent) {
+    console.error("Secure MCP Server running on stdio");
+  }
 }
 
 if (process.argv.includes("--stdio")) {

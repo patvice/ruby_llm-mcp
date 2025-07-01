@@ -5,22 +5,10 @@ require "uri"
 require "httpx"
 require "timeout"
 require "securerandom"
-require_relative "../errors"
-require_relative "../result"
 
 module RubyLLM
   module MCP
     module Transport
-      # Error class for StreamableHTTP-specific errors
-      class StreamableHTTPError < Errors::BaseError
-        attr_reader :code
-
-        def initialize(message:, code: nil)
-          @code = code
-          super(message: "Streamable HTTP error: #{message}")
-        end
-      end
-
       # Configuration options for reconnection behavior
       class ReconnectionOptions
         attr_reader :max_reconnection_delay, :initial_reconnection_delay,
@@ -130,18 +118,12 @@ module RubyLLM
             response = @connection.delete(@url, headers: headers)
 
             # Handle HTTPX error responses first
-            if response.is_a?(HTTPX::ErrorResponse)
-              error_message = response.error&.message || "Session termination failed"
-              raise StreamableHTTPError.new(
-                code: nil,
-                message: "HTTPX Error terminating session: #{error_message}"
-              )
-            end
+            handle_httpx_error_response!(response, context: { location: "terminating session" })
 
             # 405 Method Not Allowed is acceptable per spec
             unless [200, 405].include?(response.status)
               reason_phrase = response.respond_to?(:reason_phrase) ? response.reason_phrase : nil
-              raise StreamableHTTPError.new(
+              raise Errors::TransportError.new(
                 code: response.status,
                 message: "Failed to terminate session: #{reason_phrase || response.status}"
               )
@@ -149,7 +131,11 @@ module RubyLLM
 
             @session_id = nil
           rescue StandardError => e
-            raise StreamableHTTPError.new(message: "Failed to terminate session: #{e.message}")
+            raise Errors::TransportError.new(
+              message: "Failed to terminate session: #{e.message}",
+              code: nil,
+              error: e
+            )
           end
         end
 
@@ -158,6 +144,33 @@ module RubyLLM
         end
 
         private
+
+        def handle_httpx_error_response!(response, context:, allow_eof_for_sse: false)
+          return false unless response.is_a?(HTTPX::ErrorResponse)
+
+          error = response.error
+
+          # Special handling for EOFError in SSE contexts
+          if allow_eof_for_sse && error.is_a?(EOFError)
+            RubyLLM::MCP.logger.info "SSE stream closed: #{response.error.message}"
+            return :eof_handled
+          end
+
+          if error.is_a?(HTTPX::ReadTimeoutError)
+            raise Errors::TimeoutError.new(
+              message: "Request timed out after #{@request_timeout / 1000} seconds",
+              request_id: context[:request_id]
+            )
+          end
+
+          error_message = response.error&.message || "Request failed"
+          RubyLLM::MCP.logger.error "HTTPX error in #{context[:location]}: #{error_message}"
+
+          raise Errors::TransportError.new(
+            code: nil,
+            message: "HTTPX Error #{context}: #{error_message}"
+          )
+        end
 
         def register_client(client)
           @clients_mutex.synchronize do
@@ -236,9 +249,8 @@ module RubyLLM
 
             response = connection.post(@url, json: body, headers: headers)
             handle_response(response, request_id, body)
-          rescue StandardError => e
+          ensure
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
-            raise Errors::TransportError.new(message: e.message)
           end
         end
 
@@ -265,13 +277,7 @@ module RubyLLM
 
         def handle_response(response, request_id, original_message)
           # Handle HTTPX error responses first
-          if response.is_a?(HTTPX::ErrorResponse)
-            error_message = response.error&.message || "HTTP request failed"
-            raise StreamableHTTPError.new(
-              code: nil,
-              message: "HTTPX Error: #{error_message}"
-            )
-          end
+          handle_httpx_error_response!(response, context: { location: "handling response", request_id: request_id })
 
           # Extract session ID if present (only for successful responses)
           session_id = response.headers["mcp-session-id"]
@@ -292,7 +298,7 @@ module RubyLLM
             handle_client_error(response)
           else
             response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
-            raise StreamableHTTPError.new(
+            raise Errors::TransportError.new(
               code: response.status,
               message: "HTTP request failed: #{response.status} - #{response_body}"
             )
@@ -311,7 +317,7 @@ module RubyLLM
             # Direct JSON response
             response_body = response.respond_to?(:body) ? response.body.to_s : "{}"
             json_response = JSON.parse(response_body)
-            result = RubyLLM::MCP::Result.new(json_response)
+            result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
             if request_id
               @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
@@ -319,13 +325,16 @@ module RubyLLM
 
             result
           else
-            raise StreamableHTTPError.new(
+            raise Errors::TransportError.new(
               code: -1,
               message: "Unexpected content type: #{content_type}"
             )
           end
-        rescue JSON::ParserError => e
-          raise StreamableHTTPError.new(message: "Invalid JSON response: #{e.message}")
+        rescue StandardError => e
+          raise Errors::TransportError.new(
+            message: "Invalid JSON response: #{e.message}",
+            error: e
+          )
         end
 
         def handle_accepted_response(original_message)
@@ -346,13 +355,13 @@ module RubyLLM
               error_message = error_body["error"]["message"] || error_body["error"]["code"]
 
               if error_message.to_s.downcase.include?("session")
-                raise StreamableHTTPError.new(
+                raise Errors::TransportError.new(
                   code: response.status,
                   message: "Server error: #{error_message} (Current session ID: #{@session_id || 'none'})"
                 )
               end
 
-              raise StreamableHTTPError.new(
+              raise Errors::TransportError.new(
                 code: response.status,
                 message: "Server error: #{error_message}"
               )
@@ -365,7 +374,7 @@ module RubyLLM
           response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
           status_code = response.respond_to?(:status) ? response.status : "Unknown"
 
-          raise StreamableHTTPError.new(
+          raise Errors::TransportError.new(
             code: status_code,
             message: "HTTP client error: #{status_code} - #{response_body}"
           )
@@ -415,21 +424,9 @@ module RubyLLM
             response = connection.get(@url, headers: headers)
 
             # Handle HTTPX error responses first
-            if response.is_a?(HTTPX::ErrorResponse)
-              # This is on connection close, this is expected if the connection quickly closed before the
-              # request is completed. We can just end execution early.
-              if response.error.is_a?(EOFError)
-                RubyLLM::MCP.logger.info "SSE stream closed: #{response.error.message}"
-                return
-              else
-                error_message = response.error&.message || "SSE connection failed"
-                RubyLLM::MCP.logger.error "SSE stream error: #{error_message}"
-                raise StreamableHTTPError.new(
-                  code: nil,
-                  message: "HTTPX SSE Error: #{response.error.message}"
-                )
-              end
-            end
+            error_result = handle_httpx_error_response!(response, context: { location: "SSE connection" },
+                                                                  allow_eof_for_sse: true)
+            return if error_result == :eof_handled
 
             case response.status
             when 200
@@ -442,7 +439,7 @@ module RubyLLM
               nil
             else
               reason_phrase = response.respond_to?(:reason_phrase) ? response.reason_phrase : nil
-              raise StreamableHTTPError.new(
+              raise Errors::TransportError.new(
                 code: response.status,
                 message: "Failed to open SSE stream: #{reason_phrase || response.status}"
               )
@@ -562,7 +559,7 @@ module RubyLLM
               event_data["id"] = replay_message_id
             end
 
-            result = RubyLLM::MCP::Result.new(event_data)
+            result = RubyLLM::MCP::Result.new(event_data, session_id: @session_id)
             RubyLLM::MCP.logger.debug "SSE Result Received: #{result.inspect}"
 
             # Handle different types of messages
@@ -584,6 +581,12 @@ module RubyLLM
             RubyLLM::MCP.logger.warn "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
           rescue Errors::UnknownRequest => e
             RubyLLM::MCP.logger.warn "Unknown request from MCP server: #{e.message}"
+          rescue StandardError => e
+            RubyLLM::MCP.logger.error "Error processing SSE event: #{e.message}"
+            raise Errors::TransportError.new(
+              message: "Error processing SSE event: #{e.message}",
+              error: e
+            )
           end
         end
 

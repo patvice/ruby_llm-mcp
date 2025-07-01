@@ -66,6 +66,18 @@ export function setupUtilityTools(server: McpServer) {
   );
 
   server.tool(
+    "timeout_tool",
+    "Sleeps for a given number of seconds",
+    { seconds: z.number() },
+    async ({ seconds }) => {
+      await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+      return {
+        content: [{ type: "text", text: "Succesfull executed timeout tool" }],
+      };
+    }
+  );
+
+  server.tool(
     "fetch_site",
     "Fetches website content and returns it as text",
     {

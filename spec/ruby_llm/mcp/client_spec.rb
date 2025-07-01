@@ -34,6 +34,22 @@ RSpec.describe RubyLLM::MCP::Client do
     end
   end
 
+  describe "cancel_request" do
+    it "cancels a request if the timeout is triggered" do
+      options = CLIENT_OPTIONS.last[:options].merge({ start: false, request_timeout: 1000 })
+      client = RubyLLM::MCP::Client.new(**options)
+      client.start
+
+      tool = client.tool("timeout_tool")
+
+      allow(client.instance_variable_get(:@coordinator)).to receive(:cancelled_notification).and_call_original
+      expect { tool.execute(seconds: 2) }.to raise_error(RubyLLM::MCP::Errors::TimeoutError)
+      expect(client.instance_variable_get(:@coordinator)).to have_received(:cancelled_notification)
+
+      client.stop
+    end
+  end
+
   CLIENT_OPTIONS.each do |options|
     context "with #{options[:name]}" do
       let(:client) do
@@ -253,19 +269,14 @@ RSpec.describe RubyLLM::MCP::Client do
         end
 
         it "forces refresh on next resource_templates call" do
-          # Load resource templates to populate cache
           client.resource_templates
           cache_before_reset = client.instance_variable_get(:@resource_templates)
           expect(cache_before_reset).not_to be_empty
 
-          # Mock the coordinator to verify fresh call is made
           allow(client.instance_variable_get(:@coordinator)).to receive(:resource_template_list).and_call_original
-
-          # Reset and reload
           client.reset_resource_templates!
           expect(client.instance_variable_get(:@resource_templates)).to eq({})
 
-          # Load again - should make fresh call to coordinator
           client.resource_templates
           expect(client.instance_variable_get(:@coordinator)).to have_received(:resource_template_list)
         end
@@ -290,11 +301,9 @@ RSpec.describe RubyLLM::MCP::Client do
 
           client.on_logging(level: RubyLLM::MCP::Logging::DEBUG, logger: "test_logger")
 
-          # Check that the logging handler is set and is a Proc
           logging_handler = client.instance_variable_get(:@on)[:logging]
           expect(logging_handler).to be_a(Proc)
 
-          # Test that the lambda calls the coordinator's default_process_logging_message
           mock_notification = instance_double(Object)
           logging_handler.call(mock_notification)
 
@@ -309,11 +318,9 @@ RSpec.describe RubyLLM::MCP::Client do
             custom_handler_called = true
           end
 
-          # Check that the logging handler is the provided block
           logging_handler = client.instance_variable_get(:@on)[:logging]
           expect(logging_handler).to be_a(Proc)
 
-          # Test that the custom handler is called
           mock_notification = instance_double(Object)
           logging_handler.call(mock_notification)
           expect(custom_handler_called).to be(true)

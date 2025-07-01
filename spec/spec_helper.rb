@@ -69,8 +69,6 @@ VCR.configure do |config|
   end
 end
 
-MCPTestConfiguration.configure!
-
 FILESYSTEM_CLIENT = {
   name: "filesystem",
   transport_type: :stdio,
@@ -112,15 +110,13 @@ CLIENT_OPTIONS = [
     } }
 ].freeze
 
-AUDIO_MODELS = [
-  { provider: :openai, model: "gpt-4o-audio-preview" }
-].freeze
-
 COMPLEX_FUNCTION_MODELS = [
   { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
   { provider: :gemini, model: "gemini-2.0-flash" },
   { provider: :openai, model: "gpt-4.1" }
 ].freeze
+
+MCPTestConfiguration.configure!
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -139,12 +135,5 @@ RSpec.configure do |config|
 
   config.after(:all) do
     TestServerManager.stop_server
-  end
-
-  config.around(:each, :show_stdout) do |example|
-    original = $stdout
-    $stdout = STDOUT
-    example.run
-    $stdout = original
   end
 end
