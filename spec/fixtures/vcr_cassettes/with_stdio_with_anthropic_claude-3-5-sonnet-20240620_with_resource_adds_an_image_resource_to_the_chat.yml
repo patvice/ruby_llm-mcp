@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:58:53 GMT
+      - Tue, 01 Jul 2025 15:43:58 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:58:50Z'
+      - '2025-07-01T15:43:53Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:58:54Z'
+      - '2025-07-01T15:43:59Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:58:51Z'
+      - '2025-07-01T15:43:51Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:58:50Z'
+      - '2025-07-01T15:43:53Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,14 +76,14 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01BbVJ9KfUMVFm2e97b9gxoG","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"The
-        image I see is of an adorable golden retriever puppy. The puppy is standing
-        and appears to be yawning or barking, with its mouth wide open. Its fur is
-        a light cream color, and it has the typical fluffy, soft appearance of a young
-        puppy. The puppy''s eyes are slightly closed, giving it an endearing, sleepy
-        look. Its small paws, floppy ears, and wagging tail are visible, adding to
-        its cuteness. The background is plain white, which makes the puppy stand out
-        clearly in the image. This picture perfectly captures the charm and energy
-        of a young, playful puppy."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":141,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:58:53 GMT
+      string: '{"id":"msg_01KAvKWtMtECorZDLCRaRVs1","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"The
+        image I have is of an adorable Golden Retriever puppy. The puppy is standing
+        and appears to be yawning or barking, with its mouth wide open. It has a creamy
+        white coat that looks soft and fluffy. The puppy''s eyes are closed, giving
+        it an expression that looks like it''s laughing or very happy. Its ears are
+        floppy and hanging down on the sides of its head. The puppy is standing on
+        what seems to be a white background, making the image clean and focused entirely
+        on the cute little dog. This image captures the essence of puppy cuteness
+        and energy perfectly."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":135,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:43:58 GMT
 recorded_with: VCR 6.3.1

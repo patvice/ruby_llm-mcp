@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:21 GMT
+      - Tue, 01 Jul 2025 15:44:49 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:18Z'
+      - '2025-07-01T15:44:46Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:22Z'
+      - '2025-07-01T15:44:51Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:19Z'
+      - '2025-07-01T15:44:45Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:18Z'
+      - '2025-07-01T15:44:46Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,16 +76,17 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01SikoAtQJwBtW6abbNYPFCv","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"I
+      string: '{"id":"msg_01AB3nZ87XTSZeEhv4gg5MiC","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"I
         don''t have access to any external resources beyond what you''ve provided
-        in our conversation. However, I can analyze the image you''ve shared, which
-        shows an adorable Golden Retriever puppy. The puppy appears to be yawning
-        or possibly barking, with its mouth wide open. It has a creamy white coat
-        that looks soft and fluffy. The puppy is standing on all four paws and seems
-        to be quite young based on its proportions. Golden Retrievers are known for
-        being friendly, intelligent, and energetic dogs that make great family pets.
-        This image captures the charming and cute nature of puppies that many people
-        find irresistible. Is there anything specific about the image or Golden Retrievers
-        you''d like to discuss?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":161,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:21 GMT
+        in our conversation. However, I can analyze and discuss the image you''ve
+        shared. \n\nThe image shows an adorable Golden Retriever puppy. The puppy
+        appears to be very young, with a fluffy cream-colored coat. It''s standing
+        on a white background, which makes its fur stand out nicely. The puppy''s
+        mouth is wide open in what looks like a big yawn or possibly an excited bark.
+        Its eyes are closed, giving it an expression of pure contentment or sleepiness.
+        The puppy''s ears are floppy and its paws look oversized compared to its body,
+        which is typical for young puppies. Overall, it''s a heartwarming image that
+        captures the cuteness and innocence of a young dog.\n\nIs there anything specific
+        about the image you''d like me to comment on or discuss further?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":194,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:44:49 GMT
 recorded_with: VCR 6.3.1

@@ -23,11 +23,13 @@ module RubyLLM
               if param.item_type == :object
                 {
                   type: param.type,
+                  description: param.description,
                   items: { type: param.item_type, properties: clean_parameters(param.properties) }
-                }
+                }.compact
               else
                 {
                   type: param.type,
+                  description: param.description,
                   default: param.default,
                   items: { type: param.item_type, enum: param.enum }.compact
                 }.compact
@@ -35,9 +37,10 @@ module RubyLLM
             when :object
               {
                 type: param.type,
+                description: param.description,
                 properties: clean_parameters(param.properties),
                 required: required_parameters(param.properties)
-              }
+              }.compact
             when :union
               {
                 param.union_type => param.properties.map { |property| build_properties(property) }

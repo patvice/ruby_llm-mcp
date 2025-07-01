@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:41 GMT
+      - Tue, 01 Jul 2025 15:46:21 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,25 +38,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:40Z'
+      - '2025-07-01T15:46:20Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:41Z'
+      - '2025-07-01T15:46:21Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:40Z'
+      - '2025-07-01T15:46:20Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:40Z'
+      - '2025-07-01T15:46:20Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -75,10 +75,10 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01J565neCUbRSMvv4wr7FsGj","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+      string: '{"id":"msg_01AHSJYSWf9okyt8yjbS3w75","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
         I can help you retrieve the messages from the Ruby channel. To do this, I''ll
-        use the `list_messages` function. Let me fetch that information for you."},{"type":"tool_use","id":"toolu_01SXrvnwea61o64STrSdSRov","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":357,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":92,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:41 GMT
+        use the \"list_messages\" function. Let me fetch that information for you."},{"type":"tool_use","id":"toolu_01XbwfJffVdV3VPjNXAUtWQ6","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":357,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":92,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:21 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -87,7 +87,7 @@ http_interactions:
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you pull messages for ruby channel and let me know what they say?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly!
         I can help you retrieve the messages from the Ruby channel. To do this, I''ll
-        use the `list_messages` function. Let me fetch that information for you."},{"type":"tool_use","id":"toolu_01SXrvnwea61o64STrSdSRov","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01SXrvnwea61o64STrSdSRov","content":"Ruby
+        use the \"list_messages\" function. Let me fetch that information for you."},{"type":"tool_use","id":"toolu_01XbwfJffVdV3VPjNXAUtWQ6","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01XbwfJffVdV3VPjNXAUtWQ6","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
         community."}]}],"temperature":0.7,"stream":false,"max_tokens":8192,"tools":[{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}}]}'
     headers:
@@ -109,7 +109,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:44 GMT
+      - Tue, 01 Jul 2025 15:46:23 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -121,25 +121,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:42Z'
+      - '2025-07-01T15:46:22Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:45Z'
+      - '2025-07-01T15:46:25Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:42Z'
+      - '2025-07-01T15:46:22Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:42Z'
+      - '2025-07-01T15:46:22Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -158,15 +158,16 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_014gAUrqB3XQmhm5njf53Uze","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
-        on the result from the `list_messages` function, here''s what the messages
-        in the Ruby channel say:\n\n\"Ruby is a great language for web development.
-        It''s easy to learn and has a large community.\"\n\nThis message highlights
-        some of the key advantages of the Ruby programming language:\n\n1. It''s well-suited
-        for web development.\n2. It has a reputation for being easy to learn.\n3.
-        There''s a large community of Ruby developers, which typically means good
-        support, plenty of resources, and a wide range of libraries and frameworks
-        available.\n\nIs there anything specific about this message or Ruby that you''d
-        like to discuss further?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":479,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":140,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:44 GMT
+      string: '{"id":"msg_011DVgyxW5LJqwLt9JRGUfUK","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
+        on the function results, here''s what the messages in the Ruby channel say:\n\n\"Ruby
+        is a great language for web development. It''s easy to learn and has a large
+        community.\"\n\nThis message highlights some key points about Ruby:\n1. It''s
+        considered excellent for web development.\n2. It''s known for being easy to
+        learn.\n3. Ruby has a large and supportive community.\n\nThese characteristics
+        make Ruby a popular choice among developers, especially for those working
+        on web applications. The large community often translates to good resources,
+        libraries, and support for developers using the language.\n\nIs there anything
+        specific about these messages you''d like to discuss or any other information
+        about Ruby you''re interested in?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":479,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":151,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:23 GMT
 recorded_with: VCR 6.3.1

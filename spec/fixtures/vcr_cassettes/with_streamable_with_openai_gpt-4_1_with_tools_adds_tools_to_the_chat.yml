@@ -13,8 +13,8 @@ http_interactions:
         an error","parameters":{"type":"object","properties":{"shouldError":{"type":"boolean"}},"required":[]}}},{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}},{"type":"function","function":{"name":"get_jackhammer_audio","description":"Returns
         the jackhammer audio file as a base64-encoded WAV","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded JPEG","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"get_file_resource","description":"Returns
-        a file resource reference","parameters":{"type":"object","properties":{"filename":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"list_messages","description":null,"parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"upgrade_auth","description":"Upgrade
+        the dog image as a base64-encoded PNG","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"get_file_resource","description":"Returns
+        a file resource reference","parameters":{"type":"object","properties":{"filename":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"list_messages","description":"","parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"upgrade_auth","description":"Upgrade
         authentication permissions","parameters":{"type":"object","properties":{"permission":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}}},{"type":"function","function":{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","parameters":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":[]}},"required":["geocode"]}}}],"tool_choice":"auto"}'
@@ -35,7 +35,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:52:40 GMT
+      - Tue, 01 Jul 2025 15:47:35 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -47,11 +47,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '499'
+      - '447'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '507'
+      - '450'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -85,9 +85,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-Bkts8T9wkN5yLARWcSYIQwX0D1DAI",
+          "id": "chatcmpl-BoXUkQgGZXqO6Cxac1AOVb8Bxz5hH",
           "object": "chat.completion",
-          "created": 1750517560,
+          "created": 1751384854,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -97,7 +97,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_sN5U1XUpnrpxV2YQ7RUYUNRk",
+                    "id": "call_7cyyRY1HdH2bj1iAoC1e7XUb",
                     "type": "function",
                     "function": {
                       "name": "add",
@@ -130,22 +130,22 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_51e1070cf2"
         }
-  recorded_at: Sat, 21 Jun 2025 14:52:40 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:35 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you add
-        1 and 2?"},{"role":"assistant","tool_calls":[{"id":"call_sN5U1XUpnrpxV2YQ7RUYUNRk","type":"function","function":{"name":"add","arguments":"{\"a\":1,\"b\":2}"}}]},{"role":"tool","content":"3","tool_call_id":"call_sN5U1XUpnrpxV2YQ7RUYUNRk"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"add","description":"Addes
+        1 and 2?"},{"role":"assistant","tool_calls":[{"id":"call_7cyyRY1HdH2bj1iAoC1e7XUb","type":"function","function":{"name":"add","arguments":"{\"a\":1,\"b\":2}"}}]},{"role":"tool","content":"3","tool_call_id":"call_7cyyRY1HdH2bj1iAoC1e7XUb"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"add","description":"Addes
         two numbers together","parameters":{"type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":[]}}},{"type":"function","function":{"name":"return_set_evn","description":"Returns
         the set environment variable","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"malformed_tool","description":"A
         malformed tool","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"tool_error","description":"Returns
         an error","parameters":{"type":"object","properties":{"shouldError":{"type":"boolean"}},"required":[]}}},{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}},{"type":"function","function":{"name":"get_jackhammer_audio","description":"Returns
         the jackhammer audio file as a base64-encoded WAV","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded JPEG","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"get_file_resource","description":"Returns
-        a file resource reference","parameters":{"type":"object","properties":{"filename":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"list_messages","description":null,"parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"upgrade_auth","description":"Upgrade
+        the dog image as a base64-encoded PNG","parameters":{"type":"object","properties":{},"required":[]}}},{"type":"function","function":{"name":"get_file_resource","description":"Returns
+        a file resource reference","parameters":{"type":"object","properties":{"filename":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"list_messages","description":"","parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"upgrade_auth","description":"Upgrade
         authentication permissions","parameters":{"type":"object","properties":{"permission":{"type":"string"}},"required":[]}}},{"type":"function","function":{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}}},{"type":"function","function":{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","parameters":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":[]}},"required":["geocode"]}}}],"tool_choice":"auto"}'
@@ -166,7 +166,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:52:41 GMT
+      - Tue, 01 Jul 2025 15:47:36 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -178,11 +178,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '430'
+      - '707'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '438'
+      - '769'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -190,11 +190,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29980'
+      - '29744'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 38ms
+      - 510ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
       Strict-Transport-Security:
@@ -216,16 +216,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-Bkts9XbYyG8449jF6zwtp4kh6i7Ty",
+          "id": "chatcmpl-BoXUlfokliBPCAILUMTWL6EfoOF76",
           "object": "chat.completion",
-          "created": 1750517561,
+          "created": 1751384855,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "1 + 2 = 3.",
+                "content": "1 + 2 equals 3.",
                 "refusal": null,
                 "annotations": []
               },
@@ -251,5 +251,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_51e1070cf2"
         }
-  recorded_at: Sat, 21 Jun 2025 14:52:41 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:35 GMT
 recorded_with: VCR 6.3.1

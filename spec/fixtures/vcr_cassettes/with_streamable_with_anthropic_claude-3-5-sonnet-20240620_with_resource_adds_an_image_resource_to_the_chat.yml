@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:59:09 GMT
+      - Tue, 01 Jul 2025 15:46:59 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:59:06Z'
+      - '2025-07-01T15:46:57Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:59:10Z'
+      - '2025-07-01T15:47:00Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:59:07Z'
+      - '2025-07-01T15:46:55Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:59:06Z'
+      - '2025-07-01T15:46:57Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,15 +76,13 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01Tn7YuKPUC6GtB4VTSuvWuu","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"The
-        image I see is of an adorable Golden Retriever puppy. The puppy has a light
-        cream-colored coat and is standing on a white background. Its mouth is wide
-        open, appearing to be mid-yawn or possibly barking, showing its pink tongue
-        and some of its teeth. The puppy''s eyes are slightly squinted, giving it
-        an expression that looks happy and energetic. Its ears are floppy and hanging
-        down on the sides of its head. The puppy''s body posture suggests it''s in
-        a playful stance, with its legs straight and tail likely wagging (though the
-        tail isn''t visible in this image). This is a classic image that captures
-        the charm and cuteness of a young Golden Retriever."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":158,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:59:09 GMT
+      string: '{"id":"msg_01CNX7zcoMRgJVXJ1hVGRiJZ","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"The
+        image I have is of an adorable Golden Retriever puppy. The puppy is standing
+        and appears to be yawning or barking, with its mouth wide open. Its fur is
+        a light cream color, typical of Golden Retriever puppies. The puppy looks
+        very young, with a plump body and slightly oversized paws that it will grow
+        into. Its eyes are closed, likely due to the yawn or bark. The background
+        is plain white, making the puppy stand out clearly. This image captures the
+        charm and cuteness that makes Golden Retriever puppies so popular and beloved."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":131,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:59 GMT
 recorded_with: VCR 6.3.1

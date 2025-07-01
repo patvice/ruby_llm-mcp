@@ -6,7 +6,8 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
-        you write me a beautiful poem about the current day?"}]}],"temperature":0.7,"stream":false,"max_tokens":8192}'
+        you write me a beautiful poem about the current day? Make sure to include
+        the word ''poem'' in your response."}]}],"temperature":0.7,"stream":false,"max_tokens":8192}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -26,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:33 GMT
+      - Tue, 01 Jul 2025 15:45:11 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:30Z'
+      - '2025-07-01T15:45:04Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:34Z'
+      - '2025-07-01T15:45:12Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
-      - '48'
+      - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:31Z'
+      - '2025-07-01T15:45:05Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:30Z'
+      - '2025-07-01T15:45:04Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -75,15 +76,15 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01Bir7wwAWH1vUUpHgUaMqxc","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Here''s
-        a poem about the current day:\n\nEphemeral Dawn\n\nA new day breaks, fresh
-        and bright,\nBanishing shadows of yesternight.\nDew-kissed petals unfurl with
-        grace,\nAs golden rays caress Earth''s face.\n\nBirdsong fills the morning
-        air,\nA symphony beyond compare.\nClouds drift by in lazy streams,\nPainting
-        skies with hopeful dreams.\n\nEach moment brims with possibility,\nA gift
-        of time, a new reality.\nIn this day, both fresh and fleeting,\nLife and love
-        are ever meeting.\n\nSo seize this day with open arms,\nEmbrace its joys and
-        soothe its harms.\nFor in each sunrise, we are blessed\nWith chances to be
-        our very best."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":19,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":175,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:33 GMT
+      string: '{"id":"msg_01WuX5d7G3kcsnojGEqHijn4","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Here''s
+        a poem about the current day, including the word ''poem'' in the response:\n\nA
+        Canvas of Today\n\nThis poem unfolds like the day,\nA blank page at dawn''s
+        first light,\nFilled with promise, fresh and bright,\nAs the world begins
+        to sway.\n\nSun-kissed petals greet the morn,\nDew-dropped grass, a sparkling
+        sight,\nBirds in chorus take their flight,\nA new chapter has been born.\n\nEach
+        moment, a brushstroke bold,\nPainting stories yet untold,\nIn the masterpiece
+        of now.\n\nTime flows like a gentle stream,\nReality blends with dream,\nAs
+        the present takes a bow.\n\nThis poem, like the day, will fade,\nBut memories
+        are forever made,\nIn the beauty of today."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":33,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":182,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:45:11 GMT
 recorded_with: VCR 6.3.1

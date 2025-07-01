@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 21 Jun 2025 16:44:54 GMT
+      - Tue, 01 Jul 2025 15:45:16 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=619
+      - gfet4t7; dur=653
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -70,7 +70,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -5.4054681889035486e-05
+              "avgLogprobs": -1.374850134280595e-05
             }
           ],
           "usageMetadata": {
@@ -91,9 +91,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "heFWaMuzK9Ck7dcPs7e1yQw"
+          "responseId": "jAJkaInJD_LhmNAPpebBuQM"
         }
-  recorded_at: Sat, 21 Jun 2025 16:44:54 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:16 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -101,7 +101,7 @@ http_interactions:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you tell me the weather
         for Ottawa and San Francisco?"}]},{"role":"model","parts":[{"functionCall":{"name":"get_weather_from_locations","args":{"locations":["Ottawa","San
-        Francisco"]}}}]},{"role":"user","parts":[{"functionResponse":{"name":"63bf7808-f967-4596-8f50-c9c6b8cabd99","response":{"name":"63bf7808-f967-4596-8f50-c9c6b8cabd99","content":"Weather
+        Francisco"]}}}]},{"role":"user","parts":[{"functionResponse":{"name":"9e2e110d-25a6-4a11-993d-397462fc1b26","response":{"name":"9e2e110d-25a6-4a11-993d-397462fc1b26","content":"Weather
         for Ottawa, San Francisco is great!"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":[]}},"required":["geocode"]}}]}]}'
@@ -128,7 +128,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 21 Jun 2025 16:44:54 GMT
+      - Tue, 01 Jul 2025 15:45:17 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -138,7 +138,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=460
+      - gfet4t7; dur=399
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -158,17 +158,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.013713645664128389
+              "avgLogprobs": -0.0627438100901517
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 142,
+            "promptTokenCount": 146,
             "candidatesTokenCount": 11,
-            "totalTokenCount": 153,
+            "totalTokenCount": 157,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 142
+                "tokenCount": 146
               }
             ],
             "candidatesTokensDetails": [
@@ -179,7 +179,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "huFWaP7SG92j7dcP5sOOgAI"
+          "responseId": "jAJkaPXFO5mBmNAP8YDO2QI"
         }
-  recorded_at: Sat, 21 Jun 2025 16:44:54 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:17 GMT
 recorded_with: VCR 6.3.1

@@ -33,7 +33,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:17 GMT
+      - Tue, 01 Jul 2025 15:44:44 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -45,25 +45,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:14Z'
+      - '2025-07-01T15:44:41Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:19Z'
+      - '2025-07-01T15:44:45Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:15Z'
+      - '2025-07-01T15:44:41Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:14Z'
+      - '2025-07-01T15:44:41Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -82,18 +82,18 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_015PKct4r6KFw1x6uTgc4MpM","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
+      string: '{"id":"msg_013pBsMnbAdUD2iJVB7gJ82d","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
         on the information provided, I have details about three different files:\n\n1.
         test.txt:\n   - It''s a text file\n   - Contains a message stating it''s a
         test file\n   - Mentions that its content will be served by the MCP resource\n   -
         Indicates that the file can be modified and will be cached for 5 minutes\n\n2.
-        second_file.txt:\n   - It''s also a text file\n   - Contains a single line
-        of text describing it as the second file to be used as a resource\n\n3. my.md:\n   -
-        It''s a markdown file\n   - Has a title \"My Markdown File\"\n   - Contains
-        an introductory line about being a markdown file for use as a resource\n   -
-        Has two sections:\n     - Section 1: with a brief description\n     - Section
-        2: with another brief description\n\nThese files appear to be examples or
-        templates for different types of resources that can be used in some system
-        or application."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":150,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":218,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:17 GMT
+        second_file.txt:\n   - It''s described as \"A second text file\"\n   - Contains
+        a single line of text stating it''s the second file that can be used as a
+        resource\n\n3. my.md:\n   - It''s a markdown file\n   - Has a title \"My Markdown
+        File\"\n   - Contains an introductory line about being a markdown file for
+        use as a resource\n   - Has two sections:\n     - Section 1: with a brief
+        description\n     - Section 2: with another brief description\n\nThese files
+        appear to be examples or templates for different types of resources that can
+        be used in some system or application."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":150,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":223,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:44:44 GMT
 recorded_with: VCR 6.3.1

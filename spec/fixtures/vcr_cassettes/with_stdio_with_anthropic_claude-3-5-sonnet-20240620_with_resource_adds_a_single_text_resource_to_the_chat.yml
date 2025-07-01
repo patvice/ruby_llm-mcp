@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:23 GMT
+      - Tue, 01 Jul 2025 15:44:53 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,25 +40,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:21Z'
+      - '2025-07-01T15:44:52Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:24Z'
+      - '2025-07-01T15:44:54Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:22Z'
+      - '2025-07-01T15:44:51Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:21Z'
+      - '2025-07-01T15:44:52Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -77,13 +77,13 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_0185PUh8ZvYYSG3BDrqWBft9","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
+      string: '{"id":"msg_0189jUxTeLYuh4xhDuH9Lgf9","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Based
         on the information provided, the test.txt file contains the following content:\n\nHello,
         this is a test file!\nThis content will be served by the MCP resource.\nYou
-        can modify this file and it will be cached for 5 minutes.\n\nThis appears
+        can modify this file and it will be cached for 5 minutes.\n\nThe file appears
         to be a simple text file with three lines of content. It mentions that it''s
         a test file, indicates that its content will be served by an MCP (Master Control
         Program) resource, and notes that modifications to the file will be cached
-        for 5 minutes."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":60,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":115,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:23 GMT
+        for 5 minutes."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":60,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":116,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:44:53 GMT
 recorded_with: VCR 6.3.1

@@ -31,7 +31,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 21 Jun 2025 14:52:51 GMT
+      - Tue, 01 Jul 2025 15:47:50 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -43,11 +43,11 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '6960'
+      - '4481'
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '6976'
+      - '4924'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -55,11 +55,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29858'
+      - '29759'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 284ms
+      - 481ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
       Strict-Transport-Security:
@@ -79,7 +79,42 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        ewogICJpZCI6ICJjaGF0Y21wbC1Ca3RzQ0VsNkg2SnQ5QUtDRGk5emtObWwyeFVneiIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc1MDUxNzU2NCwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJIZXJl4oCZcyBhIHN1bW1hcnkgb2YgdGhlIGluZm9ybWF0aW9uIGZyb20gdGhlIHByb3ZpZGVkIHJlc291cmNlczpcblxuLS0tXG5cbiMjIyAxLiAqKnRlc3QudHh0Kipcbi0gKipUeXBlOioqIFRleHQgZmlsZVxuLSAqKkNvbnRlbnQ6KipcbiAgYGBgXG4gIEhlbGxvLCB0aGlzIGlzIGEgdGVzdCBmaWxlIVxuICBUaGlzIGNvbnRlbnQgd2lsbCBiZSBzZXJ2ZWQgYnkgdGhlIE1DUCByZXNvdXJjZS5cbiAgWW91IGNhbiBtb2RpZnkgdGhpcyBmaWxlIGFuZCBpdCB3aWxsIGJlIGNhY2hlZCBmb3IgNSBtaW51dGVzLlxuICBgYGBcblxuLS0tXG5cbiMjIyAyLiAqKnNlY29uZF9maWxlLnR4dCoqXG4tICoqVHlwZToqKiBUZXh0IGZpbGVcbi0gKipDb250ZW50OioqXG4gIGBgYFxuICBUaGlzIGlzIHRoZSBzZWNvbmQgZmlsZSB0aGF0IEkgd2FudCB0byBiZSBhYmxlIHRvIHVzZSBhcyBhIHJlc291cmNlXG4gIGBgYFxuXG4tLS1cblxuIyMjIDMuICoqbXkubWQqKlxuLSAqKlR5cGU6KiogTWFya2Rvd24gZmlsZVxuLSAqKkNvbnRlbnQ6KipcbiAgYGBgbWFya2Rvd25cbiAgIyBNeSBNYXJrZG93biBGaWxlXG5cbiAgVGhpcyBpcyBhIG1hcmtkb3duIGZpbGUgdGhhdCBJIHdhbnQgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSByZXNvdXJjZVxuXG4gICMjIFNlY3Rpb24gMVxuXG4gIFRoaXMgaXMgYSBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcblxuICAjIyBTZWN0aW9uIDJcblxuICBUaGlzIGlzIGFub3RoZXIgc2VjdGlvbiBpbiBteSBtYXJrZG93biBmaWxlXG4gIGBgYFxuXG4tLS1cblxuKipTdW1tYXJ5OioqICBcbllvdSBoYXZlIHByb3ZpZGVkIHR3byBwbGFpbiB0ZXh0IGZpbGVzIChgdGVzdC50eHRgLCBgc2Vjb25kX2ZpbGUudHh0YCkgY29udGFpbmluZyBzYW1wbGUgdGV4dCwgYW5kIG9uZSBtYXJrZG93biBmaWxlIChgbXkubWRgKSB3aXRoIGEgdGl0bGUsIHNvbWUgaW50cm9kdWN0b3J5IHRleHQsIGFuZCB0d28gc2VjdGlvbnMsIGVhY2ggd2l0aCBhIGJyaWVmIGRlc2NyaXB0aW9uLiBUaGUgZmlsZXMgYXJlIGludGVuZGVkIHRvIGJlIHVzZWQgYXMgcmVzb3VyY2VzLCBhbmQgYXQgbGVhc3Qgb25lIG1lbnRpb25zIGNhY2hpbmcgYmVoYXZpb3IgKGNhY2hlZCBmb3IgNSBtaW51dGVzKS4iLAogICAgICAgICJyZWZ1c2FsIjogbnVsbCwKICAgICAgICAiYW5ub3RhdGlvbnMiOiBbXQogICAgICB9LAogICAgICAibG9ncHJvYnMiOiBudWxsLAogICAgICAiZmluaXNoX3JlYXNvbiI6ICJzdG9wIgogICAgfQogIF0sCiAgInVzYWdlIjogewogICAgInByb21wdF90b2tlbnMiOiAxNTIsCiAgICAiY29tcGxldGlvbl90b2tlbnMiOiAyNzgsCiAgICAidG90YWxfdG9rZW5zIjogNDMwLAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfYTExMDJjZjk3OCIKfQo=
-  recorded_at: Sat, 21 Jun 2025 14:52:51 GMT
+      string: |
+        {
+          "id": "chatcmpl-BoXUvpKPytEGNBOqbTiLHL7InLCDk",
+          "object": "chat.completion",
+          "created": 1751384865,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Here is a summary of the information from the provided resources:\n\n---\n\n### **test.txt**  \nA plain text file containing:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n\n**Key points:**\n- It is a test file.\n- Its content will be served by an MCP resource.\n- The file is cacheable for 5 minutes and can be modified.\n\n---\n\n### **second_file.txt**  \nAnother plain text file:\n\n```\nThis is the second file that I want to be able to use as a resource\n```\n\n**Key points:**\n- This is a second file meant to be used as a resource.\n\n---\n\n### **my.md**  \nA Markdown file containing:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\n**Key points:**\n- The file is titled \"My Markdown File\".\n- It contains two sections: \"Section 1\" and \"Section 2\", each with a short description.\n\n---\n\n**Summary:**  \nYou have provided three files: two plain text files and one Markdown file. All are meant to be used as resources, potentially to be served or processed in some way (such as by an MCP resource). The contents are simple test/demo data, with explicit mention of caching in `test.txt` and a structured outline in `my.md`.",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 152,
+            "completion_tokens": 331,
+            "total_tokens": 483,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_51e1070cf2"
+        }
+  recorded_at: Tue, 01 Jul 2025 15:47:50 GMT
 recorded_with: VCR 6.3.1

@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:58:00 GMT
+      - Tue, 01 Jul 2025 15:46:43 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,25 +39,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:57Z'
+      - '2025-07-01T15:46:41Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:58:01Z'
+      - '2025-07-01T15:46:44Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:58Z'
+      - '2025-07-01T15:46:40Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:57Z'
+      - '2025-07-01T15:46:41Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -76,14 +76,14 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01G2u4YNbsZMvPeKogyCU8zK","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"I
+      string: '{"id":"msg_01Ru2H3bVGAKYYhp32tGacLN","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"I
         don''t have access to any external resources beyond what you''ve provided
         here. I can see and analyze the image you''ve shared, which shows an adorable
         Golden Retriever puppy. The puppy appears to be yawning or possibly barking,
         with its mouth wide open. It has a creamy white coat and is standing on a
         white background. The puppy looks very young, probably just a few weeks old,
-        with that characteristic fluffy puppy fur. Its eyes are barely visible as
-        it''s mid-yawn/bark. This image captures a cute and energetic moment of a
-        young, playful dog."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":132,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:58:00 GMT
+        with that typical fluffy puppy fur. Its eyes are slightly closed, giving it
+        an endearing, sleepy expression. This image captures the charm and cuteness
+        that makes Golden Retriever puppies so popular and beloved."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":137,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:43 GMT
 recorded_with: VCR 6.3.1

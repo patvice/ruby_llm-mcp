@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:47 GMT
+      - Tue, 01 Jul 2025 15:46:26 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,25 +40,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:45Z'
+      - '2025-07-01T15:46:26Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:47Z'
+      - '2025-07-01T15:46:27Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:45Z'
+      - '2025-07-01T15:46:25Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:45Z'
+      - '2025-07-01T15:46:26Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -77,11 +77,11 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_01QZd1xyMM9drv2BQwq2aGfd","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
-        I can fetch the content of the Google homepage for you and check if it explicitly
-        states what they do. To accomplish this, I''ll use the `fetch_site` function.
-        Let me do that for you now."},{"type":"tool_use","id":"toolu_011yvXfcByC1XqF2oZcP72Rg","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":454,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":107,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:47 GMT
+      string: '{"id":"msg_01KF5H6LNb4iYYmUMeCMNqAw","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+        I''ll use the fetch_site function to retrieve the content from http://www.google.com
+        and then analyze it to see if the site explicitly states what they do. Let
+        me fetch the content for you."},{"type":"tool_use","id":"toolu_012Tvfs2cuEXz73RLsX8nKNX","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":454,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":106,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:26 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -89,10 +89,10 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you fetch the website http://www.google.com and see if the site say what they
-        do?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly! I
-        can fetch the content of the Google homepage for you and check if it explicitly
-        states what they do. To accomplish this, I''ll use the `fetch_site` function.
-        Let me do that for you now."},{"type":"tool_use","id":"toolu_011yvXfcByC1XqF2oZcP72Rg","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_011yvXfcByC1XqF2oZcP72Rg","content":"Website
+        do?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly! I''ll
+        use the fetch_site function to retrieve the content from http://www.google.com
+        and then analyze it to see if the site explicitly states what they do. Let
+        me fetch the content for you."},{"type":"tool_use","id":"toolu_012Tvfs2cuEXz73RLsX8nKNX","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_012Tvfs2cuEXz73RLsX8nKNX","content":"Website
         content from http://www.google.com:\n\nGoogle Search Images Maps Play YouTube
         News Gmail Drive More Calendar Translate Books Shopping Blogger Finance Photos
         Docs Even more &raquo; Account Options Sign in Search settings Web History
@@ -118,7 +118,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 22 Jun 2025 12:57:53 GMT
+      - Tue, 01 Jul 2025 15:46:33 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -130,25 +130,25 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '40000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-06-22T12:57:48Z'
+      - '2025-07-01T15:46:28Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-06-22T12:57:55Z'
+      - '2025-07-01T15:46:35Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-06-22T12:57:48Z'
+      - '2025-07-01T15:46:27Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '48000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '48000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-06-22T12:57:48Z'
+      - '2025-07-01T15:46:28Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -167,26 +167,28 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"id":"msg_018Wwbi6qrnVhwSviphHpx3j","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"After
-        analyzing the content fetched from Google''s homepage (http://www.google.com),
-        I can provide you with the following information:\n\nThe homepage doesn''t
-        explicitly state in detail what Google does. However, we can infer some information
-        from the content:\n\n1. Google''s primary function appears to be search-related,
-        as evidenced by the prominent \"Search\" option and \"Advanced search\" link.\n\n2.
-        Google offers a variety of services, which are listed on the homepage:\n   -
-        Search\n   - Images\n   - Maps\n   - Play (likely referring to Google Play)\n   -
-        YouTube\n   - News\n   - Gmail\n   - Drive\n   - Calendar\n   - Translate\n   -
-        Books\n   - Shopping\n   - Blogger\n   - Finance\n   - Photos\n   - Docs\n\n3.
-        There are links to \"Advertising\" and \"Business Solutions,\" suggesting
-        that Google also provides services for businesses.\n\n4. The homepage mentions
-        \"About Google,\" which would likely lead to more detailed information about
-        what Google does, but that content is not directly visible on the main page.\n\nIt''s
-        worth noting that Google''s homepage is intentionally minimalistic, focusing
-        mainly on the search function and providing quick access to their various
-        services. For a more comprehensive description of what Google does, you would
-        typically need to visit their \"About\" page or other sections of their website.\n\nIf
-        you''d like more specific information about Google''s mission or detailed
-        descriptions of their services, I could fetch the content from their \"About\"
-        page. Would you like me to do that?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":651,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":336,"service_tier":"standard"}}'
-  recorded_at: Sun, 22 Jun 2025 12:57:53 GMT
+      string: '{"id":"msg_01HB4u6438mVbXHzm6Qh4Lkp","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"After
+        analyzing the content fetched from http://www.google.com, I can provide you
+        with the following information:\n\nThe website doesn''t explicitly state what
+        Google does in a clear, concise statement on their homepage. However, based
+        on the content we can infer some information about Google''s services:\n\n1.
+        Search: The most prominent feature seems to be the search functionality, which
+        is Google''s primary service.\n\n2. Various products and services: The homepage
+        lists several Google products, including:\n   - Images\n   - Maps\n   - Play
+        (likely referring to Google Play Store)\n   - YouTube\n   - News\n   - Gmail\n   -
+        Drive\n   - Calendar\n   - Translate\n   - Books\n   - Shopping\n   - Blogger\n   -
+        Finance\n   - Photos\n   - Docs\n\n3. Account options: There''s a mention
+        of \"Account Options\" and \"Sign in,\" indicating that Google offers personalized
+        services.\n\n4. Additional features: The homepage mentions \"Advanced search\"
+        and \"Web History,\" which are related to their core search functionality.\n\n5.
+        Business focus: There''s a reference to \"Advertising\" and \"Business Solutions,\"
+        suggesting that Google also caters to businesses.\n\nWhile the homepage doesn''t
+        explicitly state \"This is what we do,\" it''s clear that Google is primarily
+        a technology company offering a wide range of internet-related services and
+        products, with search being their most prominent feature.\n\nIt''s worth noting
+        that this is a very minimalist homepage design, focused on the search bar
+        and quick access to other Google services. For a more detailed explanation
+        of what Google does, one would typically need to visit their \"About\" page
+        or other informational pages on their website."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":650,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":364,"service_tier":"standard"}}'
+  recorded_at: Tue, 01 Jul 2025 15:46:33 GMT
 recorded_with: VCR 6.3.1

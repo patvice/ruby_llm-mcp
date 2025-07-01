@@ -37,7 +37,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 21 Jun 2025 16:44:57 GMT
+      - Tue, 01 Jul 2025 15:45:22 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -47,7 +47,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1413
+      - gfet4t7; dur=2267
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -61,19 +61,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have the content of three files:\n\n*   **test.txt:**\n    ```\n    Hello, this is a test file!\n    This content will be served by the MCP resource.\n    You can modify this file and it will be cached for 5 minutes.\n    ```\n\n*   **second_file.txt:**\n    ```\n    This is the second file that I want to be able to use as a resource\n    ```\n\n*   **my.md:**\n    ```markdown\n    # My Markdown File\n\n    This is a markdown file that I want to be able to use as a resource\n\n    ## Section 1\n\n    This is a section in my markdown file\n\n    ## Section 2\n\n    This is another section in my markdown file\n    ```\n\nI also know that:\n\n*   `test.txt` is intended to be served by an \"MCP resource\".\n*   The MCP resource will cache `test.txt` for 5 minutes after modification.\n*   `second_file.txt` and `my.md` are also intended to be used as resources.\n"
+                    "text": "I have the following information from the provided resources:\n\n*   **test.txt:** This file contains the following text:\n    ```\n    Hello, this is a test file!\n    This content will be served by the MCP resource.\n    You can modify this file and it will be cached for 5 minutes.\n    ```\n    It seems to be intended for serving as a resource, likely through an MCP (Management Component Provider) system, and it indicates that modifications to the file will be cached for 5 minutes.\n\n*   **second_file.txt:** This file contains the following text:\n    ```\n    This is the second file that I want to be able to use as a resource\n    ```\n    This file is also intended to be used as a resource.\n\n*   **my.md:** This file contains markdown formatted text:\n    ```markdown\n    # My Markdown File\n\n    This is a markdown file that I want to be able to use as a resource\n\n    ## Section 1\n\n    This is a section in my markdown file\n\n    ## Section 2\n\n    This is another section in my markdown file\n    ```\n    This file is a markdown document with a title \"My Markdown File\" and two sections.  It's also intended to be used as a resource.\n\nIn summary, I have the content of three files, all of which appear to be intended for use as resources, possibly served by some kind of content management or deployment system.  The `test.txt` file provides a hint that an MCP system might be involved, and mentions a caching mechanism.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.073874091297262329
+              "avgLogprobs": -0.21673222829604291
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 140,
-            "candidatesTokenCount": 237,
-            "totalTokenCount": 377,
+            "candidatesTokenCount": 338,
+            "totalTokenCount": 478,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -83,12 +83,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 237
+                "tokenCount": 338
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "iOFWaNm9IKqU7dcP4sqikAE"
+          "responseId": "kAJkaIXcLpK3mNAPh5HH0QM"
         }
-  recorded_at: Sat, 21 Jun 2025 16:44:57 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:22 GMT
 recorded_with: VCR 6.3.1

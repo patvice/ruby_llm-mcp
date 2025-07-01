@@ -11,7 +11,7 @@ http_interactions:
         tool"},{"name":"tool_error","description":"Returns an error","parameters":{"type":"OBJECT","properties":{"shouldError":{"type":"BOOLEAN"}},"required":[]}},{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}},{"name":"get_jackhammer_audio","description":"Returns
         the jackhammer audio file as a base64-encoded WAV"},{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded JPEG"},{"name":"get_file_resource","description":"Returns
+        the dog image as a base64-encoded PNG"},{"name":"get_file_resource","description":"Returns
         a file resource reference","parameters":{"type":"OBJECT","properties":{"filename":{"type":"STRING"}},"required":[]}},{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}},{"name":"upgrade_auth","description":"Upgrade
         authentication permissions","parameters":{"type":"OBJECT","properties":{"permission":{"type":"STRING"}},"required":[]}},{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
@@ -39,7 +39,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:07:50 GMT
+      - Tue, 01 Jul 2025 15:47:14 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -49,7 +49,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=477
+      - gfet4t7; dur=539
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -75,7 +75,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0011602087877690792
+              "avgLogprobs": -0.0016336379572749137
             }
           ],
           "usageMetadata": {
@@ -96,21 +96,21 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "JQBYaMnWMcy12cAP0YDw0Qc"
+          "responseId": "AQNkaKP8JZK3mNAPh5HH0QM"
         }
-  recorded_at: Sun, 22 Jun 2025 13:07:50 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:13 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
-      string: '{"contents":[{"role":"user","parts":[{"text":"Can you add 1 and 2?"}]},{"role":"model","parts":[{"functionCall":{"name":"add","args":{"b":2,"a":1}}}]},{"role":"user","parts":[{"functionResponse":{"name":"76fe3400-5492-49f5-b068-55ef4dfb598c","response":{"name":"76fe3400-5492-49f5-b068-55ef4dfb598c","content":"3"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"add","description":"Addes
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you add 1 and 2?"}]},{"role":"model","parts":[{"functionCall":{"name":"add","args":{"b":2,"a":1}}}]},{"role":"user","parts":[{"functionResponse":{"name":"7984415d-2890-4a9a-925c-217f1abf87a2","response":{"name":"7984415d-2890-4a9a-925c-217f1abf87a2","content":"3"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"add","description":"Addes
         two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":[]}},{"name":"return_set_evn","description":"Returns
         the set environment variable"},{"name":"malformed_tool","description":"A malformed
         tool"},{"name":"tool_error","description":"Returns an error","parameters":{"type":"OBJECT","properties":{"shouldError":{"type":"BOOLEAN"}},"required":[]}},{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}},{"name":"get_jackhammer_audio","description":"Returns
         the jackhammer audio file as a base64-encoded WAV"},{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded JPEG"},{"name":"get_file_resource","description":"Returns
+        the dog image as a base64-encoded PNG"},{"name":"get_file_resource","description":"Returns
         a file resource reference","parameters":{"type":"OBJECT","properties":{"filename":{"type":"STRING"}},"required":[]}},{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}},{"name":"upgrade_auth","description":"Upgrade
         authentication permissions","parameters":{"type":"OBJECT","properties":{"permission":{"type":"STRING"}},"required":[]}},{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
@@ -138,7 +138,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:07:50 GMT
+      - Tue, 01 Jul 2025 15:47:14 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -148,7 +148,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=515
+      - gfet4t7; dur=446
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -168,17 +168,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.12026730179786682
+              "avgLogprobs": -0.0053930007852613926
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 256,
+            "promptTokenCount": 260,
             "candidatesTokenCount": 2,
-            "totalTokenCount": 258,
+            "totalTokenCount": 262,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 256
+                "tokenCount": 260
               }
             ],
             "candidatesTokensDetails": [
@@ -189,7 +189,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "JgBYaIqoHLG0xfcP74Lc0Q0"
+          "responseId": "AgNkaJCiDqizxfcPvo3h8QI"
         }
-  recorded_at: Sun, 22 Jun 2025 13:07:50 GMT
+  recorded_at: Tue, 01 Jul 2025 15:47:14 GMT
 recorded_with: VCR 6.3.1

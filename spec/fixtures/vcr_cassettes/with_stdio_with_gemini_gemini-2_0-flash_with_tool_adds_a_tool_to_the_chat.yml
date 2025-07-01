@@ -6,7 +6,7 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you pull messages
-        for ruby channel and let me know what they say?"}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
+        for ruby channel and let me know what they say?"}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 21 Jun 2025 16:44:55 GMT
+      - Tue, 01 Jul 2025 15:45:17 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=675
+      - gfet4t7; dur=517
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -65,7 +65,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -3.9495970122516154e-05
+              "avgLogprobs": -0.00039330129511654376
             }
           ],
           "usageMetadata": {
@@ -86,18 +86,18 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "h-FWaOnJAt2j7dcP5sOOgAI"
+          "responseId": "jQJkaNyHJaizxfcPvo3h8QI"
         }
-  recorded_at: Sat, 21 Jun 2025 16:44:55 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:17 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you pull messages
-        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"83a6ce02-fb7d-4942-a718-314a23ae67fc","response":{"name":"83a6ce02-fb7d-4942-a718-314a23ae67fc","content":"Ruby
+        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"ca72768f-b5dd-42bb-9c17-b6bb5850fbf4","response":{"name":"ca72768f-b5dd-42bb-9c17-b6bb5850fbf4","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
-        community."}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
+        community."}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -121,7 +121,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 21 Jun 2025 16:44:56 GMT
+      - Tue, 01 Jul 2025 15:45:18 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -131,7 +131,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=627
+      - gfet4t7; dur=742
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -145,34 +145,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The message in the ruby channel says: \"Ruby is a great language for web development. It's easy to learn and has a large community.\"\n"
+                    "text": "OK. I found one message in the ruby channel. It says, \"Ruby is a great language for web development. It's easy to learn and has a large community.\"\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.028889540703065934
+              "avgLogprobs": -0.04601045879157814
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 113,
-            "candidatesTokenCount": 31,
-            "totalTokenCount": 144,
+            "promptTokenCount": 111,
+            "candidatesTokenCount": 37,
+            "totalTokenCount": 148,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 113
+                "tokenCount": 111
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 31
+                "tokenCount": 37
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "h-FWaLK8N9Ck7dcPs7e1yQw"
+          "responseId": "jgJkaLnDDZmBmNAP8YDO2QI"
         }
-  recorded_at: Sat, 21 Jun 2025 16:44:56 GMT
+  recorded_at: Tue, 01 Jul 2025 15:45:18 GMT
 recorded_with: VCR 6.3.1
