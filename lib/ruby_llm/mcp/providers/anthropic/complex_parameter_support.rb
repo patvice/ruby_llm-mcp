@@ -28,8 +28,9 @@ module RubyLLM
               else
                 {
                   type: param.type,
+                  default: param.default,
                   items: { type: param.item_type, enum: param.enum }.compact
-                }
+                }.compact
               end
             when :object
               {

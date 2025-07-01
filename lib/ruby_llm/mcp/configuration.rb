@@ -6,6 +6,8 @@ module RubyLLM
       attr_accessor :request_timeout, :log_file, :log_level, :has_support_complex_parameters
       attr_writer :logger
 
+      REQUEST_TIMEOUT_DEFAULT = 8000
+
       def initialize
         set_defaults
       end
@@ -51,7 +53,7 @@ module RubyLLM
 
       def set_defaults
         # Connection configuration
-        @request_timeout = 8000
+        @request_timeout = REQUEST_TIMEOUT_DEFAULT
 
         # Logging configuration
         @log_file = $stdout

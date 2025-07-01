@@ -95,7 +95,8 @@ module RubyLLM
           key,
           type: param_data["type"] || lifted_type,
           desc: param_data["description"],
-          required: param_data["required"]
+          required: param_data["required"],
+          default: param_data["default"]
         )
 
         if param.type == :array
@@ -104,8 +105,8 @@ module RubyLLM
           if items.key?("properties")
             param.properties = create_parameters(items)
           end
-          if param_data.key?("enum")
-            param.enum = param_data["enum"]
+          if items.key?("enum")
+            param.enum = items["enum"]
           end
         elsif param.type == :object
           if param_data.key?("properties")
