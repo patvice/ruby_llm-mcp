@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "httpx"
+
 module RubyLLM
   module MCP
     class Resource
@@ -88,7 +90,7 @@ module RubyLLM
       end
 
       def fetch_uri_content(uri)
-        response = Faraday.get(uri)
+        response = HTTPX.get(uri)
         { "result" => { "contents" => [{ "text" => response.body }] } }
       end
     end
