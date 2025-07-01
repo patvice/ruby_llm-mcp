@@ -2,8 +2,8 @@
 
 module RubyLLM
   module MCP
-    module Requests
-      class PingResponse
+    module Responses
+      class Ping
         def initialize(coordinator, id:)
           @coordinator = coordinator
           @id = id

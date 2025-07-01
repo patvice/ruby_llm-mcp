@@ -3,12 +3,36 @@
 module RubyLLM
   module MCP
     class Configuration
-      attr_accessor :request_timeout, :log_file, :log_level, :has_support_complex_parameters
+      class Sampling
+        attr_accessor :enabled, :prefered_model
+
+        def initialize
+          set_defaults
+        end
+
+        def reset!
+          set_defaults
+        end
+
+        def enabled?
+          @enabled
+        end
+
+        private
+
+        def set_defaults
+          @enabled = false
+          @prefered_model = nil
+        end
+      end
+
+      attr_accessor :request_timeout, :log_file, :log_level, :has_support_complex_parameters, :roots, :sampling
       attr_writer :logger
 
       REQUEST_TIMEOUT_DEFAULT = 8000
 
       def initialize
+        @sampling = Sampling.new
         set_defaults
       end
 
@@ -60,6 +84,7 @@ module RubyLLM
         @log_level = ENV["RUBYLLM_MCP_DEBUG"] ? Logger::DEBUG : Logger::INFO
         @has_support_complex_parameters = false
         @logger = nil
+        @roots = []
       end
     end
   end

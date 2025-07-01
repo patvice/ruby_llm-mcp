@@ -7,7 +7,7 @@ module RubyLLM
     class Client
       extend Forwardable
 
-      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on
+      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on, :roots
 
       def initialize(name:, transport_type:, start: true, request_timeout: MCP.config.request_timeout, config: {})
         @name = name
@@ -24,6 +24,7 @@ module RubyLLM
         @prompts = {}
 
         @log_level = nil
+        @roots = Roots.new(paths: MCP.config.roots, coordinator: @coordinator)
 
         @coordinator.start_transport if start
       end
@@ -162,6 +163,15 @@ module RubyLLM
                             @coordinator.default_process_logging_message(notification, logger: logger)
                           end
                         end
+        self
+      end
+
+      def sampling_callback_enabled?
+        @on.key?(:sampling) && !@on[:sampling].nil?
+      end
+
+      def on_sampling(&block)
+        @on[:sampling] = block
         self
       end
 

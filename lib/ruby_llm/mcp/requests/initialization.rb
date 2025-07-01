@@ -16,7 +16,7 @@ module RubyLLM
             method: "initialize",
             params: {
               protocolVersion: coordinator.protocol_version,
-              capabilities: {},
+              capabilities: coordinator.client_capabilities,
               clientInfo: {
                 name: "RubyLLM-MCP Client",
                 version: RubyLLM::MCP::VERSION
