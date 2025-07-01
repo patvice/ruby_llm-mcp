@@ -32,11 +32,14 @@ RSpec.describe RubyLLM::MCP::Transport::SSE do
   let(:client) { Runner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    TestServerManager.start_sse_server
+    sleep 1
     Runner.instance.start
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
     Runner.instance.stop
+    TestServerManager.stop_sse_server
   end
 
   describe "start" do
