@@ -24,12 +24,14 @@ module RubyLLM
         @prompts = {}
 
         @log_level = nil
-        @roots = Roots.new(paths: MCP.config.roots, coordinator: @coordinator)
+
+        setup_roots
+        setup_sampling
 
         @coordinator.start_transport if start
       end
 
-      def_delegators :@coordinator, :alive?, :capabilities, :ping
+      def_delegators :@coordinator, :alive?, :capabilities, :ping, :client_capabilities
 
       def start
         @coordinator.start_transport
@@ -196,6 +198,14 @@ module RubyLLM
           instance = klass.new(@coordinator, item)
           acc[instance.name] = instance
         end
+      end
+
+      def setup_roots
+        @roots = Roots.new(paths: MCP.config.roots, coordinator: @coordinator)
+      end
+
+      def setup_sampling
+        @on[:sampling] = MCP.config.sampling.guard
       end
     end
   end

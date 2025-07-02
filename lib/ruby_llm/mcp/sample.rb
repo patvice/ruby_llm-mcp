@@ -31,6 +31,8 @@ module RubyLLM
         end
       end
 
+      REJECTED_MESSAGE = "Sampling request was rejected"
+
       attr_reader :messages, :model_preferences, :system_prompt, :max_tokens
 
       def initialize(result, coordinator)
@@ -45,6 +47,8 @@ module RubyLLM
       end
 
       def execute
+        return unless callback_guard_success?
+
         chat_message = chat
         @coordinator.sampling_create_message_response(
           id: @id, message: chat_message, model: prefered_model
@@ -53,13 +57,28 @@ module RubyLLM
 
       private
 
+      def callback_guard_success?
+        return true unless @coordinator.client.sampling_callback_enabled?
+
+        unless @coordinator.client.on[:sampling].call(self)
+          @coordinator.error_response(id: @id, message: REJECTED_MESSAGE)
+          return false
+        end
+
+        true
+      rescue StandardError => e
+        RubyLLM::MCP.logger.error("Error in callback guard: #{e.message}, #{e.backtrace.join("\n")}")
+        @coordinator.error_response(id: @id, message: "Error executing sampling request")
+        false
+      end
+
       def chat
         chat = RubyLLM::Chat.new(
           model: prefered_model
         )
         if system_prompt
-          system_message = create_message(system_message)
-          chat.add_message(system_message)
+          formated_system_message = create_message(system_message)
+          chat.add_message(formated_system_message)
         end
         messages.each { |message| chat.add_message(create_message(message)) }
 

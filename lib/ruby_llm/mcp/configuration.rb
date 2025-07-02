@@ -14,6 +14,11 @@ module RubyLLM
           set_defaults
         end
 
+        def guard(&block)
+          @guard = block if block_given?
+          @guard
+        end
+
         def enabled?
           @enabled
         end
@@ -23,6 +28,7 @@ module RubyLLM
         def set_defaults
           @enabled = false
           @prefered_model = nil
+          @guard = nil
         end
       end
 
@@ -85,6 +91,8 @@ module RubyLLM
         @has_support_complex_parameters = false
         @logger = nil
         @roots = []
+
+        @sampling.reset!
       end
     end
   end

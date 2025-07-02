@@ -198,6 +198,10 @@ module RubyLLM
         RubyLLM::MCP::Responses::SamplingCreateMessage.new(self, **args).call
       end
 
+      def error_response(**args)
+        RubyLLM::MCP::Responses::Error.new(self, **args).call
+      end
+
       def client_capabilities
         capabilities = {}
 

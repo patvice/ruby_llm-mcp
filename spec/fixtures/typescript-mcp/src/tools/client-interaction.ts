@@ -44,6 +44,17 @@ export function setupClientInteractionTools(server: McpServer) {
         maxTokens: 100,
       });
 
+      if (result.isError) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Sampling test failed: ${result.error}`,
+            },
+          ],
+          isError: true,
+        };
+      }
       return {
         content: [
           {

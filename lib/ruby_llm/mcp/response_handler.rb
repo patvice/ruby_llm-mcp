@@ -30,6 +30,12 @@ module RubyLLM
       private
 
       def handle_sampling_response(result)
+        unless MCP.config.sampling.enabled?
+          RubyLLM::MCP.logger.info("Sampling is disabled, yet server requested sampling")
+          coordinator.error_response(id: result.id, message: "Sampling is disabled", code: -32_000)
+          return
+        end
+
         RubyLLM::MCP.logger.info("Sampling response: #{result.inspect}")
         Sample.new(result, coordinator).execute
       end
