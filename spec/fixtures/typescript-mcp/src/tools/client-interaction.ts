@@ -1,8 +1,30 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
 
 export function setupClientInteractionTools(server: McpServer) {
-  const rawServer = server.server;
+  server.tool(
+    "client-capabilities",
+    "Get the capabilities of the client and return them back",
+    {},
+    async ({}) => {
+      const result = await server.server.getClientCapabilities();
+
+      if (result) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Client capabilities: ${JSON.stringify(result)}`,
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [{ type: "text", text: "Client capabilities not found" }],
+        isError: true,
+      };
+    }
+  );
 
   server.tool(
     "ping_client",
@@ -21,6 +43,40 @@ export function setupClientInteractionTools(server: McpServer) {
         content: [{ type: "text", text: "Ping failed" }],
         isError: true,
       };
+    }
+  );
+
+  server.tool(
+    "roots-test",
+    "Test the roots list for a client",
+    {},
+    async ({}) => {
+      try {
+        const result = await server.server.listRoots();
+
+        if (result.isError) {
+          return {
+            content: [
+              { type: "text", text: `Roots test failed: ${result.error}` },
+            ],
+            isError: true,
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Roots test completed: ${JSON.stringify(result)}`,
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [{ type: "text", text: `Roots test failed: ${error}` }],
+          isError: true,
+        };
+      }
     }
   );
 

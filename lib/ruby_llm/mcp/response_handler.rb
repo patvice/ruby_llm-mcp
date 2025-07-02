@@ -15,7 +15,7 @@ module RubyLLM
           coordinator.ping_response(id: result.id)
           true
         elsif result.roots?
-          coordinator.roots_response(id: result.id)
+          handle_roots_response(result)
           true
         elsif result.sampling?
           handle_sampling_response(result)
@@ -28,6 +28,14 @@ module RubyLLM
       end
 
       private
+
+      def handle_roots_response(result)
+        if client.roots.active?
+          coordinator.roots_list_response(id: result.id, roots: client.roots)
+        else
+          coordinator.error_response(id: result.id, message: "Roots are not enabled", code: -32_000)
+        end
+      end
 
       def handle_sampling_response(result)
         unless MCP.config.sampling.enabled?

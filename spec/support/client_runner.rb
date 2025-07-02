@@ -17,6 +17,10 @@ class ClientRunner
       @client_runners ||= {}
     end
 
+    def fetch_client(name)
+      client_runners[name].client
+    end
+
     def start_all
       @client_runners.each_value(&:start)
     end

@@ -10,11 +10,9 @@ RSpec.describe RubyLLM::MCP::Prompt do
     ClientRunner.stop_all
   end
 
-  CLIENT_OPTIONS.each do |options|
-    context "with #{options[:name]}" do
-      let(:client) do
-        ClientRunner.client_runners[options[:name]].client
-      end
+  CLIENT_OPTIONS.each do |config|
+    context "with #{config[:name]}" do
+      let(:client) { ClientRunner.fetch_client(config[:name]) }
 
       describe "prompts" do
         it "returns array of prompts" do

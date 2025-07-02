@@ -42,9 +42,9 @@ RSpec.describe RubyLLM::Chat do
     end
   end
 
-  CLIENT_OPTIONS.each do |options|
-    context "with #{options[:name]}" do
-      let(:client) { ClientRunner.client_runners[options[:name]].client }
+  CLIENT_OPTIONS.each do |client_config|
+    context "with #{client_config[:name]}" do
+      let(:client) { ClientRunner.fetch_client(client_config[:name]) }
 
       COMPLEX_FUNCTION_MODELS.each do |config|
         context "with #{config[:provider]}/#{config[:model]}" do
