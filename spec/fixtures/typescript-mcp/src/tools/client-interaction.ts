@@ -91,7 +91,7 @@ export function setupClientInteractionTools(server: McpServer) {
         ],
         model: "gpt-4o",
         modelPreferences: {
-          hints: [{ name: "gpt-4o" }],
+          hints: [{ name: "gemini-2.0-flash" }, { name: "gpt-4o" }],
           costPriority: 1,
           speedPriority: 1,
           intelligencePriority: 1,

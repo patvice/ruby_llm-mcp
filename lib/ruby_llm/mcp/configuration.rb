@@ -4,7 +4,8 @@ module RubyLLM
   module MCP
     class Configuration
       class Sampling
-        attr_accessor :enabled, :prefered_model
+        attr_accessor :enabled
+        attr_writer :preferred_model
 
         def initialize
           set_defaults
@@ -19,6 +20,11 @@ module RubyLLM
           @guard
         end
 
+        def preferred_model(&block)
+          @preferred_model = block if block_given?
+          @preferred_model
+        end
+
         def enabled?
           @enabled
         end
@@ -27,7 +33,7 @@ module RubyLLM
 
         def set_defaults
           @enabled = false
-          @prefered_model = nil
+          @preferred_model = nil
           @guard = nil
         end
       end

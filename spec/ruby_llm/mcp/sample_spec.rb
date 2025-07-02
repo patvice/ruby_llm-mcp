@@ -152,10 +152,48 @@ RSpec.describe RubyLLM::MCP::Sample do
         expect(sample.system_prompt).to eq("You are a helpful assistant.")
         expect(sample.max_tokens).to eq(100)
         expect(sample.model_preferences.model).to eq("gpt-4o")
-        expect(sample.model_preferences.hints).to eq(["gpt-4o"])
+        expect(sample.model_preferences.hints).to eq(["gemini-2.0-flash", "gpt-4o"])
         expect(sample.model_preferences.cost_priority).to eq(1)
         expect(sample.model_preferences.speed_priority).to eq(1)
         expect(sample.model_preferences.intelligence_priority).to eq(1)
+      end
+
+      it "client can call a block to determine the preferred model, accessing the model preferences" do
+        model_preferences = nil
+        RubyLLM::MCP.configure do |config|
+          config.sampling.enabled = true
+
+          config.sampling.preferred_model do |incoming_model_preferences|
+            model_preferences = incoming_model_preferences
+            incoming_model_preferences&.hints&.first
+          end
+        end
+
+        client.start
+
+        tool = client.tool("sampling-test")
+        result = tool.execute
+
+        expect(result.to_s).to include("gemini-2.0-flash")
+        expect(model_preferences).to be_a(RubyLLM::MCP::Sample::Hint)
+      end
+
+      it "client calls a block to determine the preferred model, and raises an error it will send an error message back" do
+        RubyLLM::MCP.configure do |config|
+          config.sampling.enabled = true
+
+          config.sampling.preferred_model do
+            raise "Error in preferred model"
+          end
+        end
+
+        client.start
+
+        tool = client.tool("sampling-test")
+        result = tool.execute
+
+        expect(result.to_s).to include("Failed to determine preferred model")
+        expect(result.to_s).to include("Error in preferred model")
       end
 
       COMPLEX_FUNCTION_MODELS.each do |model|
@@ -163,7 +201,7 @@ RSpec.describe RubyLLM::MCP::Sample do
           it "executes a chat message and provides information to the server, without a guard" do
             RubyLLM::MCP.configure do |config|
               config.sampling.enabled = true
-              config.sampling.prefered_model = model[:model]
+              config.sampling.preferred_model = model[:model]
             end
             client.start
 
@@ -176,7 +214,7 @@ RSpec.describe RubyLLM::MCP::Sample do
           it "provides information about the sample, with a guard" do
             RubyLLM::MCP.configure do |config|
               config.sampling.enabled = true
-              config.sampling.prefered_model = model[:model]
+              config.sampling.preferred_model = model[:model]
 
               config.sampling.guard do
                 true

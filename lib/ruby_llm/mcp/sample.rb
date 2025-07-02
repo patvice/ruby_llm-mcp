@@ -49,9 +49,12 @@ module RubyLLM
       def execute
         return unless callback_guard_success?
 
-        chat_message = chat
+        model = preferred_model
+        return unless model
+
+        chat_message = chat(model)
         @coordinator.sampling_create_message_response(
-          id: @id, message: chat_message, model: prefered_model
+          id: @id, message: chat_message, model: model
         )
       end
 
@@ -76,9 +79,9 @@ module RubyLLM
         false
       end
 
-      def chat
+      def chat(model)
         chat = RubyLLM::Chat.new(
-          model: prefered_model
+          model: model
         )
         if system_prompt
           formated_system_message = create_message(system_message)
@@ -89,15 +92,19 @@ module RubyLLM
         chat.complete
       end
 
-      def prefered_model
-        @prefered_model ||= begin
-          model = RubyLLM::MCP.config.sampling.prefered_model
+      def preferred_model
+        @preferred_model ||= begin
+          model = RubyLLM::MCP.config.sampling.preferred_model
           if model.respond_to?(:call)
-            model.call(model_preferences.hints)
+            model.call(model_preferences)
           else
             model
           end
         end
+      rescue StandardError => e
+        RubyLLM::MCP.logger.error("Error in preferred model: #{e.message}, #{e.backtrace.join("\n")}")
+        @coordinator.error_response(id: @id, message: "Failed to determine preferred model: #{e.message}")
+        false
       end
 
       def create_message(message)
