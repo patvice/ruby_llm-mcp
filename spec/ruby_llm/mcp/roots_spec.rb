@@ -3,13 +3,19 @@
 require "spec_helper"
 
 RSpec.describe RubyLLM::MCP::Roots do
+  let(:coordinator) do
+    coordinator = instance_double(RubyLLM::MCP::Coordinator)
+    allow(coordinator).to receive(:roots_list_change_notification).and_return(true)
+    coordinator
+  end
+
   it "can be initialized with an array of paths" do
-    roots = RubyLLM::MCP::Roots.new(paths: ["path/to/file1", "path/to/file2"])
+    roots = RubyLLM::MCP::Roots.new(paths: ["path/to/file1", "path/to/file2"], coordinator: coordinator)
     expect(roots.paths).to eq(["path/to/file1", "path/to/file2"])
   end
 
   it "can pass both a string to a path or a pathname object" do
-    roots = RubyLLM::MCP::Roots.new(paths: ["path/to/file1", Pathname.new("path/to/file2")])
+    roots = RubyLLM::MCP::Roots.new(paths: ["path/to/file1", Pathname.new("path/to/file2")], coordinator: coordinator)
     expect(roots.to_request).to eq([
                                      {
                                        uri: "file://path/to/file1",
@@ -20,6 +26,40 @@ RSpec.describe RubyLLM::MCP::Roots do
                                        name: "file2"
                                      }
                                    ])
+  end
+
+  it "supports Pathname objects" do
+    roots = RubyLLM::MCP::Roots.new(paths: [Pathname.new("path/to/file1"), Pathname.new("path/to/file2")],
+                                    coordinator: coordinator)
+    expect(roots.to_request).to eq([
+                                     {
+                                       uri: "file://path/to/file1",
+                                       name: "file1"
+                                     },
+                                     {
+                                       uri: "file://path/to/file2",
+                                       name: "file2"
+                                     }
+                                   ])
+
+    roots.add(Pathname.new("path/to/file3"))
+    roots.remove(Pathname.new("path/to/file2"))
+    roots.remove(Pathname.new("path/to/file1"))
+    expect(roots.to_request).to eq([
+                                     {
+                                       uri: "file://path/to/file3",
+                                       name: "file3"
+                                     }
+                                   ])
+  end
+
+  it "calls the list notification change on a remove and an add" do
+    roots = RubyLLM::MCP::Roots.new(paths: ["path/to/file1"], coordinator: coordinator)
+    roots.add("path/to/file2")
+    expect(coordinator).to have_received(:roots_list_change_notification).exactly(1).times
+
+    roots.remove("path/to/file2")
+    expect(coordinator).to have_received(:roots_list_change_notification).exactly(2).times
   end
 
   CLIENT_OPTIONS.each do |config|
