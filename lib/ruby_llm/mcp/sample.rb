@@ -33,14 +33,14 @@ module RubyLLM
 
       REJECTED_MESSAGE = "Sampling request was rejected"
 
-      attr_reader :messages, :model_preferences, :system_prompt, :max_tokens
+      attr_reader :model_preferences, :system_prompt, :max_tokens, :raw_messages
 
       def initialize(result, coordinator)
         params = result.params
         @id = result.id
         @coordinator = coordinator
 
-        @messages = params["messages"] || []
+        @raw_messages = params["messages"] || []
         @model_preferences = Hint.new(params["model"], params["modelPreferences"])
         @system_prompt = params["systemPrompt"]
         @max_tokens = params["maxTokens"]
@@ -53,6 +53,10 @@ module RubyLLM
         @coordinator.sampling_create_message_response(
           id: @id, message: chat_message, model: prefered_model
         )
+      end
+
+      def messages
+        @messages ||= raw_messages.map { |message| message.fetch("content")&.fetch("text") }.join("\n")
       end
 
       private
@@ -80,7 +84,7 @@ module RubyLLM
           formated_system_message = create_message(system_message)
           chat.add_message(formated_system_message)
         end
-        messages.each { |message| chat.add_message(create_message(message)) }
+        raw_messages.each { |message| chat.add_message(create_message(message)) }
 
         chat.complete
       end

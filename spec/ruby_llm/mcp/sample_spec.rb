@@ -7,6 +7,27 @@ RSpec.describe RubyLLM::MCP::Sample do
     MCPTestConfiguration.reset_config!
   end
 
+  let(:coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
+  let(:result) do
+    RubyLLM::MCP::Result.new(
+      { "id" => "123",
+        "params" => { "messages" => [
+          { "role" => "user",
+            "content" => { "type" => "text", "text" => "Hello, how are you?" } },
+          { "role" => "assistant",
+            "content" => { "type" => "text", "text" => "I'm good, thank you!" } }
+        ] } }
+    )
+  end
+
+  it "messages will be a string of all the messages" do
+    sample = RubyLLM::MCP::Sample.new(
+      result,
+      coordinator
+    )
+    expect(sample.messages).to eq("Hello, how are you?\nI'm good, thank you!")
+  end
+
   CLIENT_OPTIONS.each do |config|
     context "with #{config[:name]}" do
       let(:client) do
@@ -106,15 +127,15 @@ RSpec.describe RubyLLM::MCP::Sample do
         tool.execute
 
         expect(sample).to be_a(RubyLLM::MCP::Sample)
-        expect(sample.messages).to eq([
-                                        {
-                                          "role" => "user",
-                                          "content" => {
-                                            "type" => "text",
-                                            "text" => "Hello, how are you?"
-                                          }
-                                        }
-                                      ])
+        expect(sample.raw_messages).to eq([
+                                            {
+                                              "role" => "user",
+                                              "content" => {
+                                                "type" => "text",
+                                                "text" => "Hello, how are you?"
+                                              }
+                                            }
+                                          ])
         expect(sample.system_prompt).to eq("You are a helpful assistant.")
         expect(sample.max_tokens).to eq(100)
         expect(sample.model_preferences.model).to eq("gpt-4o")
