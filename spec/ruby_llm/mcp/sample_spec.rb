@@ -23,7 +23,8 @@ RSpec.describe RubyLLM::MCP::Sample do
 
   around do |example|
     cassette_name = example.full_description
-                           .delete_prefix("RubyLLM::Chat ")
+                           .delete_prefix("RubyLLM::MCP::")
+                           .downcase
                            .gsub(" ", "_")
                            .gsub("/", "_")
 
