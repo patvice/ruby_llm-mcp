@@ -9,9 +9,7 @@ loader.inflector.inflect("mcp" => "MCP")
 loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
-
 loader.setup
-loader.eager_load
 
 module RubyLLM
   module MCP
