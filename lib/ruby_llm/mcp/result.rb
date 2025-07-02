@@ -12,7 +12,7 @@ module RubyLLM
     end
 
     class Result
-      attr_reader :result, :error, :params, :id, :response, :session_id
+      attr_reader :result, :error, :params, :id, :response, :session_id, :method
 
       REQUEST_METHODS = {
         ping: "ping",

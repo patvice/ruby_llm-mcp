@@ -178,7 +178,7 @@ RSpec.describe RubyLLM::MCP::Sample do
         expect(model_preferences).to be_a(RubyLLM::MCP::Sample::Hint)
       end
 
-      it "client calls a block to determine the preferred model, and raises an error it will send an error message back" do
+      it "client calls a block to determine the preferred model, and raises an error it will send an error back" do
         RubyLLM::MCP.configure do |config|
           config.sampling.enabled = true
 

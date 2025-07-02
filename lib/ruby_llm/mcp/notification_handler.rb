@@ -27,8 +27,7 @@ module RubyLLM
         when "notifications/cancelled"
           # TODO: - do nothing at the moment until we support client operations
         else
-          message = "Unknown notification type: #{notification.type} params:#{notification.params.to_h}"
-          raise Errors::UnknownNotification.new(message: message)
+          process_unknown_notification(notification)
         end
       end
 
@@ -74,6 +73,11 @@ module RubyLLM
         when "alert", "emergency"
           logger.fatal(message["message"])
         end
+      end
+
+      def process_unknown_notification(notification)
+        message = "Unknown notification type: #{notification.type} params: #{notification.params.to_h}"
+        RubyLLM::MCP.logger.error(message)
       end
     end
   end

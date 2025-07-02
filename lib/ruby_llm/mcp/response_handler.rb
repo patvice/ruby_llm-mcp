@@ -10,7 +10,7 @@ module RubyLLM
         @client = coordinator.client
       end
 
-      def execute(result)
+      def execute(result) # rubocop:disable Metrics/PredicateMethod
         if result.ping?
           coordinator.ping_response(id: result.id)
           true
@@ -21,9 +21,9 @@ module RubyLLM
           handle_sampling_response(result)
           true
         else
-          # Handle server-initiated requests
-          # Currently, we do not support any client operations but will
-          raise RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type: #{result.inspect}")
+          handle_unknown_request(result)
+          RubyLLM::MCP.logger.error("MCP client was sent unknown method type and could not respond: #{result.inspect}")
+          false
         end
       end
 
@@ -46,6 +46,12 @@ module RubyLLM
 
         RubyLLM::MCP.logger.info("Sampling response: #{result.inspect}")
         Sample.new(result, coordinator).execute
+      end
+
+      def handle_unknown_request(result)
+        coordinator.error_response(id: result.id,
+                                   message: "Unknown method and could not respond: #{result.method}",
+                                   code: -32_000)
       end
     end
   end
