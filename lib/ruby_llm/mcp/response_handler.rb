@@ -10,7 +10,7 @@ module RubyLLM
         @client = coordinator.client
       end
 
-      def execute(result) # rubocop:disable Metrics/PredicateMethod
+      def execute(result) # rubocop:disable Naming/PredicateMethod
         if result.ping?
           coordinator.ping_response(id: result.id)
           true
