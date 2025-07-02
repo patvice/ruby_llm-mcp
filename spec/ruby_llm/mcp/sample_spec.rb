@@ -5,6 +5,7 @@ require "spec_helper"
 RSpec.describe RubyLLM::MCP::Sample do
   before do
     MCPTestConfiguration.reset_config!
+    MCPTestConfiguration.configure_ruby_llm!
   end
 
   let(:coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
@@ -20,12 +21,23 @@ RSpec.describe RubyLLM::MCP::Sample do
     )
   end
 
+  around do |example|
+    cassette_name = example.full_description
+                           .delete_prefix("RubyLLM::Chat ")
+                           .gsub(" ", "_")
+                           .gsub("/", "_")
+
+    VCR.use_cassette(cassette_name) do
+      example.run
+    end
+  end
+
   it "messages will be a string of all the messages" do
     sample = RubyLLM::MCP::Sample.new(
       result,
       coordinator
     )
-    expect(sample.messages).to eq("Hello, how are you?\nI'm good, thank you!")
+    expect(sample.message).to eq("Hello, how are you?\nI'm good, thank you!")
   end
 
   CLIENT_OPTIONS.each do |config|

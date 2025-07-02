@@ -55,8 +55,8 @@ module RubyLLM
         )
       end
 
-      def messages
-        @messages ||= raw_messages.map { |message| message.fetch("content")&.fetch("text") }.join("\n")
+      def message
+        @message ||= raw_messages.map { |message| message.fetch("content")&.fetch("text") }.join("\n")
       end
 
       private
