@@ -12,6 +12,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
+- 🎛️ **Client Features**: Support for sampling and roots
 - 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 
@@ -461,6 +462,81 @@ puts result
 
 # Result: { status: "success", data: "Processed data" }
 ```
+
+## Client Features
+
+The RubyLLM::MCP client provides support functionality that can be exposed to MCP servers. These features must be explicitly configured before creating client objects to ensure you're opting into this functionality.
+
+### Roots
+
+Roots provide MCP servers with access to underlying file system information. The implementation starts with a lightweight approach due to the MCP specification's current limitations on root usage.
+
+When roots are configured, the client will:
+
+- Expose roots as a supported capability to MCP servers
+- Support dynamic addition and removal of roots during the client lifecycle
+- Fire `notifications/roots/list_changed` events when roots are modified
+
+#### Configuration
+
+```ruby
+RubyLLM::MCP.config do |config|
+  config.roots = ["to/a/path", Rails.root]
+end
+
+client = RubyLLM::MCP::Client.new(...)
+```
+
+#### Usage
+
+```ruby
+# Access current root paths
+client.roots.paths
+# => ["to/a/path", #<Pathname:/to/rails/root/path>]
+
+# Add a new root (fires list_changed notification)
+client.roots.add("new/path")
+client.roots.paths
+# => ["to/a/path", #<Pathname:/to/rails/root/path>, "new/path"]
+
+# Remove a root (fires list_changed notification)
+client.roots.remove("to/a/path")
+client.roots.paths
+# => [#<Pathname:/to/rails/root/path>, "new/path"]
+```
+
+### Sampling
+
+Sampling allows MCP servers to offload LLM requests to the MCP client rather than making them directly from the server. This enables MCP servers to optionally use LLM connections through the client.
+
+#### Configuration
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.sampling.enabled = true
+  config.sampling.preferred_model = "gpt-4.1"
+
+  # Optional: Use a block for dynamic model selection
+  config.sampling.preferred_model do |model_preferences|
+    model_preferences.hints.first
+  end
+
+  # Optional: Add guards to filter sampling requests
+  config.sampling.guard do |sample|
+    sample.message.include("Hello")
+  end
+end
+```
+
+#### How It Works
+
+With the above configuration:
+
+- Clients will respond to all incoming sample requests using the specified model (`gpt-4.1`)
+- Sample messages will only be approved if they contain the word "Hello" (when using the guard)
+- The `preferred_model` can be a string or a proc that provides dynamic model selection based on MCP server characteristics
+
+The `preferred_model` proc receives model preferences from the MCP server, allowing you to make intelligent model selection decisions based on the server's requirements for success.
 
 ## Transport Types
 
