@@ -4,13 +4,6 @@ require "ruby_llm"
 require "zeitwerk"
 require_relative "chat"
 
-loader = Zeitwerk::Loader.for_gem_extension(RubyLLM)
-loader.inflector.inflect("mcp" => "MCP")
-loader.inflector.inflect("sse" => "SSE")
-loader.inflector.inflect("openai" => "OpenAI")
-loader.inflector.inflect("streamable_http" => "StreamableHTTP")
-loader.setup
-
 module RubyLLM
   module MCP
     module_function
@@ -41,3 +34,11 @@ module RubyLLM
     end
   end
 end
+
+loader = Zeitwerk::Loader.for_gem_extension(RubyLLM)
+loader.inflector.inflect("mcp" => "MCP")
+loader.inflector.inflect("sse" => "SSE")
+loader.inflector.inflect("openai" => "OpenAI")
+loader.inflector.inflect("streamable_http" => "StreamableHTTP")
+
+loader.setup
