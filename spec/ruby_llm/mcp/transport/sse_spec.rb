@@ -20,7 +20,7 @@ class Runner
       name: "fast-mcp-ruby",
       transport_type: :sse,
       config: {
-        url: "http://127.0.0.1:3006/mcp/sse",
+        url: "http://127.0.0.1:#{TestServerManager::PORTS[:sse]}/mcp/sse",
         request_timeout: 100
       }
     )

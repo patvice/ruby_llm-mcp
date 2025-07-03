@@ -3,9 +3,13 @@
 module RubyLLM
   module MCP
     module Requests
-      class Initialization < RubyLLM::MCP::Requests::Base
+      class Initialization
+        def initialize(coordinator)
+          @coordinator = coordinator
+        end
+
         def call
-          coordinator.request(initialize_body)
+          @coordinator.request(initialize_body)
         end
 
         private
@@ -15,8 +19,8 @@ module RubyLLM
             jsonrpc: "2.0",
             method: "initialize",
             params: {
-              protocolVersion: coordinator.protocol_version,
-              capabilities: coordinator.client_capabilities,
+              protocolVersion: @coordinator.protocol_version,
+              capabilities: @coordinator.client_capabilities,
               clientInfo: {
                 name: "RubyLLM-MCP Client",
                 version: RubyLLM::MCP::VERSION

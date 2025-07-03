@@ -12,7 +12,7 @@ module RubyLLM
     end
 
     class Result
-      attr_reader :result, :error, :params, :id, :response, :session_id, :method
+      attr_reader :response, :session_id, :id, :method, :result, :params, :error, :next_cursor
 
       REQUEST_METHODS = {
         ping: "ping",
@@ -30,6 +30,7 @@ module RubyLLM
         @error = response["error"] || {}
 
         @result_is_error = response.dig("result", "isError") || false
+        @next_cursor = response.dig("result", "nextCursor")
       end
 
       REQUEST_METHODS.each do |method_name, method_value|
@@ -64,6 +65,10 @@ module RubyLLM
 
       def notification?
         @method&.include?("notifications") || false
+      end
+
+      def next_cursor?
+        !@next_cursor.nil?
       end
 
       def request?

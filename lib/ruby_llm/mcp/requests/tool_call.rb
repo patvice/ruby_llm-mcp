@@ -4,7 +4,7 @@ module RubyLLM
   module MCP
     module Requests
       class ToolCall
-        include Meta
+        include Shared::Meta
 
         def initialize(coordinator, name:, parameters: {})
           @coordinator = coordinator

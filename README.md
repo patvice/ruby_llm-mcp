@@ -229,23 +229,6 @@ content = log_template.to_content(arguments: {
 puts content
 ```
 
-#### Resource Argument Completion
-
-For resource templates, you can get suggested values for arguments:
-
-```ruby
-template = client.resource_template("user_profile")
-
-# Search for possible values for a specific argument
-suggestions = template.complete("username", "john")
-puts "Suggested usernames:"
-suggestions.values.each do |value|
-  puts "- #{value}"
-end
-puts "Total matches: #{suggestions.total}"
-puts "Has more: #{suggestions.has_more}"
-```
-
 ### Working with Prompts
 
 MCP servers can provide predefined prompts that can be used in conversations:
@@ -308,7 +291,7 @@ response = chat.ask("Please review the recent commits using the checklist and su
 puts response
 ```
 
-## Argument Completion
+### Argument Completion
 
 Some MCP servers support argument completion for prompts and resource templates:
 
@@ -325,7 +308,13 @@ puts "Total matches: #{suggestions.total}"
 puts "Has more results: #{suggestions.has_more}"
 ```
 
-## Additional Chat Methods
+### Pagination
+
+MCP servers can support pagination for their lists. The client will automatically paginate the lists to include all items from the list you wanted to pull.
+
+Pagination is supported for tools, resources, prompts, and resource templates.
+
+### Additional Chat Methods
 
 The gem extends RubyLLM's chat interface with convenient methods for MCP integration:
 

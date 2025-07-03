@@ -22,6 +22,25 @@ RSpec.describe RubyLLM::MCP::Tool do
     end
   end
 
+  context "with #{PAGINATION_CLIENT_CONFIG[:name]}" do
+    let(:client) { RubyLLM::MCP::Client.new(**PAGINATION_CLIENT_CONFIG) }
+
+    before do
+      client.start
+    end
+
+    after do
+      client.stop
+    end
+
+    describe "tool_list" do
+      it "paginates tool list to get all tools" do
+        tools = client.tools
+        expect(tools.count).to eq(2)
+      end
+    end
+  end
+
   CLIENT_OPTIONS.each do |config|
     context "with #{config[:name]}" do
       let(:client) { ClientRunner.fetch_client(config[:name]) }

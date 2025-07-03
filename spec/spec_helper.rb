@@ -104,11 +104,19 @@ CLIENT_OPTIONS = [
       name: "streamable-server",
       transport_type: :streamable,
       config: {
-        url: "http://localhost:3005/mcp"
+        url: TestServerManager::HTTP_SERVER_URL
       },
       request_timeout: 10_000
     } }
 ].freeze
+
+PAGINATION_CLIENT_CONFIG = {
+  name: "pagination",
+  transport_type: :streamable,
+  config: {
+    url: TestServerManager::PAGINATION_SERVER_URL
+  }
+}.freeze
 
 COMPLEX_FUNCTION_MODELS = [
   { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
@@ -129,11 +137,11 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.before(:all) do
+  config.before(:suite) do
     TestServerManager.start_server
   end
 
-  config.after(:all) do
+  config.after(:suite) do
     TestServerManager.stop_server
   end
 end

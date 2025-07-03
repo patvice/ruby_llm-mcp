@@ -9,6 +9,7 @@ require "rack"
 require "rack/handler/puma"
 
 is_silent = ARGV.include?("--silent")
+port = ENV.fetch("PORT2", 3006)
 
 class NullWriter
   def write(*args)
@@ -107,10 +108,10 @@ end
 
 unless is_silent
   # Run the Rack application with Puma
-  puts "Starting Rack application with MCP middleware on http://localhost:3006"
+  puts "Starting Rack application with MCP middleware on http://localhost:#{port}"
   puts "MCP endpoints:"
-  puts "  - http://localhost:3006/mcp/sse (SSE endpoint)"
-  puts "  - http://localhost:3006/mcp/messages (JSON-RPC endpoint)"
+  puts "  - http://localhost:#{port}/mcp/sse (SSE endpoint)"
+  puts "  - http://localhost:#{port}/mcp/messages (JSON-RPC endpoint)"
   puts "Press Ctrl+C to stop"
 end
 
@@ -124,7 +125,7 @@ app = Rack::Builder.new { run mcp_app }
 log_writer = is_silent ? Puma::LogWriter.new(NullWriter.new, NullWriter.new) : Puma::LogWriter.stdio
 
 config = Puma::Configuration.new(log_writer: log_writer) do |user_config|
-  user_config.bind "tcp://localhost:3006"
+  user_config.bind "tcp://127.0.0.1:#{port}"
   user_config.app app
 end
 

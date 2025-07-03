@@ -7,7 +7,6 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { setupTools } from "./tools/index.js";
 import { setupResources } from "./resources/index.js";
 import { setupPrompts } from "./prompts/index.js";
-import { registerLogging } from "./logging.js";
 
 // Check for silent flag
 const isSilent =
@@ -221,7 +220,6 @@ function createServer(): McpServer {
   setupTools(server);
   setupResources(server);
   setupPrompts(server);
-  registerLogging(server);
 
   return server;
 }
@@ -297,7 +295,7 @@ if (process.argv.includes("--stdio")) {
     process.exit(1);
   });
 } else {
-  const PORT = process.env.PORT1 || 3005;
+  const PORT = process.env.PORT3 || 3007;
   app.listen(PORT, () => {
     log(`🚀 MCP Streamable server running on port ${PORT}`);
     log(`📡 Endpoint: http://localhost:${PORT}/mcp`);

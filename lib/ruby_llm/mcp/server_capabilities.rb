@@ -2,7 +2,7 @@
 
 module RubyLLM
   module MCP
-    class Capabilities
+    class ServerCapabilities
       attr_accessor :capabilities
 
       def initialize(capabilities = {})

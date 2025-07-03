@@ -3,9 +3,17 @@
 module RubyLLM
   module MCP
     module Requests
-      class PromptList < Base
+      class PromptList
+        include Shared::Pagination
+
+        def initialize(coordinator, cursor: nil)
+          @coordinator = coordinator
+          @cursor = cursor
+        end
+
         def call
-          coordinator.request(request_body)
+          body = merge_pagination(request_body)
+          @coordinator.request(body)
         end
 
         private

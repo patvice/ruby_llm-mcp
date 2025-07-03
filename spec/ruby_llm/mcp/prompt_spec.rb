@@ -10,11 +10,30 @@ RSpec.describe RubyLLM::MCP::Prompt do
     ClientRunner.stop_all
   end
 
+  context "with #{PAGINATION_CLIENT_CONFIG[:name]}" do
+    let(:client) { RubyLLM::MCP::Client.new(**PAGINATION_CLIENT_CONFIG) }
+
+    before do
+      client.start
+    end
+
+    after do
+      client.stop
+    end
+
+    describe "prompts_list" do
+      it "paginates prompts list to get all prompts" do
+        prompts = client.prompts
+        expect(prompts.count).to eq(2)
+      end
+    end
+  end
+
   CLIENT_OPTIONS.each do |config|
     context "with #{config[:name]}" do
       let(:client) { ClientRunner.fetch_client(config[:name]) }
 
-      describe "prompts" do
+      describe "prompts_list" do
         it "returns array of prompts" do
           prompts = client.prompts
           expect(prompts).to be_a(Array)

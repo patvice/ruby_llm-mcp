@@ -51,7 +51,7 @@ module RubyLLM
           @transport.set_protocol_version(@protocol_version)
         end
 
-        @capabilities = RubyLLM::MCP::Capabilities.new(initialize_response.value["capabilities"])
+        @capabilities = RubyLLM::MCP::ServerCapabilities.new(initialize_response.value["capabilities"])
         initialize_notification
       end
 
@@ -98,11 +98,15 @@ module RubyLLM
         RubyLLM::MCP::Requests::Initialization.new(self).call
       end
 
-      def tool_list
-        result = RubyLLM::MCP::Requests::ToolList.new(self).call
+      def tool_list(cursor: nil)
+        result = RubyLLM::MCP::Requests::ToolList.new(self, cursor: cursor).call
         result.raise_error! if result.error?
 
-        result.value["tools"]
+        if result.next_cursor?
+          result.value["tools"] + tool_list(cursor: result.next_cursor)
+        else
+          result.value["tools"]
+        end
       end
 
       def execute_tool(**args)
@@ -125,33 +129,45 @@ module RubyLLM
         RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
       end
 
-      def resource_list
-        result = RubyLLM::MCP::Requests::ResourceList.new(self).call
+      def resource_list(cursor: nil)
+        result = RubyLLM::MCP::Requests::ResourceList.new(self, cursor: cursor).call
         result.raise_error! if result.error?
 
-        result.value["resources"]
+        if result.next_cursor?
+          result.value["resources"] + resource_list(cursor: result.next_cursor)
+        else
+          result.value["resources"]
+        end
       end
 
       def resource_read(**args)
         RubyLLM::MCP::Requests::ResourceRead.new(self, **args).call
       end
 
-      def resource_template_list
-        result = RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
+      def resource_template_list(cursor: nil)
+        result = RubyLLM::MCP::Requests::ResourceTemplateList.new(self, cursor: cursor).call
         result.raise_error! if result.error?
 
-        result.value["resourceTemplates"]
+        if result.next_cursor?
+          result.value["resourceTemplates"] + resource_template_list(cursor: result.next_cursor)
+        else
+          result.value["resourceTemplates"]
+        end
       end
 
       def resources_subscribe(**args)
         RubyLLM::MCP::Requests::ResourcesSubscribe.new(self, **args).call
       end
 
-      def prompt_list
-        result = RubyLLM::MCP::Requests::PromptList.new(self).call
+      def prompt_list(cursor: nil)
+        result = RubyLLM::MCP::Requests::PromptList.new(self, cursor: cursor).call
         result.raise_error! if result.error?
 
-        result.value["prompts"]
+        if result.next_cursor?
+          result.value["prompts"] + prompt_list(cursor: result.next_cursor)
+        else
+          result.value["prompts"]
+        end
       end
 
       def execute_prompt(**args)
