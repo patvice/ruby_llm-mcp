@@ -2,8 +2,8 @@
 
 module RubyLLM
   module MCP
-    module Requests
-      class CancelledNotification
+    module Notifications
+      class Cancelled
         def initialize(coordinator, request_id:, reason:)
           @coordinator = coordinator
           @request_id = request_id

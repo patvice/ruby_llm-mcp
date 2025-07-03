@@ -12,7 +12,13 @@ module RubyLLM
     end
 
     class Result
-      attr_reader :result, :error, :params, :id, :response, :session_id, :next_cursor
+      attr_reader :response, :session_id, :id, :method, :result, :params, :error, :next_cursor
+
+      REQUEST_METHODS = {
+        ping: "ping",
+        roots: "roots/list",
+        sampling: "sampling/createMessage"
+      }.freeze
 
       def initialize(response, session_id: nil)
         @response = response
@@ -25,6 +31,12 @@ module RubyLLM
 
         @result_is_error = response.dig("result", "isError") || false
         @next_cursor = response.dig("result", "nextCursor")
+      end
+
+      REQUEST_METHODS.each do |method_name, method_value|
+        define_method "#{method_name}?" do
+          @method == method_value
+        end
       end
 
       alias value result
@@ -49,10 +61,6 @@ module RubyLLM
 
       def matching_id?(request_id)
         @id&.to_s == request_id
-      end
-
-      def ping?
-        @method == "ping"
       end
 
       def notification?

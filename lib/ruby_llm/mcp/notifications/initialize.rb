@@ -2,8 +2,8 @@
 
 module RubyLLM
   module MCP
-    module Requests
-      class InitializeNotification
+    module Notifications
+      class Initialize
         def initialize(coordinator)
           @coordinator = coordinator
         end

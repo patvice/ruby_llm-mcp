@@ -172,24 +172,4 @@ export function setupUtilityTools(server: McpServer) {
       }
     }
   );
-
-  server.tool(
-    "ping_client",
-    "Sends a ping to the client to test connectivity",
-    {},
-    async ({}) => {
-      const result = await server.server.ping();
-
-      if (result) {
-        return {
-          content: [{ type: "text", text: "Ping successful" }],
-        };
-      }
-
-      return {
-        content: [{ type: "text", text: "Ping failed" }],
-        isError: true,
-      };
-    }
-  );
 }

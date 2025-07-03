@@ -50,20 +50,20 @@ RSpec.describe RubyLLM::MCP::Client do
     end
   end
 
-  CLIENT_OPTIONS.each do |options|
-    context "with #{options[:name]}" do
+  CLIENT_OPTIONS.each do |config|
+    context "with #{config[:name]}" do
       let(:client) do
-        ClientRunner.client_runners[options[:name]].client
+        ClientRunner.fetch_client(config[:name])
       end
 
       describe "initialization" do
         it "initializes with correct transport type and capabilities" do
-          expect(client.transport_type).to eq(options[:options][:transport_type])
+          expect(client.transport_type).to eq(config[:options][:transport_type])
           expect(client.capabilities).to be_a(RubyLLM::MCP::Capabilities)
         end
 
         it "initializes with a custom request_timeout" do
-          merged_options = options[:options].merge(request_timeout: 15_000)
+          merged_options = config[:options].merge(request_timeout: 15_000)
           client = RubyLLM::MCP::Client.new(**merged_options)
           expect(client.request_timeout).to eq(15_000)
           expect(
@@ -93,7 +93,7 @@ RSpec.describe RubyLLM::MCP::Client do
 
       describe "ping server" do
         it "can ping the client that hasn't been started yet" do
-          new_options = { start: false }.merge(options[:options])
+          new_options = { start: false }.merge(config[:options])
           new_client = RubyLLM::MCP::Client.new(**new_options)
 
           ping = new_client.ping
@@ -110,7 +110,7 @@ RSpec.describe RubyLLM::MCP::Client do
           old_logger = RubyLLM::MCP.config.logger
           RubyLLM::MCP.config.logger = Logger.new(buffer)
 
-          new_client = if options[:options][:transport_type] == :streamable
+          new_client = if config[:options][:transport_type] == :streamable
                          RubyLLM::MCP::Client.new(
                            start: false,
                            name: "fake_client",
