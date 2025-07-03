@@ -10,6 +10,25 @@ RSpec.describe RubyLLM::MCP::ResourceTemplate do
     ClientRunner.stop_all
   end
 
+  context "with #{PAGINATION_CLIENT_CONFIG[:name]}" do
+    let(:client) { RubyLLM::MCP::Client.new(**PAGINATION_CLIENT_CONFIG) }
+
+    before do
+      client.start
+    end
+
+    after do
+      client.stop
+    end
+
+    describe "resource_template_list" do
+      it "paginates resource templates list to get all resource templates" do
+        resource_templates = client.resource_templates
+        expect(resource_templates.count).to eq(2)
+      end
+    end
+  end
+
   CLIENT_OPTIONS.each do |config|
     context "with #{config[:name]}" do
       let(:client) { ClientRunner.fetch_client(config[:name]) }

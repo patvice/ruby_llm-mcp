@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RubyLLM::MCP::Capabilities do
+RSpec.describe RubyLLM::MCP::ServerCapabilities do
   describe "#initialize" do
     context "when no capabilities are provided" do
       let(:capabilities) { described_class.new }

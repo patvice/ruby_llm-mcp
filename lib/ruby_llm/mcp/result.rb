@@ -68,7 +68,7 @@ module RubyLLM
       end
 
       def next_cursor?
-        @next_cursor.present?
+        !@next_cursor.nil?
       end
 
       def request?

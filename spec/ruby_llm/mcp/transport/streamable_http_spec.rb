@@ -38,7 +38,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       # If protocol version negotiation succeeds, the client should be alive
       expect(client).to be_alive
-      expect(client.capabilities).to be_a(RubyLLM::MCP::Capabilities)
+      expect(client.capabilities).to be_a(RubyLLM::MCP::ServerCapabilities)
 
       client.stop
     end

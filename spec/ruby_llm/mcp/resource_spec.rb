@@ -10,6 +10,25 @@ RSpec.describe RubyLLM::MCP::Resource do
     ClientRunner.stop_all
   end
 
+  context "with #{PAGINATION_CLIENT_CONFIG[:name]}" do
+    let(:client) { RubyLLM::MCP::Client.new(**PAGINATION_CLIENT_CONFIG) }
+
+    before do
+      client.start
+    end
+
+    after do
+      client.stop
+    end
+
+    describe "resource_list" do
+      it "paginates resources list to get all resources" do
+        resources = client.resources
+        expect(resources.count).to eq(2)
+      end
+    end
+  end
+
   CLIENT_OPTIONS.each do |config|
     context "with #{config[:name]}" do
       let(:client) { ClientRunner.fetch_client(config[:name]) }

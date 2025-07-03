@@ -51,7 +51,7 @@ module RubyLLM
           @transport.set_protocol_version(@protocol_version)
         end
 
-        @capabilities = RubyLLM::MCP::Capabilities.new(initialize_response.value["capabilities"])
+        @capabilities = RubyLLM::MCP::ServerCapabilities.new(initialize_response.value["capabilities"])
         initialize_notification
       end
 
@@ -103,7 +103,7 @@ module RubyLLM
         result.raise_error! if result.error?
 
         if result.next_cursor?
-          result.value["tools"] + tool_list(next_cursor: result.next_cursor)
+          result.value["tools"] + tool_list(cursor: result.next_cursor)
         else
           result.value["tools"]
         end
@@ -134,7 +134,7 @@ module RubyLLM
         result.raise_error! if result.error?
 
         if result.next_cursor?
-          result.value["resources"] + resource_list(next_cursor: result.next_cursor)
+          result.value["resources"] + resource_list(cursor: result.next_cursor)
         else
           result.value["resources"]
         end
@@ -149,7 +149,7 @@ module RubyLLM
         result.raise_error! if result.error?
 
         if result.next_cursor?
-          result.value["resourceTemplates"] + resource_template_list(next_cursor: result.next_cursor)
+          result.value["resourceTemplates"] + resource_template_list(cursor: result.next_cursor)
         else
           result.value["resourceTemplates"]
         end
@@ -164,7 +164,7 @@ module RubyLLM
         result.raise_error! if result.error?
 
         if result.next_cursor?
-          result.value["prompts"] + prompt_list(next_cursor: result.next_cursor)
+          result.value["prompts"] + prompt_list(cursor: result.next_cursor)
         else
           result.value["prompts"]
         end

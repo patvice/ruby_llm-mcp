@@ -59,7 +59,7 @@ RSpec.describe RubyLLM::MCP::Client do
       describe "initialization" do
         it "initializes with correct transport type and capabilities" do
           expect(client.transport_type).to eq(config[:options][:transport_type])
-          expect(client.capabilities).to be_a(RubyLLM::MCP::Capabilities)
+          expect(client.capabilities).to be_a(RubyLLM::MCP::ServerCapabilities)
         end
 
         it "initializes with a custom request_timeout" do

@@ -1,0 +1,23 @@
+{
+  "name": "mcp-streamable",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start:http": "bun src/index.ts",
+    "start:cli": "bun src/index.ts --stdio",
+    "dev": "bun --watch src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^5.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.1",
+    "agents": "^0.0.94",
+    "express": "^5.1.0",
+    "zod": "^3.25.51"
+  }
+}

@@ -110,6 +110,14 @@ CLIENT_OPTIONS = [
     } }
 ].freeze
 
+PAGINATION_CLIENT_CONFIG = {
+  name: "pagination",
+  transport_type: :streamable,
+  config: {
+    url: "http://localhost:3007/mcp"
+  }
+}.freeze
+
 COMPLEX_FUNCTION_MODELS = [
   { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
   { provider: :gemini, model: "gemini-2.0-flash" },
