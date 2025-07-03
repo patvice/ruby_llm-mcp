@@ -9,7 +9,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       transport_type: :streamable,
       request_timeout: 5000,
       config: {
-        url: "http://localhost:3005/mcp"
+        url: TestServerManager::HTTP_SERVER_URL
       }
     )
   end
@@ -17,7 +17,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
   let(:mock_coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
   let(:transport) do
     RubyLLM::MCP::Transport::StreamableHTTP.new(
-      "http://localhost:3005/mcp",
+      TestServerManager::HTTP_SERVER_URL,
       request_timeout: 5000,
       coordinator: mock_coordinator
     )
@@ -166,7 +166,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
     describe "connection errors" do
       it "handles connection refused errors" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_raise(Errno::ECONNREFUSED)
 
         expect do
@@ -175,7 +175,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles timeout errors" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_timeout
 
         expect do
@@ -184,7 +184,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles network errors" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_raise(SocketError.new("Failed to open TCP connection"))
 
         expect do
@@ -195,7 +195,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
     describe "HTTP status errors" do
       it "handles 400 Bad Request with JSON error" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 400,
             headers: { "Content-Type" => "application/json" },
@@ -208,7 +208,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles 400 Bad Request with malformed JSON error" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 400,
             headers: { "Content-Type" => "application/json" },
@@ -221,7 +221,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles 401 Unauthorized" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 401)
 
         result = transport.request({ "method" => "initialize", "id" => 1 }, wait_for_response: false)
@@ -229,7 +229,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles 404 Not Found (session expired)" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 404)
 
         expect do
@@ -238,7 +238,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles 405 Method Not Allowed" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 405)
 
         result = transport.request({ "method" => "unsupported", "id" => 1 }, wait_for_response: false)
@@ -246,7 +246,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles 500 Internal Server Error" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 500,
             body: "Internal Server Error"
@@ -258,7 +258,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles session-related errors in error message" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 400,
             headers: { "Content-Type" => "application/json" },
@@ -275,7 +275,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
     describe "response content errors" do
       it "handles invalid JSON in successful response" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json" },
@@ -288,7 +288,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles unexpected content type" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "text/plain" },
@@ -303,7 +303,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
     describe "SSE (Server-Sent Events) errors" do
       it "handles SSE 400 errors" do
-        stub_request(:get, "http://localhost:3005/mcp")
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
           .with(headers: { "Accept" => "text/event-stream" })
           .to_return(status: 400)
 
@@ -315,7 +315,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "handles SSE 405 Method Not Allowed gracefully" do
-        stub_request(:get, "http://localhost:3005/mcp")
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
           .with(headers: { "Accept" => "text/event-stream" })
           .to_return(status: 405)
 
@@ -405,7 +405,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       it "handles session termination failure" do
         transport.instance_variable_set(:@session_id, "test-session")
 
-        stub_request(:delete, "http://localhost:3005/mcp")
+        stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 500, body: "Server Error")
 
         expect do
@@ -416,7 +416,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       it "handles session termination connection error" do
         transport.instance_variable_set(:@session_id, "test-session")
 
-        stub_request(:delete, "http://localhost:3005/mcp")
+        stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
           .to_raise(Errno::ECONNREFUSED)
 
         expect do
@@ -427,7 +427,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       it "accepts 405 status for session termination" do
         transport.instance_variable_set(:@session_id, "test-session")
 
-        stub_request(:delete, "http://localhost:3005/mcp")
+        stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 405)
 
         # Should not raise an error for 405 (acceptable per spec)
@@ -442,7 +442,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         transport.instance_variable_set(:@session_id, nil)
 
         # Should return early without making any requests
-        expect(WebMock).not_to have_requested(:delete, "http://localhost:3005/mcp")
+        expect(WebMock).not_to have_requested(:delete, TestServerManager::HTTP_SERVER_URL)
 
         transport.send(:terminate_session)
       end
@@ -451,7 +451,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         before do
           transport.instance_variable_set(:@session_id, "test-session")
 
-          stub_request(:delete, "http://localhost:3005/mcp")
+          stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
             .to_return(status: 400, body: "Bad Request")
         end
 
@@ -540,7 +540,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
     describe "202 Accepted response handling" do
       it "starts SSE stream on initialization with 202" do
         allow(transport).to receive(:start_sse_stream)
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 202)
 
         transport.request({ "method" => "initialize", "id" => 1 }, wait_for_response: false)
@@ -550,7 +550,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       it "does not start SSE stream on non-initialization 202" do
         allow(transport).to receive(:start_sse_stream)
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 202)
 
         result = transport.request({ "method" => "other", "id" => 1 }, wait_for_response: false)
@@ -573,7 +573,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
         let(:transport_with_options) do
           RubyLLM::MCP::Transport::StreamableHTTP.new(
-            "http://localhost:3005/mcp",
+            TestServerManager::HTTP_SERVER_URL,
             request_timeout: 5000,
             coordinator: mock_coordinator,
             reconnection_options: reconnection_options
@@ -592,7 +592,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         let(:reconnection_options) { RubyLLM::MCP::Transport::ReconnectionOptions.new(max_retries: 1) }
         let(:transport_with_options) do
           RubyLLM::MCP::Transport::StreamableHTTP.new(
-            "http://localhost:3005/mcp",
+            TestServerManager::HTTP_SERVER_URL,
             request_timeout: 1000,
             coordinator: mock_coordinator,
             reconnection_options: reconnection_options
@@ -600,7 +600,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         end
 
         before do
-          stub_request(:get, "http://localhost:3005/mcp")
+          stub_request(:get, TestServerManager::HTTP_SERVER_URL)
             .with(headers: { "Accept" => "text/event-stream" })
             .to_raise(Errno::ECONNREFUSED)
         end
@@ -617,7 +617,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       it "stops retrying when transport is closed" do
         transport.instance_variable_set(:@running, false)
 
-        stub_request(:get, "http://localhost:3005/mcp")
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
@@ -628,10 +628,24 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Connection refused/)
       end
 
+      it "returns a 400 error if server is not running" do
+        transport.instance_variable_set(:@running, false)
+
+        stub_request(:get, "http://fakeurl:4000/mcp")
+          .with(headers: { "Accept" => "text/event-stream" })
+          .to_raise(Errno::ECONNREFUSED)
+
+        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+
+        expect do
+          transport.send(:start_sse, options)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Failed to open SSE stream: 400/)
+      end
+
       it "stops retrying when abort controller is set" do
         transport.instance_variable_set(:@abort_controller, true)
 
-        stub_request(:get, "http://localhost:3005/mcp")
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
@@ -645,7 +659,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
     describe "edge cases and boundary conditions" do
       it "handles bad JSON format request body gracefully" do
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json" },
@@ -661,7 +675,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       it "handles request without ID gracefully" do
         session_id = SecureRandom.uuid
 
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json", "mcp-session-id" => session_id },
@@ -676,7 +690,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       it "handles very large response gracefully" do
         large_response = { "result" => { "content" => [{ "type" => "text", "value" => "x" * 10_000 }] } }
 
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json" },
@@ -690,7 +704,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       it "handles response with event-stream content type" do
         allow(transport).to receive(:start_sse_stream)
-        stub_request(:post, "http://localhost:3005/mcp")
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "text/event-stream" },
@@ -705,7 +719,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       context "when handling session ID extraction from response headers" do
         before do
-          stub_request(:post, "http://localhost:3005/mcp")
+          stub_request(:post, TestServerManager::HTTP_SERVER_URL)
             .to_return(
               status: 200,
               headers: {
@@ -724,7 +738,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       context "when response has malformed JSON" do
         before do
-          stub_request(:post, "http://localhost:3005/mcp")
+          stub_request(:post, TestServerManager::HTTP_SERVER_URL)
             .to_return(
               status: 200,
               headers: { "Content-Type" => "application/json" },
@@ -741,7 +755,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       context "when handling HTTPX error response in main request" do
         before do
-          stub_request(:post, "http://localhost:3005/mcp")
+          stub_request(:post, TestServerManager::HTTP_SERVER_URL)
             .to_raise(Net::ReadTimeout.new("Connection timeout"))
         end
 
@@ -754,7 +768,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       context "when HTTPX error response has no error message" do
         before do
-          stub_request(:post, "http://localhost:3005/mcp")
+          stub_request(:post, TestServerManager::HTTP_SERVER_URL)
             .to_return(status: 500, body: "Internal Server Error")
         end
 

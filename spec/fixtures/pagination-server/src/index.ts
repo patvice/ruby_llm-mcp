@@ -295,7 +295,7 @@ if (process.argv.includes("--stdio")) {
     process.exit(1);
   });
 } else {
-  const PORT = process.env.PORT || 3007;
+  const PORT = process.env.PORT3 || 3007;
   app.listen(PORT, () => {
     log(`🚀 MCP Streamable server running on port ${PORT}`);
     log(`📡 Endpoint: http://localhost:${PORT}/mcp`);

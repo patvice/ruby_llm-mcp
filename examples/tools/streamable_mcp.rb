@@ -16,7 +16,7 @@ client = RubyLLM::MCP.client(
   name: "streamable_mcp",
   transport_type: :streamable,
   config: {
-    url: "http://localhost:3005/mcp"
+    url: "http://localhost:#{ENV.fetch('PORT1', 3005)}/mcp"
   }
 )
 

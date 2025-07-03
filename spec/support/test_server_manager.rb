@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
+require "socket"
+require "timeout"
+
 class TestServerManager
+  PORTS = {
+    http: ENV.fetch("PORT1", 3005),
+    pagination: ENV.fetch("PORT3", 3007),
+    sse: ENV.fetch("PORT2", 3006)
+  }.freeze
+
+  HTTP_SERVER_URL = "http://localhost:#{PORTS[:http]}/mcp".freeze
+  PAGINATION_SERVER_URL = "http://localhost:#{PORTS[:pagination]}/mcp".freeze
+  SSE_SERVER_URL = "http://localhost:#{PORTS[:sse]}/mcp/sse".freeze
+
   SERVERS = {
     stdio: {
       command: "bun",
@@ -10,18 +23,21 @@ class TestServerManager
     http: {
       command: "bun",
       args: ["spec/fixtures/typescript-mcp/index.ts", "--", "--silent"],
-      pid_accessor: :http_server_pid
+      pid_accessor: :http_server_pid,
+      port: PORTS[:http]
     },
     pagination: {
       command: "bun",
       args: ["spec/fixtures/pagination-server/index.ts", "--", "--silent"],
-      pid_accessor: :pagination_server_pid
+      pid_accessor: :pagination_server_pid,
+      port: PORTS[:pagination]
     },
     sse: {
       command: "ruby",
       args: ["lib/app.rb", "--silent"],
       chdir: "spec/fixtures/fast-mcp-ruby",
-      pid_accessor: :sse_server_pid
+      pid_accessor: :sse_server_pid,
+      port: PORTS[:sse]
     }
   }.freeze
 
@@ -29,15 +45,15 @@ class TestServerManager
     attr_accessor :stdio_server_pid, :http_server_pid, :sse_server_pid, :pagination_server_pid
 
     def start_server
+      puts "Starting test servers with ports: #{ENV.fetch('PORT1',
+                                                          3005)}, #{ENV.fetch('PORT2',
+                                                                              3006)}, #{ENV.fetch('PORT3', 3007)}"
       return if stdio_server_pid && http_server_pid && pagination_server_pid
 
       begin
         start_server_type(:stdio)
         start_server_type(:http)
         start_server_type(:pagination)
-
-        # Give servers time to start
-        sleep 1.0
       rescue StandardError => e
         puts "Failed to start test server: #{e.message}"
         stop_server
@@ -97,6 +113,9 @@ class TestServerManager
       pid = spawn(config[:command], *config[:args], **spawn_options)
       Process.detach(pid)
       send("#{pid_accessor}=", pid)
+
+      # Wait for the server to start, ensure they are ready to start
+      wait_for_port(config[:port]) if config[:port]
     end
 
     def stop_server_type(server_type)
@@ -115,6 +134,17 @@ class TestServerManager
         puts "Warning: Failed to cleanly shutdown #{server_type} server: #{e.message}"
       ensure
         send("#{pid_accessor}=", nil)
+      end
+    end
+
+    def wait_for_port(port, host = "127.0.0.1", timeout = 15)
+      Timeout.timeout(timeout) do
+        loop do
+          Socket.tcp(host, port, connect_timeout: 1).close
+          break
+        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          sleep 0.1
+        end
       end
     end
 
