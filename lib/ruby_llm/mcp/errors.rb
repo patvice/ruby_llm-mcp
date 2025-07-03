@@ -17,6 +17,8 @@ module RubyLLM
         class ResourceSubscribeNotAvailable < BaseError; end
       end
 
+      class InvalidFormatError < BaseError; end
+
       class InvalidProtocolVersionError < BaseError; end
 
       class InvalidTransportType < BaseError; end

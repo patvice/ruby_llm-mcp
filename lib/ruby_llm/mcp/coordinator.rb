@@ -23,6 +23,10 @@ module RubyLLM
         @capabilities = nil
       end
 
+      def name
+        client.name
+      end
+
       def request(body, **options)
         @transport.request(body, **options)
       rescue RubyLLM::MCP::Errors::TimeoutError => e
@@ -83,39 +87,11 @@ module RubyLLM
 
       def process_notification(result)
         notification = result.notification
-
-        case notification.type
-        when "notifications/tools/list_changed"
-          client.reset_tools!
-        when "notifications/resources/list_changed"
-          client.reset_resources!
-        when "notifications/resources/updated"
-          uri = notification.params["uri"]
-          resource = client.resources.find { |r| r.uri == uri }
-          resource&.reset_content!
-        when "notifications/prompts/list_changed"
-          client.reset_prompts!
-        when "notifications/message"
-          process_logging_message(notification)
-        when "notifications/progress"
-          process_progress_message(notification)
-        when "notifications/cancelled"
-          # TODO: - do nothing at the moment until we support client operations
-        else
-          message = "Unknown notification type: #{notification.type} params:#{notification.params.to_h}"
-          raise Errors::UnknownNotification.new(message: message)
-        end
+        NotificationHandler.new(self).execute(notification)
       end
 
       def process_request(result)
-        if result.ping?
-          ping_response(id: result.id)
-          return
-        end
-
-        # Handle server-initiated requests
-        # Currently, we do not support any client operations but will
-        raise RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type: #{result.inspect}")
+        ResponseHandler.new(self).execute(result)
       end
 
       def initialize_request
@@ -190,20 +166,56 @@ module RubyLLM
         RubyLLM::MCP::Requests::CompletionPrompt.new(self, **args).call
       end
 
+      def set_logging(**args)
+        RubyLLM::MCP::Requests::LoggingSetLevel.new(self, **args).call
+      end
+
+      ## Notifications
+      #
       def initialize_notification
-        RubyLLM::MCP::Requests::InitializeNotification.new(self).call
+        RubyLLM::MCP::Notifications::Initialize.new(self).call
       end
 
       def cancelled_notification(**args)
-        RubyLLM::MCP::Requests::CancelledNotification.new(self, **args).call
+        RubyLLM::MCP::Notifications::Cancelled.new(self, **args).call
       end
 
-      def ping_response(id: nil)
-        RubyLLM::MCP::Requests::PingResponse.new(self, id: id).call
+      def roots_list_change_notification
+        RubyLLM::MCP::Notifications::RootsListChange.new(self).call
       end
 
-      def set_logging(level:)
-        RubyLLM::MCP::Requests::LoggingSetLevel.new(self, level: level).call
+      ## Responses
+      #
+      def ping_response(**args)
+        RubyLLM::MCP::Responses::Ping.new(self, **args).call
+      end
+
+      def roots_list_response(**args)
+        RubyLLM::MCP::Responses::RootsList.new(self, **args).call
+      end
+
+      def sampling_create_message_response(**args)
+        RubyLLM::MCP::Responses::SamplingCreateMessage.new(self, **args).call
+      end
+
+      def error_response(**args)
+        RubyLLM::MCP::Responses::Error.new(self, **args).call
+      end
+
+      def client_capabilities
+        capabilities = {}
+
+        if client.roots.active?
+          capabilities[:roots] = {
+            listChanged: true
+          }
+        end
+
+        if sampling_enabled?
+          capabilities[:sampling] = {}
+        end
+
+        capabilities
       end
 
       def build_transport
@@ -230,46 +242,10 @@ module RubyLLM
         end
       end
 
-      def process_logging_message(notification)
-        if client.logging_handler_enabled?
-          client.on[:logging].call(notification)
-        else
-          default_process_logging_message(notification)
-        end
-      end
-
-      def default_process_logging_message(notification, logger: RubyLLM::MCP.logger)
-        level = notification.params["level"]
-        logger_message = notification.params["logger"]
-        message = notification.params["data"]
-
-        message = "#{logger_message}: #{message}"
-
-        case level
-        when "debug"
-          logger.debug(message["message"])
-        when "info", "notice"
-          logger.info(message["message"])
-        when "warning"
-          logger.warn(message["message"])
-        when "error", "critical"
-          logger.error(message["message"])
-        when "alert", "emergency"
-          logger.fatal(message["message"])
-        end
-      end
-
-      def name
-        client.name
-      end
-
       private
 
-      def process_progress_message(notification)
-        progress_obj = RubyLLM::MCP::Progress.new(self, client.on[:progress], notification.params)
-        if client.tracking_progress?
-          progress_obj.execute_progress_handler
-        end
+      def sampling_enabled?
+        MCP.config.sampling.enabled?
       end
     end
   end

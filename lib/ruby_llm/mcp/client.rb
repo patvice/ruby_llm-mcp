@@ -7,7 +7,7 @@ module RubyLLM
     class Client
       extend Forwardable
 
-      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on
+      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on, :roots
 
       def initialize(name:, transport_type:, start: true, request_timeout: MCP.config.request_timeout, config: {})
         @name = name
@@ -25,10 +25,13 @@ module RubyLLM
 
         @log_level = nil
 
+        setup_roots
+        setup_sampling
+
         @coordinator.start_transport if start
       end
 
-      def_delegators :@coordinator, :alive?, :capabilities, :ping
+      def_delegators :@coordinator, :alive?, :capabilities, :ping, :client_capabilities
 
       def start
         @coordinator.start_transport
@@ -165,6 +168,15 @@ module RubyLLM
         self
       end
 
+      def sampling_callback_enabled?
+        @on.key?(:sampling) && !@on[:sampling].nil?
+      end
+
+      def on_sampling(&block)
+        @on[:sampling] = block
+        self
+      end
+
       private
 
       def setup_coordinator
@@ -186,6 +198,14 @@ module RubyLLM
           instance = klass.new(@coordinator, item)
           acc[instance.name] = instance
         end
+      end
+
+      def setup_roots
+        @roots = Roots.new(paths: MCP.config.roots, coordinator: @coordinator)
+      end
+
+      def setup_sampling
+        @on[:sampling] = MCP.config.sampling.guard
       end
     end
   end

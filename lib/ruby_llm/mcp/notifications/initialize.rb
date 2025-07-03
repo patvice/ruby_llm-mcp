@@ -2,10 +2,14 @@
 
 module RubyLLM
   module MCP
-    module Requests
-      class InitializeNotification < RubyLLM::MCP::Requests::Base
+    module Notifications
+      class Initialize
+        def initialize(coordinator)
+          @coordinator = coordinator
+        end
+
         def call
-          coordinator.request(notification_body, add_id: false, wait_for_response: false)
+          @coordinator.request(notification_body, add_id: false, wait_for_response: false)
         end
 
         def notification_body
