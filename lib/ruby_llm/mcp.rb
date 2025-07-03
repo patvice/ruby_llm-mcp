@@ -42,4 +42,3 @@ loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 
 loader.setup
-loader.eager_load

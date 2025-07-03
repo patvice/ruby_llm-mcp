@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# This is an override of the RubyLLM::Chat class to convient methods for easy MCP support
+# This is an override of the RubyLLM::Chat class to add convenient methods to more
+# easily work with the MCP clients.
 module RubyLLM
   class Chat
     def with_resources(*resources, **args)
