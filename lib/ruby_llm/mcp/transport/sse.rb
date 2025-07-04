@@ -125,7 +125,7 @@ module RubyLLM
             end
             @sse_thread.abort_on_exception = true
 
-            Timeout.timeout(100) do
+            Timeout.timeout(@request_timeout / 1000) do
               endpoint = response_queue.pop
               set_message_endpoint(endpoint)
             end

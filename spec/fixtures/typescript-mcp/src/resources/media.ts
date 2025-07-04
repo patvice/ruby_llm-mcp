@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { readFile } from "node:fs/promises";
+import { readResourceFile } from "../utils/file-utils.js";
 
 export function setupMediaResources(server: McpServer) {
   server.resource(
@@ -12,9 +12,7 @@ export function setupMediaResources(server: McpServer) {
     },
     async (uri) => {
       try {
-        const imageBuffer = await readFile(
-          "./spec/fixtures/typescript-mcp/resources/dog.png"
-        );
+        const imageBuffer = await readResourceFile("dog.png");
         const base64Image = imageBuffer.toString("base64");
 
         return {
@@ -51,9 +49,7 @@ export function setupMediaResources(server: McpServer) {
     },
     async (uri) => {
       try {
-        const audioBuffer = await readFile(
-          "./spec/fixtures/typescript-mcp/resources/jackhammer.wav"
-        );
+        const audioBuffer = await readResourceFile("jackhammer.wav");
         const base64Audio = audioBuffer.toString("base64");
 
         return {

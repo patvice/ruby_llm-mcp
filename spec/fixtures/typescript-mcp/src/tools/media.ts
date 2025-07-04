@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { readFile } from "node:fs/promises";
+import { readResourceFile } from "../utils/file-utils.js";
 import { z } from "zod";
 
 export function setupMediaTools(server: McpServer) {
@@ -10,9 +10,7 @@ export function setupMediaTools(server: McpServer) {
     async () => {
       try {
         // Read the jackhammer audio file from resources
-        const audioBuffer = await readFile(
-          "./spec/fixtures/typescript-mcp/resources/jackhammer.wav"
-        );
+        const audioBuffer = await readResourceFile("jackhammer.wav");
 
         // Convert to base64
         const base64Audio = audioBuffer.toString("base64");
@@ -48,9 +46,7 @@ export function setupMediaTools(server: McpServer) {
     async () => {
       try {
         // Read the dog image file from resources
-        const imageBuffer = await readFile(
-          "./spec/fixtures/typescript-mcp/resources/dog.png"
-        );
+        const imageBuffer = await readResourceFile("dog.png");
 
         // Convert to base64
         const base64Image = imageBuffer.toString("base64");

@@ -2,14 +2,11 @@ import {
   McpServer,
   type RegisteredResource,
 } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { readFile } from "node:fs/promises";
+import { readResourceTextFile } from "../utils/file-utils.js";
 
 async function getFileContents(path: string) {
   const filepath = path.replace("file://", "");
-  const content = await readFile(
-    `./spec/fixtures/typescript-mcp/resources/${filepath}`,
-    "utf-8"
-  );
+  const content = await readResourceTextFile(filepath);
   return content;
 }
 
