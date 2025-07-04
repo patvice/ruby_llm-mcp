@@ -149,8 +149,8 @@ bind_address = if is_ci
 
 unless is_silent
   # Run the Rack application with MCP middleware
-  puts "Starting Rack application with MCP middleware on http://#{}"
-  puts "Docker mode: #{is_docker_or_ci ? 'enabled' : 'disabled'}"
+  puts "Starting Rack application with MCP middleware on http://#{bind_address}"
+  puts "Docker mode: #{is_ci ? 'enabled' : 'disabled'}"
   puts "Allowed IPs: #{allowed_ips.join(', ')}"
   puts "MCP endpoints:"
   puts "  - http://#{bind_address}/mcp/sse (SSE endpoint)"
