@@ -295,10 +295,11 @@ if (process.argv.includes("--stdio")) {
     process.exit(1);
   });
 } else {
-  const PORT = process.env.PORT3 || 3007;
-  app.listen(PORT, () => {
-    log(`🚀 MCP Streamable server running on port ${PORT}`);
-    log(`📡 Endpoint: http://localhost:${PORT}/mcp`);
-    log(`❤️  Health Check: http://localhost:${PORT}/health`);
+  const PORT = Number(process.env.PORT) || 3007;
+  const HOST = process.env.HOST || "0.0.0.0";
+  app.listen(PORT, HOST, () => {
+    log(`🚀 MCP Streamable server running on ${HOST}:${PORT}`);
+    log(`📡 Endpoint: http://${HOST}:${PORT}/mcp`);
+    log(`❤️  Health Check: http://${HOST}:${PORT}/health`);
   });
 }

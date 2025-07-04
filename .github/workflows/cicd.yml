@@ -1,15 +1,14 @@
-name: Ruby
+name: CICD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
 jobs:
   test:
+    name: Ruby Tests
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
     strategy:
       matrix:
         ruby: ['3.1.3', '3.2', '3.3', '3.4']
@@ -21,38 +20,62 @@ jobs:
         with:
           bun-version: 1.2.16
 
-      - name: Install dependencies for typescript-mcp && pagination-server
-        run: |
-          cd spec/fixtures/typescript-mcp
-          bun install
-          cd ../pagination-server
-          bun install
-          cd ../../..
-
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
-      - name: Install dependencies for gem and fast-mcp
+      - name: Install Ruby dependencies
         run: |
           bundle install
-          cd spec/fixtures/fast-mcp-ruby
-          bundle install
-          cd ../../..
 
-
-      - name: Generate random ports
-        id: portgen
-        run: |
-          echo "PORT1=$(( (RANDOM % 1000) + 3000 ))" >> $GITHUB_ENV
-          echo "PORT2=$(( (RANDOM % 1000) + 4000 ))" >> $GITHUB_ENV
-          echo "PORT3=$(( (RANDOM % 1000) + 5000 ))" >> $GITHUB_ENV
-
-      - name: Run the test suite
-        run: PORT1=$PORT1 PORT2=$PORT2 PORT3=$PORT3 bundle exec rake
+      - name: Run specs
+        run: bundle exec rake
         env:
-          PORT1: ${{ env.PORT1 }}
-          PORT2: ${{ env.PORT2 }}
-          PORT3: ${{ env.PORT3 }}
+          GITHUB_ACTIONS: "true"
+
+
+  release:
+    name: Release Gem to RubyGems
+    needs: test
+    if: github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Build the gem
+        run: |
+          gem build *.gemspec
+          gem_name=$(ls *.gem | head -n1)
+          echo "GEM_FILE=$gem_name" >> $GITHUB_ENV
+
+      - name: Check if gem version already exists
+        id: check_version
+        run: |
+          gem_name=$(basename $GEM_FILE .gem)
+          name=$(echo $gem_name | cut -d'-' -f1)
+          version=$(echo $gem_name | cut -d'-' -f2-)
+          echo "Gem: $name, Version: $version"
+
+          if gem list ^$name$ -r -a | grep -q $version; then
+            echo "Gem version $version already exists on RubyGems."
+            echo "already_published=true" >> $GITHUB_OUTPUT
+          else
+            echo "Gem version $version is new."
+            echo "already_published=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push to RubyGems
+        if: steps.check_version.outputs.already_published == 'false'
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          gem push "$GEM_FILE"
