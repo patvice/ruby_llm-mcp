@@ -38,7 +38,13 @@ module RubyLLM
         end
       end
 
-      attr_accessor :request_timeout, :log_file, :log_level, :has_support_complex_parameters, :roots, :sampling
+      attr_accessor :request_timeout,
+                    :log_file,
+                    :as_support_complex_parameters,
+                    :roots,
+                    :sampling,
+                    :max_connections,
+                    :pool_timeout
       attr_writer :logger
 
       REQUEST_TIMEOUT_DEFAULT = 8000
@@ -90,6 +96,10 @@ module RubyLLM
       def set_defaults
         # Connection configuration
         @request_timeout = REQUEST_TIMEOUT_DEFAULT
+
+        # Connection Pool
+        @max_connections = Float::INFINITY
+        @pool_timeout = 5
 
         # Logging configuration
         @log_file = $stdout

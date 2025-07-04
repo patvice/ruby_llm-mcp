@@ -40,6 +40,8 @@ module RubyLLM
 
       # Main StreamableHTTP transport class
       class StreamableHTTP
+        include Timeout
+
         attr_reader :session_id, :protocol_version, :coordinator
 
         def initialize( # rubocop:disable Metrics/ParameterLists
@@ -200,7 +202,7 @@ module RubyLLM
         end
 
         def create_connection
-          client = HTTPX.with(
+          client = HTTPClient.connection.with(
             timeout: {
               connect_timeout: 10,
               read_timeout: @request_timeout / 1000,
@@ -257,7 +259,7 @@ module RubyLLM
         def create_connection_with_streaming_callbacks(request_id)
           buffer = +""
 
-          client = HTTPX.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
+          client = HTTPClient.connection.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
             next unless @running && !@abort_controller
 
             RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
@@ -591,15 +593,14 @@ module RubyLLM
         end
 
         def wait_for_response_with_timeout(request_id, response_queue)
-          Timeout.timeout(@request_timeout / 1000) do
+          with_timeout(@request_timeout / 1000, request_id: request_id) do
             response_queue.pop
           end
-        rescue Timeout::Error
+        rescue RubyLLM::MCP::Errors::TimeoutError => e
+          log_message = "StreamableHTTP request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
+          RubyLLM::MCP.logger.error(log_message)
           @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-          raise Errors::TimeoutError.new(
-            message: "Request timed out after #{@request_timeout / 1000} seconds",
-            request_id: request_id
-          )
+          raise e
         end
 
         def cleanup_sse_resources

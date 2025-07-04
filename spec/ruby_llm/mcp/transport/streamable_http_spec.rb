@@ -468,7 +468,12 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       before do
         request_id = "timeout-test"
-        allow(response_queue).to receive(:pop).and_raise(Timeout::Error)
+        allow(response_queue).to receive(:pop).and_raise(
+          RubyLLM::MCP::Errors::TimeoutError.new(
+            message: "Request timed out",
+            request_id: request_id
+          )
+        )
 
         transport.instance_variable_get(:@pending_mutex).synchronize do
           transport.instance_variable_get(:@pending_requests)[request_id] = response_queue

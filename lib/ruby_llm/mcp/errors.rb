@@ -41,7 +41,7 @@ module RubyLLM
       class TimeoutError < BaseError
         attr_reader :request_id
 
-        def initialize(message:, request_id:)
+        def initialize(message:, request_id: nil)
           @request_id = request_id
           super(message: message)
         end

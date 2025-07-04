@@ -10,6 +10,8 @@ module RubyLLM
   module MCP
     module Transport
       class SSE
+        include Timeout
+
         attr_reader :headers, :id, :coordinator
 
         def initialize(url, coordinator:, request_timeout:, headers: {})
@@ -60,7 +62,8 @@ module RubyLLM
           end
 
           begin
-            http_client = HTTPX.with(timeout: { request_timeout: @request_timeout / 1000 }, headers: @headers)
+            http_client = HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
+                                                     headers: @headers)
             response = http_client.post(@messages_url, body: JSON.generate(body))
 
             unless response.status == 200
@@ -83,16 +86,13 @@ module RubyLLM
           return unless wait_for_response
 
           begin
-            Timeout.timeout(@request_timeout / 1000) do
+            with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
-          rescue Timeout::Error
+          rescue RubyLLM::MCP::Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             RubyLLM::MCP.logger.error "SSE request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
-            raise Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds",
-              request_id: request_id
-            )
+            raise e
           end
         end
 
@@ -125,7 +125,7 @@ module RubyLLM
             end
             @sse_thread.abort_on_exception = true
 
-            Timeout.timeout(@request_timeout / 1000) do
+            with_timeout(@request_timeout / 1000) do
               endpoint = response_queue.pop
               set_message_endpoint(endpoint)
             end
@@ -155,7 +155,7 @@ module RubyLLM
         end
 
         def stream_events_from_server
-          sse_client = HTTPX.plugin(:stream)
+          sse_client = HTTPClient.connection.plugin(:stream)
           sse_client = sse_client.with(
             headers: @headers
           )

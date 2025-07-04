@@ -46,6 +46,8 @@ class TestServerManager
   }.freeze
 
   class << self
+    include RubyLLM::MCP::Transport::Timeout
+
     attr_accessor :stdio_server_pid, :http_server_pid, :sse_server_pid, :pagination_server_pid
 
     def start_server
@@ -201,7 +203,7 @@ class TestServerManager
     end
 
     def wait_for_port(port, host = "127.0.0.1", timeout = 15)
-      Timeout.timeout(timeout) do
+      with_timeout(timeout) do
         loop do
           Socket.tcp(host, port, connect_timeout: 1).close
           break

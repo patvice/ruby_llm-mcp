@@ -100,13 +100,20 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
 
       # Mock successful response
       response_queue = Queue.new
-      response_queue.push(RubyLLM::MCP::Result.new({ "id" => 1, "result" => {} }))
+      mock_result = RubyLLM::MCP::Result.new({ "id" => 1, "result" => {} })
+      response_queue.push(mock_result)
       allow(Queue).to receive(:new).and_return(response_queue)
 
-      mock_transport.request(request_body)
+      # Mock the with_timeout method to avoid thread creation issues
+      allow(mock_transport).to receive(:with_timeout) do |_timeout, **_opts|
+        response_queue.pop
+      end
+
+      result = mock_transport.request(request_body)
 
       expect(mock_stdin).to have_received(:puts)
       expect(mock_stdin).to have_received(:flush)
+      expect(result).to eq(mock_result)
 
       parsed = JSON.parse(captured_json)
       expect(parsed["method"]).to eq("test")
@@ -162,7 +169,12 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
         allow(mock_stdin).to receive(:flush)
 
         # Mock timeout behavior
-        allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+        allow(RubyLLM::MCP::Transport::Timeout).to receive(:with_timeout).and_raise(
+          RubyLLM::MCP::Errors::TimeoutError.new(
+            message: "Request timed out",
+            request_id: 1
+          )
+        )
 
         short_timeout_transport = mock_transport
         short_timeout_transport.instance_variable_set(:@request_timeout, 10)

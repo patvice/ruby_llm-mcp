@@ -9,6 +9,8 @@ module RubyLLM
   module MCP
     module Transport
       class Stdio
+        include Timeout
+
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
         def initialize(command, request_timeout:, coordinator:, args: [], env: {})
@@ -58,15 +60,14 @@ module RubyLLM
           return unless wait_for_response
 
           begin
-            Timeout.timeout(@request_timeout / 1000) do
+            with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
-          rescue Timeout::Error
+          rescue RubyLLM::MCP::Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise RubyLLM::MCP::Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds",
-              request_id: request_id
-            )
+            log_message = "Stdio request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
+            RubyLLM::MCP.logger.error(log_message)
+            raise e
           end
         end
 
