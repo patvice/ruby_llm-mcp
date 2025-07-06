@@ -41,8 +41,7 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
     allow(mock_stderr).to receive(:close)
     allow(mock_wait_thread).to receive(:join)
     allow(mock_wait_thread).to receive(:alive?).and_return(true)
-    allow(coordinator).to receive(:process_notification)
-    allow(coordinator).to receive(:process_request)
+    allow(coordinator).to receive(:process_result)
   end
 
   describe "#initialize" do
@@ -197,8 +196,7 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
     it "processes valid JSON responses" do
       valid_response = '{"id": "1", "result": {"success": true}}'
 
-      allow(coordinator).to receive(:process_notification)
-      allow(coordinator).to receive(:process_request)
+      allow(coordinator).to receive(:process_result)
 
       expect { mock_transport.send(:process_response, valid_response) }.not_to raise_error
     end
@@ -218,11 +216,11 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
       allow(result).to receive_messages(notification?: true, request?: false)
-      allow(coordinator).to receive(:process_notification)
+      allow(coordinator).to receive(:process_result)
 
       mock_transport.send(:process_response, notification)
 
-      expect(coordinator).to have_received(:process_notification).with(result)
+      expect(coordinator).to have_received(:process_result).with(result)
     end
 
     it "processes requests correctly" do
@@ -231,11 +229,11 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
       allow(result).to receive_messages(notification?: false, request?: true)
-      allow(coordinator).to receive(:process_request)
+      allow(coordinator).to receive(:process_result)
 
       mock_transport.send(:process_response, request)
 
-      expect(coordinator).to have_received(:process_request).with(result)
+      expect(coordinator).to have_received(:process_result).with(result)
     end
 
     it "handles responses with matching request IDs" do
@@ -244,10 +242,9 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
       response_queue = Queue.new
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
-      allow(result).to receive_messages(notification?: false, request?: false)
       allow(result).to receive(:matching_id?).with("1").and_return(true)
+      allow(coordinator).to receive(:process_result).and_return(result)
 
-      # Set up pending request
       mock_transport.instance_variable_get(:@pending_requests)["1"] = response_queue
 
       mock_transport.send(:process_response, response)

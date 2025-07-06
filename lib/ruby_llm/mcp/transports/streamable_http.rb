@@ -564,19 +564,14 @@ module RubyLLM
             result = RubyLLM::MCP::Result.new(event_data, session_id: @session_id)
             RubyLLM::MCP.logger.debug "SSE Result Received: #{result.inspect}"
 
-            # Handle different types of messages
-            if result.notification?
-              @coordinator.process_notification(result)
-            elsif result.request?
-              @coordinator.process_request(result)
-            elsif result.response?
-              # Handle response to client request
-              request_id = result.id&.to_s
-              if request_id
-                @pending_mutex.synchronize do
-                  response_queue = @pending_requests.delete(request_id)
-                  response_queue&.push(result)
-                end
+            result = @coordinator.process_result(result)
+            return if result.nil?
+
+            request_id = result.id&.to_s
+            if request_id
+              @pending_mutex.synchronize do
+                response_queue = @pending_requests.delete(request_id)
+                response_queue&.push(result)
               end
             end
           rescue JSON::ParserError => e

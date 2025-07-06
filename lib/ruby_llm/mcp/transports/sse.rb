@@ -187,7 +187,7 @@ module RubyLLM
           sleep 1
         end
 
-        def process_event(raw_event) # rubocop:disable Metrics/MethodLength
+        def process_event(raw_event)
           # Return if we believe that are getting a partial event
           return if raw_event[:data].nil?
 
@@ -217,15 +217,8 @@ module RubyLLM
             request_id = event["id"]&.to_s
             result = RubyLLM::MCP::Result.new(event)
 
-            if result.notification?
-              coordinator.process_notification(result)
-              return
-            end
-
-            if result.request?
-              coordinator.process_request(result) if coordinator.alive?
-              return
-            end
+            result = @coordinator.process_result(result)
+            return if result.nil?
 
             @pending_mutex.synchronize do
               # You can receieve duplicate events for the same request id, and we will ignore thoses

@@ -36,13 +36,13 @@ module RubyLLM
 
       def process_result(result)
         if result.notification?
-          coordinator.process_notification(result)
-          return
+          process_notification(result)
+          return nil
         end
 
         if result.request?
-          coordinator.process_request(result) if coordinator.alive?
-          return
+          process_request(result) if alive?
+          return nil
         end
 
         if result.response?

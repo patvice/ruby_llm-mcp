@@ -340,10 +340,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
 
       context "when handling unknown request errors in SSE processing" do
         before do
-          allow(mock_coordinator).to receive(:process_notification).and_raise(
-            RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type")
-          )
-          allow(mock_coordinator).to receive(:process_request).and_raise(
+          allow(mock_coordinator).to receive(:process_result).and_raise(
             RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type")
           )
         end
@@ -358,25 +355,25 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       end
 
       it "respects abort controller in SSE processing" do
-        allow(mock_coordinator).to receive(:process_notification)
+        allow(mock_coordinator).to receive(:process_result)
         transport.instance_variable_set(:@abort_controller, true)
 
         raw_event = { data: '{"method": "test"}' }
 
         transport.send(:process_sse_event, raw_event, nil)
 
-        expect(mock_coordinator).not_to have_received(:process_notification)
+        expect(mock_coordinator).not_to have_received(:process_result)
       end
 
       it "respects running flag in SSE processing" do
-        allow(mock_coordinator).to receive(:process_notification)
+        allow(mock_coordinator).to receive(:process_result)
         transport.instance_variable_set(:@running, false)
 
         raw_event = { data: '{"method": "test"}' }
 
         transport.send(:process_sse_event, raw_event, nil)
 
-        expect(mock_coordinator).not_to have_received(:process_notification)
+        expect(mock_coordinator).not_to have_received(:process_result)
       end
 
       it "handles SSE buffer events with abort controller" do
@@ -846,8 +843,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
         let(:mock_result) { instance_double(RubyLLM::MCP::Result) }
 
         before do
-          allow(mock_coordinator).to receive(:process_notification)
-          allow(mock_coordinator).to receive(:process_request)
+          allow(mock_coordinator).to receive(:process_result)
           allow(RubyLLM::MCP::Result).to receive(:new).and_return(mock_result)
         end
 
@@ -857,16 +853,17 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
 
           transport.send(:process_sse_event, notification_event, nil)
 
-          expect(mock_coordinator).to have_received(:process_notification)
+          expect(mock_coordinator).to have_received(:process_result)
         end
 
         it "processes requests correctly" do
           request_event = { data: '{"method": "test_request", "id": "req-1"}' }
-          allow(mock_result).to receive_messages(notification?: false, request?: true, response?: false)
+          allow(mock_result).to receive_messages(notification?: false, request?: true, response?: false, id: "req-1")
+          allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
 
           transport.send(:process_sse_event, request_event, nil)
 
-          expect(mock_coordinator).to have_received(:process_request)
+          expect(mock_coordinator).to have_received(:process_result)
         end
       end
 
@@ -880,6 +877,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
             transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
           end
           allow(mock_result).to receive_messages(notification?: false, request?: false, response?: true, id: request_id)
+          allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
           allow(RubyLLM::MCP::Result).to receive(:new).and_return(mock_result)
         end
 
@@ -911,7 +909,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
           allow(JSON).to receive(:parse).with('{"id": "original-456", "method": "test"}').and_return(
             { "id" => "original-456", "method" => "test" }
           )
-          allow(mock_coordinator).to receive(:process_notification)
+          allow(mock_coordinator).to receive(:process_result)
         end
 
         it "processes with replay ID" do
@@ -921,7 +919,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
 
           transport.send(:process_sse_event, original_event, replay_id)
 
-          expect(mock_coordinator).to have_received(:process_notification)
+          expect(mock_coordinator).to have_received(:process_result)
         end
       end
     end

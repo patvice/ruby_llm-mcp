@@ -34,7 +34,10 @@ module RubyLLM
     def establish_connection(&)
       clients.each(&:start)
       yield clients
-      clients.each(&:stop)
+    ensure
+      clients.each do |client|
+        client.stop if client.alive?
+      end
     end
 
     def tools(blacklist: [], whitelist: [])
