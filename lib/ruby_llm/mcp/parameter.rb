@@ -15,7 +15,7 @@ module RubyLLM
       end
 
       def item_type
-        @items["type"].to_sym
+        @items&.[]("type")&.to_sym
       end
     end
   end
