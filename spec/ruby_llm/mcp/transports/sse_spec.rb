@@ -27,7 +27,7 @@ class Runner
   end
 end
 
-RSpec.describe RubyLLM::MCP::Transport::SSE do
+RSpec.describe RubyLLM::MCP::Transports::SSE do
   let(:client) { Runner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll

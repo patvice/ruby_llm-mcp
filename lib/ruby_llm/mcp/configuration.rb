@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require "json"
+require "yaml"
+require "erb"
+
 module RubyLLM
   module MCP
     class Configuration
@@ -38,14 +42,60 @@ module RubyLLM
         end
       end
 
+      class ConfigFile
+        attr_reader :file_path
+
+        def initialize(file_path)
+          @file_path = file_path
+        end
+
+        def parse
+          @parse ||= if @file_path && File.exist?(@file_path)
+                       config = parse_config_file
+                       load_mcps_config(config)
+                     else
+                       []
+                     end
+        end
+
+        private
+
+        def parse_config_file
+          output = ERB.new(File.read(@file_path)).result
+
+          if [".yaml", ".yml"].include?(File.extname(@file_path))
+            YAML.safe_load(output, symbolize_names: true)
+          else
+            JSON.parse(output, symbolize_names: true)
+          end
+        end
+
+        def load_mcps_config(config)
+          return [] unless config.key?(:mcp_servers)
+
+          config[:mcp_servers].map do |name, configuration|
+            {
+              name: name,
+              transport_type: configuration.delete(:transport_type),
+              start: false,
+              config: configuration
+            }
+          end
+        end
+      end
+
       attr_accessor :request_timeout,
                     :log_file,
-                    :as_support_complex_parameters,
+                    :log_level,
+                    :has_support_complex_parameters,
                     :roots,
                     :sampling,
                     :max_connections,
-                    :pool_timeout
-      attr_writer :logger
+                    :pool_timeout,
+                    :config_path,
+                    :launch_control
+
+      attr_writer :logger, :mcp_configuration
 
       REQUEST_TIMEOUT_DEFAULT = 8000
 
@@ -73,6 +123,10 @@ module RubyLLM
         )
       end
 
+      def mcp_configuration
+        @mcp_configuration + load_mcps_config
+      end
+
       def inspect
         redacted = lambda do |name, value|
           if name.match?(/_id|_key|_secret|_token$/)
@@ -93,6 +147,11 @@ module RubyLLM
 
       private
 
+      def load_mcps_config
+        @config_file ||= ConfigFile.new(config_path)
+        @config_file.parse
+      end
+
       def set_defaults
         # Connection configuration
         @request_timeout = REQUEST_TIMEOUT_DEFAULT
@@ -104,10 +163,22 @@ module RubyLLM
         # Logging configuration
         @log_file = $stdout
         @log_level = ENV["RUBYLLM_MCP_DEBUG"] ? Logger::DEBUG : Logger::INFO
-        @has_support_complex_parameters = false
         @logger = nil
+
+        # Complex parameters support
+        @has_support_complex_parameters = false
+
+        # MCPs configuration
+        @mcps_config_path = nil
+        @mcp_configuration = []
+
+        # Rails specific configuration
+        @launch_control = :automatic
+
+        # Roots configuration
         @roots = []
 
+        # Sampling configuration
         @sampling.reset!
       end
     end

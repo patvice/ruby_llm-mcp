@@ -60,7 +60,7 @@ module RubyLLM
       end
 
       def matching_id?(request_id)
-        @id&.to_s == request_id
+        @id&.to_s == request_id.to_s
       end
 
       def notification?
@@ -72,11 +72,11 @@ module RubyLLM
       end
 
       def request?
-        @method && !notification? && @result.none? && @error.none?
+        !@method.nil? && !notification? && @result.none? && @error.none?
       end
 
       def response?
-        @id && (@result || @error.any?) && !@method
+        !@id.nil? && (@result || @error.any?) && !@method
       end
 
       def success?

@@ -11,6 +11,7 @@ module RubyLLM
 
       def initialize(name:, transport_type:, start: true, request_timeout: MCP.config.request_timeout, config: {})
         @name = name
+        @with_prefix = config.delete(:with_prefix) || false
         @config = config.merge(request_timeout: request_timeout)
         @transport_type = transport_type.to_sym
         @request_timeout = request_timeout
@@ -50,7 +51,7 @@ module RubyLLM
 
         fetch(:tools, refresh) do
           tools = @coordinator.tool_list
-          build_map(tools, MCP::Tool)
+          build_map(tools, MCP::Tool, with_prefix: @with_prefix)
         end
 
         @tools.values
@@ -155,16 +156,10 @@ module RubyLLM
         !@log_level.nil?
       end
 
-      def on_logging(level: Logging::WARNING, logger: nil, &block)
+      def on_logging(level: Logging::WARNING, &block)
         @coordinator.set_logging(level: level)
 
-        @on[:logging] = if block_given?
-                          block
-                        else
-                          lambda do |notification|
-                            @coordinator.default_process_logging_message(notification, logger: logger)
-                          end
-                        end
+        @on[:logging] = block
         self
       end
 
@@ -193,9 +188,13 @@ module RubyLLM
         instance_variable_get("@#{cache_key}")
       end
 
-      def build_map(raw_data, klass)
+      def build_map(raw_data, klass, with_prefix: false)
         raw_data.each_with_object({}) do |item, acc|
-          instance = klass.new(@coordinator, item)
+          instance = if with_prefix
+                       klass.new(@coordinator, item, with_prefix: @with_prefix)
+                     else
+                       klass.new(@coordinator, item)
+                     end
           acc[instance.name] = instance
         end
       end

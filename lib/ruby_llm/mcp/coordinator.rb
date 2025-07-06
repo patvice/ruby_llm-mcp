@@ -8,8 +8,7 @@ module RubyLLM
       PROTOCOL_VERSION = "2025-03-26"
       PV_2024_11_05 = "2024-11-05"
 
-      attr_reader :client, :transport_type, :config, :request_timeout, :headers, :transport, :initialize_response,
-                  :capabilities, :protocol_version
+      attr_reader :client, :transport_type, :config, :capabilities, :protocol_version
 
       def initialize(client, transport_type:, config: {})
         @client = client
@@ -17,7 +16,6 @@ module RubyLLM
         @config = config
 
         @protocol_version = PROTOCOL_VERSION
-        @headers = config[:headers] || {}
 
         @transport = nil
         @capabilities = nil
@@ -28,16 +26,36 @@ module RubyLLM
       end
 
       def request(body, **options)
-        @transport.request(body, **options)
+        transport.request(body, **options)
       rescue RubyLLM::MCP::Errors::TimeoutError => e
-        if @transport.alive?
+        if transport&.alive?
           cancelled_notification(reason: "Request timed out", request_id: e.request_id)
         end
         raise e
       end
 
+      def process_result(result)
+        if result.notification?
+          coordinator.process_notification(result)
+          return
+        end
+
+        if result.request?
+          coordinator.process_request(result) if coordinator.alive?
+          return
+        end
+
+        if result.response?
+          return result
+        end
+
+        nil
+      end
+
       def start_transport
-        build_transport
+        return unless capabilities.nil?
+
+        transport.start
 
         initialize_response = initialize_request
         initialize_response.raise_error! if initialize_response.error?
@@ -57,10 +75,13 @@ module RubyLLM
 
       def stop_transport
         @transport&.close
+        @capabilities = nil
         @transport = nil
+        @protocol_version = PROTOCOL_VERSION
       end
 
       def restart_transport
+        @initialize_response = nil
         stop_transport
         start_transport
       end
@@ -74,7 +95,7 @@ module RubyLLM
         if alive?
           result = ping_request.call
         else
-          build_transport
+          transport.start
 
           result = ping_request.call
           @transport = nil
@@ -234,28 +255,8 @@ module RubyLLM
         capabilities
       end
 
-      def build_transport
-        case @transport_type
-        when :sse
-          @transport = RubyLLM::MCP::Transport::SSE.new(@config[:url],
-                                                        request_timeout: @config[:request_timeout],
-                                                        headers: @headers,
-                                                        coordinator: self)
-        when :stdio
-          @transport = RubyLLM::MCP::Transport::Stdio.new(@config[:command],
-                                                          request_timeout: @config[:request_timeout],
-                                                          args: @config[:args],
-                                                          env: @config[:env],
-                                                          coordinator: self)
-        when :streamable
-          @transport = RubyLLM::MCP::Transport::StreamableHTTP.new(@config[:url],
-                                                                   request_timeout: @config[:request_timeout],
-                                                                   headers: @headers,
-                                                                   coordinator: self)
-        else
-          message = "Invalid transport type: :#{transport_type}. Supported types are :sse, :stdio, :streamable"
-          raise Errors::InvalidTransportType.new(message: message)
-        end
+      def transport
+        @transport ||= RubyLLM::MCP::Transport.new(@transport_type, self, config: @config)
       end
 
       private

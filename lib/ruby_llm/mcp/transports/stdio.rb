@@ -7,13 +7,13 @@ require "securerandom"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       class Stdio
         include Timeout
 
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command, request_timeout:, coordinator:, args: [], env: {})
+        def initialize(command:, request_timeout:, coordinator:, args: [], env: {})
           @request_timeout = request_timeout
           @command = command
           @coordinator = coordinator
@@ -25,11 +25,9 @@ module RubyLLM
           @id_mutex = Mutex.new
           @pending_requests = {}
           @pending_mutex = Mutex.new
-          @running = true
+          @running = false
           @reader_thread = nil
           @stderr_thread = nil
-
-          start_process
         end
 
         def request(body, add_id: true, wait_for_response: true)
@@ -73,6 +71,11 @@ module RubyLLM
 
         def alive?
           @running
+        end
+
+        def start
+          start_process unless @running
+          @running = true
         end
 
         def close # rubocop:disable Metrics/MethodLength
@@ -120,6 +123,10 @@ module RubyLLM
           @wait_thread = nil
           @reader_thread = nil
           @stderr_thread = nil
+        end
+
+        def set_protocol_version(version)
+          @protocol_version = version
         end
 
         private

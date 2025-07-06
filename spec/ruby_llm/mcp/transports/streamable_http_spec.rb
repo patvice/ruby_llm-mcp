@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
+RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
   let(:client) do
     RubyLLM::MCP::Client.new(
       name: "test-client",
@@ -16,10 +16,11 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
   let(:mock_coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
   let(:transport) do
-    RubyLLM::MCP::Transport::StreamableHTTP.new(
-      TestServerManager::HTTP_SERVER_URL,
+    RubyLLM::MCP::Transports::StreamableHTTP.new(
+      url: TestServerManager::HTTP_SERVER_URL,
       request_timeout: 5000,
-      coordinator: mock_coordinator
+      coordinator: mock_coordinator,
+      headers: {}
     )
   end
   let(:logger) { instance_double(Logger) }
@@ -126,7 +127,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       transport = coordinator.transport
 
       # The transport should have a protocol version set
-      expect(transport.instance_variable_get(:@protocol_version)).to eq("2025-03-26")
+      expect(transport.transport_protocol.protocol_version).to eq("2025-03-26")
 
       client.stop
     end
@@ -307,7 +308,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_return(status: 400)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -319,7 +320,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_return(status: 405)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         # Should not raise an error for 405 (acceptable per spec)
         expect do
@@ -568,7 +569,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
     describe "SSE reconnection logic" do
       context "when implementing exponential backoff" do
         let(:reconnection_options) do
-          RubyLLM::MCP::Transport::ReconnectionOptions.new(
+          RubyLLM::MCP::Transports::ReconnectionOptions.new(
             max_reconnection_delay: 10_000,
             initial_reconnection_delay: 100,
             reconnection_delay_grow_factor: 2.0,
@@ -577,8 +578,8 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         end
 
         let(:transport_with_options) do
-          RubyLLM::MCP::Transport::StreamableHTTP.new(
-            TestServerManager::HTTP_SERVER_URL,
+          RubyLLM::MCP::Transports::StreamableHTTP.new(
+            url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 5000,
             coordinator: mock_coordinator,
             reconnection_options: reconnection_options
@@ -594,10 +595,10 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       context "when respecting max retry limit" do
-        let(:reconnection_options) { RubyLLM::MCP::Transport::ReconnectionOptions.new(max_retries: 1) }
+        let(:reconnection_options) { RubyLLM::MCP::Transports::ReconnectionOptions.new(max_retries: 1) }
         let(:transport_with_options) do
-          RubyLLM::MCP::Transport::StreamableHTTP.new(
-            TestServerManager::HTTP_SERVER_URL,
+          RubyLLM::MCP::Transports::StreamableHTTP.new(
+            url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 1000,
             coordinator: mock_coordinator,
             reconnection_options: reconnection_options
@@ -611,7 +612,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         end
 
         it "stops after max retries" do
-          options = RubyLLM::MCP::Transport::StartSSEOptions.new
+          options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
           expect do
             transport_with_options.send(:start_sse, options)
@@ -626,7 +627,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -640,7 +641,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -654,7 +655,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)

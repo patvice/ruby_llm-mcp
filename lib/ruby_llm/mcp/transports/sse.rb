@@ -8,13 +8,13 @@ require "securerandom"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       class SSE
         include Timeout
 
         attr_reader :headers, :id, :coordinator
 
-        def initialize(url, coordinator:, request_timeout:, headers: {})
+        def initialize(url:, coordinator:, request_timeout:, headers: {})
           @event_url = url
           @messages_url = nil
           @coordinator = coordinator
@@ -38,13 +38,10 @@ module RubyLLM
           @pending_requests = {}
           @pending_mutex = Mutex.new
           @connection_mutex = Mutex.new
-          @running = true
+          @running = false
           @sse_thread = nil
 
           RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
-
-          # Start the SSE listener thread
-          start_sse_listener
         end
 
         def request(body, add_id: true, wait_for_response: true) # rubocop:disable Metrics/MethodLength
@@ -100,11 +97,22 @@ module RubyLLM
           @running
         end
 
+        def start
+          return if @running
+
+          @running = true
+          start_sse_listener
+        end
+
         def close
           RubyLLM::MCP.logger.info "Closing SSE transport connection"
           @running = false
           @sse_thread&.join(1) # Give the thread a second to clean up
           @sse_thread = nil
+        end
+
+        def set_protocol_version(version)
+          @protocol_version = version
         end
 
         private
@@ -155,7 +163,7 @@ module RubyLLM
         end
 
         def stream_events_from_server
-          sse_client = HTTPClient.connection.plugin(:stream)
+          sse_client = HTTPX.plugin(:stream)
           sse_client = sse_client.with(
             headers: @headers
           )

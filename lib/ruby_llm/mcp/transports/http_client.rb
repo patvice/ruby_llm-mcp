@@ -4,20 +4,16 @@ require "httpx"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       class HTTPClient
         CONNECTION_KEY = :ruby_llm_mcp_client_connection
 
         def self.connection
-          Thread.current[:ruby_llm_mcp_client_connection] ||= build_connection
-        end
-
-        def self.reset!
-          Thread.current[:ruby_llm_mcp_client_connection] = nil
+          Thread.current[CONNECTION_KEY] ||= build_connection
         end
 
         def self.build_connection
-          HTTPX.plugin(:persistent).with(
+          HTTPX.with(
             pool_options: {
               max_connections: RubyLLM::MCP.config.max_connections,
               pool_timeout: RubyLLM::MCP.config.pool_timeout

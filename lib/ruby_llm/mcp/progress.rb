@@ -17,7 +17,7 @@ module RubyLLM
       end
 
       def execute_progress_handler
-        @progress_handler&.call(self)
+        @progress_handler.call(self)
       end
 
       def to_h
@@ -28,6 +28,8 @@ module RubyLLM
           message: @message
         }
       end
+
+      alias to_json to_h
     end
   end
 end

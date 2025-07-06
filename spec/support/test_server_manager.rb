@@ -46,7 +46,7 @@ class TestServerManager
   }.freeze
 
   class << self
-    include RubyLLM::MCP::Transport::Timeout
+    include RubyLLM::MCP::Transports::Timeout
 
     attr_accessor :stdio_server_pid, :http_server_pid, :sse_server_pid, :pagination_server_pid
 

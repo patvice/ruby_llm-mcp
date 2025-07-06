@@ -8,8 +8,42 @@ module RubyLLM
   module MCP
     module_function
 
-    def client(*args, **kwargs)
-      @client ||= Client.new(*args, **kwargs)
+    def clients(config = RubyLLM::MCP.config.mcp_configuration)
+      @clients ||= {}
+      config.map do |options|
+        @clients[options[:name]] ||= Client.new(**options)
+      end
+    end
+
+    def add_client(options)
+      @clients ||= {}
+      @clients[options[:name]] ||= Client.new(**options)
+    end
+
+    def remove_client(name)
+      @clients ||= {}
+      client = @clients.delete(name)
+      client&.stop
+      client
+    end
+
+    def client(...)
+      Client.new(...)
+    end
+
+    def establish_connection(&)
+      clients.each(&:start)
+      yield clients
+      clients.each(&:stop)
+    end
+
+    def tools(blacklist: [], whitelist: [])
+      tools = @clients.values.map(&:tools)
+                      .flatten
+                      .reject { |tool| blacklist.include?(tool.name) }
+
+      tools = tools.select { |tool| whitelist.include?(tool.name) } if whitelist.any?
+      tools.uniq(&:name)
     end
 
     def support_complex_parameters!
@@ -34,6 +68,8 @@ module RubyLLM
     end
   end
 end
+
+require_relative "mcp/railtie" if defined?(Rails::Railtie)
 
 loader = Zeitwerk::Loader.for_gem_extension(RubyLLM)
 loader.inflector.inflect("mcp" => "MCP")

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RubyLLM::MCP::Transport::Stdio do
+RSpec.describe RubyLLM::MCP::Transports::Stdio do
   let(:coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
   let(:command) { "echo" }
   let(:args) { [] }
@@ -169,7 +169,7 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
         allow(mock_stdin).to receive(:flush)
 
         # Mock timeout behavior
-        allow(RubyLLM::MCP::Transport::Timeout).to receive(:with_timeout).and_raise(
+        allow(RubyLLM::MCP::Transports::Timeout).to receive(:with_timeout).and_raise(
           RubyLLM::MCP::Errors::TimeoutError.new(
             message: "Request timed out",
             request_id: 1

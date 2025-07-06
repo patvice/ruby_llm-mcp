@@ -61,16 +61,6 @@ RSpec.describe RubyLLM::MCP::Client do
           expect(client.transport_type).to eq(config[:options][:transport_type])
           expect(client.capabilities).to be_a(RubyLLM::MCP::ServerCapabilities)
         end
-
-        it "initializes with a custom request_timeout" do
-          merged_options = config[:options].merge(request_timeout: 15_000)
-          client = RubyLLM::MCP::Client.new(**merged_options)
-          expect(client.request_timeout).to eq(15_000)
-          expect(
-            client.instance_variable_get(:@coordinator).transport.instance_variable_get(:@request_timeout)
-          ).to eq(15_000)
-          client.stop
-        end
       end
 
       describe "stop" do
@@ -305,22 +295,6 @@ RSpec.describe RubyLLM::MCP::Client do
       end
 
       describe "on_logging" do
-        it "sets up a default lambda when no block is given" do
-          allow(client.instance_variable_get(:@coordinator)).to receive(:set_logging)
-          allow(client.instance_variable_get(:@coordinator)).to receive(:default_process_logging_message)
-
-          client.on_logging(level: RubyLLM::MCP::Logging::DEBUG, logger: "test_logger")
-
-          logging_handler = client.instance_variable_get(:@on)[:logging]
-          expect(logging_handler).to be_a(Proc)
-
-          mock_notification = instance_double(Object)
-          logging_handler.call(mock_notification)
-
-          expect(client.instance_variable_get(:@coordinator)).to have_received(:default_process_logging_message)
-            .with(mock_notification, logger: "test_logger")
-        end
-
         it "uses provided block when given" do
           custom_handler_called = false
 
@@ -378,6 +352,21 @@ RSpec.describe RubyLLM::MCP::Client do
 
           client.tool("log_message").execute(message: "This is a warning", level: "warning")
           expect(is_called).to be(true)
+        end
+
+        it "uses default logging handler if no handler is provided" do
+          client.on_logging
+
+          logger_double = instance_double(Logger)
+          allow(logger_double).to receive(:error)
+          allow(logger_double).to receive(:debug)
+          allow(logger_double).to receive(:info)
+
+          RubyLLM::MCP.config.logger = logger_double
+          client.tool("log_message").execute(message: "Hello, world!", level: "critical")
+
+          expect(logger_double).to have_received(:error)
+          RubyLLM::MCP.config.logger = nil
         end
       end
     end

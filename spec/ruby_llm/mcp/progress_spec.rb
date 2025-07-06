@@ -32,6 +32,15 @@ RSpec.describe RubyLLM::MCP::Progress do
           expect(progress.progress_token).to be_a(String)
         end
 
+        it "does not process progress if no handler is provided" do
+          client.on_progress
+
+          allow(RubyLLM::MCP::Progress).to receive(:new).and_return(nil)
+          client.tool("simple_progress").execute(progress: 75)
+
+          expect(RubyLLM::MCP::Progress).not_to have_received(:new)
+        end
+
         it "progress will contain a progress token" do
           progress = nil
           client.on_progress do |progress_update|

@@ -8,7 +8,7 @@ require "securerandom"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       # Configuration options for reconnection behavior
       class ReconnectionOptions
         attr_reader :max_reconnection_delay, :initial_reconnection_delay,
@@ -45,7 +45,7 @@ module RubyLLM
         attr_reader :session_id, :protocol_version, :coordinator
 
         def initialize( # rubocop:disable Metrics/ParameterLists
-          url,
+          url:,
           request_timeout:,
           coordinator:,
           headers: {},
@@ -112,6 +112,12 @@ module RubyLLM
           @abort_controller = false
         end
 
+        def set_protocol_version(version)
+          @protocol_version = version
+        end
+
+        private
+
         def terminate_session
           return unless @session_id
 
@@ -140,12 +146,6 @@ module RubyLLM
             )
           end
         end
-
-        def set_protocol_version(version)
-          @protocol_version = version
-        end
-
-        private
 
         def handle_httpx_error_response!(response, context:, allow_eof_for_sse: false)
           return false unless response.is_a?(HTTPX::ErrorResponse)
