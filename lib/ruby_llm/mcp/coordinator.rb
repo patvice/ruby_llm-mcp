@@ -5,9 +5,6 @@ require "logger"
 module RubyLLM
   module MCP
     class Coordinator
-      PROTOCOL_VERSION = "2025-03-26"
-      PV_2024_11_05 = "2024-11-05"
-
       attr_reader :client, :transport_type, :config, :capabilities, :protocol_version
 
       def initialize(client, transport_type:, config: {})
@@ -15,7 +12,7 @@ module RubyLLM
         @transport_type = transport_type
         @config = config
 
-        @protocol_version = PROTOCOL_VERSION
+        @protocol_version = MCP::Protocol.default_negotiated_version
 
         @transport = nil
         @capabilities = nil
@@ -62,6 +59,16 @@ module RubyLLM
 
         # Extract and store the negotiated protocol version
         negotiated_version = initialize_response.value["protocolVersion"]
+
+        if negotiated_version && !MCP::Protocol.supported_version?(negotiated_version)
+          raise Errors::UnsupportedProtocolVersion.new(
+            message: <<~MESSAGE
+              Unsupported protocol version, and could not negotiate a supported version: #{negotiated_version}.
+              Supported versions: #{MCP::Protocol.supported_versions.join(', ')}
+            MESSAGE
+          )
+        end
+
         @protocol_version = negotiated_version if negotiated_version
 
         # Set the protocol version on the transport for subsequent requests
@@ -77,7 +84,7 @@ module RubyLLM
         @transport&.close
         @capabilities = nil
         @transport = nil
-        @protocol_version = PROTOCOL_VERSION
+        @protocol_version = MCP::Protocol.default_negotiated_version
       end
 
       def restart_transport
