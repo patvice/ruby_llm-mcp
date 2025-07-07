@@ -27,6 +27,21 @@ module RubyLLM
         end
       end
 
+      class OAuthOptions
+        attr_reader :issuer, :client_id, :client_secret, :scope
+
+        def initialize(issuer:, client_id:, client_secret:, scopes:)
+          @issuer = issuer
+          @client_id = client_id
+          @client_secret = client_secret
+          @scope = scopes
+        end
+
+        def enabled?
+          @issuer && @client_id && @client_secret && @scope
+        end
+      end
+
       # Options for starting SSE connections
       class StartSSEOptions
         attr_reader :resumption_token, :on_resumption_token, :replay_message_id
@@ -40,7 +55,7 @@ module RubyLLM
 
       # Main StreamableHTTP transport class
       class StreamableHTTP
-        include Timeout
+        include Support::Timeout
 
         attr_reader :session_id, :protocol_version, :coordinator
 
@@ -49,7 +64,9 @@ module RubyLLM
           request_timeout:,
           coordinator:,
           headers: {},
-          reconnection_options: nil,
+          reconnection: nil,
+          oauth: nil,
+          rate_limit: nil,
           session_id: nil
         )
           @url = URI(url)
@@ -57,10 +74,13 @@ module RubyLLM
           @request_timeout = request_timeout
           @headers = headers || {}
           @session_id = session_id
-          @reconnection_options = reconnection_options || ReconnectionOptions.new
           @protocol_version = nil
           @resource_metadata_url = nil
           @client_id = SecureRandom.uuid
+
+          @reconnection_options = ReconnectionOptions.new(**reconnection)
+          @oauth_options = OAuthOptions.new(**oauth)
+          @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
           @id_counter = 0
           @id_mutex = Mutex.new
@@ -79,6 +99,11 @@ module RubyLLM
         end
 
         def request(body, add_id: true, wait_for_response: true)
+          if @rate_limiter&.exceeded?
+            sleep(1) while @rate_limiter&.exceeded?
+          end
+          @rate_limiter&.add
+
           # Generate a unique request ID for requests
           if add_id && body.is_a?(Hash) && !body.key?("id")
             @id_mutex.synchronize { @id_counter += 1 }
@@ -202,7 +227,7 @@ module RubyLLM
         end
 
         def create_connection
-          client = HTTPClient.connection.with(
+          client = Support::HTTPClient.connection.with(
             timeout: {
               connect_timeout: 10,
               read_timeout: @request_timeout / 1000,
@@ -210,6 +235,18 @@ module RubyLLM
               operation_timeout: @request_timeout / 1000
             }
           )
+
+          if @oauth_options.enabled?
+            client = client.plugin(:oauth).oauth_auth(
+              issuer: @oauth_options.issuer,
+              client_id: @oauth_options.client_id,
+              client_secret: @oauth_options.client_secret,
+              scope: @oauth_options.scope
+            )
+
+            client.with_access_token
+          end
+
           register_client(client)
         end
 
@@ -219,6 +256,7 @@ module RubyLLM
           headers["mcp-session-id"] = @session_id if @session_id
           headers["mcp-protocol-version"] = @protocol_version if @protocol_version
           headers["X-CLIENT-ID"] = @client_id
+          headers["Origin"] = @uri.to_s
 
           headers
         end
@@ -259,7 +297,7 @@ module RubyLLM
         def create_connection_with_streaming_callbacks(request_id)
           buffer = +""
 
-          client = HTTPClient.connection.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
+          client = Support::HTTPClient.connection.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
             next unless @running && !@abort_controller
 
             RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
@@ -274,6 +312,17 @@ module RubyLLM
               operation_timeout: @request_timeout / 1000
             }
           )
+
+          if @oauth_options.enabled?
+            client = client.plugin(:oauth).oauth_auth(
+              issuer: @oauth_options.issuer,
+              client_id: @oauth_options.client_id,
+              client_secret: @oauth_options.client_secret,
+              scope: @oauth_options.scope
+            )
+
+            client.with_access_token
+          end
           register_client(client)
         end
 

@@ -50,16 +50,17 @@ module RubyLLM
 
       alias say ask
 
-      def complete(argument, value)
+      def complete(argument, value, context: nil)
         if @coordinator.capabilities.completion?
-          result = @coordinator.completion_prompt(name: @name, argument: argument, value: value)
+          result = @coordinator.completion_prompt(name: @name, argument: argument, value: value, context: context)
           if result.error?
             return result.to_error
           end
 
           response = result.value["completion"]
 
-          Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
+          Completion.new(argument: argument, values: response["values"], total: response["total"],
+                         has_more: response["hasMore"])
         else
           message = "Completion is not available for this MCP server"
           raise Errors::Capabilities::CompletionNotAvailable.new(message: message)

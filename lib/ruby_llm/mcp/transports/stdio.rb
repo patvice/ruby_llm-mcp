@@ -9,7 +9,7 @@ module RubyLLM
   module MCP
     module Transports
       class Stdio
-        include Timeout
+        include Support::Timeout
 
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 

@@ -150,6 +150,11 @@ module RubyLLM
         RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
       end
 
+      def register_resource(resource)
+        @client.linked_resources << resource
+        @client.resources[resource.name] = resource
+      end
+
       def resource_list(cursor: nil)
         result = RubyLLM::MCP::Requests::ResourceList.new(self, cursor: cursor).call
         result.raise_error! if result.error?
@@ -239,6 +244,10 @@ module RubyLLM
         RubyLLM::MCP::Responses::Error.new(self, **args).call
       end
 
+      def elicitation_response(**args)
+        RubyLLM::MCP::Responses::Elicitation.new(self, **args).call
+      end
+
       def client_capabilities
         capabilities = {}
 
@@ -250,6 +259,10 @@ module RubyLLM
 
         if sampling_enabled?
           capabilities[:sampling] = {}
+        end
+
+        if client.elicitation_enabled?
+          capabilities[:elicitation] = {}
         end
 
         capabilities

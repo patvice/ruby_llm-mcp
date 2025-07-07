@@ -10,7 +10,7 @@ module RubyLLM
   module MCP
     module Transports
       class SSE
-        include Timeout
+        include Support::Timeout
 
         attr_reader :headers, :id, :coordinator
 

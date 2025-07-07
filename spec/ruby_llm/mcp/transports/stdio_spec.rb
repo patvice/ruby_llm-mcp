@@ -168,7 +168,7 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
         allow(mock_stdin).to receive(:flush)
 
         # Mock timeout behavior
-        allow(RubyLLM::MCP::Transports::Timeout).to receive(:with_timeout).and_raise(
+        allow(RubyLLM::MCP::Transports::Support::Timeout).to receive(:with_timeout).and_raise(
           RubyLLM::MCP::Errors::TimeoutError.new(
             message: "Request timed out",
             request_id: 1

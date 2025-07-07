@@ -4,11 +4,12 @@ module RubyLLM
   module MCP
     module Requests
       class CompletionResource
-        def initialize(coordinator, uri:, argument:, value:)
+        def initialize(coordinator, uri:, argument:, value:, context: nil)
           @coordinator = coordinator
           @uri = uri
           @argument = argument
           @value = value
+          @context = context
         end
 
         def call
@@ -30,8 +31,17 @@ module RubyLLM
               argument: {
                 name: @argument,
                 value: @value
-              }
+              },
+              context: format_context
             }
+          }
+        end
+
+        def format_context
+          return nil if @context.nil?
+
+          {
+            arguments: @context
           }
         end
       end

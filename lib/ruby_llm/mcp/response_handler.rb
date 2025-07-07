@@ -20,6 +20,9 @@ module RubyLLM
         elsif result.sampling?
           handle_sampling_response(result)
           true
+        elsif result.elicitation?
+          handle_elicitation_response(result)
+          true
         else
           handle_unknown_request(result)
           RubyLLM::MCP.logger.error("MCP client was sent unknown method type and could not respond: #{result.inspect}")
@@ -30,6 +33,7 @@ module RubyLLM
       private
 
       def handle_roots_response(result)
+        RubyLLM::MCP.logger.info("Roots request: #{result.inspect}")
         if client.roots.active?
           coordinator.roots_list_response(id: result.id, roots: client.roots)
         else
@@ -44,8 +48,13 @@ module RubyLLM
           return
         end
 
-        RubyLLM::MCP.logger.info("Sampling response: #{result.inspect}")
+        RubyLLM::MCP.logger.info("Sampling request: #{result.inspect}")
         Sample.new(result, coordinator).execute
+      end
+
+      def handle_elicitation_response(result)
+        RubyLLM::MCP.logger.info("Elicitation request: #{result.inspect}")
+        Elicitation.new(result, coordinator).execute
       end
 
       def handle_unknown_request(result)

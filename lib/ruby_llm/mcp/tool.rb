@@ -36,6 +36,10 @@ module RubyLLM
         @mcp_name = tool_response["name"]
         @description = tool_response["description"].to_s
         @parameters = create_parameters(tool_response["inputSchema"])
+
+        @input_schema = tool_response["inputSchema"]
+        @output_schema = tool_response["outputSchema"]
+
         @annotations = tool_response["annotations"] ? Annotation.new(tool_response["annotations"]) : nil
       end
 
@@ -59,6 +63,15 @@ module RubyLLM
           return { error: "Tool execution error: #{text_values}" }
         end
 
+        if result.value.key?("structuredContent") && !@output_schema.nil?
+          is_valid = JSON::Validator.validate(@output_schema, result.value["structuredContent"])
+          unless is_valid
+            return { error: "Structued outputs was not invalid: #{result.value['structuredContent']}" }
+          end
+
+          return text_values
+        end
+
         if text_values.empty?
           create_content_for_message(result.value.dig("content", 0))
         else
@@ -79,12 +92,12 @@ module RubyLLM
 
       private
 
-      def create_parameters(input_schema)
+      def create_parameters(schema)
         params = {}
-        return params if input_schema["properties"].nil?
+        return params if schema["properties"].nil?
 
-        input_schema["properties"].each_key do |key|
-          param_data = input_schema.dig("properties", key)
+        schema["properties"].each_key do |key|
+          param_data = schema.dig("properties", key)
 
           param = if param_data.key?("oneOf") || param_data.key?("anyOf") || param_data.key?("allOf")
                     process_union_parameter(key, param_data)
@@ -152,10 +165,25 @@ module RubyLLM
             "name" => name,
             "description" => description,
             "uri" => content.dig("resource", "uri"),
-            "content" => content["resource"]
+            "mimeType" => content.dig("resource", "mimeType"),
+            "content_response" => {
+              "text" => content.dig("resource", "text"),
+              "blob" => content.dig("resource", "blob")
+            }
           }
 
           resource = Resource.new(coordinator, resource_data)
+          resource.to_content
+        when "resource_link"
+          resource_data = {
+            "name" => content["name"],
+            "uri" => content["uri"],
+            "description" => content["description"],
+            "mimeType" => content["mimeType"]
+          }
+
+          resource = Resource.new(coordinator, resource_data)
+          @coordinator.register_resource(resource)
           resource.to_content
         end
       end
