@@ -7,11 +7,13 @@ require "securerandom"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       class Stdio
+        include Timeout
+
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command, request_timeout:, coordinator:, args: [], env: {})
+        def initialize(command:, request_timeout:, coordinator:, args: [], env: {})
           @request_timeout = request_timeout
           @command = command
           @coordinator = coordinator
@@ -23,11 +25,9 @@ module RubyLLM
           @id_mutex = Mutex.new
           @pending_requests = {}
           @pending_mutex = Mutex.new
-          @running = true
+          @running = false
           @reader_thread = nil
           @stderr_thread = nil
-
-          start_process
         end
 
         def request(body, add_id: true, wait_for_response: true)
@@ -58,20 +58,24 @@ module RubyLLM
           return unless wait_for_response
 
           begin
-            Timeout.timeout(@request_timeout / 1000) do
+            with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
-          rescue Timeout::Error
+          rescue RubyLLM::MCP::Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise RubyLLM::MCP::Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds",
-              request_id: request_id
-            )
+            log_message = "Stdio request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
+            RubyLLM::MCP.logger.error(log_message)
+            raise e
           end
         end
 
         def alive?
           @running
+        end
+
+        def start
+          start_process unless @running
+          @running = true
         end
 
         def close # rubocop:disable Metrics/MethodLength
@@ -119,6 +123,10 @@ module RubyLLM
           @wait_thread = nil
           @reader_thread = nil
           @stderr_thread = nil
+        end
+
+        def set_protocol_version(version)
+          @protocol_version = version
         end
 
         private
@@ -199,22 +207,16 @@ module RubyLLM
           response = JSON.parse(line)
           request_id = response["id"]&.to_s
           result = RubyLLM::MCP::Result.new(response)
-
           RubyLLM::MCP.logger.debug "Result Received: #{result.inspect}"
-          # Handle notifications (process but don't return - continue processing other responses)
-          if result.notification?
-            coordinator.process_notification(result)
-            # Don't return here - continue to process potential tool responses
-          elsif result.request?
-            coordinator.process_request(result)
-            nil
-          else
-            # Handle regular responses (tool calls, etc.)
-            @pending_mutex.synchronize do
-              if result.matching_id?(request_id) && @pending_requests.key?(request_id)
-                response_queue = @pending_requests.delete(request_id)
-                response_queue&.push(result)
-              end
+
+          result = @coordinator.process_result(result)
+          return if result.nil?
+
+          # Handle regular responses (tool calls, etc.)
+          @pending_mutex.synchronize do
+            if result.matching_id?(request_id) && @pending_requests.key?(request_id)
+              response_queue = @pending_requests.delete(request_id)
+              response_queue&.push(result)
             end
           end
         rescue JSON::ParserError => e

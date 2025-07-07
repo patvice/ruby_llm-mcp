@@ -8,11 +8,13 @@ require "securerandom"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       class SSE
+        include Timeout
+
         attr_reader :headers, :id, :coordinator
 
-        def initialize(url, coordinator:, request_timeout:, headers: {})
+        def initialize(url:, coordinator:, request_timeout:, headers: {})
           @event_url = url
           @messages_url = nil
           @coordinator = coordinator
@@ -36,13 +38,10 @@ module RubyLLM
           @pending_requests = {}
           @pending_mutex = Mutex.new
           @connection_mutex = Mutex.new
-          @running = true
+          @running = false
           @sse_thread = nil
 
           RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
-
-          # Start the SSE listener thread
-          start_sse_listener
         end
 
         def request(body, add_id: true, wait_for_response: true) # rubocop:disable Metrics/MethodLength
@@ -60,7 +59,8 @@ module RubyLLM
           end
 
           begin
-            http_client = HTTPX.with(timeout: { request_timeout: @request_timeout / 1000 }, headers: @headers)
+            http_client = HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
+                                                     headers: @headers)
             response = http_client.post(@messages_url, body: JSON.generate(body))
 
             unless response.status == 200
@@ -83,16 +83,13 @@ module RubyLLM
           return unless wait_for_response
 
           begin
-            Timeout.timeout(@request_timeout / 1000) do
+            with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
-          rescue Timeout::Error
+          rescue RubyLLM::MCP::Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             RubyLLM::MCP.logger.error "SSE request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
-            raise Errors::TimeoutError.new(
-              message: "Request timed out after #{@request_timeout / 1000} seconds",
-              request_id: request_id
-            )
+            raise e
           end
         end
 
@@ -100,11 +97,22 @@ module RubyLLM
           @running
         end
 
+        def start
+          return if @running
+
+          @running = true
+          start_sse_listener
+        end
+
         def close
           RubyLLM::MCP.logger.info "Closing SSE transport connection"
           @running = false
           @sse_thread&.join(1) # Give the thread a second to clean up
           @sse_thread = nil
+        end
+
+        def set_protocol_version(version)
+          @protocol_version = version
         end
 
         private
@@ -125,7 +133,7 @@ module RubyLLM
             end
             @sse_thread.abort_on_exception = true
 
-            Timeout.timeout(@request_timeout / 1000) do
+            with_timeout(@request_timeout / 1000) do
               endpoint = response_queue.pop
               set_message_endpoint(endpoint)
             end
@@ -179,7 +187,7 @@ module RubyLLM
           sleep 1
         end
 
-        def process_event(raw_event) # rubocop:disable Metrics/MethodLength
+        def process_event(raw_event)
           # Return if we believe that are getting a partial event
           return if raw_event[:data].nil?
 
@@ -209,15 +217,8 @@ module RubyLLM
             request_id = event["id"]&.to_s
             result = RubyLLM::MCP::Result.new(event)
 
-            if result.notification?
-              coordinator.process_notification(result)
-              return
-            end
-
-            if result.request?
-              coordinator.process_request(result) if coordinator.alive?
-              return
-            end
+            result = @coordinator.process_result(result)
+            return if result.nil?
 
             @pending_mutex.synchronize do
               # You can receieve duplicate events for the same request id, and we will ignore thoses

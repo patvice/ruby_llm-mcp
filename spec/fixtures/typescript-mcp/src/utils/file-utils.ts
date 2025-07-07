@@ -41,7 +41,6 @@ export async function readResourceTextFile(
   encoding: BufferEncoding = "utf-8"
 ): Promise<string> {
   const resourcesPath = getResourcesPath();
-  console.log("Resources path: ", resourcesPath);
   const fullPath = join(resourcesPath, filename);
   return await readFile(fullPath, encoding);
 }

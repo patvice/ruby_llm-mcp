@@ -17,6 +17,24 @@ module RubyLLM
       def item_type
         @items&.dig("type")&.to_sym
       end
+
+      def as_json(*_args)
+        to_h
+      end
+
+      def to_h
+        {
+          name: @name,
+          type: @type,
+          description: @desc,
+          required: @required,
+          default: @default,
+          union_type: @union_type,
+          items: @items&.to_h,
+          properties: @properties&.values,
+          enum: @enum
+        }
+      end
     end
   end
 end

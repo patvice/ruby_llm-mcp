@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RubyLLM::MCP::Transport::Stdio do
+RSpec.describe RubyLLM::MCP::Transports::Stdio do
   let(:coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
   let(:command) { "echo" }
   let(:args) { [] }
@@ -41,8 +41,7 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
     allow(mock_stderr).to receive(:close)
     allow(mock_wait_thread).to receive(:join)
     allow(mock_wait_thread).to receive(:alive?).and_return(true)
-    allow(coordinator).to receive(:process_notification)
-    allow(coordinator).to receive(:process_request)
+    allow(coordinator).to receive(:process_result)
   end
 
   describe "#initialize" do
@@ -100,13 +99,20 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
 
       # Mock successful response
       response_queue = Queue.new
-      response_queue.push(RubyLLM::MCP::Result.new({ "id" => 1, "result" => {} }))
+      mock_result = RubyLLM::MCP::Result.new({ "id" => 1, "result" => {} })
+      response_queue.push(mock_result)
       allow(Queue).to receive(:new).and_return(response_queue)
 
-      mock_transport.request(request_body)
+      # Mock the with_timeout method to avoid thread creation issues
+      allow(mock_transport).to receive(:with_timeout) do |_timeout, **_opts|
+        response_queue.pop
+      end
+
+      result = mock_transport.request(request_body)
 
       expect(mock_stdin).to have_received(:puts)
       expect(mock_stdin).to have_received(:flush)
+      expect(result).to eq(mock_result)
 
       parsed = JSON.parse(captured_json)
       expect(parsed["method"]).to eq("test")
@@ -162,7 +168,12 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
         allow(mock_stdin).to receive(:flush)
 
         # Mock timeout behavior
-        allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+        allow(RubyLLM::MCP::Transports::Timeout).to receive(:with_timeout).and_raise(
+          RubyLLM::MCP::Errors::TimeoutError.new(
+            message: "Request timed out",
+            request_id: 1
+          )
+        )
 
         short_timeout_transport = mock_transport
         short_timeout_transport.instance_variable_set(:@request_timeout, 10)
@@ -185,8 +196,7 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
     it "processes valid JSON responses" do
       valid_response = '{"id": "1", "result": {"success": true}}'
 
-      allow(coordinator).to receive(:process_notification)
-      allow(coordinator).to receive(:process_request)
+      allow(coordinator).to receive(:process_result)
 
       expect { mock_transport.send(:process_response, valid_response) }.not_to raise_error
     end
@@ -206,11 +216,11 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
       allow(result).to receive_messages(notification?: true, request?: false)
-      allow(coordinator).to receive(:process_notification)
+      allow(coordinator).to receive(:process_result)
 
       mock_transport.send(:process_response, notification)
 
-      expect(coordinator).to have_received(:process_notification).with(result)
+      expect(coordinator).to have_received(:process_result).with(result)
     end
 
     it "processes requests correctly" do
@@ -219,11 +229,11 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
       allow(result).to receive_messages(notification?: false, request?: true)
-      allow(coordinator).to receive(:process_request)
+      allow(coordinator).to receive(:process_result)
 
       mock_transport.send(:process_response, request)
 
-      expect(coordinator).to have_received(:process_request).with(result)
+      expect(coordinator).to have_received(:process_result).with(result)
     end
 
     it "handles responses with matching request IDs" do
@@ -232,10 +242,9 @@ RSpec.describe RubyLLM::MCP::Transport::Stdio do
       response_queue = Queue.new
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
-      allow(result).to receive_messages(notification?: false, request?: false)
       allow(result).to receive(:matching_id?).with("1").and_return(true)
+      allow(coordinator).to receive(:process_result).and_return(result)
 
-      # Set up pending request
       mock_transport.instance_variable_get(:@pending_requests)["1"] = response_queue
 
       mock_transport.send(:process_response, response)

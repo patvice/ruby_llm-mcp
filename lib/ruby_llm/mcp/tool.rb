@@ -12,16 +12,28 @@ module RubyLLM
         @idempotent_hint = annotation["idempotentHint"] || false
         @open_world_hint = annotation["openWorldHint"] || true
       end
+
+      def to_h
+        {
+          title: @title,
+          readOnlyHint: @read_only_hint,
+          destructiveHint: @destructive_hint,
+          idempotentHint: @idempotent_hint,
+          openWorldHint: @open_world_hint
+        }
+      end
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :description, :parameters, :coordinator, :tool_response
+      attr_reader :name, :description, :parameters, :coordinator, :tool_response, :with_prefix
 
-      def initialize(coordinator, tool_response)
+      def initialize(coordinator, tool_response, with_prefix: false)
         super()
         @coordinator = coordinator
 
-        @name = tool_response["name"]
+        @with_prefix = with_prefix
+        @name = format_name(tool_response["name"])
+        @mcp_name = tool_response["name"]
         @description = tool_response["description"].to_s
         @parameters = create_parameters(tool_response["inputSchema"])
         @annotations = tool_response["annotations"] ? Annotation.new(tool_response["annotations"]) : nil
@@ -33,7 +45,7 @@ module RubyLLM
 
       def execute(**params)
         result = @coordinator.execute_tool(
-          name: @name,
+          name: @mcp_name,
           parameters: params
         )
 
@@ -53,6 +65,17 @@ module RubyLLM
           create_content_for_message({ "type" => "text", "text" => text_values })
         end
       end
+
+      def to_h
+        {
+          name: @name,
+          description: @description,
+          parameters: @parameters.to_h,
+          annotations: @annotations&.to_h
+        }
+      end
+
+      alias to_json to_h
 
       private
 
@@ -134,6 +157,14 @@ module RubyLLM
 
           resource = Resource.new(coordinator, resource_data)
           resource.to_content
+        end
+      end
+
+      def format_name(name)
+        if @with_prefix
+          "#{@coordinator.name}_#{name}"
+        else
+          name
         end
       end
     end

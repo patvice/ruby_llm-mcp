@@ -20,7 +20,7 @@ module RubyLLM
           @hints.map { |hint| hint["name"] }
         end
 
-        def to_request
+        def to_h
           {
             model: model,
             hints: hints,
@@ -61,6 +61,17 @@ module RubyLLM
       def message
         @message ||= raw_messages.map { |message| message.fetch("content")&.fetch("text") }.join("\n")
       end
+
+      def to_h
+        {
+          id: @id,
+          model_preferences: @model_preferences.to_h,
+          system_prompt: @system_prompt,
+          max_tokens: @max_tokens
+        }
+      end
+
+      alias to_json to_h
 
       private
 

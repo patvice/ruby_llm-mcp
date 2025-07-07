@@ -48,8 +48,8 @@ module RubyLLM
       end
 
       def process_progress_message(notification)
-        progress_obj = RubyLLM::MCP::Progress.new(self, client.on[:progress], notification.params)
         if client.tracking_progress?
+          progress_obj = RubyLLM::MCP::Progress.new(self, client.on[:progress], notification.params)
           progress_obj.execute_progress_handler
         end
       end

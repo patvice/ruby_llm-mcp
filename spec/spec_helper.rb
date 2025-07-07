@@ -8,10 +8,6 @@ require "webmock/rspec"
 
 Dotenv.load
 
-require_relative "support/client_runner"
-require_relative "support/test_server_manager"
-require_relative "support/mcp_test_configuration"
-
 SimpleCov.start do
   add_filter "/spec/"
   add_filter "/examples/"
@@ -22,6 +18,10 @@ end
 require "bundler/setup"
 require "ruby_llm"
 require "ruby_llm/mcp"
+
+require_relative "support/client_runner"
+require_relative "support/test_server_manager"
+require_relative "support/mcp_test_configuration"
 
 # VCR Configuration
 VCR.configure do |config|

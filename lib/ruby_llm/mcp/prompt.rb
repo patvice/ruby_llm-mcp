@@ -11,6 +11,14 @@ module RubyLLM
           @description = description
           @required = required
         end
+
+        def to_h
+          {
+            name: @name,
+            description: @description,
+            required: @required
+          }
+        end
       end
 
       attr_reader :name, :description, :arguments, :coordinator
@@ -57,6 +65,16 @@ module RubyLLM
           raise Errors::Capabilities::CompletionNotAvailable.new(message: message)
         end
       end
+
+      def to_h
+        {
+          name: @name,
+          description: @description,
+          arguments: @arguments.map(&:to_h)
+        }
+      end
+
+      alias to_json to_h
 
       private
 

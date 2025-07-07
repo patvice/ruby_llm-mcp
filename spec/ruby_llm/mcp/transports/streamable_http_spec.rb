@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
+RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
   let(:client) do
     RubyLLM::MCP::Client.new(
       name: "test-client",
@@ -16,10 +16,11 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
   let(:mock_coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
   let(:transport) do
-    RubyLLM::MCP::Transport::StreamableHTTP.new(
-      TestServerManager::HTTP_SERVER_URL,
+    RubyLLM::MCP::Transports::StreamableHTTP.new(
+      url: TestServerManager::HTTP_SERVER_URL,
       request_timeout: 5000,
-      coordinator: mock_coordinator
+      coordinator: mock_coordinator,
+      headers: {}
     )
   end
   let(:logger) { instance_double(Logger) }
@@ -126,7 +127,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       transport = coordinator.transport
 
       # The transport should have a protocol version set
-      expect(transport.instance_variable_get(:@protocol_version)).to eq("2025-03-26")
+      expect(transport.transport_protocol.protocol_version).to eq("2025-03-26")
 
       client.stop
     end
@@ -307,7 +308,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_return(status: 400)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -319,7 +320,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_return(status: 405)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         # Should not raise an error for 405 (acceptable per spec)
         expect do
@@ -339,10 +340,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       context "when handling unknown request errors in SSE processing" do
         before do
-          allow(mock_coordinator).to receive(:process_notification).and_raise(
-            RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type")
-          )
-          allow(mock_coordinator).to receive(:process_request).and_raise(
+          allow(mock_coordinator).to receive(:process_result).and_raise(
             RubyLLM::MCP::Errors::UnknownRequest.new(message: "Unknown request type")
           )
         end
@@ -357,25 +355,25 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       it "respects abort controller in SSE processing" do
-        allow(mock_coordinator).to receive(:process_notification)
+        allow(mock_coordinator).to receive(:process_result)
         transport.instance_variable_set(:@abort_controller, true)
 
         raw_event = { data: '{"method": "test"}' }
 
         transport.send(:process_sse_event, raw_event, nil)
 
-        expect(mock_coordinator).not_to have_received(:process_notification)
+        expect(mock_coordinator).not_to have_received(:process_result)
       end
 
       it "respects running flag in SSE processing" do
-        allow(mock_coordinator).to receive(:process_notification)
+        allow(mock_coordinator).to receive(:process_result)
         transport.instance_variable_set(:@running, false)
 
         raw_event = { data: '{"method": "test"}' }
 
         transport.send(:process_sse_event, raw_event, nil)
 
-        expect(mock_coordinator).not_to have_received(:process_notification)
+        expect(mock_coordinator).not_to have_received(:process_result)
       end
 
       it "handles SSE buffer events with abort controller" do
@@ -468,7 +466,12 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
       before do
         request_id = "timeout-test"
-        allow(response_queue).to receive(:pop).and_raise(Timeout::Error)
+        allow(response_queue).to receive(:pop).and_raise(
+          RubyLLM::MCP::Errors::TimeoutError.new(
+            message: "Request timed out",
+            request_id: request_id
+          )
+        )
 
         transport.instance_variable_get(:@pending_mutex).synchronize do
           transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
@@ -563,7 +566,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
     describe "SSE reconnection logic" do
       context "when implementing exponential backoff" do
         let(:reconnection_options) do
-          RubyLLM::MCP::Transport::ReconnectionOptions.new(
+          RubyLLM::MCP::Transports::ReconnectionOptions.new(
             max_reconnection_delay: 10_000,
             initial_reconnection_delay: 100,
             reconnection_delay_grow_factor: 2.0,
@@ -572,8 +575,8 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         end
 
         let(:transport_with_options) do
-          RubyLLM::MCP::Transport::StreamableHTTP.new(
-            TestServerManager::HTTP_SERVER_URL,
+          RubyLLM::MCP::Transports::StreamableHTTP.new(
+            url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 5000,
             coordinator: mock_coordinator,
             reconnection_options: reconnection_options
@@ -589,10 +592,10 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
       end
 
       context "when respecting max retry limit" do
-        let(:reconnection_options) { RubyLLM::MCP::Transport::ReconnectionOptions.new(max_retries: 1) }
+        let(:reconnection_options) { RubyLLM::MCP::Transports::ReconnectionOptions.new(max_retries: 1) }
         let(:transport_with_options) do
-          RubyLLM::MCP::Transport::StreamableHTTP.new(
-            TestServerManager::HTTP_SERVER_URL,
+          RubyLLM::MCP::Transports::StreamableHTTP.new(
+            url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 1000,
             coordinator: mock_coordinator,
             reconnection_options: reconnection_options
@@ -606,7 +609,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         end
 
         it "stops after max retries" do
-          options = RubyLLM::MCP::Transport::StartSSEOptions.new
+          options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
           expect do
             transport_with_options.send(:start_sse, options)
@@ -621,7 +624,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -635,7 +638,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -649,7 +652,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           .with(headers: { "Accept" => "text/event-stream" })
           .to_raise(Errno::ECONNREFUSED)
 
-        options = RubyLLM::MCP::Transport::StartSSEOptions.new
+        options = RubyLLM::MCP::Transports::StartSSEOptions.new
 
         expect do
           transport.send(:start_sse, options)
@@ -840,8 +843,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
         let(:mock_result) { instance_double(RubyLLM::MCP::Result) }
 
         before do
-          allow(mock_coordinator).to receive(:process_notification)
-          allow(mock_coordinator).to receive(:process_request)
+          allow(mock_coordinator).to receive(:process_result)
           allow(RubyLLM::MCP::Result).to receive(:new).and_return(mock_result)
         end
 
@@ -851,16 +853,17 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
           transport.send(:process_sse_event, notification_event, nil)
 
-          expect(mock_coordinator).to have_received(:process_notification)
+          expect(mock_coordinator).to have_received(:process_result)
         end
 
         it "processes requests correctly" do
           request_event = { data: '{"method": "test_request", "id": "req-1"}' }
-          allow(mock_result).to receive_messages(notification?: false, request?: true, response?: false)
+          allow(mock_result).to receive_messages(notification?: false, request?: true, response?: false, id: "req-1")
+          allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
 
           transport.send(:process_sse_event, request_event, nil)
 
-          expect(mock_coordinator).to have_received(:process_request)
+          expect(mock_coordinator).to have_received(:process_result)
         end
       end
 
@@ -874,6 +877,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
             transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
           end
           allow(mock_result).to receive_messages(notification?: false, request?: false, response?: true, id: request_id)
+          allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
           allow(RubyLLM::MCP::Result).to receive(:new).and_return(mock_result)
         end
 
@@ -905,7 +909,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
           allow(JSON).to receive(:parse).with('{"id": "original-456", "method": "test"}').and_return(
             { "id" => "original-456", "method" => "test" }
           )
-          allow(mock_coordinator).to receive(:process_notification)
+          allow(mock_coordinator).to receive(:process_result)
         end
 
         it "processes with replay ID" do
@@ -915,7 +919,7 @@ RSpec.describe RubyLLM::MCP::Transport::StreamableHTTP do
 
           transport.send(:process_sse_event, original_event, replay_id)
 
-          expect(mock_coordinator).to have_received(:process_notification)
+          expect(mock_coordinator).to have_received(:process_result)
         end
       end
     end

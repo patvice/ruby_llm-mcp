@@ -1,6 +1,6 @@
 # RubyLLM::MCP
 
-Aiming to make using MCP with RubyLLM as easy as possible.
+Aiming to make using MCPs with RubyLLM as easy as possible.
 
 This project is a Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), designed to work seamlessly with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources and prompts as part of LLM conversations.
 
@@ -8,7 +8,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 
 ## Features
 
-- 🔌 **Multiple Transport Types**: Support for SSE (Server-Sent Events), Streamable HTTP, and stdio transports
+- 🔌 **Multiple Transport Types**: Streamable HTTP, and STDIO and legacy SSE transports
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
@@ -123,13 +123,11 @@ puts result # 3
 # If the human in the loop returns false, the tool call will be cancelled
 result = tool.execute(a: 2, b: 2)
 puts result # Tool execution error: Tool call was cancelled by the client
-```
 
 tool = client.tool("add")
 result = tool.execute(a: 1, b: 2)
 puts result
-
-````
+```
 
 ### Support Complex Parameters
 
@@ -137,7 +135,7 @@ If you want to support complex parameters, like an array of objects it currently
 
 ```ruby
 RubyLLM::MCP.support_complex_parameters!
-````
+```
 
 ### Streaming Responses with Tool Calls
 
@@ -337,6 +335,69 @@ chat.with_prompt(prompt, arguments: { name: "Alice" })
 # Ask using a prompt directly
 response = chat.ask_prompt(prompt, arguments: { name: "Alice" })
 ```
+
+## Rails Integration
+
+RubyLLM MCP provides seamless Rails integration through a Railtie and generator system.
+
+### Setup
+
+Generate the configuration files:
+
+```bash
+rails generate ruby_llm:mcp:install
+```
+
+This creates:
+
+- `config/initializers/ruby_llm_mcp.rb` - Main configuration
+- `config/mcps.yml` - MCP servers configuration
+
+### MCP Server Configuration
+
+Configure your MCP servers in `config/mcps.yml`:
+
+```yaml
+mcp_servers:
+  filesystem:
+    transport_type: stdio
+    command: npx
+    args:
+      - "@modelcontextprotocol/server-filesystem"
+      - "<%= Rails.root %>"
+    env: {}
+    with_prefix: true
+
+  api_server:
+    transport_type: sse
+    url: "https://api.example.com/mcp/sse"
+    headers:
+      Authorization: "Bearer <%= ENV['API_TOKEN'] %>"
+```
+
+### Automatic Client Management
+
+With `launch_control: :automatic`, Rails will:
+
+- Start all configured MCP clients when the application initializes
+- Gracefully shut down clients when the application exits
+- Handle client lifecycle automatically
+
+However, it's very command to due to the performace of LLM calls that are made in the background.
+
+For this, we recommend using `launch_control: :manual` and use `establish_connection` method to manage the client lifecycle manually inside your background jobs. It will provide you active connections to the MCP servers, and take care of closing them when the job is done.
+
+```ruby
+RubyLLM::MCP.establish_connection do |clients|
+  chat = RubyLLM.chat(model: "gpt-4")
+  chat.with_tools(*clients.tools)
+
+  response = chat.ask("Hello, world!")
+  puts response
+end
+```
+
+You can also avoid this completely manually start and stop the clients if you so choose.
 
 ## Client Lifecycle Management
 
@@ -574,6 +635,150 @@ client = RubyLLM::MCP.client(
     env: { "DEBUG" => "1" }
   }
 )
+```
+
+## Creating Custom Transports
+
+Part of the MCP specification outlines that custom transports can be used for some MCP servers. Out of the box, RubyLLM::MCP supports Streamable HTTP transports, STDIO and the legacy SSE transport.
+
+You can create custom transport implementations to support additional communication protocols or specialized connection methods.
+
+### Transport Registration
+
+Register your custom transport with the transport factory:
+
+```ruby
+# Define your custom transport class
+class MyCustomTransport
+  # Implementation details...
+end
+
+# Register it with the factory
+RubyLLM::MCP::Transport.register_transport(:my_custom, MyCustomTransport)
+
+# Now you can use it
+client = RubyLLM::MCP.client(
+  name: "custom-server",
+  transport_type: :my_custom,
+  config: {
+    # Your custom configuration
+  }
+)
+```
+
+### Required Interface
+
+All transport implementations must implement the following interface:
+
+```ruby
+class MyCustomTransport
+  # Initialize the transport
+  def initialize(coordinator:, **config)
+    @coordinator = coordinator # Uses for communication between the client and the MCP server
+    @config = config # Transport-specific configuration
+  end
+
+  # Send a request and optionally wait for response
+  # Returns a RubyLLM::MCP::Result object
+  # body: the request body
+  # add_id: true will add an id to the request
+  # wait_for_response: true will wait for a response from the MCP server
+  # Returns a RubyLLM::MCP::Result object
+  def request(body, add_id: true, wait_for_response: true)
+    # Implementation: send request and return result
+    data = some_method_to_send_request_and_get_result(body)
+    # Use Result object to make working with the protocol easier
+    result = RubyLLM::MCP::Result.new(data)
+
+    # Call the coordinator to process the result
+    @coordinator.process_result(result)
+    return if result.nil? # Some results are related to notifications and should not be returned to the client, but processed by the coordinator instead
+
+    # Return the result
+    result
+  end
+
+  # Check if transport is alive/connected
+  def alive?
+    # Implementation: return true if connected
+  end
+
+  # Start the transport connection
+  def start
+    # Implementation: establish connection
+  end
+
+  # Close the transport connection
+  def close
+    # Implementation: cleanup and close connection
+  end
+
+  # Set the MCP protocol version, used in some transports to identify the agreed upon protocol version
+  def set_protocol_version(version)
+    @protocol_version = version
+  end
+end
+```
+
+### The Result Object
+
+The `RubyLLM::MCP::Result` class wraps MCP responses and provides convenient methods:
+
+```ruby
+result = transport.request(body)
+
+# Core properties
+result.id          # Request ID
+result.method      # Request method
+result.result      # Result data (hash)
+result.params      # Request parameters
+result.error       # Error data (hash)
+result.session_id  # Session ID (if applicable)
+
+# Type checking
+result.success?      # Has result data
+result.error?        # Has error data
+result.notification? # Is a notification
+result.request?      # Is a request
+result.response?     # Is a response
+
+# Specialized methods
+result.tool_success?     # Successful tool execution
+result.execution_error?  # Tool execution failed
+result.matching_id?(id)  # Matches request ID
+result.next_cursor?      # Has pagination cursor
+
+# Error handling
+result.raise_error!  # Raise exception if error
+result.to_error      # Convert to Error object
+
+# Notifications
+result.notification  # Get notification object
+```
+
+### Error Handling
+
+Custom transports should handle errors appropriately. If request fails, you should raise a `RubyLLM::MCP::Errors::TransportError` exception. If the request times out, you should raise a `RubyLLM::MCP::Errors::TimeoutError` exception. This will ensure that a cancellation notification is sent to the MCP server correctly.
+
+```ruby
+def request(body, add_id: true, wait_for_response: true)
+  begin
+    # Send request
+    send_request(body)
+  rescue SomeConnectionError => e
+    # Convert to MCP transport error
+    raise RubyLLM::MCP::Errors::TransportError.new(
+      message: "Connection failed: #{e.message}",
+      error: e
+    )
+  rescue Timeout::Error => e
+    # Convert to MCP timeout error
+    raise RubyLLM::MCP::Errors::TimeoutError.new(
+      message: "Request timeout after #{@request_timeout}ms",
+      request_id: body["id"]
+    )
+  end
+end
 ```
 
 ## RubyLLM::MCP and Client Configuration Options

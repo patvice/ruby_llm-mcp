@@ -31,6 +31,10 @@ module RubyLLM
         @content = @content_response["text"] || @content_response["blob"]
       end
 
+      def content_loaded?
+        !@content.nil?
+      end
+
       def subscribe!
         if @coordinator.capabilities.resource_subscribe?
           @coordinator.resources_subscribe(uri: @uri)
@@ -66,6 +70,19 @@ module RubyLLM
           MCP::Content.new(text: "#{name}: #{description}", attachments: [attachment])
         end
       end
+
+      def to_h
+        {
+          uri: @uri,
+          name: @name,
+          description: @description,
+          mime_type: @mime_type,
+          contented_loaded: content_loaded?,
+          content: @content
+        }
+      end
+
+      alias to_json to_h
 
       private
 

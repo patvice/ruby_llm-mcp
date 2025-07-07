@@ -1,0 +1,9 @@
+mcp_servers:
+  filesystem:
+    transport_type: stdio
+    command: npx
+    args:
+      - "@modelcontextprotocol/server-filesystem"
+      - "<%%= Rails.root %>"
+    env: {}
+    with_prefix: true

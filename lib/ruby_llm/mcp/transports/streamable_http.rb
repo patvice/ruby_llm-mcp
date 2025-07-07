@@ -8,7 +8,7 @@ require "securerandom"
 
 module RubyLLM
   module MCP
-    module Transport
+    module Transports
       # Configuration options for reconnection behavior
       class ReconnectionOptions
         attr_reader :max_reconnection_delay, :initial_reconnection_delay,
@@ -40,10 +40,12 @@ module RubyLLM
 
       # Main StreamableHTTP transport class
       class StreamableHTTP
+        include Timeout
+
         attr_reader :session_id, :protocol_version, :coordinator
 
         def initialize( # rubocop:disable Metrics/ParameterLists
-          url,
+          url:,
           request_timeout:,
           coordinator:,
           headers: {},
@@ -110,6 +112,12 @@ module RubyLLM
           @abort_controller = false
         end
 
+        def set_protocol_version(version)
+          @protocol_version = version
+        end
+
+        private
+
         def terminate_session
           return unless @session_id
 
@@ -138,12 +146,6 @@ module RubyLLM
             )
           end
         end
-
-        def set_protocol_version(version)
-          @protocol_version = version
-        end
-
-        private
 
         def handle_httpx_error_response!(response, context:, allow_eof_for_sse: false)
           return false unless response.is_a?(HTTPX::ErrorResponse)
@@ -200,7 +202,7 @@ module RubyLLM
         end
 
         def create_connection
-          client = HTTPX.with(
+          client = HTTPClient.connection.with(
             timeout: {
               connect_timeout: 10,
               read_timeout: @request_timeout / 1000,
@@ -257,7 +259,7 @@ module RubyLLM
         def create_connection_with_streaming_callbacks(request_id)
           buffer = +""
 
-          client = HTTPX.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
+          client = HTTPClient.connection.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
             next unless @running && !@abort_controller
 
             RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
@@ -562,19 +564,14 @@ module RubyLLM
             result = RubyLLM::MCP::Result.new(event_data, session_id: @session_id)
             RubyLLM::MCP.logger.debug "SSE Result Received: #{result.inspect}"
 
-            # Handle different types of messages
-            if result.notification?
-              @coordinator.process_notification(result)
-            elsif result.request?
-              @coordinator.process_request(result)
-            elsif result.response?
-              # Handle response to client request
-              request_id = result.id&.to_s
-              if request_id
-                @pending_mutex.synchronize do
-                  response_queue = @pending_requests.delete(request_id)
-                  response_queue&.push(result)
-                end
+            result = @coordinator.process_result(result)
+            return if result.nil?
+
+            request_id = result.id&.to_s
+            if request_id
+              @pending_mutex.synchronize do
+                response_queue = @pending_requests.delete(request_id)
+                response_queue&.push(result)
               end
             end
           rescue JSON::ParserError => e
@@ -591,15 +588,14 @@ module RubyLLM
         end
 
         def wait_for_response_with_timeout(request_id, response_queue)
-          Timeout.timeout(@request_timeout / 1000) do
+          with_timeout(@request_timeout / 1000, request_id: request_id) do
             response_queue.pop
           end
-        rescue Timeout::Error
+        rescue RubyLLM::MCP::Errors::TimeoutError => e
+          log_message = "StreamableHTTP request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
+          RubyLLM::MCP.logger.error(log_message)
           @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-          raise Errors::TimeoutError.new(
-            message: "Request timed out after #{@request_timeout / 1000} seconds",
-            request_id: request_id
-          )
+          raise e
         end
 
         def cleanup_sse_resources
