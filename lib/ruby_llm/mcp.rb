@@ -9,7 +9,7 @@ module RubyLLM
     module_function
 
     def client(*args, **kwargs)
-      @client ||= Client.new(*args, **kwargs)
+      @client = Client.new(*args, **kwargs)
     end
 
     def support_complex_parameters!
