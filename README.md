@@ -622,21 +622,6 @@ Check out the `examples/` directory for more detailed usage examples:
 - `examples/resources/list_resources.rb` - Example of listing and using resources
 - `examples/prompts/streamable_prompt_call.rb` - Example of using prompts with streamable transport
 
-## Advanced Usage
-
-### Managing Multiple MCP Clients
-
-For advanced use cases where you need to manage multiple MCP clients simultaneously, see our comprehensive guide:
-
-📖 **[Managing Multiple MCP Clients](managing_multiple_clients.md)**
-
-This documentation covers:
-- Creating and managing multiple MCP clients
-- Client lifecycle management and best practices
-- Integration patterns for complex applications
-- Error handling and resilience strategies
-- Performance considerations and resource management
-
 ## Contributing
 
 We welcome contributions! Bug reports and pull requests are welcome on GitHub at https://github.com/patvice/ruby_llm-mcp.
