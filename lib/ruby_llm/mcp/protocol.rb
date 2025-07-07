@@ -3,7 +3,7 @@
 module RubyLLM
   module MCP
     module Protocol
-      module_functions
+      module_function
 
       LATEST_PROTOCOL_VERSION = "2025-06-18"
       DEFAULT_NEGOTIATED_PROTOCOL_VERSION = "2025-03-26"

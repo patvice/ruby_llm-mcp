@@ -61,7 +61,6 @@ module RubyLLM
 
       def to_content
         content = self.content
-
         case content_type
         when "text"
           MCP::Content.new(text: "#{name}: #{description}\n\n#{content}")
@@ -89,7 +88,7 @@ module RubyLLM
       def content_type
         return "text" if @content_response.nil?
 
-        if @content_response.key?("blob")
+        if @content_response.key?("blob") && !@content_response["blob"].nil?
           "blob"
         else
           "text"

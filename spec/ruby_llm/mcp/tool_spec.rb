@@ -125,12 +125,10 @@ RSpec.describe RubyLLM::MCP::Tool do
           value = <<~TODO
             get_file_resource: Returns a file resource reference
 
-            Hello, this is a test file!
-            This content will be served by the MCP resource.
-            You can modify this file and it will be cached for 5 minutes.
+            This is the content of test.txt
           TODO
 
-          expect(result.to_s).to eq(value)
+          expect(result.to_s).to eq(value.strip)
         end
 
         it "handles tool errors gracefully" do

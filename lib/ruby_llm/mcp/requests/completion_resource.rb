@@ -33,7 +33,7 @@ module RubyLLM
                 value: @value
               },
               context: format_context
-            }
+            }.compact
           }
         end
 

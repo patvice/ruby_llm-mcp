@@ -64,7 +64,7 @@ module RubyLLM
           request_timeout:,
           coordinator:,
           headers: {},
-          reconnection: nil,
+          reconnection: {},
           oauth: nil,
           rate_limit: nil,
           session_id: nil
@@ -79,7 +79,7 @@ module RubyLLM
           @client_id = SecureRandom.uuid
 
           @reconnection_options = ReconnectionOptions.new(**reconnection)
-          @oauth_options = OAuthOptions.new(**oauth)
+          @oauth_options = OAuthOptions.new(**oauth) unless oauth.nil?
           @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
           @id_counter = 0
@@ -236,7 +236,7 @@ module RubyLLM
             }
           )
 
-          if @oauth_options.enabled?
+          if @oauth_options&.enabled?
             client = client.plugin(:oauth).oauth_auth(
               issuer: @oauth_options.issuer,
               client_id: @oauth_options.client_id,
@@ -297,7 +297,8 @@ module RubyLLM
         def create_connection_with_streaming_callbacks(request_id)
           buffer = +""
 
-          client = Support::HTTPClient.connection.plugin(:callbacks).on_response_body_chunk do |request, _response, chunk|
+          client = Support::HTTPClient.connection.plugin(:callbacks)
+                                      .on_response_body_chunk do |request, _response, chunk|
             next unless @running && !@abort_controller
 
             RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
@@ -313,7 +314,7 @@ module RubyLLM
             }
           )
 
-          if @oauth_options.enabled?
+          if @oauth_options&.enabled?
             client = client.plugin(:oauth).oauth_auth(
               issuer: @oauth_options.issuer,
               client_id: @oauth_options.client_id,

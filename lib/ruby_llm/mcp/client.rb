@@ -75,8 +75,8 @@ module RubyLLM
 
         fetch(:resources, refresh) do
           resources = @coordinator.resource_list
-          build_map(resources, MCP::Resource)
-          include_linked_resources
+          resources = build_map(resources, MCP::Resource)
+          include_linked_resources(resources)
         end
 
         @resources.values
@@ -212,10 +212,12 @@ module RubyLLM
         end
       end
 
-      def include_linked_resources
+      def include_linked_resources(resources)
         @linked_resources.each do |resource|
-          @resources[resource.name] = resource
+          resources[resource.name] = resource
         end
+
+        resources
       end
 
       def setup_roots

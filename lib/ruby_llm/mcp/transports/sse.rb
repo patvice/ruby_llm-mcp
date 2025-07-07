@@ -59,8 +59,8 @@ module RubyLLM
           end
 
           begin
-            http_client = HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
-                                                     headers: @headers)
+            http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
+                                                              headers: @headers)
             response = http_client.post(@messages_url, body: JSON.generate(body))
 
             unless response.status == 200

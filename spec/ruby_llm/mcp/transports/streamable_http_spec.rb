@@ -566,12 +566,12 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
     describe "SSE reconnection logic" do
       context "when implementing exponential backoff" do
         let(:reconnection_options) do
-          RubyLLM::MCP::Transports::ReconnectionOptions.new(
+          {
             max_reconnection_delay: 10_000,
             initial_reconnection_delay: 100,
             reconnection_delay_grow_factor: 2.0,
             max_retries: 3
-          )
+          }
         end
 
         let(:transport_with_options) do
@@ -579,7 +579,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
             url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 5000,
             coordinator: mock_coordinator,
-            reconnection_options: reconnection_options
+            reconnection: reconnection_options
           )
         end
 
@@ -592,13 +592,13 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       end
 
       context "when respecting max retry limit" do
-        let(:reconnection_options) { RubyLLM::MCP::Transports::ReconnectionOptions.new(max_retries: 1) }
+        let(:reconnection_options) { { max_retries: 1 } }
         let(:transport_with_options) do
           RubyLLM::MCP::Transports::StreamableHTTP.new(
             url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 1000,
             coordinator: mock_coordinator,
-            reconnection_options: reconnection_options
+            reconnection: reconnection_options
           )
         end
 
