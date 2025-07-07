@@ -14,6 +14,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
 - 🎛️ **Client Features**: Support for sampling and roots
 - 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
+- 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously for different servers and purposes
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 
 ## Installation
@@ -620,6 +621,21 @@ Check out the `examples/` directory for more detailed usage examples:
 - `examples/tools/sse_mcp_with_gpt.rb` - Example using SSE transport with GPT
 - `examples/resources/list_resources.rb` - Example of listing and using resources
 - `examples/prompts/streamable_prompt_call.rb` - Example of using prompts with streamable transport
+
+## Advanced Usage
+
+### Managing Multiple MCP Clients
+
+For advanced use cases where you need to manage multiple MCP clients simultaneously, see our comprehensive guide:
+
+📖 **[Managing Multiple MCP Clients](managing_multiple_clients.md)**
+
+This documentation covers:
+- Creating and managing multiple MCP clients
+- Client lifecycle management and best practices
+- Integration patterns for complex applications
+- Error handling and resilience strategies
+- Performance considerations and resource management
 
 ## Contributing
 
