@@ -2,35 +2,32 @@
 
 RSpec.describe RubyLLM::MCP::Parameter do
   describe "#item_type" do
-    context "when @items is nil" do
-      it "returns nil" do
-        parameter = described_class.new("test_param", type: "string")
-        expect(parameter.item_type).to be_nil
-      end
+    it "when @items is nil will return nil" do
+      parameter = described_class.new("test_param", type: "string")
+      expect(parameter.item_type).to be_nil
     end
 
-    context "when @items is empty hash" do
-      it "returns nil" do
-        parameter = described_class.new("test_param", type: "string")
-        parameter.items = {}
-        expect(parameter.item_type).to be_nil
-      end
+    it "when @items is empty hash it will returns nil" do
+      parameter = described_class.new("test_param", type: "string")
+      parameter.items = {}
+      expect(parameter.item_type).to be_nil
     end
 
-    context "when @items['type'] is nil" do
-      it "returns nil" do
-        parameter = described_class.new("test_param", type: "string")
-        parameter.items = { "other_key" => "value" }
-        expect(parameter.item_type).to be_nil
-      end
+    it "when @items['type'] is nil it will return nil" do
+      parameter = described_class.new("test_param", type: "string")
+      parameter.items = { "other_key" => "value" }
+      expect(parameter.item_type).to be_nil
     end
 
-    context "when @items['type'] has a value" do
-      it "returns the type as a symbol" do
-        parameter = described_class.new("test_param", type: "array")
-        parameter.items = { "type" => "string" }
-        expect(parameter.item_type).to eq(:string)
-      end
+    it "when type is an array and item is not defined it will return nill" do
+      parameter = described_class.new("test_param", type: "array")
+      expect(parameter.item_type).to be_nil
+    end
+
+    it "when @items['type'] has a value it will returns the type as a symbol" do
+      parameter = described_class.new("test_param", type: "array")
+      parameter.items = { "type" => "string" }
+      expect(parameter.item_type).to eq(:string)
     end
   end
 
@@ -47,7 +44,7 @@ RSpec.describe RubyLLM::MCP::Parameter do
       parameter = described_class.new("test_param", type: "array", desc: "Test description", required: false)
       expect(parameter.name).to eq("test_param")
       expect(parameter.type).to eq(:array)
-      expect(parameter.desc).to eq("Test description")
+      expect(parameter.description).to eq("Test description")
       expect(parameter.required).to be(false)
     end
   end
