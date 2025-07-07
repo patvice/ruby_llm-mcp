@@ -33,8 +33,18 @@ module RubyLLM
 
     def establish_connection(&)
       clients.each(&:start)
-      yield clients
-    ensure
+      if block_given?
+        begin
+          yield clients
+        ensure
+          close_connection
+        end
+      else
+        clients
+      end
+    end
+
+    def close_connection
       clients.each do |client|
         client.stop if client.alive?
       end

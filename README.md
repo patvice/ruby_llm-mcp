@@ -399,6 +399,23 @@ end
 
 You can also avoid this completely manually start and stop the clients if you so choose.
 
+If you want to use the clients outside of the block, you can use the `clients` method to get the clients.
+
+```ruby
+clients = RubyLLM::MCP.establish_connection
+chat = RubyLLM.chat(model: "gpt-4")
+chat.with_tools(*clients.tools)
+
+response = chat.ask("Hello, world!")
+puts response
+```
+
+However, you will be responsible for closing the connection when you are done with it.
+
+```ruby
+RubyLLM::MCP.close_connection
+```
+
 ## Client Lifecycle Management
 
 You can manage the MCP client connection lifecycle:

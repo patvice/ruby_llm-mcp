@@ -118,6 +118,95 @@ RSpec.describe RubyLLM::MCP do
     end
   end
 
+  describe "#establish_connection" do
+    let(:client_streamable_http) { instance_double(RubyLLM::MCP::Client) }
+    let(:client_stdio) { instance_double(RubyLLM::MCP::Client) }
+    let(:clients) { [client_streamable_http, client_stdio] }
+
+    before do
+      allow(RubyLLM::MCP).to receive(:clients).and_return(clients)
+      allow(client_streamable_http).to receive(:start)
+      allow(client_stdio).to receive(:start)
+      allow(client_streamable_http).to receive(:alive?).and_return(true)
+      allow(client_stdio).to receive(:alive?).and_return(true)
+      allow(client_streamable_http).to receive(:stop)
+      allow(client_stdio).to receive(:stop)
+    end
+
+    it "starts all clients" do
+      RubyLLM::MCP.establish_connection
+
+      expect(client_streamable_http).to have_received(:start)
+      expect(client_stdio).to have_received(:start)
+    end
+
+    it "returns clients when no block given" do
+      result = RubyLLM::MCP.establish_connection
+
+      expect(result).to eq(clients)
+    end
+
+    context "when block is given" do
+      it "yields clients to the block" do
+        yielded_clients = nil
+        RubyLLM::MCP.establish_connection do |c|
+          yielded_clients = c
+        end
+
+        expect(yielded_clients).to eq(clients)
+      end
+
+      it "calls close_connection after the block executes" do
+        RubyLLM::MCP.establish_connection { |_c| "test" }
+
+        expect(client_streamable_http).to have_received(:stop)
+        expect(client_stdio).to have_received(:stop)
+      end
+
+      it "calls close_connection even if block raises an exception" do
+        expect do
+          RubyLLM::MCP.establish_connection { |_c| raise "test error" }
+        end.to raise_error("test error")
+
+        expect(client_streamable_http).to have_received(:stop)
+        expect(client_stdio).to have_received(:stop)
+      end
+    end
+  end
+
+  describe "#close_connection" do
+    let(:alive_client) { instance_double(RubyLLM::MCP::Client) }
+    let(:dead_client) { instance_double(RubyLLM::MCP::Client) }
+    let(:clients) { [alive_client, dead_client] }
+
+    before do
+      allow(RubyLLM::MCP).to receive(:clients).and_return(clients)
+      allow(alive_client).to receive(:alive?).and_return(true)
+      allow(dead_client).to receive(:alive?).and_return(false)
+      allow(alive_client).to receive(:stop)
+      allow(dead_client).to receive(:stop)
+    end
+
+    it "stops all alive clients" do
+      RubyLLM::MCP.close_connection
+
+      expect(alive_client).to have_received(:stop)
+    end
+
+    it "does not stop clients that are not alive" do
+      RubyLLM::MCP.close_connection
+
+      expect(dead_client).not_to have_received(:stop)
+    end
+
+    it "checks alive status of all clients" do
+      RubyLLM::MCP.close_connection
+
+      expect(alive_client).to have_received(:alive?)
+      expect(dead_client).to have_received(:alive?)
+    end
+  end
+
   describe "#tools" do
     let(:add) { instance_double(RubyLLM::MCP::Tool, name: "add") }
     let(:sub) { instance_double(RubyLLM::MCP::Tool, name: "sub") }
