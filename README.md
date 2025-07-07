@@ -14,6 +14,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
 - 🎛️ **Client Features**: Support for sampling and roots
 - 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
+- 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously for different servers and purposes
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 
 ## Installation
