@@ -15,7 +15,7 @@ module RubyLLM
       end
 
       def item_type
-        @items["type"]&.to_sym
+        @items&.dig("type")&.to_sym
       end
 
       def as_json(*_args)
