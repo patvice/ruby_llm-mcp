@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-description: "RubyLLM MCP is a full-featured Ruby Client for the Model Context Protocol (MCP)."
+description: "RubyLLM::MCP is a full-featured Ruby Client for the Model Context Protocol (MCP)."
 permalink: /
 ---
 
