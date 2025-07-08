@@ -13,6 +13,7 @@ module RubyLLM
       config.map do |options|
         @clients[options[:name]] ||= Client.new(**options)
       end
+      @clients
     end
 
     def add_client(options)
