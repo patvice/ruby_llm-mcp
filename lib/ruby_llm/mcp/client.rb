@@ -172,6 +172,28 @@ module RubyLLM
         self
       end
 
+      def to_h
+        {
+          name: @name,
+          transport_type: @transport_type,
+          request_timeout: @request_timeout,
+          start: @start,
+          config: @config,
+          on: @on,
+          tools: @tools,
+          resources: @resources,
+          resource_templates: @resource_templates,
+          prompts: @prompts,
+          log_level: @log_level
+        }
+      end
+
+      alias as_json to_h
+
+      def inspect
+        "#<#{self.class.name}:0x#{object_id.to_s(16)} #{to_h.map { |k, v| "#{k}: #{v}" }.join(', ')}>"
+      end
+
       private
 
       def setup_coordinator
