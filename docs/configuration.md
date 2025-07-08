@@ -34,6 +34,13 @@ RubyLLM::MCP.configure do |config|
   # Or use a custom logger
   config.logger = Logger.new(STDOUT)
 
+  # Paths to MCP servers
+  config.mcps_config_path = "../mcps.yml"
+
+  # Connection Pool for HTTP and SSE transports
+  config.max_connections = 10
+  config.pool_timeout = 5
+
   # Configure roots for filesystem access
   config.roots = ["/path/to/project", Rails.root]
 
