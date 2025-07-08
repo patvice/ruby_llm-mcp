@@ -5,7 +5,7 @@ email: patrickgvice@gmail.com
 description: >-
   A Ruby client for the Model Context Protocol (MCP) that seamlessly integrates with RubyLLM.
 baseurl: "/"
-url: "https://rubyllm-mcp.com"
+url: "https://www.rubyllm-mcp.com"
 
 theme: just-the-docs
 plugins:
@@ -14,7 +14,7 @@ plugins:
 
 # Just the Docs settings
 
-logo: /assets/images/rubyllm-mcp-logo-type.svg
+logo: "/assets/images/rubyllm-mcp-logo-text.svg"
 favicon_ico: "/assets/images/favicon/favicon.ico"
 favicon_png: "/assets/images/favicon/favicon-96x96.png"
 favicon_svg: "/assets/images/favicon/favicon.svg"
@@ -29,12 +29,6 @@ search:
   tokenizer_separator: /[\s/]+/
   rel_url: true
   button: false
-
-# Navigation structure
-nav_external_links:
-  - title: GitHub
-    url: https://github.com/crmne/ruby_llm
-    hide_icon: false
 
 back_to_top: true
 back_to_top_text: "Back to top"
