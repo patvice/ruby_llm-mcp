@@ -10,7 +10,7 @@
 
 This project is a Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), designed to work seamlessly with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources and prompts as part of LLM conversations.
 
-For a more detailed guide, see the RubyLLM::MCP [docs](https://rubyllm-mcp.com/).
+For a more detailed guide, see the [RubyLLM::MCP docs](https://rubyllm-mcp.com/).
 
 ## RubyLLM::MCP Features
 
