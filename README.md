@@ -1,4 +1,4 @@
-<img src="/docs/assets/images/logotype.svg" alt="RubyLLM" height="120" width="250">
+<img src="/docs/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM" height="120" width="250">
 
 
 <div class="badge-container">

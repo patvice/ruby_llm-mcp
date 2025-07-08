@@ -7,7 +7,7 @@ permalink: /
 ---
 
 <div class="logo-container">
-  <img src="/assets/images/rubyllm-mcp-logo-type.svg" alt="RubyLLM" height="120" width="250">
+  <img src="/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM" height="120" width="250">
   <iframe src="https://ghbtns.com/github-btn.html?user=patvice&repo=ruby_llm-mcp&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub" style="vertical-align: middle; display: inline-block;"></iframe>
 </div>
 
