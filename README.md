@@ -1,16 +1,17 @@
 <img src="/docs/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM" height="120" width="250">
 
-
-<div class="badge-container">
-  <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
-  <a href="https://rubygems.org/gems/ruby_llm-mcp"><img alt="Gem Downloads" src="https://img.shields.io/gem/dt/ruby_llm-mcp"></a>
-</div>
-
 **Aiming to make using MCPs with RubyLLM and Ruby as easy as possible.**
 
 This project is a Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), designed to work seamlessly with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources and prompts as part of LLM conversations.
 
 For a more detailed guide, see the [RubyLLM::MCP docs](https://rubyllm-mcp.com/).
+
+Currently full support for MCP protocol version up to `2025-03-26`.
+
+<div class="badge-container">
+  <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
+  <a href="https://rubygems.org/gems/ruby_llm-mcp"><img alt="Gem Downloads" src="https://img.shields.io/gem/dt/ruby_llm-mcp"></a>
+</div>
 
 ## RubyLLM::MCP Features
 

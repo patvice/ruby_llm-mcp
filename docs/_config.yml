@@ -1,6 +1,6 @@
 
 
-title: RubyLLM MCP
+title: RubyLLM::MCP
 email: patrickgvice@gmail.com
 description: >-
   A Ruby client for the Model Context Protocol (MCP) that seamlessly integrates with RubyLLM.
@@ -36,8 +36,14 @@ back_to_top_text: "Back to top"
 # Footer content
 footer_content: "Copyright &copy; 2025 <a href='https://patrickvice.com'>Patrick Vice</a>. Distributed under an <a href=\"https://github.com/patvice/ruby_llm-mcp/tree/main/LICENSE\">MIT license.</a>"
 
-# Enable navigation
+# navigation
 nav_enabled: true
+
+nav_external_links:
+  - title: Github
+    url: https://github.com/patvice/ruby_llm-mcp
+    hide_icon: false # set to true to hide the external link icon - defaults to false
+    opens_in_new_tab: false # set to true to open this link in a new tab - defaults to false
 
 # Make Anchor links show on hover
 heading_anchors: true
