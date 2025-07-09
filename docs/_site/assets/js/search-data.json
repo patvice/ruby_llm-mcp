@@ -1,0 +1,779 @@
+{"0": {
+    "doc": "Configuration",
+    "title": "Configuration",
+    "content": "This covers all the configuration options available for RubyLLM MCP clients, including transport settings, connection options, and advanced features. ",
+    "url": "/configuration.html",
+    
+    "relUrl": "/configuration.html"
+  },"1": {
+    "doc": "Configuration",
+    "title": "Table of contents",
+    "content": ". | Global Configuration | Client Configuration . | Basic Client Options | Transport-Specific Configuration . | STDIO Transport | SSE Transport | Streamable HTTP Transport | . | . | Advanced Configuration . | Request Timeout | Manual Connection Control | Complex Parameter Support | . | Logging Configuration . | Basic Logging | Custom Logger | Log Levels | . | Sampling Configuration | Roots Configuration | Environment-Specific Configuration . | Development Configuration | Production Configuration | . | Error Handling Configuration . | Timeout Handling | Connection Error Handling | . | Configuration Best Practices . | 1. Use Environment Variables | 2. Validate Configuration | 3. Use Separate Configurations | 4. Connection Pooling | . | Next Steps | . ",
+    "url": "/configuration.html#table-of-contents",
+    
+    "relUrl": "/configuration.html#table-of-contents"
+  },"2": {
+    "doc": "Configuration",
+    "title": "Global Configuration",
+    "content": "Configure RubyLLM MCP globally before creating clients: . RubyLLM::MCP.configure do |config| # Enable complex parameter support config.support_complex_parameters! # Set logging options config.log_file = $stdout config.log_level = Logger::INFO # Or use a custom logger config.logger = Logger.new(STDOUT) # Paths to MCP servers config.mcps_config_path = \"../mcps.yml\" # Connection Pool for HTTP and SSE transports config.max_connections = 10 config.pool_timeout = 5 # Configure roots for filesystem access config.roots = [\"/path/to/project\", Rails.root] # Configure sampling config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" end . ",
+    "url": "/configuration.html#global-configuration",
+    
+    "relUrl": "/configuration.html#global-configuration"
+  },"3": {
+    "doc": "Configuration",
+    "title": "Client Configuration",
+    "content": "Basic Client Options . All MCP clients support these common options: . client = RubyLLM::MCP.client( name: \"unique-client-name\", # Required: unique identifier transport_type: :stdio, # Required: :stdio, :sse, or :streamable start: true, # Optional: auto-start connection (default: true) request_timeout: 8000, # Optional: timeout in milliseconds (default: 8000) config: { # Required: transport-specific configuration # See transport sections below } ) . Transport-Specific Configuration . STDIO Transport . Best for local MCP servers or command-line tools: . client = RubyLLM::MCP.client( name: \"local-server\", transport_type: :stdio, config: { command: \"python\", # Required: command to run args: [\"-m\", \"my_mcp_server\"], # Optional: command arguments env: { # Optional: environment variables \"DEBUG\" =&gt; \"1\", \"PATH\" =&gt; \"/custom/path\" } } ) . Common STDIO configurations: . # Node.js MCP server config: { command: \"node\", args: [\"server.js\"], env: { \"NODE_ENV\" =&gt; \"production\" } } # Python MCP server config: { command: \"python\", args: [\"-m\", \"mcp_server\"], env: { \"PYTHONPATH\" =&gt; \"/path/to/modules\" } } # NPX package config: { command: \"npx\", args: [\"@modelcontextprotocol/server-filesystem\", \"/path/to/directory\"] } . SSE Transport . Best for web-based MCP servers using Server-Sent Events: . client = RubyLLM::MCP.client( name: \"web-server\", transport_type: :sse, config: { url: \"https://api.example.com/mcp/sse\", # Required: SSE endpoint headers: { # Optional: HTTP headers \"Authorization\" =&gt; \"Bearer #{ENV['API_TOKEN']}\", \"User-Agent\" =&gt; \"MyApp/1.0\" } } ) . Streamable HTTP Transport . Best for HTTP-based MCP servers that support streaming: . client = RubyLLM::MCP.client( name: \"streaming-server\", transport_type: :streamable, config: { url: \"https://api.example.com/mcp\", # Required: HTTP endpoint headers: { # Optional: HTTP headers \"Authorization\" =&gt; \"Bearer #{ENV['API_TOKEN']}\", \"Content-Type\" =&gt; \"application/json\" } } ) . ",
+    "url": "/configuration.html#client-configuration",
+    
+    "relUrl": "/configuration.html#client-configuration"
+  },"4": {
+    "doc": "Configuration",
+    "title": "Advanced Configuration",
+    "content": "Request Timeout . Control how long to wait for responses: . client = RubyLLM::MCP.client( name: \"slow-server\", transport_type: :stdio, request_timeout: 30000, # 30 seconds config: { command: \"slow-mcp-server\" } ) . Manual Connection Control . Create clients without auto-starting: . client = RubyLLM::MCP.client( name: \"manual-server\", transport_type: :stdio, start: false, # Don't start automatically config: { command: \"mcp-server\" } ) # Start when ready client.start # Check status puts client.alive? # Restart if needed client.restart! # Stop when done client.stop . Complex Parameter Support . Enable support for complex parameters like arrays and nested objects: . RubyLLM::MCP.configure do |config| config.support_complex_parameters! end # Now you can use complex parameters in tools result = client.execute_tool( name: \"complex_tool\", parameters: { items: [ { name: \"item1\", value: 100 }, { name: \"item2\", value: 200 } ], options: { sort: true, filter: { category: \"active\" } } } ) . ",
+    "url": "/configuration.html#advanced-configuration",
+    
+    "relUrl": "/configuration.html#advanced-configuration"
+  },"5": {
+    "doc": "Configuration",
+    "title": "Logging Configuration",
+    "content": "Basic Logging . RubyLLM::MCP.configure do |config| config.log_file = $stdout config.log_level = Logger::INFO end . Custom Logger . # File-based logging logger = Logger.new(\"mcp.log\") logger.level = Logger::DEBUG RubyLLM::MCP.configure do |config| config.logger = logger end . Log Levels . Available log levels: . | Logger::DEBUG - Detailed debugging information | Logger::INFO - General information | Logger::WARN - Warning messages | Logger::ERROR - Error messages only | Logger::FATAL - Fatal errors only | . ",
+    "url": "/configuration.html#logging-configuration",
+    
+    "relUrl": "/configuration.html#logging-configuration"
+  },"6": {
+    "doc": "Configuration",
+    "title": "Sampling Configuration",
+    "content": "Enable MCP servers to use your LLM for their own requests: . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" # Or use dynamic model selection config.sampling.preferred_model do |model_preferences| # Use the server's preferred model if available model_preferences.hints.first || \"gpt-4\" end # Add guards to control what gets processed config.sampling.guard do |sample| # Only allow samples containing \"Hello\" sample.message.include?(\"Hello\") end end . ",
+    "url": "/configuration.html#sampling-configuration",
+    
+    "relUrl": "/configuration.html#sampling-configuration"
+  },"7": {
+    "doc": "Configuration",
+    "title": "Roots Configuration",
+    "content": "Provide filesystem access to MCP servers: . RubyLLM::MCP.configure do |config| config.roots = [ \"/path/to/project\", Rails.root, Pathname.new(\"/another/path\") ] end # Access roots in your client client = RubyLLM::MCP.client(...) puts client.roots.paths # =&gt; [\"/path/to/project\", \"/path/to/rails/root\", \"/another/path\"] # Modify roots at runtime client.roots.add(\"/new/path\") client.roots.remove(\"/old/path\") . ",
+    "url": "/configuration.html#roots-configuration",
+    
+    "relUrl": "/configuration.html#roots-configuration"
+  },"8": {
+    "doc": "Configuration",
+    "title": "Environment-Specific Configuration",
+    "content": "Development Configuration . if Rails.env.development? RubyLLM::MCP.configure do |config| config.log_level = Logger::DEBUG config.sampling.enabled = true config.roots = [Rails.root] end end . Production Configuration . if Rails.env.production? RubyLLM::MCP.configure do |config| config.log_level = Logger::ERROR config.logger = Logger.new(\"/var/log/mcp.log\") config.sampling.enabled = false end end . ",
+    "url": "/configuration.html#environment-specific-configuration",
+    
+    "relUrl": "/configuration.html#environment-specific-configuration"
+  },"9": {
+    "doc": "Configuration",
+    "title": "Error Handling Configuration",
+    "content": "Timeout Handling . client = RubyLLM::MCP.client( name: \"timeout-server\", transport_type: :stdio, request_timeout: 5000, config: { command: \"slow-server\" } ) begin result = client.execute_tool(name: \"slow_tool\", parameters: {}) rescue RubyLLM::MCP::Errors::TimeoutError =&gt; e puts \"Request timed out: #{e.message}\" end . Connection Error Handling . begin client = RubyLLM::MCP.client( name: \"failing-server\", transport_type: :stdio, config: { command: \"nonexistent-command\" } ) rescue RubyLLM::MCP::Errors::TransportError =&gt; e puts \"Failed to start server: #{e.message}\" end . ",
+    "url": "/configuration.html#error-handling-configuration",
+    
+    "relUrl": "/configuration.html#error-handling-configuration"
+  },"10": {
+    "doc": "Configuration",
+    "title": "Configuration Best Practices",
+    "content": "1. Use Environment Variables . client = RubyLLM::MCP.client( name: \"api-server\", transport_type: :sse, config: { url: ENV.fetch(\"MCP_SERVER_URL\"), headers: { \"Authorization\" =&gt; \"Bearer #{ENV.fetch('MCP_API_TOKEN')}\" } } ) . 2. Validate Configuration . def create_mcp_client(name, config) required_keys = %w[url headers] missing_keys = required_keys - config.keys raise ArgumentError, \"Missing keys: #{missing_keys}\" unless missing_keys.empty? RubyLLM::MCP.client( name: name, transport_type: :sse, config: config ) end . 3. Use Separate Configurations . # config/mcp.yml development: filesystem: transport_type: stdio command: npx args: [\"@modelcontextprotocol/server-filesystem\", \".\"] production: api_server: transport_type: sse url: \"https://api.example.com/mcp/sse\" headers: Authorization: \"Bearer &lt;%= ENV['API_TOKEN'] %&gt;\" . 4. Connection Pooling . class MCPClientPool def initialize(configs) @clients = configs.map do |name, config| [name, RubyLLM::MCP.client(name: name, **config)] end.to_h end def client(name) @clients[name] || raise(\"Client #{name} not found\") end def all_tools @clients.values.flat_map(&amp;:tools) end end . ",
+    "url": "/configuration.html#configuration-best-practices",
+    
+    "relUrl": "/configuration.html#configuration-best-practices"
+  },"11": {
+    "doc": "Configuration",
+    "title": "Next Steps",
+    "content": ". | Tools - Working with MCP tools | Resources - Managing resources and templates | Rails Integration - Using MCP with Rails | . ",
+    "url": "/configuration.html#next-steps",
+    
+    "relUrl": "/configuration.html#next-steps"
+  },"12": {
+    "doc": "Basics",
+    "title": "Getting Started",
+    "content": "This guide covers the fundamentals of getting started with RubyLLM MCP, including installation, basic setup, and your first MCP client connection. This will expect you to have a basic knowleage of RubyLLM. If you want to fill in the gaps, you can read the RubyLLM Getting Started guide. ",
+    "url": "/guides/getting-started.html#getting-started",
+    
+    "relUrl": "/guides/getting-started.html#getting-started"
+  },"13": {
+    "doc": "Basics",
+    "title": "Table of contents",
+    "content": ". | Installation . | Prerequisites | Installing the Gem | . | Basic Setup . | Configure RubyLLM | Your First MCP Client | . | Basic Usage . | Using MCP Tools | Manual Tool Execution | Working with Resources | . | Connection Management . | Manual Connection Control | Health Checks | . | Error Handling | Next Steps | Common Patterns . | Multiple Clients | Combining Features | . | . ",
+    "url": "/guides/getting-started.html#table-of-contents",
+    
+    "relUrl": "/guides/getting-started.html#table-of-contents"
+  },"14": {
+    "doc": "Basics",
+    "title": "Installation",
+    "content": "Prerequisites . | Ruby 3.1.3 or higher | RubyLLM gem installed | An LLM provider API key (OpenAI, Anthropic, or Google) | . Installing the Gem . Add RubyLLM MCP to your project: . bundle add ruby_llm-mcp . Or add to your Gemfile: . gem 'ruby_llm-mcp' . Then install: . bundle install . ",
+    "url": "/guides/getting-started.html#installation",
+    
+    "relUrl": "/guides/getting-started.html#installation"
+  },"15": {
+    "doc": "Basics",
+    "title": "Basic Setup",
+    "content": "Configure RubyLLM . First, configure RubyLLM with your preferred provider: . require 'ruby_llm/mcp' # For OpenAI RubyLLM.configure do |config| config.openai_api_key = \"your-openai-key\" end . Your First MCP Client . Create a connection to an MCP server: . # Connect to a local MCP server via stdio client = RubyLLM::MCP.client( name: \"my-first-server\", transport_type: :stdio, config: { command: \"npx\", args: [\"@modelcontextprotocol/server-filesystem\", \"/path/to/directory\"] } ) # Check if the connection is alive puts client.alive? # =&gt; true . ",
+    "url": "/guides/getting-started.html#basic-setup",
+    
+    "relUrl": "/guides/getting-started.html#basic-setup"
+  },"16": {
+    "doc": "Basics",
+    "title": "Basic Usage",
+    "content": "Using MCP Tools . MCP tools are automatically converted into RubyLLM-compatible tools: . # Get all available tools tools = client.tools puts \"Available tools:\" tools.each do |tool| puts \"- #{tool.name}: #{tool.description}\" end # Use tools in a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*client.tools) response = chat.ask(\"List the files in the current directory\") puts response . Manual Tool Execution . You can also execute tools directly: . # Execute a specific tool result = client.execute_tool( name: \"read_file\", parameters: { path: \"README.md\" } ) puts result . Working with Resources . Resources provide static or dynamic data for conversations: . # Get available resources resources = client.resources puts \"Available resources:\" resources.each do |resource| puts \"- #{resource.name}: #{resource.description}\" end # Use a resource in a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_resource(client.resource(\"project_structure\")) response = chat.ask(\"What is the structure of this project?\") puts response . ",
+    "url": "/guides/getting-started.html#basic-usage",
+    
+    "relUrl": "/guides/getting-started.html#basic-usage"
+  },"17": {
+    "doc": "Basics",
+    "title": "Connection Management",
+    "content": "Manual Connection Control . You can control the connection lifecycle manually: . # Create a client without starting it client = RubyLLM::MCP.client( name: \"my-server\", transport_type: :stdio, start: false, config: { command: \"node\", args: [\"server.js\"] } ) # Start the connection client.start # Check if it's alive puts client.alive? # =&gt; true # Restart if needed client.restart! # Stop the connection client.stop . Health Checks . Monitor your MCP server connection via ping: . # Ping the server to see if you can successful communicate with it the MCP server if client.ping puts \"Server is responsive\" else puts \"Server is not responding\" end # Check connection is still marked as alive puts \"Connection alive: #{client.alive?}\" . ",
+    "url": "/guides/getting-started.html#connection-management",
+    
+    "relUrl": "/guides/getting-started.html#connection-management"
+  },"18": {
+    "doc": "Basics",
+    "title": "Error Handling",
+    "content": "Handle common errors when working with MCP: . begin client = RubyLLM::MCP.client( name: \"my-server\", transport_type: :stdio, config: { command: \"nonexistent-command\" } ) rescue RubyLLM::MCP::Errors::TransportError =&gt; e puts \"Failed to connect: #{e.message}\" end # Handle tool execution errors begin result = client.execute_tool( name: \"nonexistent_tool\", parameters: {} ) rescue RubyLLM::MCP::Errors::ToolError =&gt; e puts \"Tool error: #{e.message}\" end . ",
+    "url": "/guides/getting-started.html#error-handling",
+    
+    "relUrl": "/guides/getting-started.html#error-handling"
+  },"19": {
+    "doc": "Basics",
+    "title": "Next Steps",
+    "content": "Now that you have the basics down, explore these topics: . | Configuration - Advanced client configuration | Tools - Deep dive into MCP tools | Resources - Working with resources and templates | Prompts - Using predefined prompts | . ",
+    "url": "/guides/getting-started.html#next-steps",
+    
+    "relUrl": "/guides/getting-started.html#next-steps"
+  },"20": {
+    "doc": "Basics",
+    "title": "Common Patterns",
+    "content": "Multiple Clients . Manage multiple MCP servers simultaneously: . # Create multiple clients file_client = RubyLLM::MCP.client( name: \"filesystem\", transport_type: :stdio, config: { command: \"npx\", args: [\"@modelcontextprotocol/server-filesystem\", \"/\"] } ) api_client = RubyLLM::MCP.client( name: \"api-server\", transport_type: :sse, config: { url: \"https://api.example.com/mcp/sse\" } ) # Use tools from both clients chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*file_client.tools, *api_client.tools) response = chat.ask(\"Read the config file and make an API call\") puts response . Combining Features . Use tools, resources, and prompts together: . chat = RubyLLM.chat(model: \"gpt-4\") # Add tools for capabilities chat.with_tools(*client.tools) # Add resources for context chat.with_resource(client.resource(\"project_overview\")) # Add prompts for guidance chat.with_prompt( client.prompt(\"analysis_template\"), arguments: { focus: \"performance\" } ) response = chat.ask(\"Analyze the project\") puts response . ",
+    "url": "/guides/getting-started.html#common-patterns",
+    
+    "relUrl": "/guides/getting-started.html#common-patterns"
+  },"21": {
+    "doc": "Basics",
+    "title": "Basics",
+    "content": " ",
+    "url": "/guides/getting-started.html",
+    
+    "relUrl": "/guides/getting-started.html"
+  },"22": {
+    "doc": "Guides",
+    "title": "Guides",
+    "content": "This section contains guides for using RubyLLM MCP. ",
+    "url": "/guides/",
+    
+    "relUrl": "/guides/"
+  },"23": {
+    "doc": "Guides",
+    "title": "Getting Started",
+    "content": ". | Getting Started - Get up and running quickly | Configuration - Configure clients and transports | Rails Integration - Use with Rails applications | Transports - Build custom transport implementations | . ",
+    "url": "/guides/#getting-started",
+    
+    "relUrl": "/guides/#getting-started"
+  },"24": {
+    "doc": "Server Interactions",
+    "title": "Server Interactions",
+    "content": "Server interactions encompass all the capabilities that MCP servers provide to enhance your applications. These are the features that servers expose to clients, enabling rich functionality through tools, resources, prompts, and real-time notifications. ",
+    "url": "/server/",
+    
+    "relUrl": "/server/"
+  },"25": {
+    "doc": "Server Interactions",
+    "title": "Overview",
+    "content": "MCP servers offer four main types of interactions: . | Tools - Server-side operations that can be executed by LLMs | Resources - Static and dynamic data that can be included in conversations | Prompts - Pre-defined prompts with arguments for consistent interactions | Notifications - Real-time updates from servers about ongoing operations | . ",
+    "url": "/server/#overview",
+    
+    "relUrl": "/server/#overview"
+  },"26": {
+    "doc": "Server Interactions",
+    "title": "Table of contents",
+    "content": ". | Overview | | Server Capabilities . | Tools | Resources | Prompts | Notifications | . | Getting Started | Next Steps | . ",
+    "url": "/server/#table-of-contents",
+    
+    "relUrl": "/server/#table-of-contents"
+  },"27": {
+    "doc": "Server Interactions",
+    "title": "Server Capabilities",
+    "content": "Tools . Execute server-side operations like reading files, making API calls, or running calculations. Tools are automatically converted into RubyLLM-compatible tools for seamless LLM integration. Resources . Access structured data from files, databases, or dynamic sources. Resources can be static content or parameterized templates that generate content based on arguments. Prompts . Use pre-defined prompts with arguments to ensure consistent interactions across your application. Prompts help standardize common queries and maintain formatting consistency. Notifications . Handle real-time updates from servers including logging messages, progress tracking, and resource change notifications during long-running operations. ",
+    "url": "/server/#server-capabilities",
+    
+    "relUrl": "/server/#server-capabilities"
+  },"28": {
+    "doc": "Server Interactions",
+    "title": "Getting Started",
+    "content": "Explore each server interaction type to understand how to leverage MCP server capabilities: . | Tools - Execute server-side operations | Resources - Access and include data in conversations | Prompts - Use predefined prompts with arguments | Notifications - Handle real-time server updates | . ",
+    "url": "/server/#getting-started",
+    
+    "relUrl": "/server/#getting-started"
+  },"29": {
+    "doc": "Server Interactions",
+    "title": "Next Steps",
+    "content": "Once you understand server interactions, explore: . | Client Interactions - Client-side features like sampling and roots | Configuration - Advanced client configuration options | Rails Integration - Using MCP with Rails applications | . ",
+    "url": "/server/#next-steps",
+    
+    "relUrl": "/server/#next-steps"
+  },"30": {
+    "doc": "Home",
+    "title": "Key Features",
+    "content": ". | 🔌 Multiple Transport Types: Streamable HTTP, STDIO, and legacy SSE transports | 🛠️ Tool Integration: Automatically converts MCP tools into RubyLLM-compatible tools | 📄 Resource Management: Access and include MCP resources (files, data) and resource templates in conversations | 🎯 Prompt Integration: Use predefined MCP prompts with arguments for consistent interactions | 🎛️ Client Features: Support for sampling and roots | 🎨 Enhanced Chat Interface: Extended RubyLLM chat methods for seamless MCP integration | 🔄 Multiple Client Management: Create and manage multiple MCP clients simultaneously | 📚 Simple API: Easy-to-use interface that integrates seamlessly with RubyLLM | 🚀 Rails Integration: Built-in Rails support with generators and configuration | . ",
+    "url": "/#key-features",
+    
+    "relUrl": "/#key-features"
+  },"31": {
+    "doc": "Home",
+    "title": "Installation",
+    "content": "bundle add ruby_llm-mcp . Or add to your Gemfile: . gem 'ruby_llm-mcp' . ",
+    "url": "/#installation",
+    
+    "relUrl": "/#installation"
+  },"32": {
+    "doc": "Home",
+    "title": "Quick Start",
+    "content": "require 'ruby_llm/mcp' # Configure RubyLLM RubyLLM.configure do |config| config.openai_api_key = \"your-api-key\" end # Connect to an MCP server client = RubyLLM::MCP.client( name: \"filesystem\", transport_type: :stdio, config: { command: \"bunx\", args: [ \"@modelcontextprotocol/server-filesystem\", File.expand_path(\"..\", __dir__) ] } ) # Use MCP tools in a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*client.tools) response = chat.ask(\"Can you help me search for files in my project?\") puts response . ",
+    "url": "/#quick-start",
+    
+    "relUrl": "/#quick-start"
+  },"33": {
+    "doc": "Home",
+    "title": "Transport Types",
+    "content": "STDIO Transport . Best for local MCP servers or command-line tools: . client = RubyLLM::MCP.client( name: \"local-server\", transport_type: :stdio, config: { command: \"python\", args: [\"-m\", \"my_mcp_server\"], env: { \"DEBUG\" =&gt; \"1\" } } ) . Streamable HTTP Transport . Best for HTTP-based MCP servers that support streaming: . client = RubyLLM::MCP.client( name: \"streaming-server\", transport_type: :streamable, config: { url: \"https://your-mcp-server.com/mcp\", headers: { \"Authorization\" =&gt; \"Bearer your-token\" } } ) . SSE Transport . Best for web-based MCP servers: . client = RubyLLM::MCP.client( name: \"web-server\", transport_type: :sse, config: { url: \"https://your-mcp-server.com/mcp/sse\", headers: { \"Authorization\" =&gt; \"Bearer your-token\" } } ) . ",
+    "url": "/#transport-types",
+    
+    "relUrl": "/#transport-types"
+  },"34": {
+    "doc": "Home",
+    "title": "Core Concepts",
+    "content": "Tools . MCP tools are automatically converted into RubyLLM-compatible tools, enabling LLMs to execute server-side operations. Resources . Static or dynamic data that can be included in conversations - from files to API responses. Prompts . Pre-defined prompts with arguments for consistent interactions across your application. Notifications . Real-time updates from MCP servers including logging, progress, and resource changes. ",
+    "url": "/#core-concepts",
+    
+    "relUrl": "/#core-concepts"
+  },"35": {
+    "doc": "Home",
+    "title": "Getting Started",
+    "content": ". | Getting Started - Get up and running quickly | Configuration - Configure clients and transports | Rails Integration - Use with Rails applications | Transports - Build custom transport implementations | . ",
+    "url": "/#getting-started",
+    
+    "relUrl": "/#getting-started"
+  },"36": {
+    "doc": "Home",
+    "title": "Server Interactions",
+    "content": ". | Working with Tools - Execute server-side operations | Using Resources - Include data in conversations | Prompts - Use predefined prompts with arguments | Notifications - Handle real-time updates | . ",
+    "url": "/#server-interactions",
+    
+    "relUrl": "/#server-interactions"
+  },"37": {
+    "doc": "Home",
+    "title": "Client Interactions",
+    "content": ". | Sampling - Allow servers to use your LLM | Roots - Provide filesystem access to servers | . ",
+    "url": "/#client-interactions",
+    
+    "relUrl": "/#client-interactions"
+  },"38": {
+    "doc": "Home",
+    "title": "Examples",
+    "content": "Complete examples are available in the examples/ directory: . | Local MCP Server: Complete stdio transport example | SSE with GPT: Server-sent events with OpenAI | Resource Management: List and use resources | Prompt Integration: Use prompts with streamable transport | . ",
+    "url": "/#examples",
+    
+    "relUrl": "/#examples"
+  },"39": {
+    "doc": "Home",
+    "title": "Contributing",
+    "content": "We welcome contributions! Bug reports and pull requests are welcome on GitHub. ",
+    "url": "/#contributing",
+    
+    "relUrl": "/#contributing"
+  },"40": {
+    "doc": "Home",
+    "title": "License",
+    "content": "Released under the MIT License. ",
+    "url": "/#license",
+    
+    "relUrl": "/#license"
+  },"41": {
+    "doc": "Home",
+    "title": "Home",
+    "content": "A Ruby client for the Model Context Protocol (MCP) that seamlessly integrates with RubyLLM. This gem enables Ruby applications to connect to MCP servers and use their tools, resources, and prompts as part of LLM conversations. Currently full support for MCP protocol version up to 2025-03-26. Getting Started GitHub . ",
+    "url": "/",
+    
+    "relUrl": "/"
+  },"42": {
+    "doc": "Client Interactions",
+    "title": "Client Interactions",
+    "content": "Client interactions cover the features and capabilities that your MCP client provides to servers and manages locally. These are client-side features that enhance the MCP experience by enabling advanced functionality like sampling, filesystem access, and custom transport implementations. ",
+    "url": "/client/",
+    
+    "relUrl": "/client/"
+  },"43": {
+    "doc": "Client Interactions",
+    "title": "Overview",
+    "content": "MCP clients offer several key capabilities: . | Sampling - Allow servers to use your LLM for their own requests | Roots - Provide filesystem access to servers within specified directories | . ",
+    "url": "/client/#overview",
+    
+    "relUrl": "/client/#overview"
+  },"44": {
+    "doc": "Client Interactions",
+    "title": "Client Capabilities",
+    "content": "Sampling . Enable MCP servers to offload LLM requests to your client rather than making them directly. This allows servers to use your LLM connections and configurations while maintaining their own logic and workflows. Roots . Provide controlled filesystem access to MCP servers, allowing them to understand your project structure and access files within specified directories for more powerful and context-aware operations. Transports . Handle the communication protocol between your client and MCP servers. Use built-in transports or create custom implementations for specialized communication needs. ",
+    "url": "/client/#client-capabilities",
+    
+    "relUrl": "/client/#client-capabilities"
+  },"45": {
+    "doc": "Client Interactions",
+    "title": "Getting Started",
+    "content": "Explore each client interaction type to understand how to configure and use client-side features: . | Sampling - Allow servers to use your LLM | Roots - Provide filesystem access to servers | . ",
+    "url": "/client/#getting-started",
+    
+    "relUrl": "/client/#getting-started"
+  },"46": {
+    "doc": "Client Interactions",
+    "title": "Next Steps",
+    "content": "Once you understand client interactions, explore: . | Server Interactions - Working with server capabilities | Configuration - Advanced client configuration options | Rails Integration - Using MCP with Rails applications | . ",
+    "url": "/client/#next-steps",
+    
+    "relUrl": "/client/#next-steps"
+  },"47": {
+    "doc": "Notifications",
+    "title": "Notifications",
+    "content": "MCP notifications provide real-time updates from servers about ongoing operations, resource changes, and system events. This guide covers how to handle different types of notifications in your application. ",
+    "url": "/server/notifications.html",
+    
+    "relUrl": "/server/notifications.html"
+  },"48": {
+    "doc": "Notifications",
+    "title": "Table of contents",
+    "content": ". | Notifications . | Types of Notifications . | Logging Notifications | Progress Notifications | Resource Update Notifications | . | Logging Notifications . | Basic Logging Setup | Logging Levels | Filtering Logging by Level | Structured Logging | . | Progress Notifications . | Basic Progress Tracking | Progress with UI Updates | Progress with Timeouts | . | Resource Update Notifications . | Basic Resource Updates | Automatic Resource Refresh | Resource Change Notifications | . | Next Steps | . | . ",
+    "url": "/server/notifications.html#table-of-contents",
+    
+    "relUrl": "/server/notifications.html#table-of-contents"
+  },"49": {
+    "doc": "Notifications",
+    "title": "Types of Notifications",
+    "content": "Logging Notifications . Logging notifications allow MCP servers to send real-time log messages during tool execution. Progress Notifications . Progress notifications provide updates about the progress of long-running operations. Resource Update Notifications . Resource update notifications inform you when resources on the server have changed. ",
+    "url": "/server/notifications.html#types-of-notifications",
+    
+    "relUrl": "/server/notifications.html#types-of-notifications"
+  },"50": {
+    "doc": "Notifications",
+    "title": "Logging Notifications",
+    "content": "Basic Logging Setup . client = RubyLLM::MCP.client( name: \"filesystem\", transport_type: :stdio, config: { command: \"bunx\", args: [\"@modelcontextprotocol/server-filesystem\", \"/path/to/directory\"] } ) # Set up logging notification handler client.on_logging do |logging| puts \"#{logging.level.upcase}: #{logging.message}\" end # Execute a tool that produces logging tool = client.tool(\"long_running_operation\") result = tool.execute(operation: \"data_processing\") # Output might look like: # INFO: Starting data processing # INFO: Processing file 1 of 100 # WARNING: File corrupted, skipping # INFO: Processing complete . Logging Levels . Handle different logging levels: . # Handle all logging levels client.on_logging do |logging| case logging.level when RubyLLM::MCP::Logging::DEBUG puts \"🐛 DEBUG: #{logging.message}\" when RubyLLM::MCP::Logging::INFO puts \"ℹ️ INFO: #{logging.message}\" when RubyLLM::MCP::Logging::WARNING puts \"⚠️ WARNING: #{logging.message}\" when RubyLLM::MCP::Logging::ERROR puts \"❌ ERROR: #{logging.message}\" when RubyLLM::MCP::Logging::FATAL puts \"💀 FATAL: #{logging.message}\" end end . Filtering Logging by Level . # Only handle warning and error messages client.on_logging(RubyLLM::MCP::Logging::WARNING) do |logging| puts \"⚠️ #{logging.level.upcase}: #{logging.message}\" end # Only handle errors client.on_logging(RubyLLM::MCP::Logging::ERROR) do |logging| puts \"❌ ERROR: #{logging.message}\" # Log to file, send alert, etc. end . Structured Logging . # Create structured log entries client.on_logging do |logging| log_entry = { timestamp: Time.now.iso8601, level: logging.level, message: logging.message, source: \"mcp_server\" } # Send to your logging system Rails.logger.info(log_entry.to_json) end . ",
+    "url": "/server/notifications.html#logging-notifications-1",
+    
+    "relUrl": "/server/notifications.html#logging-notifications-1"
+  },"51": {
+    "doc": "Notifications",
+    "title": "Progress Notifications",
+    "content": "Basic Progress Tracking . # Set up progress notification handler client.on_progress do |progress| puts \"Progress: #{progress.progress}% - #{progress.message}\" end # Execute a tool that supports progress notifications tool = client.tool(\"large_file_processor\") result = tool.execute(file_path: \"/path/to/large/file.csv\") # Output might look like: # Progress: 25% - Processing data... # Progress: 50% - Validating records... # Progress: 75% - Generating report... # Progress: 100% - Complete . Progress with UI Updates . # Update a progress bar or UI element client.on_progress do |progress| # Update progress bar update_progress_bar(progress.progress) # Update status message update_status_message(progress.message) # Log progress Rails.logger.info(\"Progress: #{progress.progress}% - #{progress.message}\") end def update_progress_bar(percentage) # Update your UI progress bar bar_width = (percentage / 100.0 * 50).to_i bar = \"#\" * bar_width + \"-\" * (50 - bar_width) print \"\\r[#{bar}] #{percentage}%\" end def update_status_message(message) # Update status display puts \"\\nStatus: #{message}\" end . Progress with Timeouts . # Track progress with timeout handling class ProgressTracker def initialize(client) @client = client @last_progress = 0 @last_update = Time.now end def setup_tracking(timeout: 300) @client.on_progress do |progress| @last_progress = progress.progress @last_update = Time.now puts \"Progress: #{progress.progress}% - #{progress.message}\" # Check if we're stuck if stalled? puts \"⚠️ Progress appears stalled\" end end end private def stalled? Time.now - @last_update &gt; 60 # No progress for 60 seconds end end tracker = ProgressTracker.new(client) tracker.setup_tracking(timeout: 300) . ",
+    "url": "/server/notifications.html#progress-notifications-1",
+    
+    "relUrl": "/server/notifications.html#progress-notifications-1"
+  },"52": {
+    "doc": "Notifications",
+    "title": "Resource Update Notifications",
+    "content": "Basic Resource Updates . # Handle resource update notifications client.on_resource_updated do |resource_uri| puts \"Resource updated: #{resource_uri}\" # Refresh the resource in your cache refresh_resource_cache(resource_uri) end # Execute operations that might update resources tool = client.tool(\"modify_file\") result = tool.execute(path: \"config.json\", content: new_config) # Output: Resource updated: file:///path/to/config.json . Automatic Resource Refresh . # Automatically refresh resources when they change class ResourceManager def initialize(client) @client = client @cache = {} setup_update_handler end def resource(name) @cache[name] ||= @client.resource(name) end private def setup_update_handler @client.on_resource_updated do |resource_uri| # Find and refresh the cached resource @cache.each do |name, cached_resource| if cached_resource.uri == resource_uri puts \"Refreshing cached resource: #{name}\" @cache[name] = @client.resource(name, refresh: true) break end end end end end manager = ResourceManager.new(client) resource = manager.resource(\"config_file\") . Resource Change Notifications . # Handle different types of resource changes client.on_resource_updated do |resource_uri| case resource_uri when /\\.json$/ puts \"JSON configuration updated: #{resource_uri}\" reload_configuration when /\\.log$/ puts \"Log file updated: #{resource_uri}\" # Don't need to refresh log files usually else puts \"Unknown resource updated: #{resource_uri}\" # Generic refresh refresh_resource_cache(resource_uri) end end . ",
+    "url": "/server/notifications.html#resource-update-notifications-1",
+    
+    "relUrl": "/server/notifications.html#resource-update-notifications-1"
+  },"53": {
+    "doc": "Notifications",
+    "title": "Next Steps",
+    "content": ". | Sampling - Allow servers to use your LLM | Roots - Provide filesystem access to servers | Rails Integration - Complete Rails integration guide | . ",
+    "url": "/server/notifications.html#next-steps",
+    
+    "relUrl": "/server/notifications.html#next-steps"
+  },"54": {
+    "doc": "Prompts",
+    "title": "Prompts",
+    "content": "MCP prompts are predefined messages with arguments that can be used to create consistent interactions with LLMs. They provide a way to standardize common queries and ensure consistent formatting across your application. ",
+    "url": "/server/prompts.html",
+    
+    "relUrl": "/server/prompts.html"
+  },"55": {
+    "doc": "Prompts",
+    "title": "Table of contents",
+    "content": ". | Discovering Prompts . | Listing Available Prompts | Getting a Specific Prompt | Refreshing Prompt Cache | . | Using Prompts in Conversations . | Basic Prompt Usage | Direct Prompt Queries | Multiple Prompts | . | Prompt Arguments . | Required Arguments | Optional Arguments | Argument Validation | . | Argument Completion | Advanced Prompt Usage . | Conditional Prompts | Prompt Chaining | Prompt Templates | . | Working with Different Prompt Types . | Conversational Prompts | System Prompts | Task-Specific Prompts | Prompt Not Found | Argument Errors | Completion Errors | . | Next Steps | . ",
+    "url": "/server/prompts.html#table-of-contents",
+    
+    "relUrl": "/server/prompts.html#table-of-contents"
+  },"56": {
+    "doc": "Prompts",
+    "title": "Discovering Prompts",
+    "content": "Listing Available Prompts . client = RubyLLM::MCP.client( name: \"prompt-server\", transport_type: :stdio, config: { command: \"bunx\", args: [\"@modelcontextprotocol/server-prompts\", \"/path/to/prompts\"] } ) # Get all available prompts prompts = client.prompts puts \"Available prompts:\" prompts.each do |prompt| puts \"- #{prompt.name}: #{prompt.description}\" # Show arguments prompt.arguments.each do |arg| required = arg.required ? \" (required)\" : \"\" puts \" - #{arg.name}: #{arg.description}#{required}\" end end . Getting a Specific Prompt . # Get a specific prompt by name greeting_prompt = client.prompt(\"daily_greeting\") puts \"Prompt: #{greeting_prompt.name}\" puts \"Description: #{greeting_prompt.description}\" # Show prompt arguments greeting_prompt.arguments.each do |arg| puts \"Argument: #{arg.name}\" puts \" Description: #{arg.description}\" puts \" Required: #{arg.required}\" end . Refreshing Prompt Cache . # Refresh all prompts prompts = client.prompts(refresh: true) # Refresh a specific prompt prompt = client.prompt(\"daily_greeting\", refresh: true) . ",
+    "url": "/server/prompts.html#discovering-prompts",
+    
+    "relUrl": "/server/prompts.html#discovering-prompts"
+  },"57": {
+    "doc": "Prompts",
+    "title": "Using Prompts in Conversations",
+    "content": "Basic Prompt Usage . # Get a prompt greeting_prompt = client.prompt(\"daily_greeting\") # Use prompt in a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_prompt(greeting_prompt, arguments: { name: \"Alice\", time: \"morning\" }) response = chat.ask(\"Continue with the greeting\") puts response . Direct Prompt Queries . # Ask using a prompt directly chat = RubyLLM.chat(model: \"gpt-4\") response = chat.ask_prompt( client.prompt(\"code_review\"), arguments: { language: \"ruby\", focus: \"security\" } ) puts response . Multiple Prompts . # Use multiple prompts in a single conversation chat = RubyLLM.chat(model: \"gpt-4\") # Add context prompt chat.with_prompt( client.prompt(\"project_context\"), arguments: { project_type: \"web_application\" } ) # Add analysis prompt chat.with_prompt( client.prompt(\"analysis_template\"), arguments: { focus: \"performance\" } ) response = chat.ask(\"Analyze the project\") puts response . ",
+    "url": "/server/prompts.html#using-prompts-in-conversations",
+    
+    "relUrl": "/server/prompts.html#using-prompts-in-conversations"
+  },"58": {
+    "doc": "Prompts",
+    "title": "Prompt Arguments",
+    "content": "Required Arguments . prompt = client.prompt(\"user_report\") # Check required arguments required_args = prompt.arguments.select(&amp;:required) puts \"Required arguments:\" required_args.each do |arg| puts \"- #{arg.name}: #{arg.description}\" end # Use with all required arguments chat = RubyLLM.chat(model: \"gpt-4\") response = chat.ask_prompt(prompt, arguments: { user_id: \"12345\", date_range: \"last_30_days\" }) . Optional Arguments . prompt = client.prompt(\"search_query\") # Use with optional arguments chat = RubyLLM.chat(model: \"gpt-4\") response = chat.ask_prompt(prompt, arguments: { query: \"ruby programming\", limit: 10, # optional sort_by: \"relevance\" # optional }) . Argument Validation . def validate_prompt_arguments(prompt, arguments) required_args = prompt.arguments.select(&amp;:required).map(&amp;:name) provided_args = arguments.keys.map(&amp;:to_s) missing_args = required_args - provided_args unless missing_args.empty? raise ArgumentError, \"Missing required arguments: #{missing_args.join(', ')}\" end end # Use before calling prompt validate_prompt_arguments(prompt, arguments) response = chat.ask_prompt(prompt, arguments: arguments) . ",
+    "url": "/server/prompts.html#prompt-arguments",
+    
+    "relUrl": "/server/prompts.html#prompt-arguments"
+  },"59": {
+    "doc": "Prompts",
+    "title": "Argument Completion",
+    "content": "Some MCP servers support argument completion for prompts: . # Get completion suggestions for prompt arguments prompt = client.prompt(\"user_search\") # Complete a partial argument value suggestions = prompt.complete(\"username\", \"jo\") puts \"Suggestions: #{suggestions.values}\" puts \"Total matches: #{suggestions.total}\" puts \"Has more: #{suggestions.has_more}\" # Use suggestions in your application if suggestions.values.any? puts \"Did you mean:\" suggestions.values.each_with_index do |suggestion, index| puts \"#{index + 1}. #{suggestion}\" end end . ",
+    "url": "/server/prompts.html#argument-completion",
+    
+    "relUrl": "/server/prompts.html#argument-completion"
+  },"60": {
+    "doc": "Prompts",
+    "title": "Advanced Prompt Usage",
+    "content": "Conditional Prompts . # Use different prompts based on conditions def get_appropriate_prompt(client, user_role) case user_role when \"admin\" client.prompt(\"admin_dashboard\") when \"developer\" client.prompt(\"developer_workflow\") when \"user\" client.prompt(\"user_guide\") else client.prompt(\"general_help\") end end # Use in chat prompt = get_appropriate_prompt(client, \"developer\") chat = RubyLLM.chat(model: \"gpt-4\") response = chat.ask_prompt(prompt, arguments: { project: \"ruby_llm_mcp\", task: \"debugging\" }) . Prompt Chaining . # Chain prompts for complex workflows chat = RubyLLM.chat(model: \"gpt-4\") # Step 1: Initial analysis response1 = chat.ask_prompt( client.prompt(\"initial_analysis\"), arguments: { data: \"project_metrics\" } ) # Step 2: Detailed review based on initial analysis response2 = chat.ask_prompt( client.prompt(\"detailed_review\"), arguments: { initial_findings: response1, focus_areas: [\"performance\", \"security\"] } ) # Step 3: Generate recommendations response3 = chat.ask_prompt( client.prompt(\"recommendations\"), arguments: { analysis: response2 } ) puts response3 . Prompt Templates . # Create reusable prompt templates class PromptTemplate def initialize(client, prompt_name) @client = client @prompt_name = prompt_name @prompt = client.prompt(prompt_name) end def execute(chat, arguments = {}) validate_arguments(arguments) chat.ask_prompt(@prompt, arguments: arguments) end private def validate_arguments(arguments) required = @prompt.arguments.select(&amp;:required).map(&amp;:name) provided = arguments.keys.map(&amp;:to_s) missing = required - provided raise ArgumentError, \"Missing: #{missing.join(', ')}\" unless missing.empty? end end # Usage template = PromptTemplate.new(client, \"code_review\") chat = RubyLLM.chat(model: \"gpt-4\") response = template.execute(chat, { language: \"ruby\", focus: \"security\" }) . ",
+    "url": "/server/prompts.html#advanced-prompt-usage",
+    
+    "relUrl": "/server/prompts.html#advanced-prompt-usage"
+  },"61": {
+    "doc": "Prompts",
+    "title": "Working with Different Prompt Types",
+    "content": "Conversational Prompts . # Prompts designed for ongoing conversations chat = RubyLLM.chat(model: \"gpt-4\") # Start with a conversational prompt chat.with_prompt( client.prompt(\"friendly_assistant\"), arguments: { personality: \"helpful\", expertise: \"programming\" } ) # Continue the conversation response = chat.ask(\"How do I optimize Ruby code?\") puts response . System Prompts . # System-level prompts for setting behavior chat = RubyLLM.chat(model: \"gpt-4\") # Set system behavior chat.with_prompt( client.prompt(\"system_instructions\"), arguments: { role: \"code_reviewer\", standards: \"ruby_style_guide\" } ) # Now ask questions within that context response = chat.ask(\"Review this Ruby code: #{code}\") puts response . Task-Specific Prompts . # Prompts for specific tasks def perform_code_analysis(client, code, language) chat = RubyLLM.chat(model: \"gpt-4\") response = chat.ask_prompt( client.prompt(\"code_analysis\"), arguments: { code: code, language: language, analysis_type: \"comprehensive\" } ) response end # Use for different languages ruby_analysis = perform_code_analysis(client, ruby_code, \"ruby\") javascript_analysis = perform_code_analysis(client, js_code, \"javascript\") . Prompt Not Found . begin prompt = client.prompt(\"nonexistent_prompt\") rescue RubyLLM::MCP::Errors::PromptNotFound =&gt; e puts \"Prompt not found: #{e.message}\" end . Argument Errors . prompt = client.prompt(\"user_report\") begin chat = RubyLLM.chat(model: \"gpt-4\") response = chat.ask_prompt(prompt, arguments: { # Missing required argument user_id: \"12345\" }) rescue RubyLLM::MCP::Errors::PromptError =&gt; e puts \"Prompt error: #{e.message}\" puts \"Missing arguments: #{e.missing_arguments}\" if e.respond_to?(:missing_arguments) end . Completion Errors . begin suggestions = prompt.complete(\"invalid_argument\", \"value\") rescue RubyLLM::MCP::Errors::CompletionError =&gt; e puts \"Completion failed: #{e.message}\" end . ",
+    "url": "/server/prompts.html#working-with-different-prompt-types",
+    
+    "relUrl": "/server/prompts.html#working-with-different-prompt-types"
+  },"62": {
+    "doc": "Prompts",
+    "title": "Next Steps",
+    "content": ". | Notifications - Handle real-time updates | Sampling - Allow servers to use your LLM | Roots - Provide filesystem access to servers | . ",
+    "url": "/server/prompts.html#next-steps",
+    
+    "relUrl": "/server/prompts.html#next-steps"
+  },"63": {
+    "doc": "Rails Integration",
+    "title": "Rails Integration",
+    "content": "RubyLLM MCP provides seamless Rails integration through generators, automatic client management, and built-in patterns for common Rails use cases. ",
+    "url": "/guides/rails-integration.html",
+    
+    "relUrl": "/guides/rails-integration.html"
+  },"64": {
+    "doc": "Rails Integration",
+    "title": "Table of contents",
+    "content": ". | Installation and Setup . | Generator Installation | Generated Files . | config/initializers/ruby_llm_mcp.rb | config/mcps.yml | . | . | Client Management Strategies . | Automatic Client Management | Manual Client Management | . | Examples . | Background Job Integration | Advanced Job with Progress Tracking | Controller Integration for Basic Controller Usage | Streaming Controller | . | Next Steps | . ",
+    "url": "/guides/rails-integration.html#table-of-contents",
+    
+    "relUrl": "/guides/rails-integration.html#table-of-contents"
+  },"65": {
+    "doc": "Rails Integration",
+    "title": "Installation and Setup",
+    "content": "Generator Installation . Generate the initial configuration files: . rails generate ruby_llm:mcp:install . This creates: . | config/initializers/ruby_llm_mcp.rb - Main configuration | config/mcps.yml - MCP servers configuration | . Generated Files . config/initializers/ruby_llm_mcp.rb . RubyLLM::MCP.configure do |config| # Global configuration config.log_level = Rails.env.production? ? Logger::WARN : Logger::INFO config.logger = Rails.logger # Enable complex parameter support config.support_complex_parameters! # Configure roots for filesystem access config.roots = [Rails.root] if Rails.env.development? # Configure sampling (optional) config.sampling.enabled = false # Set to true to enable config.sampling.preferred_model = \"gpt-4\" config.sampling.guard do |sample| # Add your sampling validation logic here true end end # Choose your client management strategy RubyLLM::MCP.launch_control = :manual # or :automatic # For automatic client management, uncomment: # RubyLLM::MCP.launch_control = :automatic # RubyLLM::MCP.start_all_clients . config/mcps.yml . mcp_servers: filesystem: transport_type: stdio command: bunx args: - \"@modelcontextprotocol/server-filesystem\" - \"&lt;%= Rails.root %&gt;\" env: {} with_prefix: true # Example SSE server # api_server: # transport_type: sse # url: \"https://api.example.com/mcp/sse\" # headers: # Authorization: \"Bearer &lt;%= ENV['API_TOKEN'] %&gt;\" # Example streamable HTTP server # http_server: # transport_type: streamable # url: \"https://api.example.com/mcp\" # headers: # Authorization: \"Bearer &lt;%= ENV['API_TOKEN'] %&gt;\" . ",
+    "url": "/guides/rails-integration.html#installation-and-setup",
+    
+    "relUrl": "/guides/rails-integration.html#installation-and-setup"
+  },"66": {
+    "doc": "Rails Integration",
+    "title": "Client Management Strategies",
+    "content": "Automatic Client Management . For more basic use cases, you can run MCP clients and sub-processes directly along side your Rails application. Automatically starting clients is a good choice for most basic use cases, development, testing and getting started. # config/initializers/ruby_llm_mcp.rb RubyLLM::MCP.launch_control = :automatic RubyLLM::MCP.start_all_clients # Clients are automatically available throughout the application clients = RubyLLM::MCP.clients chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*clients.tools) . Manual Client Management . Due to the performace of LLMs, it’s likely that for production workloads you would want to that you will want to use LLM requests inside background job or streamable endpoints. Manual controller will give you more control over client connections and where they run. # config/initializers/ruby_llm_mcp.rb RubyLLM::MCP.launch_control = :manual # In your application code RubyLLM::MCP.establish_connection do |clients| chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*clients.tools) response = chat.ask(\"Analyze the project structure\") puts response end . ",
+    "url": "/guides/rails-integration.html#client-management-strategies",
+    
+    "relUrl": "/guides/rails-integration.html#client-management-strategies"
+  },"67": {
+    "doc": "Rails Integration",
+    "title": "Examples",
+    "content": "Background Job Integration . class MCPAnalysisJob &lt; ApplicationJob queue_as :default def perform(project_path) RubyLLM::MCP.establish_connection do |clients| # Add filesystem root for the project clients.each { |client| client.roots.add(project_path) } # Create chat with tools chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*clients.tools) # Analyze the project analysis = chat.ask(\"Analyze the code structure and provide recommendations\") # Store results AnalysisResult.create!( project_path: project_path, analysis: analysis, completed_at: Time.current ) end end end # Usage MCPAnalysisJob.perform_later(\"/path/to/project\") . Advanced Job with Progress Tracking . class AdvancedMCPJob &lt; ApplicationJob include Rails.application.routes.url_helpers def perform(user_id, task_params) user = User.find(user_id) RubyLLM::MCP.establish_connection do |clients| # Setup progress tracking setup_progress_tracking(clients, user) # Configure roots based on user permissions configure_user_roots(clients, user) # Execute the task result = execute_mcp_task(clients, task_params) # Notify user of completion notify_completion(user, result) end end private def setup_progress_tracking(clients, user) clients.each do |client| client.on_progress do |progress| # Broadcast progress via ActionCable ActionCable.server.broadcast( \"user_#{user.id}_progress\", { progress: progress.progress, message: progress.message } ) end end end def configure_user_roots(clients, user) # Only allow access to user's projects user.projects.each do |project| clients.each { |client| client.roots.add(project.path) } end end def execute_mcp_task(clients, params) chat = RubyLLM.chat(model: params[:model] || \"gpt-4\") chat.with_tools(*clients.tools) # Add user-specific context chat.with_resource(get_user_context_resource(clients)) chat.ask(params[:query]) end def get_user_context_resource(clients) # Get a user-specific resource clients.first.resource(\"user_preferences\") end def notify_completion(user, result) UserMailer.mcp_task_completed(user, result).deliver_now end end . Controller Integration for Basic Controller Usage . class AnalysisController &lt; ApplicationController def create authorize_mcp_access! result = RubyLLM::MCP.establish_connection do |clients| chat = RubyLLM.chat(model: params[:model] || \"gpt-4\") chat.with_tools(*clients.tools) # Add project context if specified if params[:project_id] project = current_user.projects.find(params[:project_id]) clients.each { |client| client.roots.add(project.path) } end chat.ask(params[:query]) end render json: { analysis: result } rescue RubyLLM::MCP::Error =&gt; e render json: { error: e.message }, status: :unprocessable_entity end private def authorize_mcp_access! unless current_user.can_use_mcp? render json: { error: \"MCP access not authorized\" }, status: :forbidden end end end . Streaming Controller . class StreamingAnalysisController &lt; ApplicationController include ActionController::Live def create response.headers['Content-Type'] = 'text/event-stream' response.headers['Cache-Control'] = 'no-cache' begin RubyLLM::MCP.establish_connection do |clients| chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*clients.tools) chat.ask(params[:query]) do |chunk| if chunk.tool_call? # Send tool usage information chunk.tool_calls.each do |key, tool_call| response.stream.write(\"data: #{json_event(:tool_call, { name: tool_call.name, parameters: tool_call.parameters })}\\n\\n\") end else # Send content chunk response.stream.write(\"data: #{json_event(:content, { text: chunk.content })}\\n\\n\") end end response.stream.write(\"data: #{json_event(:complete, {})}\\n\\n\") end rescue =&gt; e response.stream.write(\"data: #{json_event(:error, { message: e.message })}\\n\\n\") ensure response.stream.close end end private def json_event(type, data) { type: type, data: data }.to_json end end . ",
+    "url": "/guides/rails-integration.html#examples",
+    
+    "relUrl": "/guides/rails-integration.html#examples"
+  },"68": {
+    "doc": "Rails Integration",
+    "title": "Next Steps",
+    "content": "Now that you have comprehensive Rails integration set up: . | Configure your MCP servers in config/mcps.yml | Choose your client management strategy (manual vs automatic) | Implement MCP services for your specific use cases | Add proper error handling and monitoring | Set up tests for your MCP integrations | . For more detailed information on specific topics: . | Configuration - Advanced client configuration | Tools - Working with MCP tools | Resources - Managing resources and templates | Notifications - Handling real-time updates | . ",
+    "url": "/guides/rails-integration.html#next-steps",
+    
+    "relUrl": "/guides/rails-integration.html#next-steps"
+  },"69": {
+    "doc": "Resources",
+    "title": "Resources",
+    "content": "MCP resources provide structured data that can be included in conversations - from static files to dynamically generated content. Resources come in two types: normal resources and resource templates. ",
+    "url": "/server/resources.html",
+    
+    "relUrl": "/server/resources.html"
+  },"70": {
+    "doc": "Resources",
+    "title": "Table of contents",
+    "content": ". | Static Resources . | Discovering Resources | Using Resources in Conversations | Adding Multiple Resources | Resource Content Types | . | Resource Templates . | Discovering Resource Templates | Using Resource Templates | Template Content Generation | Template Argument Validation | . | Argument Completion | Advanced Resource Usage | Working with Different Content Types . | Text Resources | Structured Data Resources | Binary Resources | Subscribing to Resources . | Subscription Management | Handling Resource Updates | Best Practices for Resource Subscriptions | . | . | Error Handling . | Resource Not Found | Template Argument Errors | Resource Loading Errors | . | Next Steps | . ",
+    "url": "/server/resources.html#table-of-contents",
+    
+    "relUrl": "/server/resources.html#table-of-contents"
+  },"71": {
+    "doc": "Resources",
+    "title": "Static Resources",
+    "content": "Static resources are pre-defined data that doesn’t change based on parameters. Discovering Resources . client = RubyLLM::MCP.client( name: \"content-server\", transport_type: :stdio, config: { command: \"npx\", args: [\"@modelcontextprotocol/server-filesystem\", \"/path/to/docs\"] } ) # Get all available resources resources = client.resources puts \"Available resources:\" resources.each do |resource| puts \"- #{resource.name}: #{resource.description}\" puts \" URI: #{resource.uri}\" puts \" Type: #{resource.mime_type}\" end . Using Resources in Conversations . # Get a specific resource readme = client.resource(\"project_readme\") puts \"Resource: #{readme.name}\" puts \"Description: #{readme.description}\" puts \"Content: #{readme.content}\" # Use resource in a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_resource(readme) response = chat.ask(\"Summarize the README file\") puts response . Adding Multiple Resources . # Add multiple resources to a conversation chat = RubyLLM.chat(model: \"gpt-4\") # Method 1: Add resources individually chat.with_resource(client.resource(\"project_readme\")) chat.with_resource(client.resource(\"api_documentation\")) chat.with_resource(client.resource(\"changelog\")) # Method 2: Add multiple resources at once chat.with_resources( client.resource(\"project_readme\"), client.resource(\"api_documentation\"), client.resource(\"changelog\") ) response = chat.ask(\"Analyze the project documentation\") puts response . Resource Content Types . Resources can contain different types of content: . # Text resource text_resource = client.resource(\"config_file\") puts \"Text content: #{text_resource.content}\" # JSON resource json_resource = client.resource(\"api_schema\") schema = JSON.parse(json_resource.content) puts \"API endpoints: #{schema['endpoints']}\" # Binary resource (images, files) image_resource = client.resource(\"diagram\") puts \"Image data: #{image_resource.content.bytesize} bytes\" puts \"MIME type: #{image_resource.mime_type}\" . ",
+    "url": "/server/resources.html#static-resources",
+    
+    "relUrl": "/server/resources.html#static-resources"
+  },"72": {
+    "doc": "Resources",
+    "title": "Resource Templates",
+    "content": "Resource templates are parameterized resources that generate content dynamically based on arguments. Discovering Resource Templates . # Get all resource templates templates = client.resource_templates puts \"Available templates:\" templates.each do |template| puts \"- #{template.name}: #{template.description}\" puts \" URI template: #{template.uri_template}\" # Show required arguments template.arguments.each do |arg| required = arg.required ? \" (required)\" : \"\" puts \" - #{arg.name}: #{arg.description}#{required}\" end end . Using Resource Templates . # Get a specific template log_template = client.resource_template(\"application_logs\") # Use template with arguments in a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_resource_template(log_template, arguments: { date: \"2024-01-15\", level: \"error\", service: \"api\" }) response = chat.ask(\"What errors occurred in the API service?\") puts response . Template Content Generation . # Generate content from template without using in chat user_template = client.resource_template(\"user_profile\") content = user_template.to_content(arguments: { user_id: \"12345\", include_history: true }) puts \"Generated content: #{content}\" . Template Argument Validation . template = client.resource_template(\"report_generator\") # Check required arguments required_args = template.arguments.select(&amp;:required) puts \"Required arguments:\" required_args.each do |arg| puts \"- #{arg.name}: #{arg.description}\" end # Use with all required arguments chat = RubyLLM.chat(model: \"gpt-4\") chat.with_resource_template(template, arguments: { start_date: \"2024-01-01\", end_date: \"2024-01-31\", format: \"summary\" }) . ",
+    "url": "/server/resources.html#resource-templates",
+    
+    "relUrl": "/server/resources.html#resource-templates"
+  },"73": {
+    "doc": "Resources",
+    "title": "Argument Completion",
+    "content": "Some MCP servers support argument completion for resource templates: . # Get completion suggestions for template arguments template = client.resource_template(\"user_logs\") # Complete a partial argument value suggestions = template.complete(\"user_id\", \"123\") puts \"Suggestions: #{suggestions.values}\" puts \"Total matches: #{suggestions.total}\" puts \"Has more: #{suggestions.has_more}\" # Use suggestions in your application if suggestions.values.any? puts \"Did you mean:\" suggestions.values.each_with_index do |suggestion, index| puts \"#{index + 1}. #{suggestion}\" end end . ",
+    "url": "/server/resources.html#argument-completion",
+    
+    "relUrl": "/server/resources.html#argument-completion"
+  },"74": {
+    "doc": "Resources",
+    "title": "Advanced Resource Usage",
+    "content": " ",
+    "url": "/server/resources.html#advanced-resource-usage",
+    
+    "relUrl": "/server/resources.html#advanced-resource-usage"
+  },"75": {
+    "doc": "Resources",
+    "title": "Working with Different Content Types",
+    "content": "Text Resources . # Plain text text_resource = client.resource(\"plain_text_file\") puts text_resource.content # Markdown markdown_resource = client.resource(\"documentation\") puts \"Markdown content: #{markdown_resource.content}\" # Code files code_resource = client.resource(\"source_code\") puts \"Code: #{code_resource.content}\" . Structured Data Resources . # JSON resource json_resource = client.resource(\"configuration\") config = JSON.parse(json_resource.content) puts \"Config: #{config}\" # YAML resource yaml_resource = client.resource(\"metadata\") metadata = YAML.safe_load(yaml_resource.content) puts \"Metadata: #{metadata}\" # CSV resource csv_resource = client.resource(\"data_export\") require 'csv' data = CSV.parse(csv_resource.content, headers: true) puts \"Rows: #{data.length}\" . Binary Resources . # Image resource image_resource = client.resource(\"chart_image\") puts \"Image size: #{image_resource.content.bytesize} bytes\" puts \"MIME type: #{image_resource.mime_type}\" # Save binary content File.binwrite(\"chart.png\", image_resource.content) . Subscribing to Resources . MCP allows you to subscribe to resources if the server has the capabilities to do so. When you subscribe to a resource, it will be marked and automatically refreshed on the next usage when the underlying content changes. # Check if a resource supports subscriptions resource = client.resource(\"live_data\") if resource.subscribable? puts \"Resource supports subscriptions\" else puts \"Resource does not support subscriptions\" end # Subscribe to a resource for automatic updates client.subscribe_to_resource(\"live_data\") # Use the resource - content will be automatically refreshed if it changed chat = RubyLLM.chat(model: \"gpt-4\") chat.with_resource(resource) # The resource content will be automatically updated on subsequent uses response = chat.ask(\"What's the latest data?\") puts response . Subscription Management . # List subscribed resources subscriptions = client.subscribed_resources puts \"Subscribed to #{subscriptions.length} resources:\" subscriptions.each do |resource_name| puts \"- #{resource_name}\" end # Unsubscribe from a resource client.unsubscribe_from_resource(\"live_data\") # Check subscription status is_subscribed = client.subscribed_to?(\"live_data\") puts \"Subscribed to live_data: #{is_subscribed}\" . Handling Resource Updates . # Set up a callback for when subscribed resources update client.on_resource_updated do |resource_uri| puts \"Subscribed resource updated: #{resource_uri}\" # Optionally refresh cached data resource_name = extract_resource_name(resource_uri) updated_resource = client.resource(resource_name, refresh: true) puts \"Updated content preview: #{updated_resource.content[0..100]}...\" end # Subscribe to multiple resources %w[live_metrics real_time_logs current_status].each do |resource_name| if client.resource(resource_name).subscribable? client.subscribe_to_resource(resource_name) puts \"Subscribed to #{resource_name}\" end end . Best Practices for Resource Subscriptions . # Only subscribe to resources you actively use class SmartResourceSubscriber def initialize(client) @client = client @active_resources = Set.new end def use_resource_with_subscription(resource_name) # Subscribe on first use unless @active_resources.include?(resource_name) resource = @client.resource(resource_name) if resource.subscribable? @client.subscribe_to_resource(resource_name) @active_resources.add(resource_name) puts \"Auto-subscribed to #{resource_name}\" end end @client.resource(resource_name) end def cleanup_unused_subscriptions # Unsubscribe from resources not used recently @client.subscribed_resources.each do |resource_name| unless @active_resources.include?(resource_name) @client.unsubscribe_from_resource(resource_name) puts \"Auto-unsubscribed from unused resource: #{resource_name}\" end end end end # Usage subscriber = SmartResourceSubscriber.new(client) resource = subscriber.use_resource_with_subscription(\"live_metrics\") . ",
+    "url": "/server/resources.html#working-with-different-content-types",
+    
+    "relUrl": "/server/resources.html#working-with-different-content-types"
+  },"76": {
+    "doc": "Resources",
+    "title": "Error Handling",
+    "content": "Resource Not Found . begin resource = client.resource(\"nonexistent_resource\") rescue RubyLLM::MCP::Errors::ResourceNotFound =&gt; e puts \"Resource not found: #{e.message}\" end . Template Argument Errors . template = client.resource_template(\"user_report\") begin content = template.to_content(arguments: { # Missing required argument start_date: \"2024-01-01\" }) rescue RubyLLM::MCP::Errors::TemplateError =&gt; e puts \"Template error: #{e.message}\" puts \"Missing arguments: #{e.missing_arguments}\" end . Resource Loading Errors . begin resource = client.resource(\"large_file\") content = resource.content rescue RubyLLM::MCP::Errors::ResourceError =&gt; e puts \"Failed to load resource: #{e.message}\" end . class ContextBuilder def initialize(client) @client = client @resources = [] @templates = [] end def add_resource(name) @resources &lt;&lt; name self end def add_template(name, arguments) @templates &lt;&lt; { name: name, arguments: arguments } self end def build_for_chat(chat) @resources.each do |name| chat.with_resource(@client.resource(name)) end @templates.each do |template_config| template = @client.resource_template(template_config[:name]) chat.with_resource_template(template, arguments: template_config[:arguments]) end chat end end # Usage chat = RubyLLM.chat(model: \"gpt-4\") context = ContextBuilder.new(client) .add_resource(\"project_overview\") .add_resource(\"architecture_guide\") .add_template(\"recent_commits\", { days: 7 }) .build_for_chat(chat) response = chat.ask(\"Analyze the project\") puts response . ",
+    "url": "/server/resources.html#error-handling",
+    
+    "relUrl": "/server/resources.html#error-handling"
+  },"77": {
+    "doc": "Resources",
+    "title": "Next Steps",
+    "content": ". | Prompts - Using predefined prompts | Notifications - Handling real-time updates | Sampling - Allow servers to use your LLM | . ",
+    "url": "/server/resources.html#next-steps",
+    
+    "relUrl": "/server/resources.html#next-steps"
+  },"78": {
+    "doc": "Roots",
+    "title": "Roots",
+    "content": "MCP roots provide filesystem access to MCP servers, allowing them to understand your project structure and access files within specified directories. This enables more powerful and context-aware server operations. ",
+    "url": "/client/roots.html",
+    
+    "relUrl": "/client/roots.html"
+  },"79": {
+    "doc": "Roots",
+    "title": "Table of contents",
+    "content": ". | Overview | Basic Configuration . | Configuring Roots | Accessing Roots Information | . | Dynamic Root Management . | Adding Roots at Runtime | Removing Roots | Root Validation | . | Next Steps | . ",
+    "url": "/client/roots.html#table-of-contents",
+    
+    "relUrl": "/client/roots.html#table-of-contents"
+  },"80": {
+    "doc": "Roots",
+    "title": "Overview",
+    "content": "Roots functionality allows MCP servers to: . | Access files and directories within configured root paths | Understand project structure and organization | Provide more accurate file-based operations | Support relative path resolution | . Only provide root access to trusted MCP servers, as this grants filesystem access to the specified directories. ",
+    "url": "/client/roots.html#overview",
+    
+    "relUrl": "/client/roots.html#overview"
+  },"81": {
+    "doc": "Roots",
+    "title": "Basic Configuration",
+    "content": "Configuring Roots . RubyLLM::MCP.configure do |config| config.roots = [ \"/path/to/project\", Rails.root, Pathname.new(\"/another/project\") ] end # Create client with roots configured client = RubyLLM::MCP.client( name: \"filesystem\", transport_type: :stdio, config: { command: \"bunx\", args: [\"@modelcontextprotocol/server-filesystem\"] } ) . Accessing Roots Information . # Get configured root paths puts \"Root paths:\" client.roots.paths.each do |path| puts \"- #{path}\" end # Check if a path is within roots puts client.roots.includes?(\"/path/to/project/file.txt\") # true puts client.roots.includes?(\"/outside/path/file.txt\") # false . ",
+    "url": "/client/roots.html#basic-configuration",
+    
+    "relUrl": "/client/roots.html#basic-configuration"
+  },"82": {
+    "doc": "Roots",
+    "title": "Dynamic Root Management",
+    "content": "Adding Roots at Runtime . # Add a new root directory client.roots.add(\"/new/project/path\") # Add multiple roots client.roots.add(\"/project1\", \"/project2\") # Verify addition puts \"Updated roots:\" client.roots.paths.each { |path| puts \"- #{path}\" } . Removing Roots . # Remove a specific root client.roots.remove(\"/path/to/remove\") # Remove multiple roots client.roots.remove(\"/project1\", \"/project2\") # Clear all roots client.roots.clear . Root Validation . # Validate that roots exist before adding def add_validated_root(client, path) if File.directory?(path) client.roots.add(path) puts \"Added root: #{path}\" else puts \"Warning: Directory does not exist: #{path}\" end end add_validated_root(client, \"/existing/path\") add_validated_root(client, \"/nonexistent/path\") . ",
+    "url": "/client/roots.html#dynamic-root-management",
+    
+    "relUrl": "/client/roots.html#dynamic-root-management"
+  },"83": {
+    "doc": "Roots",
+    "title": "Next Steps",
+    "content": ". | Rails Integration - Complete Rails integration guide | Back to Configuration for more client setup options | . ",
+    "url": "/client/roots.html#next-steps",
+    
+    "relUrl": "/client/roots.html#next-steps"
+  },"84": {
+    "doc": "Sampling",
+    "title": "Sampling",
+    "content": "MCP sampling allows servers to offload LLM requests to your client rather than making them directly. This enables servers to use your LLM connections and configurations while maintaining their own logic and workflows. ",
+    "url": "/client/sampling.html",
+    
+    "relUrl": "/client/sampling.html"
+  },"85": {
+    "doc": "Sampling",
+    "title": "Table of contents",
+    "content": ". | Overview | Basic Sampling Configuration . | Enable Sampling | Basic Usage | . | Model Selection . | Static Model Selection | Dynamic Model Selection | Model Selection Based on Request | . | Guards and Filtering . | Basic Guards | Content-Based Guards | Rate Limiting Guards | User-Based Guards | . | Next Steps | . ",
+    "url": "/client/sampling.html#table-of-contents",
+    
+    "relUrl": "/client/sampling.html#table-of-contents"
+  },"86": {
+    "doc": "Sampling",
+    "title": "Overview",
+    "content": "When sampling is enabled, MCP servers can send “sample” requests to your client, which will: . | Execute the LLM request using your configured model | Return the response back to the server | Allow the server to continue its processing | . This is useful for servers that need LLM capabilities but don’t want to manage API keys or model connections directly. ",
+    "url": "/client/sampling.html#overview",
+    
+    "relUrl": "/client/sampling.html#overview"
+  },"87": {
+    "doc": "Sampling",
+    "title": "Basic Sampling Configuration",
+    "content": "Enable Sampling . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" end # Create client with sampling enabled client = RubyLLM::MCP.client( name: \"sampling-server\", transport_type: :stdio, config: { command: \"bunx\", args: [\"@example/mcp-server-with-sampling\"] } ) . Basic Usage . # The server can now make sampling requests # These will be automatically handled by your client tool = client.tool(\"analyze_data\") result = tool.execute(data: \"some data to analyze\") # Behind the scenes, the server may have made LLM requests # using your configured model and API credentials puts result . ",
+    "url": "/client/sampling.html#basic-sampling-configuration",
+    
+    "relUrl": "/client/sampling.html#basic-sampling-configuration"
+  },"88": {
+    "doc": "Sampling",
+    "title": "Model Selection",
+    "content": "Static Model Selection . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" end # All sampling requests will use GPT-4 . Dynamic Model Selection . RubyLLM::MCP.configure do |config| config.sampling.enabled = true # Use a block for dynamic model selection config.sampling.preferred_model do |model_preferences| # The server can send model preferences/hints server_preference = model_preferences.hints.first # You can use server preferences or override them case server_preference when \"fast\" \"gpt-3.5-turbo\" when \"smart\" \"gpt-4\" when \"coding\" \"gpt-4\" else \"gpt-4\" # Default fallback end end end . Model Selection Based on Request . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model do |model_preferences| # Access the full sampling request context messages = model_preferences.messages # Choose model based on message content if messages.any? { |msg| msg.content.include?(\"code\") } \"gpt-4\" # Use GPT-4 for code-related tasks elsif messages.length &gt; 10 \"gpt-3.5-turbo\" # Use faster model for long conversations else \"gpt-4\" # Default for other cases end end end . ",
+    "url": "/client/sampling.html#model-selection",
+    
+    "relUrl": "/client/sampling.html#model-selection"
+  },"89": {
+    "doc": "Sampling",
+    "title": "Guards and Filtering",
+    "content": "Basic Guards . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" # Only allow samples that contain \"Hello\" config.sampling.guard do |sample| sample.messages.any? { |msg| msg.content.include?(\"Hello\") } end end . Content-Based Guards . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" # Filter based on message content config.sampling.guard do |sample| messages = sample.messages # Don't allow requests containing sensitive keywords sensitive_keywords = [\"password\", \"secret\", \"private_key\"] messages.none? do |message| sensitive_keywords.any? { |keyword| message.content.include?(keyword) } end end end . Rate Limiting Guards . class SamplingRateLimiter def initialize(max_requests: 100, window: 3600) @max_requests = max_requests @window = window @requests = [] end def allow_request? now = Time.now # Remove old requests outside the window @requests.reject! { |timestamp| now - timestamp &gt; @window } # Check if we're under the limit if @requests.length &lt; @max_requests @requests &lt;&lt; now true else false end end end rate_limiter = SamplingRateLimiter.new(max_requests: 50, window: 3600) RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" config.sampling.guard do |sample| rate_limiter.allow_request? end end . User-Based Guards . RubyLLM::MCP.configure do |config| config.sampling.enabled = true config.sampling.preferred_model = \"gpt-4\" config.sampling.guard do |sample| # Check if user is authorized (if server provides user context) user_id = sample.metadata&amp;.dig(\"user_id\") if user_id # Check user permissions authorized_users = [\"user1\", \"user2\", \"admin\"] authorized_users.include?(user_id) else # Allow anonymous requests true end end end . ",
+    "url": "/client/sampling.html#guards-and-filtering",
+    
+    "relUrl": "/client/sampling.html#guards-and-filtering"
+  },"90": {
+    "doc": "Sampling",
+    "title": "Next Steps",
+    "content": ". | Roots - Provide filesystem access to servers | Rails Integration - Complete Rails integration guide | . ",
+    "url": "/client/sampling.html#next-steps",
+    
+    "relUrl": "/client/sampling.html#next-steps"
+  },"91": {
+    "doc": "Tools",
+    "title": "Tools",
+    "content": "MCP tools are server-side operations that can be executed by LLMs to perform actions like reading files, making API calls, or running calculations. This guide covers everything you need to know about working with MCP tools. ",
+    "url": "/server/tools.html",
+    
+    "relUrl": "/server/tools.html"
+  },"92": {
+    "doc": "Tools",
+    "title": "Table of contents",
+    "content": ". | Tool Discovery . | Listing Available Tools | Getting a Specific Tool | Refreshing Tool Cache | . | Tool Execution . | Direct Tool Execution | Using Tools with RubyLLM | Individual Tool Usage | . | Human-in-the-Loop . | Basic Human-in-the-Loop | Conditional Human-in-the-Loop | Programmatic Guards | . | Streaming Responses | Complex Parameters | Error Handling . | Tool Execution Errors | Tool Not Found | Timeout Errors | . | Tool Inspection . | Understanding Tool Schema | Tool Capabilities | . | Advanced Tool Usage . | Tool Result Processing | Chaining Tool Calls | Tool Composition | . | Performance Considerations . | Tool Caching | Batch Operations | . | Next Steps | . ",
+    "url": "/server/tools.html#table-of-contents",
+    
+    "relUrl": "/server/tools.html#table-of-contents"
+  },"93": {
+    "doc": "Tools",
+    "title": "Tool Discovery",
+    "content": "Listing Available Tools . Get all tools from an MCP server: . client = RubyLLM::MCP.client( name: \"filesystem\", transport_type: :stdio, config: { command: \"npx\", args: [\"@modelcontextprotocol/server-filesystem\", \"/path/to/directory\"] } ) # Get all available tools tools = client.tools puts \"Available tools:\" tools.each do |tool| puts \"- #{tool.name}: #{tool.description}\" # Show input schema tool.input_schema[\"properties\"]&amp;.each do |param, schema| required = tool.input_schema[\"required\"]&amp;.include?(param) ? \" (required)\" : \"\" puts \" - #{param}: #{schema['description']}#{required}\" end end . Getting a Specific Tool . # Get a specific tool by name file_tool = client.tool(\"read_file\") puts \"Tool: #{file_tool.name}\" puts \"Description: #{file_tool.description}\" puts \"Input schema: #{file_tool.input_schema}\" . Refreshing Tool Cache . Tools are cached to improve performance. Refresh when needed: . # Refresh all tools tools = client.tools(refresh: true) # Refresh a specific tool tool = client.tool(\"read_file\", refresh: true) . ",
+    "url": "/server/tools.html#tool-discovery",
+    
+    "relUrl": "/server/tools.html#tool-discovery"
+  },"94": {
+    "doc": "Tools",
+    "title": "Tool Execution",
+    "content": "Direct Tool Execution . Execute tools directly without using LLM: . # Execute a file reading tool result = client.execute_tool( name: \"read_file\", parameters: { path: \"README.md\" } ) puts \"File contents: #{result}\" . Using Tools with RubyLLM . Integrate tools into LLM conversations: . # Add all tools to a chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*client.tools) # Ask the LLM to use tools response = chat.ask(\"Read the README.md file and summarize it\") puts response . Individual Tool Usage . Use specific tools in conversations: . # Get a specific tool search_tool = client.tool(\"search_files\") # Add only this tool to the chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(search_tool) response = chat.ask(\"Search for all Ruby files in the project\") puts response . ",
+    "url": "/server/tools.html#tool-execution",
+    
+    "relUrl": "/server/tools.html#tool-execution"
+  },"95": {
+    "doc": "Tools",
+    "title": "Human-in-the-Loop",
+    "content": "Control tool execution with human approval: . Basic Human-in-the-Loop . # Set up human approval for all tools client.on_human_in_the_loop do |name, params| puts \"Tool: #{name}\" puts \"Parameters: #{params}\" print \"Allow execution? (y/n): \" gets.chomp.downcase == 'y' end # Execute tool (will prompt for approval) result = client.execute_tool( name: \"delete_file\", parameters: { path: \"important.txt\" } ) . Conditional Human-in-the-Loop . # Only require approval for dangerous operations client.on_human_in_the_loop do |name, params| dangerous_tools = [\"delete_file\", \"modify_file\", \"execute_command\"] if dangerous_tools.include?(name) puts \"⚠️ Dangerous operation requested!\" puts \"Tool: #{name}\" puts \"Parameters: #{params}\" print \"Allow execution? (y/n): \" gets.chomp.downcase == 'y' else true # Allow safe operations automatically end end . Programmatic Guards . Use logic to determine approval: . client.on_human_in_the_loop do |name, params| case name when \"delete_file\" # Don't allow deletion of important files !params[:path].include?(\"important\") when \"api_call\" # Only allow API calls to trusted domains params[:url].start_with?(\"https://api.trusted.com\") else true end end . ",
+    "url": "/server/tools.html#human-in-the-loop",
+    
+    "relUrl": "/server/tools.html#human-in-the-loop"
+  },"96": {
+    "doc": "Tools",
+    "title": "Streaming Responses",
+    "content": "Monitor tool execution in real-time: . chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*client.tools) chat.ask(\"Analyze all files in the project\") do |chunk| if chunk.tool_call? chunk.tool_calls.each do |key, tool_call| puts \"🔧 Using tool: #{tool_call.name}\" puts \" Parameters: #{tool_call.parameters}\" end else print chunk.content end end . ",
+    "url": "/server/tools.html#streaming-responses",
+    
+    "relUrl": "/server/tools.html#streaming-responses"
+  },"97": {
+    "doc": "Tools",
+    "title": "Complex Parameters",
+    "content": "Enable support for complex parameters like arrays and nested objects: . # Enable complex parameter support globally RubyLLM::MCP.configure do |config| config.support_complex_parameters! end # Use complex parameters in tools result = client.execute_tool( name: \"process_data\", parameters: { items: [ { name: \"item1\", value: 100, tags: [\"important\", \"urgent\"] }, { name: \"item2\", value: 200, tags: [\"normal\"] } ], options: { sort: { field: \"value\", order: \"desc\" }, filter: { category: \"active\", min_value: 50 }, pagination: { page: 1, per_page: 10 } } } ) . ",
+    "url": "/server/tools.html#complex-parameters",
+    
+    "relUrl": "/server/tools.html#complex-parameters"
+  },"98": {
+    "doc": "Tools",
+    "title": "Error Handling",
+    "content": "Tool Execution Errors . begin result = client.execute_tool( name: \"read_file\", parameters: { path: \"/nonexistent/file.txt\" } ) rescue RubyLLM::MCP::Errors::ToolError =&gt; e puts \"Tool execution failed: #{e.message}\" puts \"Error details: #{e.error_details}\" end . Tool Not Found . begin tool = client.tool(\"nonexistent_tool\") rescue RubyLLM::MCP::Errors::ToolNotFound =&gt; e puts \"Tool not found: #{e.message}\" end . Timeout Errors . begin result = client.execute_tool( name: \"slow_operation\", parameters: { size: \"large\" } ) rescue RubyLLM::MCP::Errors::TimeoutError =&gt; e puts \"Tool execution timed out: #{e.message}\" end . ",
+    "url": "/server/tools.html#error-handling",
+    
+    "relUrl": "/server/tools.html#error-handling"
+  },"99": {
+    "doc": "Tools",
+    "title": "Tool Inspection",
+    "content": "Understanding Tool Schema . tool = client.tool(\"create_file\") # Basic information puts \"Name: #{tool.name}\" puts \"Description: #{tool.description}\" # Input schema details schema = tool.input_schema puts \"Required parameters: #{schema['required']}\" schema['properties'].each do |param, details| puts \"Parameter: #{param}\" puts \" Type: #{details['type']}\" puts \" Description: #{details['description']}\" puts \" Required: #{schema['required']&amp;.include?(param)}\" end . Tool Capabilities . # Check if tool supports specific features tool = client.tool(\"search_files\") # Check parameter types if tool.input_schema[\"properties\"][\"pattern\"] puts \"Supports pattern matching\" end if tool.input_schema[\"properties\"][\"recursive\"] puts \"Supports recursive search\" end . ",
+    "url": "/server/tools.html#tool-inspection",
+    
+    "relUrl": "/server/tools.html#tool-inspection"
+  },"100": {
+    "doc": "Tools",
+    "title": "Advanced Tool Usage",
+    "content": "Tool Result Processing . # Process tool results result = client.execute_tool( name: \"list_files\", parameters: { directory: \"/path/to/search\" } ) # Parse JSON results if result.is_a?(String) &amp;&amp; result.start_with?(\"{\") parsed = JSON.parse(result) puts \"Found #{parsed['files'].length} files\" end . Chaining Tool Calls . # First tool call files = client.execute_tool( name: \"list_files\", parameters: { directory: \"/project\" } ) # Use result in second tool call parsed_files = JSON.parse(files) ruby_files = parsed_files[\"files\"].select { |f| f.end_with?(\".rb\") } ruby_files.each do |file| content = client.execute_tool( name: \"read_file\", parameters: { path: file } ) puts \"File: #{file}\" puts content end . Tool Composition . # Create a higher-level operation using multiple tools def analyze_project(client) # Get project structure structure = client.execute_tool( name: \"list_files\", parameters: { directory: \".\", recursive: true } ) # Read important files readme = client.execute_tool( name: \"read_file\", parameters: { path: \"README.md\" } ) # Search for specific patterns todos = client.execute_tool( name: \"search_files\", parameters: { pattern: \"TODO\", directory: \".\" } ) { structure: structure, readme: readme, todos: todos } end # Use in a chat analysis = analyze_project(client) chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*client.tools) response = chat.ask(\"Based on this project analysis: #{analysis}, provide recommendations\") puts response . ",
+    "url": "/server/tools.html#advanced-tool-usage",
+    
+    "relUrl": "/server/tools.html#advanced-tool-usage"
+  },"101": {
+    "doc": "Tools",
+    "title": "Performance Considerations",
+    "content": "Tool Caching . # Cache expensive tool results class ToolCache def initialize(client) @client = client @cache = {} end def execute_tool(name, parameters) key = \"#{name}:#{parameters.hash}\" @cache[key] ||= @client.execute_tool( name: name, parameters: parameters ) end end cached_client = ToolCache.new(client) . Batch Operations . # Process multiple files efficiently files = [\"file1.txt\", \"file2.txt\", \"file3.txt\"] contents = {} files.each do |file| contents[file] = client.execute_tool( name: \"read_file\", parameters: { path: file } ) end # Use all contents in a single chat chat = RubyLLM.chat(model: \"gpt-4\") chat.with_tools(*client.tools) response = chat.ask(\"Analyze these files: #{contents}\") puts response . ",
+    "url": "/server/tools.html#performance-considerations",
+    
+    "relUrl": "/server/tools.html#performance-considerations"
+  },"102": {
+    "doc": "Tools",
+    "title": "Next Steps",
+    "content": ". | Resources - Working with MCP resources | Prompts - Using predefined prompts | Notifications - Handling real-time updates | . ",
+    "url": "/server/tools.html#next-steps",
+    
+    "relUrl": "/server/tools.html#next-steps"
+  },"103": {
+    "doc": "Transports",
+    "title": "Transports",
+    "content": "MCP transports are the communication layer between your Ruby client and MCP servers. This guide covers the built-in transport types and how to create custom transport implementations for specialized use cases. ",
+    "url": "/guides/transports.html",
+    
+    "relUrl": "/guides/transports.html"
+  },"104": {
+    "doc": "Transports",
+    "title": "Table of contents",
+    "content": ". | Overview | Built-in Transport Types . | STDIO Transport | SSE Transport (Server-Sent Events) | Streamable HTTP Transport | . | Transport Interface | Creating Custom Transports . | Basic Custom Transport | . | Registering Custom Transports | Next Steps | . ",
+    "url": "/guides/transports.html#table-of-contents",
+    
+    "relUrl": "/guides/transports.html#table-of-contents"
+  },"105": {
+    "doc": "Transports",
+    "title": "Overview",
+    "content": "Transports handle the actual communication protocol between the MCP client and server. They are responsible for: . | Establishing connections | Sending requests and receiving responses | Managing the connection lifecycle | Handling protocol-specific details | . ",
+    "url": "/guides/transports.html#overview",
+    
+    "relUrl": "/guides/transports.html#overview"
+  },"106": {
+    "doc": "Transports",
+    "title": "Built-in Transport Types",
+    "content": "STDIO Transport . Best for local MCP servers that communicate via standard input/output: . client = RubyLLM::MCP.client( name: \"local-server\", transport_type: :stdio, config: { command: \"python\", args: [\"-m\", \"my_mcp_server\"], env: { \"DEBUG\" =&gt; \"1\" } } ) . Use cases: . | Local development | Command-line MCP servers | Subprocess-based servers | . SSE Transport (Server-Sent Events) . Best for web-based MCP servers using HTTP with server-sent events: . client = RubyLLM::MCP.client( name: \"web-server\", transport_type: :sse, config: { url: \"https://api.example.com/mcp/sse\", headers: { \"Authorization\" =&gt; \"Bearer token\" } } ) . Use cases: . | Web-based MCP services | Real-time communication needs | HTTP-based infrastructure | . Streamable HTTP Transport . Best for HTTP-based MCP servers that support streaming responses: . client = RubyLLM::MCP.client( name: \"streaming-server\", transport_type: :streamable, config: { url: \"https://api.example.com/mcp\", headers: { \"Content-Type\" =&gt; \"application/json\" } } ) . Use cases: . | REST API-based MCP servers | HTTP-first architectures | Cloud-based MCP services | . ",
+    "url": "/guides/transports.html#built-in-transport-types",
+    
+    "relUrl": "/guides/transports.html#built-in-transport-types"
+  },"107": {
+    "doc": "Transports",
+    "title": "Transport Interface",
+    "content": "All transport implementations must implement the following interface: . class CustomTransport # Initialize the transport def initialize(coordinator:, **config) @coordinator = coordinator @config = config end # Send a request and optionally wait for response def request(body, add_id: true, wait_for_response: true) # Implementation specific end # Check if transport is alive/connected def alive? # Implementation specific end # Start the transport connection def start # Implementation specific end # Close the transport connection def close # Implementation specific end # Set the MCP protocol version def set_protocol_version(version) @protocol_version = version end end . ",
+    "url": "/guides/transports.html#transport-interface",
+    
+    "relUrl": "/guides/transports.html#transport-interface"
+  },"108": {
+    "doc": "Transports",
+    "title": "Creating Custom Transports",
+    "content": "Basic Custom Transport . Here’s a template for creating a custom transport: . class MyCustomTransport def initialize(coordinator:, **config) @coordinator = coordinator @config = config @connection = nil @protocol_version = nil end def request(body, add_id: true, wait_for_response: true) # Add request ID if needed if add_id body = body.merge(\"id\" =&gt; generate_request_id) end # Send the request response_data = send_request(body) # Create result object result = RubyLLM::MCP::Result.new(response_data) # Let coordinator process the result @coordinator.process_result(result) # Return result if it's not a notification return nil if result.notification? result end def alive? @connection &amp;&amp; @connection.connected? end def start @connection = establish_connection perform_handshake if @connection end def close @connection&amp;.close @connection = nil end def set_protocol_version(version) @protocol_version = version end private def establish_connection # Implementation specific end def send_request(body) # Implementation specific end def generate_request_id SecureRandom.uuid end def perform_handshake # Optional: perform any connection setup end end . ",
+    "url": "/guides/transports.html#creating-custom-transports",
+    
+    "relUrl": "/guides/transports.html#creating-custom-transports"
+  },"109": {
+    "doc": "Transports",
+    "title": "Registering Custom Transports",
+    "content": "Once you’ve created a custom transport, register it with the transport factory: . # Register your custom transport RubyLLM::MCP::Transport.register_transport(:websocket, WebSocketTransport) RubyLLM::MCP::Transport.register_transport(:redis_pubsub, RedisPubSubTransport) # Now you can use it client = RubyLLM::MCP.client( name: \"websocket-server\", transport_type: :websocket, config: { url: \"ws://localhost:8080/mcp\", headers: { \"Authorization\" =&gt; \"Bearer token\" } } ) . ",
+    "url": "/guides/transports.html#registering-custom-transports",
+    
+    "relUrl": "/guides/transports.html#registering-custom-transports"
+  },"110": {
+    "doc": "Transports",
+    "title": "Next Steps",
+    "content": ". | Configuration - Advanced client configuration | Tools - Working with MCP tools | Notifications - Handling real-time updates | . ",
+    "url": "/guides/transports.html#next-steps",
+    
+    "relUrl": "/guides/transports.html#next-steps"
+  }
+}
