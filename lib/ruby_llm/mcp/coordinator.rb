@@ -71,6 +71,10 @@ module RubyLLM
 
         @capabilities = RubyLLM::MCP::ServerCapabilities.new(initialize_response.value["capabilities"])
         initialize_notification
+
+        if client.logging_handler_enabled?
+          set_logging(level: client.on_logging_level)
+        end
       end
 
       def stop_transport

@@ -93,7 +93,8 @@ module RubyLLM
                     :max_connections,
                     :pool_timeout,
                     :config_path,
-                    :launch_control
+                    :launch_control,
+                    :on_logging_level
 
       attr_writer :logger, :mcp_configuration
 
@@ -125,6 +126,21 @@ module RubyLLM
 
       def mcp_configuration
         @mcp_configuration + load_mcps_config
+      end
+
+      def on_progress(&block)
+        @on_progress = block if block_given?
+        @on_progress
+      end
+
+      def on_human_in_the_loop(&block)
+        @on_human_in_the_loop = block if block_given?
+        @on_human_in_the_loop
+      end
+
+      def on_logging(&block)
+        @on_logging = block if block_given?
+        @on_logging
       end
 
       def inspect
@@ -180,6 +196,13 @@ module RubyLLM
 
         # Sampling configuration
         @sampling.reset!
+
+        # Event handlers
+        @on_progress = nil
+        @on_human_in_the_loop = nil
+
+        @on_logging_level = nil
+        @on_logging = nil
       end
     end
   end
