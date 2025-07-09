@@ -422,8 +422,8 @@ module RubyLLM
             end
 
             # Set up SSE streaming connection with callbacks
-            connection = create_connection_with_sse_callbacks(options)
-            response = connection.get(@url, headers: headers)
+            connection = create_connection_with_sse_callbacks(options, headers)
+            response = connection.get(@url)
 
             # Handle HTTPX error responses first
             error_result = handle_httpx_error_response!(response, context: { location: "SSE connection" },
@@ -463,7 +463,7 @@ module RubyLLM
           end
         end
 
-        def create_connection_with_sse_callbacks(options)
+        def create_connection_with_sse_callbacks(options, headers)
           buffer = +""
 
           client = HTTPX
@@ -501,7 +501,9 @@ module RubyLLM
                 read_timeout: @request_timeout / 1000,
                 write_timeout: @request_timeout / 1000,
                 operation_timeout: @request_timeout / 1000
-              }
+              },
+              headers: headers,
+              ssl: { alpn_protocols: ["http/1.1"] }
             )
           register_client(client)
         end

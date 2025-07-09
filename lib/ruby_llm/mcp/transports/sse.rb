@@ -165,6 +165,7 @@ module RubyLLM
         def stream_events_from_server
           sse_client = HTTPX.plugin(:stream)
           sse_client = sse_client.with(
+            ssl: { alpn_protocols: ["http/1.1"] },
             headers: @headers
           )
           response = sse_client.get(@event_url, stream: true)
