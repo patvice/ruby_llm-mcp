@@ -467,11 +467,31 @@ module RubyLLM
         end
 
         def create_connection_with_sse_callbacks(options, headers)
-          buffer = +""
-
           client = HTTPX.plugin(:callbacks)
+          client = add_on_response_body_chunk_callback(client, options)
 
-          client = client.on_response_body_chunk do |request, response, chunk|
+          client = client.with(
+            timeout: {
+              connect_timeout: 10,
+              read_timeout: @request_timeout / 1000,
+              write_timeout: @request_timeout / 1000,
+              operation_timeout: @request_timeout / 1000
+            },
+            headers: headers
+          )
+
+          if @version == :http1
+            client = client.with(
+              ssl: { alpn_protocols: ["http/1.1"] }
+            )
+          end
+
+          register_client(client)
+        end
+
+        def add_on_response_body_chunk_callback(client, options)
+          buffer = +""
+          client.on_response_body_chunk do |request, response, chunk|
             # Only process chunks for text/event-stream and if still running
             next unless @running && !@abort_controller
 
@@ -498,24 +518,6 @@ module RubyLLM
               end
             end
           end
-
-          client = client.with(
-            timeout: {
-              connect_timeout: 10,
-              read_timeout: @request_timeout / 1000,
-              write_timeout: @request_timeout / 1000,
-              operation_timeout: @request_timeout / 1000
-            },
-            headers: headers
-          )
-
-          if @version == :http1
-            client = client.with(
-              ssl: { alpn_protocols: ["http/1.1"] }
-            )
-          end
-
-          register_client(client)
         end
 
         def calculate_reconnection_delay(attempt)
