@@ -43,7 +43,7 @@ RSpec.describe RubyLLM::MCP do
     it "creates clients from config" do
       clients = RubyLLM::MCP.clients
 
-      expect(clients).to eq([client_stdio, client_sse])
+      expect(clients).to eq({ "client1" => client_stdio, "client2" => client_sse })
     end
 
     it "caches clients" do
@@ -62,7 +62,19 @@ RSpec.describe RubyLLM::MCP do
 
       clients = RubyLLM::MCP.clients(custom_config)
 
-      expect(clients).to eq([custom_client])
+      expect(clients.keys).to eq(%w[custom])
+      expect(clients["custom"]).to eq(custom_client)
+    end
+
+    it "if a client is added, it will also return from the clients hash" do
+      custom_client = instance_double(RubyLLM::MCP::Client)
+      allow(RubyLLM::MCP::Client).to receive(:new).with(name: "custom",
+                                                        transport_type: "stdio").and_return(custom_client)
+      RubyLLM::MCP.add_client(name: "custom", transport_type: "stdio")
+
+      clients = RubyLLM::MCP.clients
+
+      expect(clients["custom"]).to eq(custom_client)
     end
   end
 
