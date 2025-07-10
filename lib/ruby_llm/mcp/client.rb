@@ -157,7 +157,10 @@ module RubyLLM
       end
 
       def on_logging(level: Logging::WARNING, &block)
-        @coordinator.set_logging(level: level)
+        @on_logging_level = level
+        if alive?
+          @coordinator.set_logging(level: level)
+        end
 
         @on[:logging] = block
         self
@@ -227,6 +230,13 @@ module RubyLLM
 
       def setup_sampling
         @on[:sampling] = MCP.config.sampling.guard
+      end
+
+      def setup_event_handlers
+        @on[:progress] = MCP.config.on_progress
+        @on[:human_in_the_loop] = MCP.config.on_human_in_the_loop
+        @on[:logging] = MCP.config.on_logging
+        @on_logging_level = MCP.config.on_logging_level
       end
     end
   end

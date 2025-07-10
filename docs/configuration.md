@@ -41,12 +41,31 @@ RubyLLM::MCP.configure do |config|
   config.max_connections = 10
   config.pool_timeout = 5
 
+  # Event handlers, these will be used for all clients, unless overridden on the client level
+  config.on_progress do |progress|
+    puts "Progress: #{progress}"
+  end
+  config.on_human_in_the_loop do |human_in_the_loop|
+    puts "Human in the loop: #{human_in_the_loop}"
+  end
+  config.on_logging do |level, message|
+    puts "Logging: #{level} - #{message}"
+  end
+
   # Configure roots for filesystem access
   config.roots = ["/path/to/project", Rails.root]
 
   # Configure sampling
+  # Enabled the clinet to support sampling requests,default: false
   config.sampling.enabled = true
+
+  # Configure sampling preferred model
   config.sampling.preferred_model = "gpt-4"
+
+  # Configure sampling guard, which can be used to filter out samples that are not wanted
+  config.sampling.guard do |sample|
+    sample.message.include?("Hello")
+  end
 end
 ```
 

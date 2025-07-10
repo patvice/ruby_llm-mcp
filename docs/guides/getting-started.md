@@ -109,12 +109,8 @@ You can also execute tools directly:
 
 ```ruby
 # Execute a specific tool
-result = client.execute_tool(
-  name: "read_file",
-  parameters: {
-    path: "README.md"
-  }
-)
+tool = client.tool("read_file")
+result = tool.execute(path: "README.md")
 
 puts result
 ```
