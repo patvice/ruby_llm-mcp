@@ -14,11 +14,12 @@ module RubyLLM
 
         attr_reader :headers, :id, :coordinator
 
-        def initialize(url:, coordinator:, request_timeout:, headers: {})
+        def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {})
           @event_url = url
           @messages_url = nil
           @coordinator = coordinator
           @request_timeout = request_timeout
+          @version = version
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
@@ -168,9 +169,15 @@ module RubyLLM
         def stream_events_from_server
           sse_client = HTTPX.plugin(:stream)
           sse_client = sse_client.with(
-            ssl: { alpn_protocols: ["http/1.1"] },
             headers: @headers
           )
+
+          if @version == :http1
+            sse_client = sse_client.with(
+              ssl: { alpn_protocols: ["http/1.1"] }
+            )
+          end
+
           response = sse_client.get(@event_url, stream: true)
 
           event_buffer = []

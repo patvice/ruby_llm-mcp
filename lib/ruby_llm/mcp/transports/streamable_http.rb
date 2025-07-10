@@ -49,6 +49,7 @@ module RubyLLM
           request_timeout:,
           coordinator:,
           headers: {},
+          version: :http2,
           reconnection_options: nil,
           session_id: nil
         )
@@ -56,9 +57,11 @@ module RubyLLM
           @coordinator = coordinator
           @request_timeout = request_timeout
           @headers = headers || {}
-          @session_id = session_id
+          @version = version
           @reconnection_options = reconnection_options || ReconnectionOptions.new
           @protocol_version = nil
+          @session_id = session_id
+
           @resource_metadata_url = nil
           @client_id = SecureRandom.uuid
 
@@ -466,9 +469,9 @@ module RubyLLM
         def create_connection_with_sse_callbacks(options, headers)
           buffer = +""
 
-          client = HTTPX
-                   .plugin(:callbacks)
-                   .on_response_body_chunk do |request, response, chunk|
+          client = HTTPX.plugin(:callbacks)
+
+          client = client.on_response_body_chunk do |request, response, chunk|
             # Only process chunks for text/event-stream and if still running
             next unless @running && !@abort_controller
 
@@ -495,16 +498,23 @@ module RubyLLM
               end
             end
           end
-            .with(
-              timeout: {
-                connect_timeout: 10,
-                read_timeout: @request_timeout / 1000,
-                write_timeout: @request_timeout / 1000,
-                operation_timeout: @request_timeout / 1000
-              },
-              headers: headers,
+
+          client = client.with(
+            timeout: {
+              connect_timeout: 10,
+              read_timeout: @request_timeout / 1000,
+              write_timeout: @request_timeout / 1000,
+              operation_timeout: @request_timeout / 1000
+            },
+            headers: headers
+          )
+
+          if @version == :http1
+            client = client.with(
               ssl: { alpn_protocols: ["http/1.1"] }
             )
+          end
+
           register_client(client)
         end
 
