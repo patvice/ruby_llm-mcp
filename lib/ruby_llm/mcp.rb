@@ -8,12 +8,18 @@ module RubyLLM
   module MCP
     module_function
 
-    def clients(config = RubyLLM::MCP.config.mcp_configuration)
+    def clients
+      @clients ||= build_clients unless @built_clients
+      @clients
+    end
+
+    def build_clients(config = RubyLLM::MCP.config.mcp_configuration)
       @clients ||= {}
-      config.map do |options|
+      clients = config.map do |options|
         @clients[options[:name]] ||= Client.new(**options)
       end
-      @clients
+      @built_clients = true
+      clients
     end
 
     def add_client(options)
