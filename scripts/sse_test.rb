@@ -12,7 +12,7 @@ RubyLLM.configure do |config|
 end
 
 RubyLLM::MCP.configure do |config|
-  config.log_level = Logger::DEBUG
+  config.log_level = Logger::ERROR
   config.support_complex_parameters!
 end
 
@@ -20,13 +20,13 @@ mcp = RubyLLM::MCP.client(
   name: "test-server",
   transport_type: :sse,
   config: {
-    url: "http://localhost:3006/mcp/sse"
+    url: "https://remote-mcp-server-authless.patrickgvice.workers.dev/sse"
   }
 )
 
 mcp.tools.each do |tool|
   puts "Tool: #{tool.name}"
   puts "Description: #{tool.description}"
-  puts "Parameters: #{tool.parameters}"
+  puts "Parameters: #{tool.parameters.map { |name, param| "#{name} (#{param.inspect})" }.join(', ')}"
   puts "---"
 end
