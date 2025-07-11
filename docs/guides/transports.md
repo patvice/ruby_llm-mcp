@@ -62,6 +62,7 @@ client = RubyLLM::MCP.client(
   transport_type: :sse,
   config: {
     url: "https://api.example.com/mcp/sse",
+    version: :http2, # You can force HTTP/1.1 by setting this to :http1, default with try to setup HTTP/2 connection
     headers: { "Authorization" => "Bearer token" }
   }
 )
@@ -83,6 +84,7 @@ client = RubyLLM::MCP.client(
   transport_type: :streamable,
   config: {
     url: "https://api.example.com/mcp",
+    version: :http2, # You can force HTTP/1.1 by setting this to :http1, default with try to setup HTTP/2 connection
     headers: { "Content-Type" => "application/json" }
   }
 )
