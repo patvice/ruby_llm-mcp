@@ -16,12 +16,31 @@
   <span class="n">config</span><span class="p">.</span><span class="nf">max_connections</span> <span class="o">=</span> <span class="mi">10</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">pool_timeout</span> <span class="o">=</span> <span class="mi">5</span>
 
+  <span class="c1"># Event handlers, these will be used for all clients, unless overridden on the client level</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">on_progress</span> <span class="k">do</span> <span class="o">|</span><span class="n">progress</span><span class="o">|</span>
+    <span class="nb">puts</span> <span class="s2">"Progress: </span><span class="si">#{</span><span class="n">progress</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">on_human_in_the_loop</span> <span class="k">do</span> <span class="o">|</span><span class="n">human_in_the_loop</span><span class="o">|</span>
+    <span class="nb">puts</span> <span class="s2">"Human in the loop: </span><span class="si">#{</span><span class="n">human_in_the_loop</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">on_logging</span> <span class="k">do</span> <span class="o">|</span><span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="o">|</span>
+    <span class="nb">puts</span> <span class="s2">"Logging: </span><span class="si">#{</span><span class="n">level</span><span class="si">}</span><span class="s2"> - </span><span class="si">#{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+
   <span class="c1"># Configure roots for filesystem access</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">roots</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"/path/to/project"</span><span class="p">,</span> <span class="no">Rails</span><span class="p">.</span><span class="nf">root</span><span class="p">]</span>
 
   <span class="c1"># Configure sampling</span>
+  <span class="c1"># Enabled the clinet to support sampling requests,default: false</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">sampling</span><span class="p">.</span><span class="nf">enabled</span> <span class="o">=</span> <span class="kp">true</span>
+
+  <span class="c1"># Configure sampling preferred model</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">sampling</span><span class="p">.</span><span class="nf">preferred_model</span> <span class="o">=</span> <span class="s2">"gpt-4"</span>
+
+  <span class="c1"># Configure sampling guard, which can be used to filter out samples that are not wanted</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">sampling</span><span class="p">.</span><span class="nf">guard</span> <span class="k">do</span> <span class="o">|</span><span class="n">sample</span><span class="o">|</span>
+    <span class="n">sample</span><span class="p">.</span><span class="nf">message</span><span class="p">.</span><span class="nf">include?</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">)</span>
+  <span class="k">end</span>
 <span class="k">end</span>
 </code></pre></div></div> <h2 id="client-configuration"> <a href="#client-configuration" class="anchor-heading" aria-labelledby="client-configuration"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Client Configuration </h2> <h3 id="basic-client-options"> <a href="#basic-client-options" class="anchor-heading" aria-labelledby="basic-client-options"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Basic Client Options </h3> <p>All MCP clients support these common options:</p> <div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">client</span> <span class="o">=</span> <span class="no">RubyLLM</span><span class="o">::</span><span class="no">MCP</span><span class="p">.</span><span class="nf">client</span><span class="p">(</span>
   <span class="ss">name: </span><span class="s2">"unique-client-name"</span><span class="p">,</span>          <span class="c1"># Required: unique identifier</span>

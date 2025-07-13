@@ -33,12 +33,8 @@
 <span class="n">response</span> <span class="o">=</span> <span class="n">chat</span><span class="p">.</span><span class="nf">ask</span><span class="p">(</span><span class="s2">"List the files in the current directory"</span><span class="p">)</span>
 <span class="nb">puts</span> <span class="n">response</span>
 </code></pre></div></div> <h3 id="manual-tool-execution"> <a href="#manual-tool-execution" class="anchor-heading" aria-labelledby="manual-tool-execution"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Manual Tool Execution </h3> <p>You can also execute tools directly:</p> <div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Execute a specific tool</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">execute_tool</span><span class="p">(</span>
-  <span class="ss">name: </span><span class="s2">"read_file"</span><span class="p">,</span>
-  <span class="ss">parameters: </span><span class="p">{</span>
-    <span class="ss">path: </span><span class="s2">"README.md"</span>
-  <span class="p">}</span>
-<span class="p">)</span>
+<span class="n">tool</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">tool</span><span class="p">(</span><span class="s2">"read_file"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">tool</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="ss">path: </span><span class="s2">"README.md"</span><span class="p">)</span>
 
 <span class="nb">puts</span> <span class="n">result</span>
 </code></pre></div></div> <h3 id="working-with-resources"> <a href="#working-with-resources" class="anchor-heading" aria-labelledby="working-with-resources"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Working with Resources </h3> <p>Resources provide static or dynamic data for conversations:</p> <div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Get available resources</span>

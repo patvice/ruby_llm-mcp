@@ -12,6 +12,7 @@
   <span class="ss">transport_type: :sse</span><span class="p">,</span>
   <span class="ss">config: </span><span class="p">{</span>
     <span class="ss">url: </span><span class="s2">"https://api.example.com/mcp/sse"</span><span class="p">,</span>
+    <span class="ss">version: :http2</span><span class="p">,</span> <span class="c1"># You can force HTTP/1.1 by setting this to :http1, default with try to setup HTTP/2 connection</span>
     <span class="ss">headers: </span><span class="p">{</span> <span class="s2">"Authorization"</span> <span class="o">=&gt;</span> <span class="s2">"Bearer token"</span> <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">)</span>
@@ -20,6 +21,7 @@
   <span class="ss">transport_type: :streamable</span><span class="p">,</span>
   <span class="ss">config: </span><span class="p">{</span>
     <span class="ss">url: </span><span class="s2">"https://api.example.com/mcp"</span><span class="p">,</span>
+    <span class="ss">version: :http2</span><span class="p">,</span> <span class="c1"># You can force HTTP/1.1 by setting this to :http1, default with try to setup HTTP/2 connection</span>
     <span class="ss">headers: </span><span class="p">{</span> <span class="s2">"Content-Type"</span> <span class="o">=&gt;</span> <span class="s2">"application/json"</span> <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">)</span>

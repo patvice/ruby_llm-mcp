@@ -14,11 +14,12 @@ module RubyLLM
 
         attr_reader :headers, :id, :coordinator
 
-        def initialize(url:, coordinator:, request_timeout:, headers: {})
+        def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {})
           @event_url = url
           @messages_url = nil
           @coordinator = coordinator
           @request_timeout = request_timeout
+          @version = version
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
@@ -44,7 +45,7 @@ module RubyLLM
           RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
         end
 
-        def request(body, add_id: true, wait_for_response: true) # rubocop:disable Metrics/MethodLength
+        def request(body, add_id: true, wait_for_response: true)
           if add_id
             @id_mutex.synchronize { @id_counter += 1 }
             request_id = @id_counter
@@ -59,34 +60,20 @@ module RubyLLM
           end
 
           begin
-            http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
-                                                              headers: @headers)
-            response = http_client.post(@messages_url, body: JSON.generate(body))
-
-            unless response.status == 200
-              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-              RubyLLM::MCP.logger.error "SSE request failed: #{response.status} - #{response.body}"
-              raise Errors::TransportError.new(
-                message: "Failed to request #{@messages_url}: #{response.status} - #{response.body}",
-                code: response.status
-              )
-            end
-          rescue StandardError => e
+            send_request(body, request_id)
+          rescue Errors::TransportError, Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            RubyLLM::MCP.logger.error "SSE request error (ID: #{request_id}): #{e.message}"
-            raise RubyLLM::MCP::Errors::TransportError.new(
-              message: e.message,
-              code: -1,
-              error: e
-            )
+            RubyLLM::MCP.logger.error "Request error (ID: #{request_id}): #{e.message}"
+            raise e
           end
+
           return unless wait_for_response
 
           begin
             with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
-          rescue RubyLLM::MCP::Errors::TimeoutError => e
+          rescue Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             RubyLLM::MCP.logger.error "SSE request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
             raise e
@@ -116,6 +103,23 @@ module RubyLLM
         end
 
         private
+
+        def send_request(body, request_id)
+          http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
+                                                            headers: @headers)
+          response = http_client.post(@messages_url, body: JSON.generate(body))
+          handle_httpx_error_response!(response,
+                                       context: { location: "message endpoint request", request_id: request_id })
+
+          unless [200, 202].include?(response.status)
+            message = "Failed to have a successful request to #{@messages_url}: #{response.status} - #{response.body}"
+            RubyLLM::MCP.logger.error(message)
+            raise Errors::TransportError.new(
+              message: message,
+              code: response.status
+            )
+          end
+        end
 
         def start_sse_listener
           @connection_mutex.synchronize do
@@ -167,15 +171,36 @@ module RubyLLM
           sse_client = sse_client.with(
             headers: @headers
           )
+
+          if @version == :http1
+            sse_client = sse_client.with(
+              ssl: { alpn_protocols: ["http/1.1"] }
+            )
+          end
+
           response = sse_client.get(@event_url, stream: true)
+
+          event_buffer = []
           response.each_line do |event_line|
             unless @running
               response.body.close
               next
             end
 
-            event = parse_event(event_line)
-            process_event(event)
+            # Strip the line and check if it's empty (indicates end of event)
+            line = event_line.strip
+
+            if line.empty?
+              # End of event - process the accumulated buffer
+              if event_buffer.any?
+                event = parse_event(event_buffer.join("\n"))
+                process_event(event)
+                event_buffer.clear
+              end
+            else
+              # Accumulate the line for the current event
+              event_buffer << line
+            end
           end
         end
 
@@ -185,6 +210,25 @@ module RubyLLM
           error_message = "#{message}: #{error.message}"
           RubyLLM::MCP.logger.error "#{error_message}. Reconnecting in 1 seconds..."
           sleep 1
+        end
+
+        def handle_httpx_error_response!(response, context:)
+          return false unless response.is_a?(HTTPX::ErrorResponse)
+
+          error = response.error
+
+          if error.is_a?(HTTPX::ReadTimeoutError)
+            raise Errors::TimeoutError.new(
+              message: "Request timed out after #{@request_timeout / 1000} seconds"
+            )
+          end
+
+          error_message = response.error&.message || "Request failed"
+
+          raise Errors::TransportError.new(
+            code: nil,
+            message: "Request Error #{context}: #{error_message}"
+          )
         end
 
         def process_event(raw_event)

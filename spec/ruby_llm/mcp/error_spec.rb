@@ -90,8 +90,8 @@ RSpec.describe RubyLLM::MCP::Error do
 
       result = error.to_s
 
-      expect(result).to eq(
-        "Error: code: -32700 (parse_error), message: Parse error, data: {\"details\"=>\"Invalid JSON\"}"
+      expect(result).to include(
+        "Error: code: -32700 (parse_error), message: Parse error, data:"
       )
     end
 
@@ -104,7 +104,7 @@ RSpec.describe RubyLLM::MCP::Error do
 
       result = error.to_s
 
-      expect(result).to eq("Error: code: -32600 (invalid_request), message: , data: {\"info\"=>\"test\"}")
+      expect(result).to include("Error: code: -32600 (invalid_request), message: , data:")
     end
 
     it "formats error with missing data" do

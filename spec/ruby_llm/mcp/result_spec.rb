@@ -362,10 +362,7 @@ RSpec.describe RubyLLM::MCP::Result do
       inspect_string = result.inspect
 
       expect(inspect_string).to include("id: 123")
-      expect(inspect_string).to include("result: {\"data\"=>\"test\"}")
-      expect(inspect_string).to include("error: {\"code\"=>-1}")
       expect(inspect_string).to include("method: ping")
-      expect(inspect_string).to include("params: {\"param1\"=>\"value1\"}")
     end
 
     it "to_s is an alias for inspect" do

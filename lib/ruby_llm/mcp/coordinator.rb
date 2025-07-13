@@ -25,7 +25,7 @@ module RubyLLM
       def request(body, **options)
         transport.request(body, **options)
       rescue RubyLLM::MCP::Errors::TimeoutError => e
-        if transport&.alive?
+        if transport&.alive? && !e.request_id.nil?
           cancelled_notification(reason: "Request timed out", request_id: e.request_id)
         end
         raise e
@@ -78,6 +78,10 @@ module RubyLLM
 
         @capabilities = RubyLLM::MCP::ServerCapabilities.new(initialize_response.value["capabilities"])
         initialize_notification
+
+        if client.logging_handler_enabled?
+          set_logging(level: client.on_logging_level)
+        end
       end
 
       def stop_transport

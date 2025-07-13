@@ -161,7 +161,10 @@ module RubyLLM
       end
 
       def on_logging(level: Logging::WARNING, &block)
-        @coordinator.set_logging(level: level)
+        @on_logging_level = level
+        if alive?
+          @coordinator.set_logging(level: level)
+        end
 
         @on[:logging] = block
         self
@@ -183,6 +186,28 @@ module RubyLLM
       def on_elicitation(&block)
         @on[:elicitation] = block
         self
+      end
+
+      def to_h
+        {
+          name: @name,
+          transport_type: @transport_type,
+          request_timeout: @request_timeout,
+          start: @start,
+          config: @config,
+          on: @on,
+          tools: @tools,
+          resources: @resources,
+          resource_templates: @resource_templates,
+          prompts: @prompts,
+          log_level: @log_level
+        }
+      end
+
+      alias as_json to_h
+
+      def inspect
+        "#<#{self.class.name}:0x#{object_id.to_s(16)} #{to_h.map { |k, v| "#{k}: #{v}" }.join(', ')}>"
       end
 
       private
@@ -228,7 +253,11 @@ module RubyLLM
         @on[:sampling] = MCP.config.sampling.guard
       end
 
-      def setup_elicitation
+      def setup_event_handlers
+        @on[:progress] = MCP.config.on_progress
+        @on[:human_in_the_loop] = MCP.config.on_human_in_the_loop
+        @on[:logging] = MCP.config.on_logging
+        @on_logging_level = MCP.config.on_logging_level
         @on[:elicitation] = MCP.config.elicitation
       end
     end
