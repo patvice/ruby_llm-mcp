@@ -34,7 +34,7 @@ module RubyLLM
     end
 
     def establish_connection(&)
-      clients.each(&:start)
+      clients.each_value(&:start)
       if block_given?
         begin
           yield clients
@@ -47,7 +47,7 @@ module RubyLLM
     end
 
     def close_connection
-      clients.each do |client|
+      clients.each_value do |client|
         client.stop if client.alive?
       end
     end
