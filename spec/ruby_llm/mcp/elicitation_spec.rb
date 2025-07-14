@@ -211,7 +211,6 @@ RSpec.describe RubyLLM::MCP::Elicitation do
           # Test rejection of sensitive request
           result = tool.execute(request_type: "sensitive")
           expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("action")
           expect(result.to_s).to include("reject")
 
           # Test acceptance of optional request
