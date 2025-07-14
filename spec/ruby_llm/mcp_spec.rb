@@ -133,7 +133,7 @@ RSpec.describe RubyLLM::MCP do
   describe "#establish_connection" do
     let(:client_streamable_http) { instance_double(RubyLLM::MCP::Client) }
     let(:client_stdio) { instance_double(RubyLLM::MCP::Client) }
-    let(:clients) { [client_streamable_http, client_stdio] }
+    let(:clients) { { "streamable_http" => client_streamable_http, "stdio" => client_stdio } }
 
     before do
       allow(RubyLLM::MCP).to receive(:clients).and_return(clients)
@@ -189,7 +189,7 @@ RSpec.describe RubyLLM::MCP do
   describe "#close_connection" do
     let(:alive_client) { instance_double(RubyLLM::MCP::Client) }
     let(:dead_client) { instance_double(RubyLLM::MCP::Client) }
-    let(:clients) { [alive_client, dead_client] }
+    let(:clients) { { "alive_client" => alive_client, "dead_client" => dead_client } }
 
     before do
       allow(RubyLLM::MCP).to receive(:clients).and_return(clients)
