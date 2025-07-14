@@ -33,6 +33,10 @@ This is useful for servers that need user input or clarification during complex 
 {: .new }
 Elicitation is a new feature in MCP Protocol 2025-06-18.
 
+**Note:** Elicitation is only available for clients that support the `2025-06-18` protocol version.
+
+Additional, in this current version the original request still needs to complete in the bounds of the initial request timeout. In some cases (like if you were to get real user input) that may take longer than what a normal request would take. A solution to this will come out in future versions.
+
 ## Basic Elicitation Configuration
 
 ### Global Configuration
@@ -250,74 +254,6 @@ elicitation.structured_response = {
 
 ---
 
-## Advanced Patterns
-
-### Interactive User Input
-
-```ruby
-client.on_elicitation do |elicitation|
-  puts "\n#{elicitation.message}"
-
-  schema = elicitation.requested_schema
-  response = {}
-
-  # Collect input based on schema properties
-  schema["properties"].each do |key, property|
-    print "#{key.capitalize}: "
-    value = gets.chomp
-
-    # Convert based on type
-    case property["type"]
-    when "number"
-      response[key] = value.to_f
-    when "boolean"
-      response[key] = ["true", "yes", "y"].include?(value.downcase)
-    else
-      response[key] = value
-    end
-  end
-
-  elicitation.structured_response = response
-  true
-end
-```
-
-### Conditional Logic
-
-```ruby
-client.on_elicitation do |elicitation|
-  case elicitation.message
-  when /approval required/i
-    # Handle approval requests
-    elicitation.structured_response = { "approved": confirm_approval() }
-    true
-  when /preference/i
-    # Handle preference requests
-    elicitation.structured_response = { "choice": get_user_preference() }
-    true
-  else
-    # Reject unknown requests
-    false
-  end
-end
-```
-
-### Async Processing
-
-```ruby
-client.on_elicitation do |elicitation|
-  # For complex processing, you might want to handle this asynchronously
-  Thread.new do
-    response = complex_processing(elicitation.message, elicitation.requested_schema)
-    elicitation.structured_response = response
-  end
-
-  true  # Accept the elicitation
-end
-```
-
----
-
 ## Error Handling
 
 ### Schema Validation Errors
@@ -358,57 +294,6 @@ end
 
 ---
 
-## Testing Elicitation
-
-### Mock Elicitation Requests
-
-```ruby
-# In your tests
-RSpec.describe "Elicitation handling" do
-  it "handles user preferences" do
-    client = create_test_client
-
-    # Mock elicitation response
-    client.on_elicitation do |elicitation|
-      expect(elicitation.message).to include("preference")
-      elicitation.structured_response = { "choice": "test_option" }
-      true
-    end
-
-    # Trigger elicitation through server interaction
-    result = client.tool("preference_tool").execute
-    expect(result).to be_successful
-  end
-end
-```
-
-### Integration Tests
-
-```ruby
-# Test with real server that sends elicitation requests
-def test_elicitation_workflow
-  client = RubyLLM::MCP.client(
-    name: "test-server",
-    transport_type: :stdio,
-    config: { command: "test-mcp-server" }
-  )
-
-  responses = []
-  client.on_elicitation do |elicitation|
-    responses << elicitation.message
-    elicitation.structured_response = { "test": "response" }
-    true
-  end
-
-  # Execute operation that triggers elicitation
-  client.tool("interactive_tool").execute
-
-  expect(responses).not_to be_empty
-end
-```
-
----
-
 ## Best Practices
 
 ### Security Considerations
@@ -438,3 +323,11 @@ end
 - **Implement async processing** for complex input collection
 - **Set reasonable timeouts** for user interactions
 - **Monitor elicitation frequency** to detect issues
+
+## Next Steps
+
+Once you understand client interactions, explore:
+
+- **[Server Interactions]({% link server/index.md %})** - Working with server capabilities
+- **[Configuration]({% link configuration.md %})** - Advanced client configuration options
+- **[Rails Integration]({% link guides/rails-integration.md %})** - Using MCP with Rails applications
