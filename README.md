@@ -19,7 +19,7 @@ Currently full support for MCP protocol version up to `2025-06-18`.
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
-- 🎛️ **Client Features**: Support for sampling and roots
+- 🎛️ **Client Features**: Support for sampling, roots, and elicitation
 - 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously for different servers and purposes
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
@@ -216,7 +216,6 @@ puts response
 chat.with_prompt(greeting_prompt, arguments: { name: "Alice", time: "morning" })
 response = chat.ask("Continue with the greeting")
 ```
-
 
 ## Development
 
