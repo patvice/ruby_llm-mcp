@@ -87,6 +87,7 @@ CLIENT_OPTIONS = [
     options: {
       name: "stdio-server",
       transport_type: :stdio,
+      request_timeout: 10_000,
       config: {
         command: "bun",
         args: [

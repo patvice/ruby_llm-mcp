@@ -78,6 +78,71 @@ RubyLLM::MCP.configure do |config|
 end
 ```
 
+## Protocol Version Configuration
+
+You can configure which MCP protocol version the client should use when connecting to servers. This is useful for testing newer protocol features or ensuring compatibility with specific server versions.
+
+### Setting Protocol Version in Transport Config
+
+```ruby
+# Force client to use a specific protocol version
+client = RubyLLM::MCP::Client.new(
+  name: "my-server",
+  transport_type: :stdio,
+  config: {
+    command: ["node", "server.js"],
+    protocol_version: "2025-06-18"  # Override default version
+  }
+)
+```
+
+### Available Protocol Versions
+
+The RubyLLM MCP client supports multiple protocol versions. You can access these through the protocol constants:
+
+```ruby
+# Latest supported protocol version
+puts RubyLLM::MCP::Protocol.latest_version
+# => "2025-06-18"
+
+# Default version used for negotiation
+puts RubyLLM::MCP::Protocol.default_negotiated_version
+# => "2025-03-26"
+
+# All supported versions
+puts RubyLLM::MCP::Protocol.supported_versions
+# => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
+
+# Check if a version is supported
+RubyLLM::MCP::Protocol.supported_version?("2025-06-18")
+# => true
+```
+
+### Protocol Version Features
+
+Different protocol versions support different features:
+
+- **2025-06-18** (Latest): Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
+- **2025-03-26** (Default): Tool calling, resources, prompts, completions, notifications
+- **2024-11-05**: Basic tool and resource support
+- **2024-10-07**: Initial MCP implementation
+
+### HTTP Transport Protocol Headers
+
+When using HTTP transports, the protocol version is automatically included in request headers:
+
+```ruby
+# HTTP transport automatically sets MCP-Protocol-Version header
+client = RubyLLM::MCP::Client.new(
+  name: "http-server",
+  transport_type: :streamable,
+  config: {
+    url: "https://api.example.com/mcp",
+    protocol_version: "2025-06-18"  # Sent as MCP-Protocol-Version header
+  }
+)
+```
+
 ## Client Configuration
 
 ### Basic Client Options

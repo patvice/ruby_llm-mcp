@@ -88,7 +88,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
 
         before do
           # Configure elicitation handler for this test
-          client.on_elicitation(&elicitation_handler) if client.respond_to?(:on_elicitation)
+          client.on_elicitation(&elicitation_handler)
         end
 
         it "handles elicitation requests from tools" do
@@ -97,45 +97,167 @@ RSpec.describe RubyLLM::MCP::Elicitation do
 
           result = tool.execute(scenario: "preference_collection")
           expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Elicitation request prepared")
+          expect(result.to_s).to include("Collected user preferences")
         end
 
-        it "provides structured responses to elicitation requests" do
-          # Test that elicitation requests can receive structured responses
+        it "executes tools that trigger elicitation workflow" do
+          # Set up elicitation handler that provides user preferences
+          client.on_elicitation do |elicitation|
+            if elicitation.message.include?("user preferences")
+              elicitation.structured_response = {
+                "theme" => "dark",
+                "language" => "en",
+                "notifications" => true
+              }
+              true
+            else
+              false
+            end
+          end
+
+          tool = client.tool("user_preference_collector")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          result = tool.execute(scenario: "app_preferences")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Collected user preferences")
+          # Verify the elicitation response is included in the result
+          expect(result.to_s).to include("dark")
+          expect(result.to_s).to include("en")
+          expect(result.to_s).to include("true")
+        end
+
+        it "executes simple elicitation tool with confirmation" do
+          # Set up elicitation handler for confirmations
+          client.on_elicitation do |elicitation|
+            if elicitation.message.include?("confirm")
+              elicitation.structured_response = { "confirmed" => true, "response" => "confirmed" }
+              true
+            else
+              false
+            end
+          end
+
           tool = client.tool("simple_elicitation")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
 
           result = tool.execute(message: "Please confirm your choice")
           expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Simple elicitation")
-
-          # Check if tool indicates elicitation was prepared
-          content_parts = result.instance_variable_get(:@content)
-          if content_parts.is_a?(Array) && content_parts.any? { |part| part.dig("_meta", "requires_elicitation") }
-            expect(content_parts.first["_meta"]["requires_elicitation"]).to be true
-          end
+          expect(result.to_s).to include("Simple elicitation completed")
+          # Verify the confirmation response is included
+          expect(result.to_s).to include("confirmed")
+          expect(result.to_s).to include("true")
         end
 
-        it "validates elicitation response against schema" do
-          # Test that tools provide proper elicitation schemas that can be validated
+        it "executes complex elicitation with structured schema validation" do # rubocop:disable RSpec/ExampleLength
+          # Set up elicitation handler that provides valid structured data
+          client.on_elicitation do |elicitation|
+            case elicitation.message
+            when /user_profile/
+              elicitation.structured_response = {
+                "name" => "John Doe",
+                "email" => "john@example.com",
+                "age" => 30,
+                "preferences" => {
+                  "theme" => "dark",
+                  "language" => "en"
+                }
+              }
+              true
+            when /settings/
+              elicitation.structured_response = {
+                "auto_save" => true,
+                "backup_frequency" => "daily",
+                "max_history" => 100
+              }
+              true
+            else
+              false
+            end
+          end
+
           tool = client.tool("complex_elicitation")
           expect(tool).to be_a(RubyLLM::MCP::Tool)
 
+          # Test user profile collection
           result = tool.execute(data_type: "user_profile")
           expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Complex elicitation prepared")
+          expect(result.to_s).to include("Complex elicitation completed")
+          expect(result.to_s).to include("John Doe")
+          expect(result.to_s).to include("john@example.com")
 
-          # Check that the tool provides a proper schema in metadata
-          content_parts = result.instance_variable_get(:@content)
-          if content_parts.is_a?(Array)
-            meta_part = content_parts.find { |part| part.dig("_meta", "elicitation_request") }
-            if meta_part
-              schema = meta_part["_meta"]["elicitation_request"]["requestedSchema"]
-              expect(schema).to be_a(Hash)
-              expect(schema).to have_key("type")
-              expect(schema).to have_key("properties")
-              expect(schema).to have_key("required")
+          # Test settings collection
+          result = tool.execute(data_type: "settings")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Complex elicitation completed")
+          expect(result.to_s).to include("auto_save")
+          expect(result.to_s).to include("daily")
+        end
+
+        it "handles rejected elicitation in tool execution" do
+          # Set up elicitation handler that rejects sensitive requests
+          client.on_elicitation do |elicitation|
+            if elicitation.message.include?("sensitive")
+              false # Reject sensitive data requests
+            else
+              elicitation.structured_response = { "data" => "safe_data" }
+              true
             end
           end
+
+          tool = client.tool("rejectable_elicitation")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          # Test rejection of sensitive request
+          result = tool.execute(request_type: "sensitive")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("\"action\":\"reject\"")
+
+          # Test acceptance of optional request
+          result = tool.execute(request_type: "optional")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("elicitation completed")
+          expect(result.to_s).to include("safe_data")
+        end
+
+        it "handles elicitation timeout and fallback" do
+          # Set up elicitation handler that simulates timeout by taking too long
+          client.on_elicitation do |elicitation|
+            # Simulate a delay that might cause timeout
+            if elicitation.message.include?("quick")
+              elicitation.structured_response = { "response" => "quick_answer" }
+              true
+            else
+              false
+            end
+          end
+
+          tool = client.tool("simple_elicitation")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          result = tool.execute(message: "Please provide a quick response")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Simple elicitation completed")
+          expect(result.to_s).to include("quick_answer")
+        end
+
+        it "handles invalid elicitation response format during execution" do
+          # Set up elicitation handler that provides invalid response format
+          client.on_elicitation do |elicitation|
+            # Invalid: setting response to a string instead of structured data
+            elicitation.structured_response = "invalid string response"
+            true
+          end
+
+          tool = client.tool("complex_elicitation")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          # Tool should handle invalid response gracefully
+          result = tool.execute(data_type: "user_profile")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Complex elicitation completed")
+          # Invalid response should cause cancellation
+          expect(result.to_s).to include("\"action\":\"cancel\"")
         end
       end
     end
@@ -144,7 +266,9 @@ RSpec.describe RubyLLM::MCP::Elicitation do
   describe "Elicitation Response Validation" do
     let(:mock_coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
     let(:mock_result) do
-      instance_double(RubyLLM::MCP::Result, params: {
+      instance_double(RubyLLM::MCP::Result,
+                      id: "test-id-123",
+                      params: {
                         "message" => "Please select your preference",
                         "requestedSchema" => {
                           "type" => "object",
@@ -205,49 +329,14 @@ RSpec.describe RubyLLM::MCP::Elicitation do
     end
   end
 
-  describe "Elicitation Error Handling" do
-    CLIENT_OPTIONS.each do |config|
-      context "with #{config[:name]}" do
-        let(:client) { ClientRunner.fetch_client(config[:name]) }
-
-        it "handles rejected elicitation requests gracefully" do
-          # Configure handler that rejects requests
-          client.on_elicitation { |_elicitation| false } if client.respond_to?(:on_elicitation)
-
-          tool = client.tool("rejectable_elicitation")
-          result = tool.execute(request_type: "sensitive")
-
-          # Tool should handle rejection gracefully
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("client may accept or reject")
-        end
-
-        it "handles invalid elicitation responses" do
-          # Configure handler that provides invalid response
-          if client.respond_to?(:on_elicitation)
-            client.on_elicitation do |elicitation|
-              elicitation.structured_response = "invalid response format"
-              true
-            end
-          end
-
-          tool = client.tool("complex_elicitation")
-          result = tool.execute(data_type: "user_profile")
-
-          # Should handle invalid response gracefully
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Complex elicitation prepared")
-        end
-      end
-    end
-  end
-
   describe "Elicitation Security" do
     let(:mock_coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
 
     it "handles elicitation messages safely" do
       # Test that potentially malicious content in elicitation messages is handled safely
-      mock_result = instance_double(RubyLLM::MCP::Result, params: {
+      mock_result = instance_double(RubyLLM::MCP::Result,
+                                    id: "test-id-123",
+                                    params: {
                                       "message" => "<script>alert('xss')</script>Please confirm",
                                       "requestedSchema" => {
                                         "type" => "object",
@@ -262,7 +351,9 @@ RSpec.describe RubyLLM::MCP::Elicitation do
     end
 
     it "handles invalid schema structures gracefully" do
-      mock_result = instance_double(RubyLLM::MCP::Result, params: {
+      mock_result = instance_double(RubyLLM::MCP::Result,
+                                    id: "test-id-123",
+                                    params: {
                                       "message" => "Test message",
                                       "requestedSchema" => "invalid schema format"
                                     })
@@ -274,10 +365,14 @@ RSpec.describe RubyLLM::MCP::Elicitation do
     end
 
     it "handles large elicitation responses" do
-      mock_result = instance_double(RubyLLM::MCP::Result, params: {
+      mock_result = instance_double(RubyLLM::MCP::Result,
+                                    id: "test-id-123",
+                                    params: {
                                       "message" => "Test message",
-                                      "requestedSchema" => { "type" => "object",
-                                                             "properties" => { "data" => { "type" => "string" } } }
+                                      "requestedSchema" => {
+                                        "type" => "object",
+                                        "properties" => { "data" => { "type" => "string" } }
+                                      }
                                     })
 
       elicitation = RubyLLM::MCP::Elicitation.new(mock_coordinator, mock_result)

@@ -14,6 +14,7 @@ module RubyLLM
       def initialize(coordinator, result)
         @coordinator = coordinator
         @result = result
+        @id = result.id
 
         @message = @result.params["message"]
         @requested_schema = @result.params["requestedSchema"]
@@ -24,13 +25,17 @@ module RubyLLM
         if success
           valid = validate_response
           if valid
-            @coordinator.elicitation_response(@id, action: ACCEPT_ACTION, content: @structured_response)
+            @coordinator.elicitation_response(id: @id, action: ACCEPT_ACTION, content: @structured_response)
           else
-            @coordinator.elicitation_response(@id, action: CANCEL_ACTION, content: nil)
+            @coordinator.elicitation_response(id: @id, action: CANCEL_ACTION, content: nil)
           end
         else
-          @coordinator.elicitation_response(@id, action: REJECT_ACTION, content: nil)
+          @coordinator.elicitation_response(id: @id, action: REJECT_ACTION, content: nil)
         end
+      end
+
+      def message
+        @result.params["message"]
       end
 
       def validate_response

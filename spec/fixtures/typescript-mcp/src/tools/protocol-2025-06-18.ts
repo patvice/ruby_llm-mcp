@@ -118,42 +118,37 @@ export function setupProtocol2025Features(server: McpServer) {
       scenario: z.string(),
     },
     async ({ scenario }) => {
-      // This would trigger an elicitation request
-      // For testing, we'll return a specific response that indicates elicitation should happen
-
+      // Real elicitation call to the client
       const elicitationSchema = {
-        type: "object",
+        type: "object" as const,
         properties: {
-          preference: {
-            type: "string",
-            enum: ["option_a", "option_b", "option_c"],
-          },
-          confidence: {
-            type: "number",
-            minimum: 0,
-            maximum: 1,
-          },
-          reasoning: {
-            type: "string",
-          },
+          theme: { type: "string" as const },
+          language: { type: "string" as const },
+          notifications: { type: "boolean" as const },
         },
-        required: ["preference"],
+        required: ["theme"],
       };
 
-      // In a real server, this would use server.request() to send an elicitation
-      // For testing, we'll simulate the response
+      const elicitationResponse = await server.server.elicitInput({
+        message: `Please provide your user preferences for scenario: ${scenario}`,
+        requestedSchema: elicitationSchema,
+      });
+
+      const userInput = elicitationResponse || { theme: "no_response" };
+
       return {
         content: [
           {
             type: "text",
-            text: `Would trigger elicitation for scenario: ${scenario}`,
+            text: `Collected user preferences for ${scenario}: ${JSON.stringify(
+              userInput
+            )}`,
           },
         ],
-        // Include metadata that indicates elicitation was requested
         _meta: {
-          elicitation_requested: true,
+          elicitation_completed: true,
+          user_input: userInput,
           scenario,
-          schema: elicitationSchema,
         },
       };
     }

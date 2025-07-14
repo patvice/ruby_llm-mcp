@@ -258,7 +258,7 @@ module RubyLLM
         @on[:human_in_the_loop] = MCP.config.on_human_in_the_loop
         @on[:logging] = MCP.config.on_logging
         @on_logging_level = MCP.config.on_logging_level
-        @on[:elicitation] = MCP.config.elicitation
+        @on[:elicitation] = MCP.config.on_elicitation
       end
     end
   end

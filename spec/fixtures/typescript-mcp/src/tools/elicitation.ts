@@ -12,46 +12,47 @@ export function setupElicitationTools(server: McpServer) {
         .describe("The scenario for which to collect preferences"),
     },
     async ({ scenario }: { scenario: string }) => {
-      // This tool simulates what would happen with real elicitation
-      // The client will need to handle the elicitation_request metadata
-
-      const elicitationSchema = {
-        type: "object",
-        properties: {
-          preference: {
-            type: "string",
-            enum: ["option_a", "option_b", "option_c"],
-            description: "User's preferred option",
+      // Real elicitation call to the client
+      const elicitationResponse = await server.server.elicitInput({
+        message: `Please provide your user preferences for scenario: ${scenario}`,
+        requestedSchema: {
+          type: "object",
+          properties: {
+            preference: {
+              type: "string",
+              enum: ["option_a", "option_b", "option_c"],
+              description: "User's preferred option",
+            } as const,
+            confidence: {
+              type: "number",
+              minimum: 0,
+              maximum: 1,
+              description: "Confidence level in the preference",
+            } as const,
+            reasoning: {
+              type: "string",
+              description: "Reasoning behind the preference",
+            } as const,
           },
-          confidence: {
-            type: "number",
-            minimum: 0,
-            maximum: 1,
-            description: "Confidence level in the preference",
-          },
-          reasoning: {
-            type: "string",
-            description: "Reasoning behind the preference",
-          },
+          required: ["preference"],
         },
-        required: ["preference"],
-      };
+      });
+
+      // Use the actual response from the client
+      const userInput = elicitationResponse || { preference: "no_response" };
 
       return {
         content: [
           {
             type: "text",
-            text: `Elicitation request prepared for scenario: ${scenario}`,
+            text: `Collected user preferences for ${scenario}: ${JSON.stringify(
+              userInput
+            )}`,
           },
         ],
         _meta: {
-          elicitation_request: {
-            message: `Please provide your preference for scenario: ${scenario}`,
-            requestedSchema: elicitationSchema,
-            scenario,
-          },
-          requires_elicitation: true,
-          test_mode: true,
+          elicitation_completed: true,
+          user_input: userInput,
         },
       };
     }
@@ -75,9 +76,11 @@ export function setupElicitationTools(server: McpServer) {
             age: { type: "number", minimum: 18, maximum: 120 },
             email: { type: "string", format: "email" },
             preferences: {
-              type: "array",
-              items: { type: "string" },
-              minItems: 1,
+              type: "object",
+              properties: {
+                theme: { type: "string" },
+                language: { type: "string" },
+              },
             },
           },
           required: ["name", "email"],
@@ -85,11 +88,14 @@ export function setupElicitationTools(server: McpServer) {
         settings: {
           type: "object",
           properties: {
-            theme: { type: "string", enum: ["light", "dark", "auto"] },
-            notifications: { type: "boolean" },
-            language: { type: "string", pattern: "^[a-z]{2}$" },
+            auto_save: { type: "boolean" },
+            backup_frequency: {
+              type: "string",
+              enum: ["daily", "weekly", "monthly"],
+            },
+            max_history: { type: "number", minimum: 10, maximum: 1000 },
           },
-          required: ["theme"],
+          required: ["auto_save"],
         },
         feedback: {
           type: "object",
@@ -104,22 +110,27 @@ export function setupElicitationTools(server: McpServer) {
 
       const schema = (schemas as any)[data_type];
 
+      // Real elicitation call to the client
+      const elicitationResponse = await server.server.elicitInput({
+        message: `Please provide ${data_type} information`,
+        requestedSchema: schema,
+      });
+
+      const userInput = elicitationResponse || { error: "no_response" };
+
       return {
         content: [
           {
             type: "text",
-            text: `Complex elicitation prepared for ${data_type}`,
+            text: `Complex elicitation completed for ${data_type}: ${JSON.stringify(
+              userInput
+            )}`,
           },
         ],
         _meta: {
-          elicitation_request: {
-            message: `Please provide ${data_type} information`,
-            requestedSchema: schema,
-            data_type,
-          },
-          requires_elicitation: true,
-          complex_schema: true,
-          test_mode: true,
+          elicitation_completed: true,
+          user_input: userInput,
+          data_type,
         },
       };
     }
@@ -144,32 +155,53 @@ export function setupElicitationTools(server: McpServer) {
       };
 
       const schema = {
-        type: "object",
+        type: "object" as const,
         properties: {
-          confirmed: { type: "boolean" },
-          additional_info: { type: "string" },
+          confirmed: { type: "boolean" as const },
+          additional_info: { type: "string" as const },
         },
         required: request_type === "required" ? ["confirmed"] : [],
       };
 
-      return {
-        content: [
-          {
-            type: "text",
-            text: `${request_type} elicitation prepared - client may accept or reject`,
-          },
-        ],
-        _meta: {
-          elicitation_request: {
-            message: (messages as any)[request_type],
-            requestedSchema: schema,
+      try {
+        // Real elicitation call to the client - may be rejected
+        const elicitationResponse = await server.server.elicitInput({
+          message: (messages as any)[request_type],
+          requestedSchema: schema,
+        });
+
+        const userInput = elicitationResponse || { confirmed: false };
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `${request_type} elicitation completed: ${JSON.stringify(
+                userInput
+              )}`,
+            },
+          ],
+          _meta: {
+            elicitation_completed: true,
+            user_input: userInput,
             request_type,
           },
-          requires_elicitation: true,
-          rejectable: true,
-          test_mode: true,
-        },
-      };
+        };
+      } catch (error) {
+        // Handle rejection
+        return {
+          content: [
+            {
+              type: "text",
+              text: `${request_type} elicitation was rejected by the client`,
+            },
+          ],
+          _meta: {
+            elicitation_rejected: true,
+            request_type,
+          },
+        };
+      }
     }
   );
 
@@ -182,29 +214,32 @@ export function setupElicitationTools(server: McpServer) {
     },
     async ({ message }: { message: string }) => {
       const schema = {
-        type: "object",
+        type: "object" as const,
         properties: {
-          response: { type: "string" },
-          confirmed: { type: "boolean" },
+          response: { type: "string" as const },
+          confirmed: { type: "boolean" as const },
         },
         required: ["response"],
       };
+
+      // Real elicitation call to the client
+      const elicitationResponse = await server.server.elicitInput({
+        message,
+        requestedSchema: schema,
+      });
+
+      const userInput = elicitationResponse || { response: "no_response" };
 
       return {
         content: [
           {
             type: "text",
-            text: `Simple elicitation: ${message}`,
+            text: `Simple elicitation completed: ${JSON.stringify(userInput)}`,
           },
         ],
         _meta: {
-          elicitation_request: {
-            message,
-            requestedSchema: schema,
-          },
-          requires_elicitation: true,
-          simple: true,
-          test_mode: true,
+          elicitation_completed: true,
+          user_input: userInput,
         },
       };
     }

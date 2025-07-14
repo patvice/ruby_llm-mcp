@@ -21,8 +21,7 @@ module RubyLLM
           {
             jsonrpc: "2.0",
             id: @id,
-            result: "elicitation/create",
-            params: {
+            result: {
               action: @action,
               content: @content
             }.compact

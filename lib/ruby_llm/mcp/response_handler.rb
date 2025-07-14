@@ -54,7 +54,7 @@ module RubyLLM
 
       def handle_elicitation_response(result)
         RubyLLM::MCP.logger.info("Elicitation request: #{result.inspect}")
-        Elicitation.new(result, coordinator).execute
+        Elicitation.new(coordinator, result).execute
       end
 
       def handle_unknown_request(result)
