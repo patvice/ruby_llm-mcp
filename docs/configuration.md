@@ -78,71 +78,6 @@ RubyLLM::MCP.configure do |config|
 end
 ```
 
-## Protocol Version Configuration
-
-You can configure which MCP protocol version the client should use when connecting to servers. This is useful for testing newer protocol features or ensuring compatibility with specific server versions.
-
-### Setting Protocol Version in Transport Config
-
-```ruby
-# Force client to use a specific protocol version
-client = RubyLLM::MCP::Client.new(
-  name: "my-server",
-  transport_type: :stdio,
-  config: {
-    command: ["node", "server.js"],
-    protocol_version: "2025-06-18"  # Override default version
-  }
-)
-```
-
-### Available Protocol Versions
-
-The RubyLLM MCP client supports multiple protocol versions. You can access these through the protocol constants:
-
-```ruby
-# Latest supported protocol version
-puts RubyLLM::MCP::Protocol.latest_version
-# => "2025-06-18"
-
-# Default version used for negotiation
-puts RubyLLM::MCP::Protocol.default_negotiated_version
-# => "2025-03-26"
-
-# All supported versions
-puts RubyLLM::MCP::Protocol.supported_versions
-# => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
-
-# Check if a version is supported
-RubyLLM::MCP::Protocol.supported_version?("2025-06-18")
-# => true
-```
-
-### Protocol Version Features
-
-Different protocol versions support different features:
-
-- **2025-06-18** (Latest): Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
-- **2025-03-26** (Default): Tool calling, resources, prompts, completions, notifications
-- **2024-11-05**: Basic tool and resource support
-- **2024-10-07**: Initial MCP implementation
-
-### HTTP Transport Protocol Headers
-
-When using HTTP transports, the protocol version is automatically included in request headers:
-
-```ruby
-# HTTP transport automatically sets MCP-Protocol-Version header
-client = RubyLLM::MCP::Client.new(
-  name: "http-server",
-  transport_type: :streamable,
-  config: {
-    url: "https://api.example.com/mcp",
-    protocol_version: "2025-06-18"  # Sent as MCP-Protocol-Version header
-  }
-)
-```
-
 ## Client Configuration
 
 ### Basic Client Options
@@ -386,12 +321,7 @@ client.roots.add("/new/path")
 client.roots.remove("/old/path")
 ```
 
-## Protocol 2025-06-18 Configuration
-
-{: .new }
-Configure advanced features available in MCP Protocol 2025-06-18.
-
-### Elicitation Configuration
+## Elicitation Configuration
 
 Configure how your client handles elicitation requests from servers:
 
@@ -445,23 +375,54 @@ client = RubyLLM::MCP.client(
 )
 ```
 
-### Protocol Version Configuration
+## Protocol Version Configuration
 
-The client automatically negotiates protocol versions, but you can check the negotiated version:
+You can configure which MCP protocol version the client should use when connecting to servers. This is useful for testing newer protocol features or ensuring compatibility with specific server versions.
+
+### Setting Protocol Version in Transport Config
 
 ```ruby
-client = RubyLLM::MCP.client(...)
-client.start
-
-# Check negotiated protocol version
-puts "Protocol version: #{client.coordinator.protocol_version}"
-
-# The client supports these versions:
-# - 2025-06-18 (latest)
-# - 2025-03-26
-# - 2024-11-05
-# - 2024-10-07
+# Force client to use a specific protocol version
+client = RubyLLM::MCP::Client.new(
+  name: "my-server",
+  transport_type: :stdio,
+  config: {
+    command: ["node", "server.js"],
+    protocol_version: "2025-06-18"  # Override default version
+  }
+)
 ```
+
+### Available Protocol Versions
+
+The RubyLLM MCP client supports multiple protocol versions. You can access these through the protocol constants:
+
+```ruby
+# Latest supported protocol version
+puts RubyLLM::MCP::Protocol.latest_version
+# => "2025-06-18"
+
+# Default version used for negotiation
+puts RubyLLM::MCP::Protocol.default_negotiated_version
+# => "2025-03-26"
+
+# All supported versions
+puts RubyLLM::MCP::Protocol.supported_versions
+# => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
+
+# Check if a version is supported
+RubyLLM::MCP::Protocol.supported_version?("2025-06-18")
+# => true
+```
+
+### Protocol Version Features
+
+Different protocol versions support different features:
+
+- **2025-06-18** (Latest): Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
+- **2025-03-26** (Default): Tool calling, resources, prompts, completions, notifications
+- **2024-11-05**: Basic tool and resource support
+- **2024-10-07**: Initial MCP implementation
 
 ### Enhanced Metadata Support
 
@@ -481,32 +442,6 @@ end
 client = RubyLLM::MCP.client(...)
 tool = client.tool("long_operation")
 result = tool.execute(data: "large_dataset")  # Includes progress metadata
-```
-
-## Environment-Specific Configuration
-
-### Development Configuration
-
-```ruby
-if Rails.env.development?
-  RubyLLM::MCP.configure do |config|
-    config.log_level = Logger::DEBUG
-    config.sampling.enabled = true
-    config.roots = [Rails.root]
-  end
-end
-```
-
-### Production Configuration
-
-```ruby
-if Rails.env.production?
-  RubyLLM::MCP.configure do |config|
-    config.log_level = Logger::ERROR
-    config.logger = Logger.new("/var/log/mcp.log")
-    config.sampling.enabled = false
-  end
-end
 ```
 
 ## Error Handling Configuration
@@ -539,78 +474,6 @@ begin
   )
 rescue RubyLLM::MCP::Errors::TransportError => e
   puts "Failed to start server: #{e.message}"
-end
-```
-
-## Configuration Best Practices
-
-### 1. Use Environment Variables
-
-```ruby
-client = RubyLLM::MCP.client(
-  name: "api-server",
-  transport_type: :sse,
-  config: {
-    url: ENV.fetch("MCP_SERVER_URL"),
-    headers: {
-      "Authorization" => "Bearer #{ENV.fetch('MCP_API_TOKEN')}"
-    }
-  }
-)
-```
-
-### 2. Validate Configuration
-
-```ruby
-def create_mcp_client(name, config)
-  required_keys = %w[url headers]
-  missing_keys = required_keys - config.keys
-
-  raise ArgumentError, "Missing keys: #{missing_keys}" unless missing_keys.empty?
-
-  RubyLLM::MCP.client(
-    name: name,
-    transport_type: :sse,
-    config: config
-  )
-end
-```
-
-### 3. Use Separate Configurations
-
-```ruby
-# config/mcp.yml
-development:
-  filesystem:
-    transport_type: stdio
-    command: npx
-    args: ["@modelcontextprotocol/server-filesystem", "."]
-
-production:
-  api_server:
-    transport_type: sse
-    url: "https://api.example.com/mcp/sse"
-    headers:
-      Authorization: "Bearer <%= ENV['API_TOKEN'] %>"
-```
-
-### 4. Connection Pooling
-
-```ruby
-class MCPClientPool
-  def initialize(configs)
-    @clients = configs.map do |name, config|
-      [name, RubyLLM::MCP.client(name: name, **config)]
-    end.to_h
-  end
-
-  def client(name)
-    @clients[name] || raise("Client #{name} not found")
-  end
-
-  def all_tools
-    @clients.values.flat_map(&:tools)
-  end
 end
 ```
 
