@@ -58,6 +58,8 @@ module RubyLLM
       end
 
       class UnknownRequest < BaseError; end
+
+      class UnsupportedProtocolVersion < BaseError; end
     end
   end
 end

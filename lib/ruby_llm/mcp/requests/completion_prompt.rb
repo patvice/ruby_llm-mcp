@@ -4,11 +4,12 @@ module RubyLLM
   module MCP
     module Requests
       class CompletionPrompt
-        def initialize(coordinator, name:, argument:, value:)
+        def initialize(coordinator, name:, argument:, value:, context: nil)
           @coordinator = coordinator
           @name = name
           @argument = argument
           @value = value
+          @context = context
         end
 
         def call
@@ -30,8 +31,17 @@ module RubyLLM
               argument: {
                 name: @argument,
                 value: @value
-              }
-            }
+              },
+              context: format_context
+            }.compact
+          }
+        end
+
+        def format_context
+          return nil if @context.nil?
+
+          {
+            arguments: @context
           }
         end
       end

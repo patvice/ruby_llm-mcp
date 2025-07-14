@@ -36,7 +36,9 @@ Gem::Specification.new do |spec|
   spec.files = Dir.glob("lib/**/*") + ["README.md", "LICENSE"]
   spec.require_paths = ["lib"]
 
+  # Runtime dependencies
   spec.add_dependency "httpx", "~> 1.4"
+  spec.add_dependency "json-schema", "~> 5.0"
   spec.add_dependency "ruby_llm", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2"
 end

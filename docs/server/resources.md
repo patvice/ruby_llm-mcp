@@ -443,6 +443,140 @@ response = chat.ask("Analyze the project")
 puts response
 ```
 
+---
+
+## Resource Links in Tool Results
+
+{: .new }
+Resource links in tool results are available in MCP Protocol 2025-06-18.
+
+Tools can now return resource references in their results, allowing dynamic resource creation and enhanced tool-resource integration.
+
+### Dynamic Resource Creation
+
+When tools execute and return resource references, these become automatically available as resources:
+
+```ruby
+# Execute a tool that creates or references resources
+file_tool = client.tool("create_file")
+result = file_tool.execute(filename: "report.txt", content: "Analysis results...")
+
+# If the tool returns a resource reference, it becomes available as a resource
+if result.is_a?(RubyLLM::MCP::Content)
+  # Resource content is automatically parsed and made available
+  puts result.to_s
+
+  # The resource may also be added to the client's resource list
+  updated_resources = client.resources(refresh: true)
+  puts "New resources: #{updated_resources.map(&:name)}"
+end
+```
+
+### Tool-Generated Resources
+
+Tools can create resources dynamically and return references to them:
+
+```ruby
+# A tool that generates a report and returns it as a resource
+report_tool = client.tool("generate_report")
+result = report_tool.execute(
+  data_source: "sales_data",
+  format: "pdf",
+  timeframe: "last_quarter"
+)
+
+# The tool returns a resource reference that can be used immediately
+if result.is_a?(RubyLLM::MCP::Content)
+  # Use the generated resource in a conversation
+  chat = RubyLLM.chat(model: "gpt-4")
+  chat.with_resource(result)
+
+  response = chat.ask("Summarize this report")
+  puts response
+end
+```
+
+### Resource Reference Format
+
+Tools can return resources in their content using the `resource` type:
+
+```json
+{
+  "content": [
+    {
+      "type": "resource",
+      "resource": {
+        "uri": "file:///path/to/created/file.txt",
+        "name": "generated_report",
+        "description": "Quarterly sales report",
+        "mimeType": "text/plain",
+        "text": "Report content here..."
+      }
+    }
+  ]
+}
+```
+
+The client automatically converts these references into usable `Resource` objects.
+
+### Tool-Resource Workflows
+
+Combine tools and resources for powerful workflows:
+
+```ruby
+# 1. Use a tool to analyze data and create a resource
+analysis_tool = client.tool("analyze_data")
+analysis_result = analysis_tool.execute(dataset: "user_behavior")
+
+# 2. Use the generated resource in another tool call
+if analysis_result.is_a?(RubyLLM::MCP::Content)
+  chat = RubyLLM.chat(model: "gpt-4")
+  chat.with_resource(analysis_result)
+
+  # 3. Generate recommendations based on the analysis
+  recommendation_tool = client.tool("generate_recommendations")
+  recommendations = recommendation_tool.execute(
+    analysis_resource: analysis_result.uri
+  )
+
+  puts "Recommendations: #{recommendations}"
+end
+```
+
+### Temporary vs Persistent Resources
+
+Tool-generated resources can be:
+
+- **Temporary**: Exist only for the current session
+- **Persistent**: Saved and available in future sessions
+
+```ruby
+# Check if a resource is temporary or persistent
+resource = client.resource("generated_report")
+if resource.uri.start_with?("temp://")
+  puts "This is a temporary resource"
+else
+  puts "This is a persistent resource"
+end
+```
+
+### Best Practices
+
+**Resource Naming:**
+- Use descriptive names for generated resources
+- Include timestamps or unique identifiers when appropriate
+- Consider namespacing for organization
+
+**Content Management:**
+- Clean up temporary resources when no longer needed
+- Monitor resource creation to prevent storage issues
+- Implement proper access controls for persistent resources
+
+**Integration Patterns:**
+- Chain tools that create and consume resources
+- Use resource templates for consistent resource generation
+- Combine with notifications for resource update tracking
+
 ## Next Steps
 
 - **[Prompts]({% link server/prompts.md %})** - Using predefined prompts

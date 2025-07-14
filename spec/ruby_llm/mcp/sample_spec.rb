@@ -124,7 +124,7 @@ RSpec.describe RubyLLM::MCP::Sample do
         expect(result.to_s).to include("Error executing sampling request")
       end
 
-      it "client will provide a sample object to the guard for validation" do # rubocop:disable RSpec/MultipleExpectations
+      it "client will provide a sample object to the guard for validation" do
         sample = nil
         RubyLLM::MCP.configure do |config|
           config.sampling.enabled = true

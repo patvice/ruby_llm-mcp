@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "ruby_llm"
+require "json-schema"
 require "zeitwerk"
 require_relative "chat"
 

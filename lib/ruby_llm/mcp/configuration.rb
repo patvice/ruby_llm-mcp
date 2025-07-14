@@ -92,6 +92,7 @@ module RubyLLM
                     :sampling,
                     :max_connections,
                     :pool_timeout,
+                    :protocol_version,
                     :config_path,
                     :launch_control,
                     :on_logging_level
@@ -141,6 +142,11 @@ module RubyLLM
       def on_logging(&block)
         @on_logging = block if block_given?
         @on_logging
+      end
+
+      def on_elicitation(&block)
+        @on_elicitation = block if block_given?
+        @on_elicitation
       end
 
       def inspect
@@ -200,7 +206,7 @@ module RubyLLM
         # Event handlers
         @on_progress = nil
         @on_human_in_the_loop = nil
-
+        @on_elicitation = nil
         @on_logging_level = nil
         @on_logging = nil
       end

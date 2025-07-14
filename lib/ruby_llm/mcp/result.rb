@@ -17,7 +17,8 @@ module RubyLLM
       REQUEST_METHODS = {
         ping: "ping",
         roots: "roots/list",
-        sampling: "sampling/createMessage"
+        sampling: "sampling/createMessage",
+        elicitation: "elicitation/create"
       }.freeze
 
       def initialize(response, session_id: nil)

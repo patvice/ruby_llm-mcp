@@ -9,11 +9,11 @@ module RubyLLM
   module MCP
     module Transports
       class Stdio
-        include Timeout
+        include Support::Timeout
 
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command:, request_timeout:, coordinator:, args: [], env: {})
+        def initialize(command:, coordinator:, request_timeout:, args: [], env: {})
           @request_timeout = request_timeout
           @command = command
           @coordinator = coordinator

@@ -89,6 +89,89 @@ result = client.execute_tool(
 puts "File contents: #{result}"
 ```
 
+### Structured Tool Output
+
+{: .new }
+Structured tool output is available in MCP Protocol 2025-06-18.
+
+Tools can now specify output schemas for structured responses, enabling type-safe tool interactions:
+
+```ruby
+# Tools with output schemas will automatically validate their structured content
+tool = client.tool("data_analyzer")
+result = tool.execute(data: "sample data")
+
+# If the tool has an output schema, structured content is validated
+# Invalid structured outputs will return an error
+puts result # Returns validated structured content or error message
+```
+
+#### Checking Tool Schemas
+
+Tools now support both input and output schemas:
+
+```ruby
+tools = client.tools
+tools.each do |tool|
+  puts "Tool: #{tool.name}"
+
+  # Input schema (parameters)
+  if tool.input_schema
+    puts "  Input Schema: #{tool.input_schema}"
+  end
+
+  # Output schema (return value validation)
+  if tool.output_schema
+    puts "  Output Schema: #{tool.output_schema}"
+  end
+end
+```
+
+#### Validation Behavior
+
+- **Valid structured output**: Returns the structured content
+- **Invalid structured output**: Returns an error with validation details
+- **No output schema**: Behaves as before (text-based output)
+
+#### Example with Schema Validation
+
+```ruby
+# A tool that returns structured data
+weather_tool = client.tool("get_weather")
+result = weather_tool.execute(location: "San Francisco")
+
+# If the tool has an output schema, the result is validated
+if result.is_a?(Hash) && result[:error]
+  puts "Tool validation failed: #{result[:error]}"
+else
+  # Structured, validated output
+  puts "Temperature: #{result.temperature}"
+  puts "Humidity: #{result.humidity}"
+end
+```
+
+#### Human-Friendly Display Names
+
+{: .new }
+Tools now support title fields for better user experience in MCP Protocol 2025-06-18:
+
+```ruby
+tools = client.tools
+tools.each do |tool|
+  # Access display-friendly title if available
+  title = tool.annotations&.title || tool.name
+  puts "Tool: #{title} - #{tool.description}"
+
+  # Check if the tool has a human-friendly title
+  if tool.annotations&.title
+    puts "  Display Name: #{tool.annotations.title}"
+    puts "  Programmatic Name: #{tool.name}"
+  end
+end
+```
+
+This separates programmatic identifiers from human-readable names for better UX.
+
 ### Using Tools with RubyLLM
 
 Integrate tools into LLM conversations:

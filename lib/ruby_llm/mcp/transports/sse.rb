@@ -10,7 +10,7 @@ module RubyLLM
   module MCP
     module Transports
       class SSE
-        include Timeout
+        include Support::Timeout
 
         attr_reader :headers, :id, :coordinator
 
@@ -105,8 +105,8 @@ module RubyLLM
         private
 
         def send_request(body, request_id)
-          http_client = HTTPX.with(timeout: { request_timeout: @request_timeout / 1000 },
-                                   headers: @headers)
+          http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
+                                                            headers: @headers)
           response = http_client.post(@messages_url, body: JSON.generate(body))
           handle_httpx_error_response!(response,
                                        context: { location: "message endpoint request", request_id: request_id })

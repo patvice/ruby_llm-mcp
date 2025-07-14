@@ -33,14 +33,15 @@ module RubyLLM
         fetch_resource(arguments: arguments).to_content
       end
 
-      def complete(argument, value)
+      def complete(argument, value, context: nil)
         if @coordinator.capabilities.completion?
-          result = @coordinator.completion_resource(uri: @uri, argument: argument, value: value)
+          result = @coordinator.completion_resource(uri: @uri, argument: argument, value: value, context: context)
           result.raise_error! if result.error?
 
           response = result.value["completion"]
 
-          Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
+          Completion.new(argument: argument, values: response["values"], total: response["total"],
+                         has_more: response["hasMore"])
         else
           message = "Completion is not available for this MCP server"
           raise Errors::Capabilities::CompletionNotAvailable.new(message: message)

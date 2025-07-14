@@ -207,6 +207,111 @@ if suggestions.values.any?
 end
 ```
 
+### Context in Completion Requests
+
+{: .new }
+Context in completion requests is available in MCP Protocol 2025-06-18.
+
+Completion requests now support context for previously-resolved variables, enabling more intelligent and context-aware suggestions:
+
+```ruby
+# For prompts with completion support
+prompt = client.prompt("user_search")
+
+# Provide context from previous completions or interactions
+completion = prompt.complete(
+  "username",
+  "jo",
+  context: {
+    "previous_selections": ["john_doe", "jane_smith"],
+    "department": "engineering",
+    "project": "web_platform"
+  }
+)
+
+puts completion.values # Context-aware suggestions
+```
+
+#### Context Object Format
+
+The context object can contain any relevant information to help the server provide better suggestions:
+
+```ruby
+context = {
+  # Previous user selections or completions
+  "previous_selections": ["item1", "item2"],
+
+  # User preferences or settings
+  "user_preferences": {
+    "sort": "date",
+    "limit": 10,
+    "include_archived": false
+  },
+
+  # Environmental context
+  "environment": "production",
+  "department": "engineering",
+  "project": "mobile_app",
+
+  # Session or workflow context
+  "current_workflow": "code_review",
+  "active_filters": ["ruby", "recent"],
+
+  # Any other relevant data
+  "metadata": {
+    "timestamp": Time.now.iso8601,
+    "session_id": "abc123"
+  }
+}
+```
+
+#### Examples with Different Context Types
+
+**User-specific context:**
+
+```ruby
+# Complete usernames with department context
+completion = prompt.complete(
+  "assignee",
+  "al",
+  context: {
+    "department": "engineering",
+    "team": "backend",
+    "project_permissions": ["read", "write"]
+  }
+)
+```
+
+**Workflow context:**
+
+```ruby
+# Complete with workflow-specific suggestions
+completion = prompt.complete(
+  "next_action",
+  "deploy",
+  context: {
+    "current_stage": "testing",
+    "available_environments": ["staging", "production"],
+    "previous_actions": ["build", "test"]
+  }
+)
+```
+
+**Historical context:**
+
+```ruby
+# Complete with historical patterns
+completion = prompt.complete(
+  "bug_priority",
+  "h",
+  context: {
+    "recent_priorities": ["high", "medium", "low"],
+    "component": "authentication",
+    "similar_issues": ["auth-001", "auth-002"]
+  }
+)
+```
+
 ## Advanced Prompt Usage
 
 ### Conditional Prompts

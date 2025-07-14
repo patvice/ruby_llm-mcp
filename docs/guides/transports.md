@@ -90,11 +90,46 @@ client = RubyLLM::MCP.client(
 )
 ```
 
+#### OAuth Authentication
+
+{: .new }
+OAuth authentication is available in MCP Protocol 2025-06-18 for Streamable HTTP transport.
+
+For servers requiring OAuth authentication:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "oauth-server",
+  transport_type: :streamable,
+  config: {
+    url: "https://api.example.com/mcp",
+    oauth: {
+      issuer: "https://oauth.provider.com",
+      client_id: "your-client-id",
+      client_secret: "your-client-secret",
+      scope: "mcp:read mcp:write"  # Optional
+    }
+  }
+)
+```
+
+**OAuth Configuration:**
+
+| Option | Description | Required |
+|--------|-------------|----------|
+| `issuer` | OAuth provider's issuer URL | Yes |
+| `client_id` | OAuth client identifier | Yes |
+| `client_secret` | OAuth client secret | Yes |
+| `scope` | Requested OAuth scopes | No |
+
+The client automatically handles token acquisition, refresh, and authorization headers.
+
 **Use cases:**
 
 - REST API-based MCP servers
 - HTTP-first architectures
 - Cloud-based MCP services
+- Enterprise servers requiring OAuth
 
 ## Transport Interface
 

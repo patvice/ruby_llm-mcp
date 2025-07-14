@@ -66,6 +66,15 @@ RubyLLM::MCP.configure do |config|
   config.sampling.guard do |sample|
     sample.message.include?("Hello")
   end
+
+  # Configure elicitation support (2025-06-18 protocol)
+  config.elicitation = lambda do |elicitation|
+    # Handle elicitation requests from MCP servers
+    # Return structured response and true to accept
+    puts "Server requests: #{elicitation.message}"
+    elicitation.structured_response = { "response": "handled" }
+    true
+  end
 end
 ```
 
@@ -312,30 +321,127 @@ client.roots.add("/new/path")
 client.roots.remove("/old/path")
 ```
 
-## Environment-Specific Configuration
+## Elicitation Configuration
 
-### Development Configuration
+Configure how your client handles elicitation requests from servers:
 
 ```ruby
-if Rails.env.development?
-  RubyLLM::MCP.configure do |config|
-    config.log_level = Logger::DEBUG
-    config.sampling.enabled = true
-    config.roots = [Rails.root]
+RubyLLM::MCP.configure do |config|
+  # Global elicitation handler
+  config.elicitation = lambda do |elicitation|
+    puts "Server message: #{elicitation.message}"
+
+    # Auto-approve simple requests
+    if elicitation.message.include?("confirmation")
+      elicitation.structured_response = { "confirmed": true }
+      true
+    else
+      # Reject complex requests
+      false
+    end
   end
+end
+
+# Or configure per-client
+client.on_elicitation do |elicitation|
+  # Interactive handler
+  puts elicitation.message
+  puts "Expected response format: #{elicitation.requested_schema}"
+
+  # Collect user input
+  response = collect_user_response(elicitation.requested_schema)
+  elicitation.structured_response = response
+  true
 end
 ```
 
-### Production Configuration
+### OAuth Authentication
+
+Configure OAuth for Streamable HTTP transport:
 
 ```ruby
-if Rails.env.production?
-  RubyLLM::MCP.configure do |config|
-    config.log_level = Logger::ERROR
-    config.logger = Logger.new("/var/log/mcp.log")
-    config.sampling.enabled = false
+client = RubyLLM::MCP.client(
+  name: "oauth-server",
+  transport_type: :streamable,
+  config: {
+    url: "https://api.example.com/mcp",
+    oauth: {
+      issuer: ENV['OAUTH_ISSUER'],
+      client_id: ENV['OAUTH_CLIENT_ID'],
+      client_secret: ENV['OAUTH_CLIENT_SECRET'],
+      scope: "mcp:read mcp:write"
+    }
+  }
+)
+```
+
+## Protocol Version Configuration
+
+You can configure which MCP protocol version the client should use when connecting to servers. This is useful for testing newer protocol features or ensuring compatibility with specific server versions.
+
+### Setting Protocol Version in Transport Config
+
+```ruby
+# Force client to use a specific protocol version
+client = RubyLLM::MCP::Client.new(
+  name: "my-server",
+  transport_type: :stdio,
+  config: {
+    command: ["node", "server.js"],
+    protocol_version: "2025-06-18"  # Override default version
+  }
+)
+```
+
+### Available Protocol Versions
+
+The RubyLLM MCP client supports multiple protocol versions. You can access these through the protocol constants:
+
+```ruby
+# Latest supported protocol version
+puts RubyLLM::MCP::Protocol.latest_version
+# => "2025-06-18"
+
+# Default version used for negotiation
+puts RubyLLM::MCP::Protocol.default_negotiated_version
+# => "2025-03-26"
+
+# All supported versions
+puts RubyLLM::MCP::Protocol.supported_versions
+# => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
+
+# Check if a version is supported
+RubyLLM::MCP::Protocol.supported_version?("2025-06-18")
+# => true
+```
+
+### Protocol Version Features
+
+Different protocol versions support different features:
+
+- **2025-06-18** (Latest): Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
+- **2025-03-26** (Default): Tool calling, resources, prompts, completions, notifications
+- **2024-11-05**: Basic tool and resource support
+- **2024-10-07**: Initial MCP implementation
+
+### Enhanced Metadata Support
+
+Progress tracking automatically includes metadata when enabled:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Enable progress tracking with metadata
+  config.on_progress do |progress|
+    puts "Operation ID: #{progress.operation_id}"
+    puts "Progress: #{progress.progress}%"
+    puts "Metadata: #{progress.metadata}"
   end
 end
+
+# Tool calls will automatically include progress tokens
+client = RubyLLM::MCP.client(...)
+tool = client.tool("long_operation")
+result = tool.execute(data: "large_dataset")  # Includes progress metadata
 ```
 
 ## Error Handling Configuration
@@ -368,78 +474,6 @@ begin
   )
 rescue RubyLLM::MCP::Errors::TransportError => e
   puts "Failed to start server: #{e.message}"
-end
-```
-
-## Configuration Best Practices
-
-### 1. Use Environment Variables
-
-```ruby
-client = RubyLLM::MCP.client(
-  name: "api-server",
-  transport_type: :sse,
-  config: {
-    url: ENV.fetch("MCP_SERVER_URL"),
-    headers: {
-      "Authorization" => "Bearer #{ENV.fetch('MCP_API_TOKEN')}"
-    }
-  }
-)
-```
-
-### 2. Validate Configuration
-
-```ruby
-def create_mcp_client(name, config)
-  required_keys = %w[url headers]
-  missing_keys = required_keys - config.keys
-
-  raise ArgumentError, "Missing keys: #{missing_keys}" unless missing_keys.empty?
-
-  RubyLLM::MCP.client(
-    name: name,
-    transport_type: :sse,
-    config: config
-  )
-end
-```
-
-### 3. Use Separate Configurations
-
-```ruby
-# config/mcp.yml
-development:
-  filesystem:
-    transport_type: stdio
-    command: npx
-    args: ["@modelcontextprotocol/server-filesystem", "."]
-
-production:
-  api_server:
-    transport_type: sse
-    url: "https://api.example.com/mcp/sse"
-    headers:
-      Authorization: "Bearer <%= ENV['API_TOKEN'] %>"
-```
-
-### 4. Connection Pooling
-
-```ruby
-class MCPClientPool
-  def initialize(configs)
-    @clients = configs.map do |name, config|
-      [name, RubyLLM::MCP.client(name: name, **config)]
-    end.to_h
-  end
-
-  def client(name)
-    @clients[name] || raise("Client #{name} not found")
-  end
-
-  def all_tools
-    @clients.values.flat_map(&:tools)
-  end
 end
 ```
 

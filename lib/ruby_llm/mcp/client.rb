@@ -8,6 +8,7 @@ module RubyLLM
       extend Forwardable
 
       attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on, :roots
+      attr_accessor :linked_resources
 
       def initialize(name:, transport_type:, start: true, request_timeout: MCP.config.request_timeout, config: {})
         @name = name
@@ -25,6 +26,8 @@ module RubyLLM
         @prompts = {}
 
         @log_level = nil
+
+        @linked_resources = []
 
         setup_roots
         setup_sampling
@@ -72,7 +75,8 @@ module RubyLLM
 
         fetch(:resources, refresh) do
           resources = @coordinator.resource_list
-          build_map(resources, MCP::Resource)
+          resources = build_map(resources, MCP::Resource)
+          include_linked_resources(resources)
         end
 
         @resources.values
@@ -175,6 +179,15 @@ module RubyLLM
         self
       end
 
+      def elicitation_enabled?
+        @on.key?(:elicitation) && !@on[:elicitation].nil?
+      end
+
+      def on_elicitation(&block)
+        @on[:elicitation] = block
+        self
+      end
+
       def to_h
         {
           name: @name,
@@ -224,6 +237,14 @@ module RubyLLM
         end
       end
 
+      def include_linked_resources(resources)
+        @linked_resources.each do |resource|
+          resources[resource.name] = resource
+        end
+
+        resources
+      end
+
       def setup_roots
         @roots = Roots.new(paths: MCP.config.roots, coordinator: @coordinator)
       end
@@ -237,6 +258,7 @@ module RubyLLM
         @on[:human_in_the_loop] = MCP.config.on_human_in_the_loop
         @on[:logging] = MCP.config.on_logging
         @on_logging_level = MCP.config.on_logging_level
+        @on[:elicitation] = MCP.config.on_elicitation
       end
     end
   end
