@@ -163,6 +163,7 @@ Real-time updates from MCP servers including logging, progress, and resource cha
 
 1. **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM
 2. **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers
+3. **[Elicitation]({% link client/elicitation.md %})** - Handle user input during conversations
 
 ## Examples
 

@@ -68,7 +68,7 @@ RubyLLM::MCP.configure do |config|
   end
 
   # Configure elicitation support (2025-06-18 protocol)
-  config.elicitation = lambda do |elicitation|
+  config.on_elicitation do |elicitation|
     # Handle elicitation requests from MCP servers
     # Return structured response and true to accept
     puts "Server requests: #{elicitation.message}"
@@ -328,7 +328,7 @@ Configure how your client handles elicitation requests from servers:
 ```ruby
 RubyLLM::MCP.configure do |config|
   # Global elicitation handler
-  config.elicitation = lambda do |elicitation|
+  config.on_elicitation do |elicitation|
     puts "Server message: #{elicitation.message}"
 
     # Auto-approve simple requests

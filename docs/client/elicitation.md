@@ -45,7 +45,7 @@ Configure elicitation handling globally for all clients:
 
 ```ruby
 RubyLLM::MCP.configure do |config|
-  config.elicitation = lambda do |elicitation|
+  config.on_elicitation do |elicitation|
     # Handle elicitation requests from MCP servers
     puts "Server requests: #{elicitation.message}"
 
