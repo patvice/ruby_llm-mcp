@@ -21,8 +21,7 @@ class Runner
       transport_type: :sse,
       config: {
         url: "http://localhost:#{TestServerManager::PORTS[:sse]}/mcp/sse",
-        version: :http1,
-        request_timeout: 100
+        version: :http1
       }
     )
   end

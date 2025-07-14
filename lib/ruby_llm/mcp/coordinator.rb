@@ -12,7 +12,7 @@ module RubyLLM
         @transport_type = transport_type
         @config = config
 
-        @protocol_version = MCP::Protocol.default_negotiated_version
+        @protocol_version = MCP.config.protocol_version || MCP::Protocol.default_negotiated_version
 
         @transport = nil
         @capabilities = nil

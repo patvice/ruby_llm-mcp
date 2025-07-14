@@ -112,4 +112,61 @@ RSpec.describe RubyLLM::MCP::Completion do
       end
     end
   end
+
+  describe "Context in Completion Requests (2025-06-18)" do
+    CLIENT_OPTIONS.each do |config|
+      context "with #{config[:name]}" do
+        let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+        it "supports context-aware completions" do
+          prompt = client.prompt("context_aware_search")
+          expect(prompt).to be_a(RubyLLM::MCP::Prompt)
+
+          # Test completion with context
+          completion = prompt.complete(
+            "domain",
+            "proj",
+            context: {
+              "department" => "engineering",
+              "user_role" => "developer"
+            }
+          )
+
+          expect(completion).to be_a(RubyLLM::MCP::Completion)
+          expect(completion.values).to be_an(Array)
+
+          # Should include engineering-specific options
+          expect(completion.values).to include("projects")
+        end
+
+        it "filters completion results based on context" do
+          prompt = client.prompt("user_selector")
+          expect(prompt).to be_a(RubyLLM::MCP::Prompt)
+
+          completion = prompt.complete(
+            "username_prefix",
+            "a",
+            context: {
+              "department" => "engineering",
+              "project" => "web_platform"
+            }
+          )
+
+          expect(completion).to be_a(RubyLLM::MCP::Completion)
+          expect(completion.values).to be_an(Array)
+          expect(completion.values).to include("alice")
+        end
+
+        it "provides default completion when no context" do
+          prompt = client.prompt("user_selector")
+
+          completion = prompt.complete("username_prefix", "a")
+          expect(completion).to be_a(RubyLLM::MCP::Completion)
+          expect(completion.values).to be_an(Array)
+          expect(completion.values).to include("alice")
+          expect(completion.values).to include("admin")
+        end
+      end
+    end
+  end
 end

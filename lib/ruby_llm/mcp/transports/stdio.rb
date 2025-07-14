@@ -13,7 +13,7 @@ module RubyLLM
 
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command:, request_timeout:, coordinator:, args: [], env: {})
+        def initialize(command:, coordinator:, request_timeout:, args: [], env: {})
           @request_timeout = request_timeout
           @command = command
           @coordinator = coordinator

@@ -307,7 +307,7 @@ RSpec.describe RubyLLM::MCP::ServerCapabilities do
 
       let(:capabilities) { described_class.new(complex_capabilities) }
 
-      it "correctly identifies all capabilities" do # rubocop:disable RSpec/MultipleExpectations
+      it "correctly identifies all capabilities" do
         expect(capabilities.resources_list?).to be true
         expect(capabilities.resources_list_changes?).to be true
         expect(capabilities.resource_subscribe?).to be false

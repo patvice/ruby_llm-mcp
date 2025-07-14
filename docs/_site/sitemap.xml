@@ -4,6 +4,9 @@
 <loc>http://localhost:4000/configuration.html</loc>
 </url>
 <url>
+<loc>http://localhost:4000/client/elicitation.html</loc>
+</url>
+<url>
 <loc>http://localhost:4000/guides/getting-started.html</loc>
 </url>
 <url>
@@ -13,10 +16,10 @@
 <loc>http://localhost:4000/server/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/</loc>
+<loc>http://localhost:4000/client/</loc>
 </url>
 <url>
-<loc>http://localhost:4000/client/</loc>
+<loc>http://localhost:4000/</loc>
 </url>
 <url>
 <loc>http://localhost:4000/server/notifications.html</loc>

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "json-schema"
+
 module RubyLLM
   module MCP
     class Elicitation

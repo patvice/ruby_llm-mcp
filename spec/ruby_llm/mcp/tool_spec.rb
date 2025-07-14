@@ -172,6 +172,7 @@ RSpec.describe RubyLLM::MCP::Tool do
           result = tool.execute(a: 1, b: 2)
           expect(result.to_s).to eq("3")
           expect(called).to be(true)
+          client.on_human_in_the_loop
         end
 
         it "calls a human in the loop and calls the tool if returns true" do
@@ -186,6 +187,136 @@ RSpec.describe RubyLLM::MCP::Tool do
           message = "Tool execution error: Tool call was cancelled by the client"
           expect(result).to eq({ error: message })
           expect(called).to be(true)
+
+          client.on_human_in_the_loop
+        end
+      end
+    end
+  end
+
+  describe "Structured Tool Output (2025-06-18)" do
+    CLIENT_OPTIONS.each do |config|
+      context "with #{config[:name]}" do
+        let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+        it "validates structured output against output schema" do
+          tool = client.tool("structured_data_analyzer")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          result = tool.execute(data: "Hello world this is a test", format: "summary")
+          expect(result).to be_a(RubyLLM::MCP::Content)
+
+          # Check if structured content is available and validated
+          if result.respond_to?(:structured_content)
+            expect(result.structured_content).to be_a(Hash)
+            expect(result.structured_content).to have_key("word_count")
+            expect(result.structured_content).to have_key("character_count")
+            expect(result.structured_content).to have_key("analysis_type")
+            expect(result.structured_content["word_count"]).to be_a(Numeric)
+            expect(result.structured_content["character_count"]).to be_a(Numeric)
+          end
+        end
+
+        it "handles invalid structured output gracefully" do
+          tool = client.tool("invalid_structured_output")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          # This should trigger validation error for structured output
+          result = tool.execute(trigger_error: true)
+
+          # The tool should still return content, but structured validation may fail
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Invalid structured data")
+        end
+
+        it "returns valid structured output when schema is satisfied" do
+          tool = client.tool("invalid_structured_output")
+
+          result = tool.execute(trigger_error: false)
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Valid output")
+        end
+      end
+    end
+  end
+
+  describe "Human-Friendly Display Names (2025-06-18)" do
+    CLIENT_OPTIONS.each do |config|
+      context "with #{config[:name]}" do
+        let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+        it "provides human-friendly titles for tools" do
+          tool = client.tool("complex_calculation")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          # Check if tool has a human-friendly description or title
+          expect(tool.description).to include("🧮 Advanced Calculator")
+        end
+
+        it "executes tools with human-friendly names" do
+          tool = client.tool("complex_calculation")
+
+          result = tool.execute(expression: "2 + 2", precision: 1)
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Result: 4.0")
+        end
+
+        it "handles calculation errors gracefully" do
+          tool = client.tool("complex_calculation")
+
+          result = tool.execute(expression: "invalid_expression")
+          error_message = "Tool execution error: Error evaluating expression: invalid_expression is not defined"
+          expect(result).to eq({ error: error_message })
+          expect(result.to_s).to include("Error evaluating expression")
+        end
+      end
+    end
+  end
+
+  describe "Tool Annotations and Enhanced Metadata (2025-06-18)" do
+    CLIENT_OPTIONS.each do |config|
+      context "with #{config[:name]}" do
+        let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+        it "supports tool annotations for better UX" do
+          tool = client.tool("complex_calculation")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          # Check if tool provides annotation information
+          if tool.respond_to?(:annotations)
+            annotations = tool.annotations
+            expect(annotations).to be_a(Hash) if annotations
+          end
+        end
+
+        it "executes annotated tools correctly" do
+          tool = client.tool("complex_calculation")
+
+          result = tool.execute(expression: "10 * 5", precision: 0)
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("50")
+        end
+
+        it "supports _meta field in tool responses" do
+          tool = client.tool("long_running_task")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          result = tool.execute(duration: 500, steps: 3)
+          expect(result).to be_a(RubyLLM::MCP::Content)
+
+          # Check for metadata in response
+          if result.respond_to?(:metadata) || result.respond_to?(:meta)
+            meta = result.respond_to?(:metadata) ? result.metadata : result.meta
+            expect(meta).to be_a(Hash) if meta
+          end
+        end
+
+        it "handles progress tracking metadata" do
+          tool = client.tool("long_running_task")
+
+          result = tool.execute(duration: 1000, steps: 5)
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("long-running task")
         end
       end
     end

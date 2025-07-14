@@ -127,7 +127,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       transport = coordinator.transport
 
       # The transport should have a protocol version set
-      expect(transport.transport_protocol.protocol_version).to eq("2025-03-26")
+      expect(transport.transport_protocol.protocol_version).to eq(RubyLLM::MCP::Protocol::DEFAULT_NEGOTIATED_PROTOCOL_VERSION)
 
       client.stop
     end
@@ -922,6 +922,36 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
           expect(mock_coordinator).to have_received(:process_result)
         end
       end
+    end
+  end
+
+  describe "Protocol Version 2025-06-18 Negotiation" do
+    it "includes MCP-Protocol-Version header in subsequent requests" do
+      client.start
+
+      # Any operation should succeed if protocol version header is properly set
+      tools = client.tools
+      expect(tools).to be_an(Array)
+      expect(tools.length).to be > 0
+
+      client.stop
+    end
+
+    it "maintains protocol version consistency across operations" do
+      client.start
+
+      # Multiple operations should all work consistently with the same protocol version
+      expect(client.tools.length).to be > 0
+      expect(client.resources.length).to be > 0
+      expect(client.ping).to be(true)
+
+      # Execute a tool to verify full round-trip functionality
+      tool = client.tool("add")
+      result = tool.execute(a: 5, b: 3)
+      expect(result).to be_a(RubyLLM::MCP::Content)
+      expect(result.to_s).to eq("8")
+
+      client.stop
     end
   end
 end

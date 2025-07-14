@@ -6,7 +6,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 
 For a more detailed guide, see the [RubyLLM::MCP docs](https://rubyllm-mcp.com/).
 
-Currently full support for MCP protocol version up to `2025-03-26`.
+Currently full support for MCP protocol version up to `2025-06-18`.
 
 <div class="badge-container">
   <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
@@ -117,8 +117,11 @@ puts response
 You can also execute MCP tools directly:
 
 ```ruby
+# Tools Execution
+tool = client.tool("search_files")
+
 # Execute a specific tool
-result = client.execute_tool(
+result = tool.execute(
   name: "search_files",
   parameters: {
     query: "*.rb",

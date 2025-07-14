@@ -66,6 +66,15 @@ RubyLLM::MCP.configure do |config|
   config.sampling.guard do |sample|
     sample.message.include?("Hello")
   end
+
+  # Configure elicitation support (2025-06-18 protocol)
+  config.elicitation = lambda do |elicitation|
+    # Handle elicitation requests from MCP servers
+    # Return structured response and true to accept
+    puts "Server requests: #{elicitation.message}"
+    elicitation.structured_response = { "response": "handled" }
+    true
+  end
 end
 ```
 
@@ -310,6 +319,103 @@ puts client.roots.paths
 # Modify roots at runtime
 client.roots.add("/new/path")
 client.roots.remove("/old/path")
+```
+
+## Protocol 2025-06-18 Configuration
+
+{: .new }
+Configure advanced features available in MCP Protocol 2025-06-18.
+
+### Elicitation Configuration
+
+Configure how your client handles elicitation requests from servers:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Global elicitation handler
+  config.elicitation = lambda do |elicitation|
+    puts "Server message: #{elicitation.message}"
+
+    # Auto-approve simple requests
+    if elicitation.message.include?("confirmation")
+      elicitation.structured_response = { "confirmed": true }
+      true
+    else
+      # Reject complex requests
+      false
+    end
+  end
+end
+
+# Or configure per-client
+client.on_elicitation do |elicitation|
+  # Interactive handler
+  puts elicitation.message
+  puts "Expected response format: #{elicitation.requested_schema}"
+
+  # Collect user input
+  response = collect_user_response(elicitation.requested_schema)
+  elicitation.structured_response = response
+  true
+end
+```
+
+### OAuth Authentication
+
+Configure OAuth for Streamable HTTP transport:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "oauth-server",
+  transport_type: :streamable,
+  config: {
+    url: "https://api.example.com/mcp",
+    oauth: {
+      issuer: ENV['OAUTH_ISSUER'],
+      client_id: ENV['OAUTH_CLIENT_ID'],
+      client_secret: ENV['OAUTH_CLIENT_SECRET'],
+      scope: "mcp:read mcp:write"
+    }
+  }
+)
+```
+
+### Protocol Version Configuration
+
+The client automatically negotiates protocol versions, but you can check the negotiated version:
+
+```ruby
+client = RubyLLM::MCP.client(...)
+client.start
+
+# Check negotiated protocol version
+puts "Protocol version: #{client.coordinator.protocol_version}"
+
+# The client supports these versions:
+# - 2025-06-18 (latest)
+# - 2025-03-26
+# - 2024-11-05
+# - 2024-10-07
+```
+
+### Enhanced Metadata Support
+
+Progress tracking automatically includes metadata when enabled:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Enable progress tracking with metadata
+  config.on_progress do |progress|
+    puts "Operation ID: #{progress.operation_id}"
+    puts "Progress: #{progress.progress}%"
+    puts "Metadata: #{progress.metadata}"
+  end
+end
+
+# Tool calls will automatically include progress tokens
+client = RubyLLM::MCP.client(...)
+tool = client.tool("long_operation")
+result = tool.execute(data: "large_dataset")  # Includes progress metadata
 ```
 
 ## Environment-Specific Configuration

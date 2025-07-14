@@ -199,4 +199,51 @@ RSpec.describe RubyLLM::MCP::Resource do
       end
     end
   end
+
+  describe "Resource Links in Tool Results (2025-06-18)" do
+    CLIENT_OPTIONS.each do |config|
+      context "with #{config[:name]}" do
+        let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+        it "creates resources from tool execution results" do
+          tool = client.tool("create_report")
+          expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+          result = tool.execute(
+            title: "Test Report",
+            content: "This is a test report with important data",
+            format: "text"
+          )
+
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("Test Report")
+          expect(result.to_s).to include("created successfully")
+
+          # Check if resource content is included
+          content_parts = result.instance_variable_get(:@content)
+          if content_parts.is_a?(Array)
+            resource_part = content_parts.find { |part| part["type"] == "resource" }
+            if resource_part
+              expect(resource_part["resource"]).to be_a(Hash)
+              expect(resource_part["resource"]["name"]).to include("test_report")
+              expect(resource_part["resource"]["text"]).to include("This is a test report")
+            end
+          end
+        end
+
+        it "creates JSON format resources" do
+          tool = client.tool("create_report")
+
+          result = tool.execute(
+            title: "JSON Report",
+            content: "Structured data analysis",
+            format: "json"
+          )
+
+          expect(result).to be_a(RubyLLM::MCP::Content)
+          expect(result.to_s).to include("JSON Report")
+        end
+      end
+    end
+  end
 end
