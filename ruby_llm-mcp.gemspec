@@ -40,7 +40,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "httpx", "~> 1.4"
   spec.add_dependency "json-schema", "~> 5.0"
   spec.add_dependency "ruby_llm", "~> 1.3"
-  spec.add_dependency "thor", "~> 1.3"
   spec.add_dependency "zeitwerk", "~> 2"
 end
 # rubocop:enable Metrics/BlockLength

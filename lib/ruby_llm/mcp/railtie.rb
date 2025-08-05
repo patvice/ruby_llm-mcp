@@ -5,9 +5,9 @@ module RubyLLM
     class Railtie < Rails::Railtie
       config.after_initialize do
         if RubyLLM::MCP.config.launch_control == :automatic
-          RubyLLM::MCP.clients.map(&:start)
+          RubyLLM::MCP.clients.each_value.map(&:start)
           at_exit do
-            RubyLLM::MCP.clients.map(&:stop)
+            RubyLLM::MCP.clients.each_value.map(&:stop)
           end
         end
       end
