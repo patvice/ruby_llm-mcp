@@ -193,8 +193,8 @@ module RubyLLM
             if line.empty?
               # End of event - process the accumulated buffer
               if event_buffer.any?
-                event = parse_event(event_buffer.join("\n"))
-                process_event(event)
+                events = parse_event(event_buffer.join("\n"))
+                events.each { |event| process_event(event) }
                 event_buffer.clear
               end
             else
@@ -275,19 +275,25 @@ module RubyLLM
         end
 
         def parse_event(raw)
-          event = {}
-          raw.each_line do |line|
-            case line
-            when /^data:\s*(.*)/
-              (event[:data] ||= []) << ::Regexp.last_match(1)
-            when /^event:\s*(.*)/
-              event[:event] = ::Regexp.last_match(1)
-            when /^id:\s*(.*)/
-              event[:id] = ::Regexp.last_match(1)
+          event_blocks = raw.split(/\n\s*\n/)
+
+          events = event_blocks.map do |event_block|
+            event = {}
+            event_block.each_line do |line|
+              case line
+              when /^data:\s*(.*)/
+                (event[:data] ||= []) << ::Regexp.last_match(1)
+              when /^event:\s*(.*)/
+                event[:event] = ::Regexp.last_match(1)
+              when /^id:\s*(.*)/
+                event[:id] = ::Regexp.last_match(1)
+              end
             end
+            event[:data] = event[:data]&.join("\n")
+            event
           end
-          event[:data] = event[:data]&.join("\n")
-          event
+
+          events.reject { |event| event.empty? || event[:data].nil? }
         end
       end
     end
