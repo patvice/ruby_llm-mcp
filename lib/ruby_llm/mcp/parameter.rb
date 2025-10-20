@@ -8,14 +8,14 @@ module RubyLLM
       attr_accessor :items, :properties, :enum, :union_type, :default
 
       def initialize(name, type: "string", desc: nil, required: true, default: nil, union_type: nil) # rubocop:disable Metrics/ParameterLists
-        super(name, type: type.to_sym, desc: desc, required: required)
+        super(name, type: type, desc: desc, required: required)
         @properties = {}
         @union_type = union_type
         @default = default
       end
 
       def item_type
-        @items&.dig("type")&.to_sym
+        @items&.dig("type")
       end
 
       def as_json(*_args)
