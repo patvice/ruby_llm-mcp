@@ -321,4 +321,96 @@ RSpec.describe RubyLLM::MCP::Tool do
       end
     end
   end
+
+  describe "complex anyOf parameter parsing" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+    let(:tool_response_with_complex_anyof) do
+      {
+        "name" => "test_tool",
+        "description" => "A test tool with complex anyOf parameter",
+        "inputSchema" => {
+          "type" => "object",
+          "properties" => {
+            "value" => {
+              "anyOf" => [
+                {
+                  "type" => %w[string number boolean],
+                  "description" => "A filter value that can be a string, number, or boolean."
+                },
+                {
+                  "type" => "array",
+                  "items" => {
+                    "$ref" => "#/properties/value/anyOf/0"
+                  }
+                }
+              ],
+              "description" => "The value or list of values for filtering."
+            }
+          }
+        }
+      }
+    end
+
+    it "parses complex anyOf with shorthand array types and array with items" do # rubocop:disable RSpec/MultipleExpectations
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_complex_anyof)
+
+      expect(tool.parameters).to have_key("value")
+      param = tool.parameters["value"]
+
+      expect(param.type).to eq(:union)
+      expect(param.union_type).to eq("anyOf")
+      expect(param.properties).to be_an(Array)
+      expect(param.properties.length).to eq(2)
+
+      # First property should be a union from shorthand ["string", "number", "boolean"]
+      first_prop = param.properties[0]
+      expect(first_prop.type).to eq(:union)
+      expect(first_prop.union_type).to eq("anyOf")
+      expect(first_prop.properties).to be_an(Array)
+      expect(first_prop.properties.length).to eq(3)
+      expect(first_prop.properties.map(&:type)).to eq(%i[string number boolean])
+
+      # Second property should be an array type
+      second_prop = param.properties[1]
+      expect(second_prop.type).to eq(:array)
+      expect(second_prop.items).to be_a(Hash)
+      expect(second_prop.items).to have_key("$ref")
+    end
+  end
+
+  describe "Direct shorthand type parsing" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+    let(:tool_response_with_direct_shorthand) do
+      {
+        "name" => "test_tool",
+        "description" => "A test tool with direct shorthand array type",
+        "inputSchema" => {
+          "type" => "object",
+          "properties" => {
+            "value" => {
+              "type" => %w[string number boolean],
+              "description" => "A filter value that can be a string, number, or boolean."
+            }
+          }
+        }
+      }
+    end
+
+    it "parses direct shorthand array type without anyOf wrapper" do
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_direct_shorthand)
+
+      expect(tool.parameters).to have_key("value")
+      param = tool.parameters["value"]
+
+      # When type is an array directly, it should be converted to an implicit anyOf union
+      expect(param).to be_a(RubyLLM::MCP::Parameter)
+      expect(param.name).to eq("value")
+      expect(param.type).to eq(:union)
+      expect(param.union_type).to eq("anyOf")
+      expect(param.description).to eq("A filter value that can be a string, number, or boolean.")
+      expect(param.properties).to be_an(Array)
+      expect(param.properties.length).to eq(3)
+      expect(param.properties.map(&:type)).to eq(%i[string number boolean])
+    end
+  end
 end
