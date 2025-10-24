@@ -122,7 +122,6 @@ module RubyLLM
 
           response_queue = setup_response_queue(request_id, wait_for_response)
           result = send_http_request(body, request_id, is_initialization: is_initialization)
-
           return result if result.is_a?(RubyLLM::MCP::Result)
 
           if wait_for_response && request_id
@@ -365,16 +364,17 @@ module RubyLLM
         end
 
         def handle_success_response(response, request_id, _original_message)
-          # Safely access content type
           content_type = response.respond_to?(:headers) ? response.headers["content-type"] : nil
 
           if content_type&.include?("text/event-stream")
-            # SSE response - let the streaming handler process it
             start_sse_stream
             nil
           elsif content_type&.include?("application/json")
-            # Direct JSON response
             response_body = response.respond_to?(:body) ? response.body.to_s : "{}"
+            if response_body == "null" # Fix related to official MCP Ruby SDK implementation
+              response_body = "{}"
+            end
+
             json_response = JSON.parse(response_body)
             result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
