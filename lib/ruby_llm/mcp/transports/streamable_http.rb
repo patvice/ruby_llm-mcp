@@ -594,10 +594,17 @@ module RubyLLM
         end
 
         def extract_sse_event(buffer)
-          return nil unless buffer.include?("\n\n")
+          # Support both Unix (\n\n) and Windows (\r\n\r\n) line endings
+          separator = if buffer.include?("\r\n\r\n")
+                        "\r\n\r\n"
+                      elsif buffer.include?("\n\n")
+                        "\n\n"
+                      else
+                        return nil
+                      end
 
-          raw, rest = buffer.split("\n\n", 2)
-          [parse_sse_event(raw), rest]
+          raw, rest = buffer.split(separator, 2)
+          [parse_sse_event(raw), rest || ""]
         end
 
         def parse_sse_event(raw)
