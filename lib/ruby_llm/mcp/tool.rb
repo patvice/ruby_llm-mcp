@@ -98,6 +98,7 @@ module RubyLLM
 
         schema["properties"].each_key do |key|
           param_data = schema.dig("properties", key)
+          param_data = expand_shorthand_type_to_anyof(param_data)
 
           param = if param_data.key?("oneOf") || param_data.key?("anyOf") || param_data.key?("allOf")
                     process_union_parameter(key, param_data)
@@ -116,11 +117,17 @@ module RubyLLM
         param = RubyLLM::MCP::Parameter.new(
           key,
           type: :union,
+          desc: param_data["description"],
           union_type: union_type
         )
 
         param.properties = param_data[union_type].map do |value|
-          process_parameter(key, value, lifted_type: param_data["type"])
+          expanded_value = expand_shorthand_type_to_anyof(value)
+          if expanded_value.key?("anyOf")
+            process_union_parameter(key, expanded_value)
+          else
+            process_parameter(key, value, lifted_type: param_data["type"])
+          end
         end.compact
 
         param
@@ -194,6 +201,21 @@ module RubyLLM
         else
           name
         end
+      end
+
+      # Expands shorthand type arrays into explicit anyOf unions
+      # Converts { "type": ["string", "number"] } into { "anyOf": [{"type": "string"}, {"type": "number"}] }
+      # This keeps $ref references clean and provides a consistent structure for union types
+      #
+      # @param param_data [Hash] The parameter data that may contain a shorthand type array
+      # @return [Hash] The expanded parameter data with anyOf, or the original if not a shorthand
+      def expand_shorthand_type_to_anyof(param_data)
+        type = param_data["type"]
+        return param_data unless type.is_a?(Array)
+
+        {
+          "anyOf" => type.map { |t| { "type" => t } }
+        }.merge(param_data.except("type"))
       end
     end
   end
