@@ -9,7 +9,7 @@ module RubyLLM
         end
 
         def call
-          @coordinator.request(notification_body, add_id: false, wait_for_response: false)
+          @coordinator.request(notification_body, add_id: true, wait_for_response: false)
         end
 
         def notification_body
