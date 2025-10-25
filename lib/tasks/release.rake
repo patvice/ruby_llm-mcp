@@ -4,8 +4,8 @@ namespace :release do
   desc "Release a new version of the gem"
   task :version do
     # Load the current version from version.rb
-    require_relative "../../lib/ruby_llm/schema/version"
-    version = RubyLlm::Schema::VERSION
+    require_relative "../../lib/ruby_llm/mcp/version"
+    version = RubyLLM::MCP::VERSION
 
     puts "Releasing version #{version}..."
 
