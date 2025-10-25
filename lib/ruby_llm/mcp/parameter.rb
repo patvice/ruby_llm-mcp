@@ -5,10 +5,11 @@ require "ruby_llm/tool"
 module RubyLLM
   module MCP
     class Parameter < RubyLLM::Parameter
-      attr_accessor :items, :properties, :enum, :union_type, :default
+      attr_accessor :items, :properties, :enum, :union_type, :default, :title
 
-      def initialize(name, type: "string", desc: nil, required: true, default: nil, union_type: nil) # rubocop:disable Metrics/ParameterLists
+      def initialize(name, type: "string", title: nil, desc: nil, required: true, default: nil, union_type: nil) # rubocop:disable Metrics/ParameterLists
         super(name, type: type.to_sym, desc: desc, required: required)
+        @title = title
         @properties = {}
         @union_type = union_type
         @default = default

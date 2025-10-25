@@ -38,6 +38,7 @@ RSpec.describe RubyLLM::MCP::Parameter do
       expect(parameter.type).to eq(:string)
       expect(parameter.required).to be(true)
       expect(parameter.items).to be_nil
+      expect(parameter.title).to be_nil
     end
 
     it "creates a parameter with custom values" do
@@ -46,6 +47,18 @@ RSpec.describe RubyLLM::MCP::Parameter do
       expect(parameter.type).to eq(:array)
       expect(parameter.description).to eq("Test description")
       expect(parameter.required).to be(false)
+    end
+
+    it "creates a parameter with title" do
+      parameter = described_class.new("test_param", type: "string", title: "Test Parameter Title")
+      expect(parameter.name).to eq("test_param")
+      expect(parameter.title).to eq("Test Parameter Title")
+      expect(parameter.type).to eq(:string)
+    end
+
+    it "handles nil title gracefully" do
+      parameter = described_class.new("test_param", type: "string", title: nil)
+      expect(parameter.title).to be_nil
     end
 
     it "handles shorthand anyOf with array of types" do
