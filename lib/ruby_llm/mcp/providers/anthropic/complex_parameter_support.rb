@@ -17,18 +17,20 @@ module RubyLLM
             parameters.select { |_, param| param.required }.keys
           end
 
-          def build_properties(param)
+          def build_properties(param) # rubocop:disable Metrics/MethodLength
             case param.type
             when :array
               if param.item_type == :object
                 {
                   type: param.type,
+                  title: param.title,
                   description: param.description,
                   items: { type: param.item_type, properties: clean_parameters(param.properties) }
                 }.compact
               else
                 {
                   type: param.type,
+                  title: param.title,
                   description: param.description,
                   default: param.default,
                   items: { type: param.item_type, enum: param.enum }.compact
@@ -37,6 +39,7 @@ module RubyLLM
             when :object
               {
                 type: param.type,
+                title: param.title,
                 description: param.description,
                 properties: clean_parameters(param.properties),
                 required: required_parameters(param.properties)
@@ -48,6 +51,7 @@ module RubyLLM
             else
               {
                 type: param.type,
+                title: param.title,
                 description: param.description
               }.compact
             end

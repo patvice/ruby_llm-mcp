@@ -413,4 +413,233 @@ RSpec.describe RubyLLM::MCP::Tool do
       expect(param.properties.map(&:type)).to eq(%i[string number boolean])
     end
   end
+
+  describe "Parameter with missing type field" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+
+    context "when type is nil" do
+      let(:tool_response_with_nil_type) do
+        {
+          "name" => "test_tool",
+          "description" => "A test tool with nil type parameter",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "param_without_type" => {
+                "title" => "Parameter Without Type",
+                "description" => "A parameter that has no type field"
+              }
+            }
+          }
+        }
+      end
+
+      it "defaults to string type when type is nil" do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_nil_type)
+
+        expect(tool.parameters).to have_key("param_without_type")
+        param = tool.parameters["param_without_type"]
+
+        expect(param).to be_a(RubyLLM::MCP::Parameter)
+        expect(param.type).to eq(:string) # Should default to string
+        expect(param.title).to eq("Parameter Without Type")
+        expect(param.description).to eq("A parameter that has no type field")
+      end
+
+      it "does not raise NoMethodError when calling to_sym on nil" do
+        expect do
+          RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_nil_type)
+        end.not_to raise_error
+      end
+    end
+
+    context "when type is missing entirely" do
+      let(:tool_response_missing_type) do
+        {
+          "name" => "test_tool",
+          "description" => "A test tool with missing type field",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "service_param" => {
+                "title" => "Service Parameter"
+              }
+            }
+          }
+        }
+      end
+
+      it "defaults to string type when type field is missing" do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_missing_type)
+
+        expect(tool.parameters).to have_key("service_param")
+        param = tool.parameters["service_param"]
+
+        expect(param.type).to eq(:string)
+        expect(param.title).to eq("Service Parameter")
+      end
+    end
+  end
+
+  describe "Parameter title field support" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+
+    context "with title on regular parameters" do
+      let(:tool_response_with_title) do
+        {
+          "name" => "test_tool",
+          "description" => "A test tool with titled parameters",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "user_email" => {
+                "type" => "string",
+                "title" => "User's Email Address",
+                "description" => "The email address of the user"
+              },
+              "count" => {
+                "type" => "integer",
+                "title" => "Item Count",
+                "description" => "Number of items to process"
+              }
+            }
+          }
+        }
+      end
+
+      it "preserves title field on string parameters" do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_title)
+
+        param = tool.parameters["user_email"]
+        expect(param.title).to eq("User's Email Address")
+        expect(param.type).to eq(:string)
+        expect(param.description).to eq("The email address of the user")
+      end
+
+      it "preserves title field on integer parameters" do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_title)
+
+        param = tool.parameters["count"]
+        expect(param.title).to eq("Item Count")
+        expect(param.type).to eq(:integer)
+        expect(param.description).to eq("Number of items to process")
+      end
+    end
+
+    context "with title on union parameters" do
+      let(:tool_response_with_union_title) do
+        {
+          "name" => "test_tool",
+          "description" => "A test tool with titled union parameters",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "optional_param" => {
+                "anyOf" => [
+                  { "type" => "string", "title" => "String Option" },
+                  { "type" => "null", "title" => "Null Option" }
+                ],
+                "title" => "Optional Parameter",
+                "description" => "An optional string parameter"
+              }
+            }
+          }
+        }
+      end
+
+      it "preserves title field on union parameters" do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_union_title)
+
+        param = tool.parameters["optional_param"]
+        expect(param.title).to eq("Optional Parameter")
+        expect(param.type).to eq(:union)
+        expect(param.union_type).to eq("anyOf")
+        expect(param.description).to eq("An optional string parameter")
+      end
+    end
+
+    context "without title field" do
+      let(:tool_response_without_title) do
+        {
+          "name" => "test_tool",
+          "description" => "A test tool without titles",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "regular_param" => {
+                "type" => "string",
+                "description" => "A regular parameter without title"
+              }
+            }
+          }
+        }
+      end
+
+      it "sets title to nil when not provided" do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_without_title)
+
+        param = tool.parameters["regular_param"]
+        expect(param.title).to be_nil
+        expect(param.type).to eq(:string)
+      end
+    end
+  end
+
+  describe "Complex scenario: missing type with title" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+    let(:tool_response_complex) do
+      {
+        "name" => "google_workspace_tool",
+        "description" => "A Google Workspace tool similar to the one that caused the bug",
+        "inputSchema" => {
+          "type" => "object",
+          "properties" => {
+            "docs_service" => {
+              "title" => "Docs Service"
+            },
+            "drive_service" => {
+              "title" => "Drive Service"
+            },
+            "user_email" => {
+              "type" => "string",
+              "title" => "User Email"
+            },
+            "document_id" => {
+              "type" => "string"
+            }
+          }
+        }
+      }
+    end
+
+    it "handles parameters with only title field" do
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_complex)
+
+      # Parameters with title but no type should default to string
+      docs_service = tool.parameters["docs_service"]
+      expect(docs_service.type).to eq(:string)
+      expect(docs_service.title).to eq("Docs Service")
+
+      drive_service = tool.parameters["drive_service"]
+      expect(drive_service.type).to eq(:string)
+      expect(drive_service.title).to eq("Drive Service")
+
+      # Parameters with both type and title
+      user_email = tool.parameters["user_email"]
+      expect(user_email.type).to eq(:string)
+      expect(user_email.title).to eq("User Email")
+
+      # Parameters with type but no title
+      document_id = tool.parameters["document_id"]
+      expect(document_id.type).to eq(:string)
+      expect(document_id.title).to be_nil
+    end
+
+    it "does not raise errors when processing all parameters" do
+      expect do
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_complex)
+        expect(tool.parameters.count).to eq(4)
+      end.not_to raise_error
+    end
+  end
 end

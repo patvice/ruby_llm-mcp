@@ -13,6 +13,7 @@ module RubyLLM
                            if param.item_type == :object
                              {
                                type: param.type,
+                               title: param.title,
                                description: param.description,
                                items: {
                                  type: param.item_type,
@@ -22,6 +23,7 @@ module RubyLLM
                            else
                              {
                                type: param.type,
+                               title: param.title,
                                description: param.description,
                                default: param.default,
                                items: { type: param.item_type, enum: param.enum }.compact
@@ -30,6 +32,7 @@ module RubyLLM
                          when :object
                            {
                              type: param.type,
+                             title: param.title,
                              description: param.description,
                              properties: param.properties.transform_values { |value| param_schema(value) },
                              required: param.properties.select { |_, p| p.required }.keys
@@ -41,6 +44,7 @@ module RubyLLM
                          else
                            {
                              type: param.type,
+                             title: param.title,
                              description: param.description
                            }.compact
                          end

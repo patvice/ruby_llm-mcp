@@ -25,7 +25,7 @@ module RubyLLM
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :description, :parameters, :coordinator, :tool_response, :with_prefix
+      attr_reader :name, :title, :description, :parameters, :coordinator, :tool_response, :with_prefix
 
       def initialize(coordinator, tool_response, with_prefix: false)
         super()
@@ -117,6 +117,7 @@ module RubyLLM
         param = RubyLLM::MCP::Parameter.new(
           key,
           type: :union,
+          title: param_data["title"],
           desc: param_data["description"],
           union_type: union_type
         )
@@ -136,7 +137,8 @@ module RubyLLM
       def process_parameter(key, param_data, lifted_type: nil)
         param = RubyLLM::MCP::Parameter.new(
           key,
-          type: param_data["type"] || lifted_type,
+          type: param_data["type"] || lifted_type || "string",
+          title: param_data["title"],
           desc: param_data["description"],
           required: param_data["required"],
           default: param_data["default"]

@@ -22,6 +22,7 @@ module RubyLLM
                            if param.item_type == :object
                              {
                                type: param_type_for_gemini(param.type),
+                               title: param.title,
                                description: param.description,
                                items: {
                                  type: param_type_for_gemini(param.item_type),
@@ -31,6 +32,7 @@ module RubyLLM
                            else
                              {
                                type: param_type_for_gemini(param.type),
+                               title: param.title,
                                description: param.description,
                                default: param.default,
                                items: { type: param_type_for_gemini(param.item_type), enum: param.enum }.compact
@@ -39,6 +41,7 @@ module RubyLLM
                          when :object
                            {
                              type: param_type_for_gemini(param.type),
+                             title: param.title,
                              description: param.description,
                              properties: param.properties.transform_values { |value| build_properties(value) },
                              required: param.properties.select { |_, p| p.required }.keys
@@ -50,6 +53,7 @@ module RubyLLM
                          else
                            {
                              type: param_type_for_gemini(param.type),
+                             title: param.title,
                              description: param.description
                            }
                          end
