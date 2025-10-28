@@ -30,7 +30,6 @@ module RubyLLM
                                      "Accept" => "text/event-stream",
                                      "Content-Type" => "application/json",
                                      "Cache-Control" => "no-cache",
-                                     "Connection" => "keep-alive",
                                      "X-CLIENT-ID" => @client_id
                                    })
 
@@ -167,41 +166,82 @@ module RubyLLM
         end
 
         def stream_events_from_server
-          sse_client = HTTPX.plugin(:stream)
-          sse_client = sse_client.with(
-            headers: @headers
-          )
-
-          if @version == :http1
-            sse_client = sse_client.with(
-              ssl: { alpn_protocols: ["http/1.1"] }
-            )
-          end
-
+          sse_client = create_sse_client
           response = sse_client.get(@event_url, stream: true)
+          validate_sse_response!(response)
+          process_event_stream(response)
+        end
 
+        def create_sse_client
+          sse_client = HTTPX.plugin(:stream).with(headers: @headers)
+          return sse_client unless @version == :http1
+
+          sse_client.with(ssl: { alpn_protocols: ["http/1.1"] })
+        end
+
+        def validate_sse_response!(response)
+          return unless response.status >= 400
+
+          error_body = read_error_body(response)
+          error_message = "HTTP #{response.status} error from SSE endpoint: #{error_body}"
+          RubyLLM::MCP.logger.error error_message
+
+          handle_client_error!(error_message, response.status) if response.status < 500
+
+          raise StandardError, error_message
+        end
+
+        def handle_client_error!(error_message, status_code)
+          @running = false
+          raise Errors::TransportError.new(
+            message: error_message,
+            code: status_code
+          )
+        end
+
+        def process_event_stream(response)
           event_buffer = []
           response.each_line do |event_line|
-            unless @running
-              response.body.close
-              next
-            end
-
-            # Strip the line and check if it's empty (indicates end of event)
-            line = event_line.strip
-
-            if line.empty?
-              # End of event - process the accumulated buffer
-              if event_buffer.any?
-                events = parse_event(event_buffer.join("\n"))
-                events.each { |event| process_event(event) }
-                event_buffer.clear
-              end
-            else
-              # Accumulate the line for the current event
-              event_buffer << line
-            end
+            break unless handle_event_line?(event_line, event_buffer, response)
           end
+        end
+
+        def handle_event_line?(event_line, event_buffer, response)
+          unless @running
+            response.body.close
+            return false
+          end
+
+          line = event_line.strip
+
+          if line.empty?
+            process_buffered_event(event_buffer)
+          else
+            event_buffer << line
+          end
+
+          true
+        end
+
+        def process_buffered_event(event_buffer)
+          return unless event_buffer.any?
+
+          events = parse_event(event_buffer.join("\n"))
+          events.each { |event| process_event(event) }
+          event_buffer.clear
+        end
+
+        def read_error_body(response)
+          # Try to read the error body from the response
+          body = ""
+          begin
+            response.each do |chunk|
+              body << chunk
+            end
+          rescue StandardError
+            # If we can't read the body, just use what we have
+          end
+          body.strip.empty? ? "No error details provided" : body.strip
         end
 
         def handle_connection_error(message, error)

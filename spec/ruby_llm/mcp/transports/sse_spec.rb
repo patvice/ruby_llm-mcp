@@ -62,6 +62,28 @@ RSpec.describe RubyLLM::MCP::Transports::SSE do
     end
   end
 
+  describe "HTTP/2 compatibility" do
+    it "does not include Connection header (forbidden in HTTP/2)" do
+      coordinator = instance_double(RubyLLM::MCP::Coordinator)
+      transport = RubyLLM::MCP::Transports::SSE.new(
+        url: "http://localhost:3000/sse",
+        coordinator: coordinator,
+        request_timeout: 5000
+      )
+
+      # Verify that the Connection header is not set
+      expect(transport.headers).not_to have_key("Connection")
+
+      # Verify we still have the essential headers
+      expect(transport.headers).to include(
+        "Accept" => "text/event-stream",
+        "Content-Type" => "application/json",
+        "Cache-Control" => "no-cache"
+      )
+      expect(transport.headers).to have_key("X-CLIENT-ID")
+    end
+  end
+
   describe "#parse_event" do
     let(:transport) do
       RubyLLM::MCP::Transports::SSE.new(
