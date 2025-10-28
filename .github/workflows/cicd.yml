@@ -30,6 +30,12 @@ jobs:
         run: |
           bundle install
 
+      - name: Install Bun dependencies for test fixtures
+        run: |
+          cd spec/fixtures/typescript-mcp && bun install
+          cd ../../..
+          cd spec/fixtures/pagination-server && bun install
+
       - name: Run specs
         run: bundle exec rake
         env:
