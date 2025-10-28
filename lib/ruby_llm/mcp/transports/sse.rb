@@ -30,7 +30,6 @@ module RubyLLM
                                      "Accept" => "text/event-stream",
                                      "Content-Type" => "application/json",
                                      "Cache-Control" => "no-cache",
-                                     "Connection" => "keep-alive",
                                      "X-CLIENT-ID" => @client_id
                                    })
 
@@ -180,6 +179,24 @@ module RubyLLM
 
           response = sse_client.get(@event_url, stream: true)
 
+          # Check for HTTP errors before attempting to stream
+          if response.status >= 400
+            error_body = read_error_body(response)
+            error_message = "HTTP #{response.status} error from SSE endpoint: #{error_body}"
+            RubyLLM::MCP.logger.error error_message
+
+            # For client errors (4xx), don't retry as they won't succeed
+            if response.status >= 400 && response.status < 500
+              @running = false
+              raise Errors::TransportError.new(
+                message: error_message,
+                code: response.status
+              )
+            end
+
+            raise StandardError, error_message
+          end
+
           event_buffer = []
           response.each_line do |event_line|
             unless @running
@@ -202,6 +219,19 @@ module RubyLLM
               event_buffer << line
             end
           end
+        end
+
+        def read_error_body(response)
+          # Try to read the error body from the response
+          body = ""
+          begin
+            response.each do |chunk|
+              body << chunk
+            end
+          rescue StandardError
+            # If we can't read the body, just use what we have
+          end
+          body.strip.empty? ? "No error details provided" : body.strip
         end
 
         def handle_connection_error(message, error)
