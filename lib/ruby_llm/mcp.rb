@@ -62,6 +62,7 @@ module RubyLLM
     end
 
     def support_complex_parameters!
+      require_relative "mcp/core_ext/object/try"
       require_relative "mcp/providers/openai/complex_parameter_support"
       require_relative "mcp/providers/anthropic/complex_parameter_support"
       require_relative "mcp/providers/gemini/complex_parameter_support"

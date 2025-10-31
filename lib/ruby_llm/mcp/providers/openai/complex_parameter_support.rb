@@ -10,41 +10,41 @@ module RubyLLM
           def param_schema(param) # rubocop:disable Metrics/MethodLength
             properties = case param.type
                          when :array
-                           if param.item_type == :object
+                           if param.try(:item_type) == :object
                              {
                                type: param.type,
-                               title: param.title,
+                               title: param.try(:title),
                                description: param.description,
                                items: {
-                                 type: param.item_type,
-                                 properties: param.properties.transform_values { |value| param_schema(value) }
+                                 type: param.try(:item_type),
+                                 properties: param.try(:properties).transform_values { |value| param_schema(value) }
                                }
                              }.compact
                            else
                              {
                                type: param.type,
-                               title: param.title,
+                               title: param.try(:title),
                                description: param.description,
-                               default: param.default,
-                               items: { type: param.item_type, enum: param.enum }.compact
+                               default: param.try(:default),
+                               items: { type: param.try(:item_type), enum: param.try(:enum) }.compact
                              }.compact
                            end
                          when :object
                            {
                              type: param.type,
-                             title: param.title,
+                             title: param.try(:title),
                              description: param.description,
-                             properties: param.properties.transform_values { |value| param_schema(value) },
-                             required: param.properties.select { |_, p| p.required }.keys
+                             properties: param.try(:properties).transform_values { |value| param_schema(value) },
+                             required: param.try(:properties).select { |_, p| p.required }.keys
                            }.compact
                          when :union
                            {
-                             param.union_type => param.properties.map { |property| param_schema(property) }
+                             param.try(:union_type) => param.try(:properties).map { |property| param_schema(property) }
                            }
                          else
                            {
                              type: param.type,
-                             title: param.title,
+                             title: param.try(:title),
                              description: param.description
                            }.compact
                          end
