@@ -496,6 +496,11 @@ module RubyLLM
               # Server doesn't support SSE - this is acceptable
               RubyLLM::MCP.logger.info "Server does not support SSE streaming"
               nil
+            when 409
+              # Conflict - SSE connection already exists for this session
+              # This is expected when reusing sessions and is acceptable
+              RubyLLM::MCP.logger.debug "SSE stream already exists for this session"
+              nil
             else
               reason_phrase = response.respond_to?(:reason_phrase) ? response.reason_phrase : nil
               raise Errors::TransportError.new(
