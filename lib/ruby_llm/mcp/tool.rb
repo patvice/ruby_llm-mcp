@@ -40,6 +40,8 @@ module RubyLLM
         @output_schema = tool_response["outputSchema"]
 
         @annotations = tool_response["annotations"] ? Annotation.new(tool_response["annotations"]) : nil
+
+        @normalized_input_schema = normalize_if_invalid(@input_schema)
       end
 
       def display_name
@@ -47,7 +49,7 @@ module RubyLLM
       end
 
       def params_schema
-        @input_schema
+        @normalized_input_schema
       end
 
       def execute(**params)
@@ -135,6 +137,89 @@ module RubyLLM
           "#{@coordinator.name}_#{name}"
         else
           name
+        end
+      end
+
+      def normalize_schema(schema)
+        return schema if schema.nil?
+
+        case schema
+        when Hash
+          normalize_hash_schema(schema)
+        when Array
+          normalize_array_schema(schema)
+        else
+          schema
+        end
+      end
+
+      def normalize_hash_schema(schema)
+        normalized = schema.transform_values { |value| normalize_schema_value(value) }
+        ensure_object_properties(normalized)
+        normalized
+      end
+
+      def normalize_array_schema(schema)
+        schema.map { |item| normalize_schema_value(item) }
+      end
+
+      def normalize_schema_value(value)
+        case value
+        when Hash
+          normalize_schema(value)
+        when Array
+          normalize_array_schema(value)
+        else
+          value
+        end
+      end
+
+      def ensure_object_properties(schema)
+        if schema["type"] == "object" && !schema.key?("properties")
+          schema["properties"] = {}
+        end
+      end
+
+      def normalize_if_invalid(schema)
+        return schema if schema.nil?
+
+        if valid_schema?(schema)
+          schema
+        else
+          normalize_schema(schema)
+        end
+      end
+
+      def valid_schema?(schema)
+        return true if schema.nil?
+
+        case schema
+        when Hash
+          valid_hash_schema?(schema)
+        when Array
+          schema.all? { |item| valid_schema?(item) }
+        else
+          true
+        end
+      end
+
+      def valid_hash_schema?(schema)
+        # Check if object type has properties (required for valid JSON Schema)
+        if schema["type"] == "object" && !schema.key?("properties")
+          return false
+        end
+
+        # Try to validate using JSON::Schema validator to catch other structural issues
+        # We catch SchemaError (schema is malformed) but ignore ValidationError (data doesn't match)
+        begin
+          JSON::Validator.validate!(schema, {})
+          true
+        rescue JSON::Schema::SchemaError, StandardError
+          # Schema itself is malformed or validation failed unexpectedly
+          false
+        rescue JSON::Schema::ValidationError
+          # Validation failed but schema structure is valid - that's fine for our purposes
+          true
         end
       end
     end

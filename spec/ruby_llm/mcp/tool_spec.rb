@@ -450,4 +450,267 @@ RSpec.describe RubyLLM::MCP::Tool do
       expect(tool.params_schema).to be_nil
     end
   end
+
+  describe "input schema validation and normalization" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+
+    describe "normalization for malformed schemas" do
+      it "normalizes object schema missing properties field" do
+        tool_response = {
+          "name" => "malformed_tool",
+          "description" => "A malformed tool",
+          "inputSchema" => {
+            "type" => "object"
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema["type"]).to eq("object")
+        expect(tool.params_schema).to have_key("properties")
+        expect(tool.params_schema["properties"]).to eq({})
+      end
+
+      it "normalizes nested object schemas missing properties" do
+        tool_response = {
+          "name" => "nested_malformed_tool",
+          "description" => "A tool with nested malformed schema",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "user" => {
+                "type" => "object"
+              }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema["properties"]["user"]["type"]).to eq("object")
+        expect(tool.params_schema["properties"]["user"]).to have_key("properties")
+        expect(tool.params_schema["properties"]["user"]["properties"]).to eq({})
+      end
+
+      it "normalizes object schemas in arrays" do
+        tool_response = {
+          "name" => "array_tool",
+          "description" => "A tool with array of objects",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "items" => {
+                "type" => "array",
+                "items" => {
+                  "type" => "object"
+                }
+              }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        item_schema = tool.params_schema["properties"]["items"]["items"]
+        expect(item_schema["type"]).to eq("object")
+        expect(item_schema).to have_key("properties")
+        expect(item_schema["properties"]).to eq({})
+      end
+    end
+
+    describe "validation using json-schema" do
+      it "does not normalize valid schemas" do
+        tool_response = {
+          "name" => "valid_tool",
+          "description" => "A valid tool",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "name" => { "type" => "string" }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Schema should be returned as-is since it's valid
+        expect(tool.params_schema).to eq(tool_response["inputSchema"])
+        expect(tool.params_schema["type"]).to eq("object")
+        expect(tool.params_schema["properties"]["name"]["type"]).to eq("string")
+      end
+
+      it "normalizes schemas that fail json-schema validation" do
+        # Create a schema that's structurally invalid (object without properties)
+        tool_response = {
+          "name" => "invalid_tool",
+          "description" => "An invalid tool",
+          "inputSchema" => {
+            "type" => "object"
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Should be normalized to include properties
+        expect(tool.params_schema["type"]).to eq("object")
+        expect(tool.params_schema).to have_key("properties")
+        expect(tool.params_schema["properties"]).to eq({})
+      end
+    end
+
+    describe "caching behavior" do
+      it "normalizes schema once during initialization" do
+        tool_response = {
+          "name" => "cached_tool",
+          "description" => "A tool to test caching",
+          "inputSchema" => {
+            "type" => "object"
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Store the normalized schema
+        first_call = tool.params_schema
+
+        # Call params_schema multiple times
+        second_call = tool.params_schema
+        third_call = tool.params_schema
+
+        # Should return the same normalized schema each time
+        expect(first_call).to eq(second_call)
+        expect(second_call).to eq(third_call)
+        expect(first_call).to have_key("properties")
+      end
+
+      it "does not mutate the original input schema" do
+        original_schema = {
+          "type" => "object"
+        }
+
+        tool_response = {
+          "name" => "immutable_tool",
+          "description" => "A tool to test immutability",
+          "inputSchema" => original_schema.dup
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Normalized schema should have properties
+        expect(tool.params_schema).to have_key("properties")
+
+        # Original schema should remain unchanged (no properties)
+        expect(original_schema).not_to have_key("properties")
+        expect(tool_response["inputSchema"]).not_to have_key("properties")
+      end
+    end
+
+    describe "edge cases" do
+      it "handles nil schema gracefully" do
+        tool_response = {
+          "name" => "nil_schema_tool",
+          "description" => "A tool with nil schema"
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema).to be_nil
+      end
+
+      it "handles empty hash schema" do
+        tool_response = {
+          "name" => "empty_tool",
+          "description" => "A tool with empty schema",
+          "inputSchema" => {}
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema).to eq({})
+      end
+
+      it "handles schema with type array" do
+        tool_response = {
+          "name" => "array_type_tool",
+          "description" => "A tool with array type schema",
+          "inputSchema" => {
+            "type" => "array",
+            "items" => { "type" => "string" }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema["type"]).to eq("array")
+        expect(tool.params_schema["items"]["type"]).to eq("string")
+      end
+
+      it "handles complex schemas with anyOf and nested objects" do
+        tool_response = {
+          "name" => "complex_tool",
+          "description" => "A tool with complex schema",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "value" => {
+                "anyOf" => [
+                  {
+                    "type" => "object",
+                    "properties" => { "key" => { "type" => "string" } }
+                  },
+                  {
+                    "type" => "object"
+                  }
+                ]
+              }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        any_of = tool.params_schema["properties"]["value"]["anyOf"]
+        expect(any_of.length).to eq(2)
+        # First anyOf option should remain unchanged (has properties)
+        expect(any_of[0]["properties"]).to have_key("key")
+        # Second anyOf option should be normalized (missing properties)
+        expect(any_of[1]["type"]).to eq("object")
+        expect(any_of[1]).to have_key("properties")
+        expect(any_of[1]["properties"]).to eq({})
+      end
+    end
+
+    describe "integration with real client" do
+      CLIENT_OPTIONS.each do |config|
+        context "with #{config[:name]}" do
+          let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+          it "normalizes malformed_tool schema correctly" do
+            tool = client.tool("malformed_tool")
+
+            schema = tool.params_schema
+            expect(schema).not_to be_nil
+            expect(schema["type"]).to eq("object")
+
+            # Should have properties field even if original was malformed
+            expect(schema).to have_key("properties")
+            expect(schema["properties"]).to be_a(Hash)
+          end
+
+          it "preserves valid schemas without normalization" do
+            tool = client.tool("add")
+
+            schema = tool.params_schema
+            expect(schema).not_to be_nil
+            expect(schema["type"]).to eq("object")
+            expect(schema["properties"]).to have_key("a")
+            expect(schema["properties"]).to have_key("b")
+
+            # Valid schema should not be modified
+            expect(schema["required"]).to include("a", "b")
+          end
+        end
+      end
+    end
+  end
 end
