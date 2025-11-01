@@ -62,7 +62,8 @@ module RubyLLM
     end
 
     def support_complex_parameters!
-      warn "[DEPRECATION] RubyLLM::MCP.support_complex_parameters! is no longer needed and will be removed in version 0.8.0"
+      warn "[DEPRECATION] RubyLLM::MCP.support_complex_parameters! is no longer needed " \
+           "and will be removed in version 0.8.0"
       # No-op: Complex parameters are now supported by default
     end
 
