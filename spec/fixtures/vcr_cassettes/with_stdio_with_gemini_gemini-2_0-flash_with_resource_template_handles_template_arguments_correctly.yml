@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:45:30 GMT
+      - Sat, 01 Nov 2025 14:53:44 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1238
+      - gfet4t7; dur=537
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "```python\ngreeting_template = \"\"\"greeting (greeting://Bob): A greeting resource\n\nHello, Bob!\"\"\"\n\n# Since the template already says \"Hello, Bob!\", we don't need to do much.\n# We could technically extract the name \"Bob\" from the template and use it\n# in a more dynamic greeting, but the prompt asks us to use the given template.\n\nprint(greeting_template.split(\"\\n\")[-1])  # Prints the last line, which is \"Hello, Bob!\"\n```\n\nThis code directly extracts and prints the greeting from the template: \"Hello, Bob!\".  It fulfills the request to \"use the greeting template to say hello to Bob.\"\n"
+                    "text": "```\nHello, Bob!\n```\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.39700960133173696
+              "avgLogprobs": -0.23016399807400173
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 23,
-            "candidatesTokenCount": 146,
-            "totalTokenCount": 169,
+            "candidatesTokenCount": 9,
+            "totalTokenCount": 32,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 146
+                "tokenCount": 9
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "mQJkaMTmE5mBmNAP8YDO2QI"
+          "responseId": "9x4GaeaWMIWwjMcP__z9sAE"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:30 GMT
+  recorded_at: Sat, 01 Nov 2025 14:53:44 GMT
 recorded_with: VCR 6.3.1

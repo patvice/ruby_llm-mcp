@@ -9,7 +9,7 @@ module RubyLLM
 
           def clean_parameters(parameters)
             parameters.transform_values do |param|
-              build_properties(param).compact
+              mcp_build_properties(param).compact
             end
           end
 
@@ -17,7 +17,7 @@ module RubyLLM
             parameters.select { |_, param| param.required }.keys
           end
 
-          def build_properties(param) # rubocop:disable Metrics/MethodLength
+          def mcp_build_properties(param) # rubocop:disable Metrics/MethodLength
             case param.type
             when :array
               if param.item_type == :object
@@ -46,7 +46,7 @@ module RubyLLM
               }.compact
             when :union
               {
-                param.union_type => param.properties.map { |property| build_properties(property) }
+                param.union_type => param.properties.map { |property| mcp_build_properties(property) }
               }
             else
               {
@@ -63,11 +63,25 @@ module RubyLLM
 end
 
 module RubyLLM::Providers::Anthropic::Tools
-  def self.clean_parameters(parameters)
-    RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.clean_parameters(parameters)
-  end
+  alias original_clean_parameters clean_parameters
+  alias original_required_parameters required_parameters
+  module_function :original_clean_parameters, :original_required_parameters
 
-  def self.required_parameters(parameters)
-    RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.required_parameters(parameters)
+  def clean_parameters(parameters)
+    if parameters.is_a?(Hash) && parameters.values.any? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+      return RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.clean_parameters(parameters)
+    end
+
+    original_clean_parameters(parameters)
   end
+  module_function :clean_parameters
+
+  def required_parameters(parameters)
+    if parameters.is_a?(Hash) && parameters.values.any? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+      return RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.required_parameters(parameters)
+    end
+
+    original_required_parameters(parameters)
+  end
+  module_function :required_parameters
 end

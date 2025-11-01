@@ -33,7 +33,8 @@ VCR.configure do |config|
 
   # Don't record new HTTP interactions when running in CI
   config.default_cassette_options = {
-    record: ENV["CI"] ? :none : :new_episodes
+    # record: ENV["CI"] ? :none : :new_episodes
+    record: :all
   }
 
   # Create new cassette directory if it doesn't exist
@@ -120,7 +121,7 @@ PAGINATION_CLIENT_CONFIG = {
 }.freeze
 
 COMPLEX_FUNCTION_MODELS = [
-  { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
+  { provider: :anthropic, model: "claude-sonnet-4" },
   { provider: :gemini, model: "gemini-2.0-flash" },
   { provider: :openai, model: "gpt-4.1" }
 ].freeze

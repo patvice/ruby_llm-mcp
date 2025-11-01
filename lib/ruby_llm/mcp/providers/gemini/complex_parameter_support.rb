@@ -11,12 +11,12 @@ module RubyLLM
           def format_parameters(parameters)
             {
               type: "OBJECT",
-              properties: parameters.transform_values { |param| build_properties(param) },
+              properties: parameters.transform_values { |param| mcp_build_properties(param) },
               required: parameters.select { |_, p| p.required }.keys.map(&:to_s)
             }
           end
 
-          def build_properties(param) # rubocop:disable Metrics/MethodLength
+          def mcp_build_properties(param) # rubocop:disable Metrics/MethodLength
             properties = case param.type
                          when :array
                            if param.item_type == :object
@@ -26,7 +26,7 @@ module RubyLLM
                                description: param.description,
                                items: {
                                  type: param_type_for_gemini(param.item_type),
-                                 properties: param.properties.transform_values { |value| build_properties(value) }
+                                 properties: param.properties.transform_values { |value| mcp_build_properties(value) }
                                }
                              }.compact
                            else
@@ -43,12 +43,12 @@ module RubyLLM
                              type: param_type_for_gemini(param.type),
                              title: param.title,
                              description: param.description,
-                             properties: param.properties.transform_values { |value| build_properties(value) },
+                             properties: param.properties.transform_values { |value| mcp_build_properties(value) },
                              required: param.properties.select { |_, p| p.required }.keys
                            }.compact
                          when :union
                            {
-                             param.union_type => param.properties.map { |properties| build_properties(properties) }
+                             param.union_type => param.properties.map { |properties| mcp_build_properties(properties) }
                            }
                          else
                            {
@@ -60,10 +60,40 @@ module RubyLLM
 
             properties.compact
           end
+
+          def param_type_for_gemini(type)
+            case type.to_s.downcase
+            when "integer", "number", "float" then "NUMBER"
+            when "boolean" then "BOOLEAN"
+            when "array" then "ARRAY"
+            when "object" then "OBJECT"
+            else "STRING"
+            end
+          end
         end
       end
     end
   end
 end
 
-RubyLLM::Providers::Gemini.extend(RubyLLM::MCP::Providers::Gemini::ComplexParameterSupport)
+module RubyLLM::Providers::Gemini::Tools
+  alias original_format_parameters format_parameters
+  module_function :original_format_parameters
+
+  alias original_param_type_for_gemini param_type_for_gemini
+  module_function :original_param_type_for_gemini
+
+  def format_parameters(parameters)
+    if parameters.is_a?(Hash) && parameters.values.all? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+      return RubyLLM::MCP::Providers::Gemini::ComplexParameterSupport.format_parameters(parameters)
+    end
+
+    original_format_parameters(parameters)
+  end
+  module_function :format_parameters
+
+  def param_type_for_gemini(type)
+    original_param_type_for_gemini(type)
+  end
+  module_function :param_type_for_gemini
+end

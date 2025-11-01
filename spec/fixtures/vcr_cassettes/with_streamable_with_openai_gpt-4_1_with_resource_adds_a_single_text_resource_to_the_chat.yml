@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:48:05 GMT
+      - Sat, 01 Nov 2025 14:56:54 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,11 +38,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '387'
+      - '763'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '391'
+      - '804'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -57,13 +59,15 @@ http_interactions:
       - 104ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -76,16 +80,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXVFk5cSf0NbUYk10HtaRuTOeqPj",
+          "id": "chatcmpl-CX7K9prqGd75JmleSHd1N2CGH0me2",
           "object": "chat.completion",
-          "created": 1751384885,
+          "created": 1762009013,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The `test.txt` file contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```",
+                "content": "The file `test.txt` contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```",
                 "refusal": null,
                 "annotations": []
               },
@@ -109,7 +113,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:48:05 GMT
+  recorded_at: Sat, 01 Nov 2025 14:56:54 GMT
 recorded_with: VCR 6.3.1

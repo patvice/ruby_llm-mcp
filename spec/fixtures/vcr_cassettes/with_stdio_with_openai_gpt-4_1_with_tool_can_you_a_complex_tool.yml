@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:45:45 GMT
+      - Sat, 01 Nov 2025 15:15:03 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '315'
+      - '706'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '318'
+      - '877'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -56,13 +58,15 @@ http_interactions:
       - 48ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -75,9 +79,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXSycnetFC9T9JAPp66JWXg2wzAl",
+          "id": "chatcmpl-CX7bjmxkFZ06LetthNbCDCtNnYLor",
           "object": "chat.completion",
-          "created": 1751384744,
+          "created": 1762010103,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -87,7 +91,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_Vdv6wrALFCgRWiMpKnKrkmz1",
+                    "id": "call_RxW5HJsC9Z1dACy0ri4FFU5H",
                     "type": "function",
                     "function": {
                       "name": "fetch_site",
@@ -118,21 +122,17 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:45 GMT
+  recorded_at: Sat, 01 Nov 2025 15:15:03 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you fetch
-        the website http://www.google.com and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_Vdv6wrALFCgRWiMpKnKrkmz1","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"http://www.google.com\"}"}}]},{"role":"tool","content":"Website
-        content from http://www.google.com:\n\nGoogle Search Images Maps Play YouTube
-        News Gmail Drive More Calendar Translate Books Shopping Blogger Finance Photos
-        Docs Even more &raquo; Account Options Sign in Search settings Web History
-        &nbsp; Advanced search Google offered in: Français Advertising Business Solutions
-        About Google Google.ca &copy; 2025 - Privacy - Terms","tool_call_id":"call_Vdv6wrALFCgRWiMpKnKrkmz1"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
+        the website http://www.google.com and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_RxW5HJsC9Z1dACy0ri4FFU5H","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"http://www.google.com\"}"}}]},{"role":"tool","content":"Tool
+        execution error: Error fetching website content: HTTP 429: Too Many Requests","tool_call_id":"call_RxW5HJsC9Z1dACy0ri4FFU5H"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}}],"tool_choice":"auto"}'
     headers:
       User-Agent:
@@ -151,7 +151,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:45:48 GMT
+      - Sat, 01 Nov 2025 15:15:07 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -163,11 +163,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2044'
+      - '2764'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '2049'
+      - '2905'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -175,20 +177,22 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29881'
+      - '29954'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 238ms
+      - 92ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -201,16 +205,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXT0nCdFV8CbiLzTFKlMUgjS1TlI",
+          "id": "chatcmpl-CX7bklAtcpsF8qWSbzkh5srhAwQPC",
           "object": "chat.completion",
-          "created": 1751384746,
+          "created": 1762010104,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The homepage of Google (http://www.google.com) does not explicitly state what they do in a descriptive sentence. Instead, it primarily features links to their various services such as Search, Images, Maps, YouTube, News, Gmail, and more. While it's clear from the context and the interface that Google provides search and other web services, there is no direct statement explaining what Google does on the main page.",
+                "content": "I wasn't able to fetch the content from http://www.google.com due to a \"Too Many Requests\" error (HTTP 429). This typically means that automated requests to the site are being limited or blocked.\n\nHowever, I can tell you that Google is a search engine that allows users to search for information across the web, including websites, images, news, videos, and much more. If you'd like more details or information from another source, let me know!",
                 "refusal": null,
                 "annotations": []
               },
@@ -219,9 +223,9 @@ http_interactions:
             }
           ],
           "usage": {
-            "prompt_tokens": 180,
-            "completion_tokens": 84,
-            "total_tokens": 264,
+            "prompt_tokens": 128,
+            "completion_tokens": 94,
+            "total_tokens": 222,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -234,7 +238,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:48 GMT
+  recorded_at: Sat, 01 Nov 2025 15:15:07 GMT
 recorded_with: VCR 6.3.1

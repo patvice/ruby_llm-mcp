@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:45:16 GMT
+      - Sat, 01 Nov 2025 14:53:29 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=653
+      - gfet4t7; dur=529
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -91,9 +91,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "jAJkaInJD_LhmNAPpebBuQM"
+          "responseId": "6R4GaeOZGdCb-8YPwv3-oAU"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:16 GMT
+  recorded_at: Sat, 01 Nov 2025 14:53:29 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -101,7 +101,7 @@ http_interactions:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you tell me the weather
         for Ottawa and San Francisco?"}]},{"role":"model","parts":[{"functionCall":{"name":"get_weather_from_locations","args":{"locations":["Ottawa","San
-        Francisco"]}}}]},{"role":"user","parts":[{"functionResponse":{"name":"9e2e110d-25a6-4a11-993d-397462fc1b26","response":{"name":"9e2e110d-25a6-4a11-993d-397462fc1b26","content":"Weather
+        Francisco"]}}}]},{"role":"user","parts":[{"functionResponse":{"name":"f899755d-c17f-4518-abd5-67eabce0587a","response":{"name":"f899755d-c17f-4518-abd5-67eabce0587a","content":"Weather
         for Ottawa, San Francisco is great!"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":[]}},"required":["geocode"]}}]}]}'
@@ -128,7 +128,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:45:17 GMT
+      - Sat, 01 Nov 2025 14:53:30 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -138,7 +138,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=399
+      - gfet4t7; dur=492
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -152,34 +152,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The weather for Ottawa and San Francisco is great!\n"
+                    "text": "OK. The weather for Ottawa and San Francisco is great!\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0627438100901517
+              "avgLogprobs": -0.0040054132158939652
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 146,
-            "candidatesTokenCount": 11,
-            "totalTokenCount": 157,
+            "promptTokenCount": 138,
+            "candidatesTokenCount": 13,
+            "totalTokenCount": 151,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 146
+                "tokenCount": 138
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 11
+                "tokenCount": 13
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "jAJkaPXFO5mBmNAP8YDO2QI"
+          "responseId": "6h4GabeoAsf_jrEP1OzNqQo"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:17 GMT
+  recorded_at: Sat, 01 Nov 2025 14:53:30 GMT
 recorded_with: VCR 6.3.1

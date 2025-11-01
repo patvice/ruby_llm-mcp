@@ -57,4 +57,16 @@ module RubyLLM
   end
 end
 
-RubyLLM::Providers::OpenAI.extend(RubyLLM::MCP::Providers::OpenAI::ComplexParameterSupport)
+module RubyLLM::Providers::OpenAI::Tools
+  alias original_param_schema param_schema
+  module_function :original_param_schema
+
+  def param_schema(param)
+    if param.is_a?(RubyLLM::MCP::Parameter)
+      return RubyLLM::MCP::Providers::OpenAI::ComplexParameterSupport.param_schema(param)
+    end
+
+    original_param_schema(param)
+  end
+  module_function :param_schema
+end

@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:46:03 GMT
+      - Sat, 01 Nov 2025 14:54:23 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2117'
+      - '1849'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '2068'
+      - '1877'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -62,13 +64,15 @@ http_interactions:
       - 1.562s
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -81,16 +85,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXTGywTx9cSeVdyMsFxYgI81C7kZ",
+          "id": "chatcmpl-CX7Hhlg3tGzCVsSOy2MUhRmDWbME8",
           "object": "chat.completion",
-          "created": 1751384762,
+          "created": 1762008861,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "You provided an image named **\"dog.png\"**. It shows a light-colored puppy standing and yawning or perhaps \"smiling\" with its mouth open. The background is plain white, making the dog the main focus of the image. If you need more details or analysis, let me know!",
+                "content": "The image you provided is of a light-colored puppy, possibly a Golden Retriever, standing and appearing to yawn or bark with its mouth open. The background is plain white, making the dog the clear focus of the picture.",
                 "refusal": null,
                 "annotations": []
               },
@@ -100,8 +104,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 280,
-            "completion_tokens": 61,
-            "total_tokens": 341,
+            "completion_tokens": 45,
+            "total_tokens": 325,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -114,7 +118,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:46:03 GMT
+  recorded_at: Sat, 01 Nov 2025 14:54:23 GMT
 recorded_with: VCR 6.3.1

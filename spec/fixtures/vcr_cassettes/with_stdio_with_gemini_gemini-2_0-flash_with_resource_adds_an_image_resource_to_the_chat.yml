@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:45:28 GMT
+      - Sat, 01 Nov 2025 14:53:42 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=974
+      - gfet4t7; dur=924
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have an image of a light-colored dog, likely a puppy, with its mouth wide open as if yawning or barking. It's standing on a white background.\n"
+                    "text": "I have an image labeled \"dog.png\" which contains a picture of a dog. It looks like a light-colored puppy, possibly a Golden Retriever, with its mouth open as if yawning or barking. It's on a white background.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.28053757879469132
+              "avgLogprobs": -0.34575582018085554
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 273,
-            "candidatesTokenCount": 36,
-            "totalTokenCount": 309,
+            "candidatesTokenCount": 51,
+            "totalTokenCount": 324,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -81,12 +81,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 36
+                "tokenCount": 51
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "lwJkaN7bJ6izxfcPvo3h8QI"
+          "responseId": "9h4GaabyCqKi_uMPo-WE-AY"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:28 GMT
+  recorded_at: Sat, 01 Nov 2025 14:53:42 GMT
 recorded_with: VCR 6.3.1

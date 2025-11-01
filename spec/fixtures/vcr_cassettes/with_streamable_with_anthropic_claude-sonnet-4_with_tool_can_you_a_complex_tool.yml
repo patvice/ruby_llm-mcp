@@ -1,0 +1,190 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you fetch the website http://www.google.com and see if the site say what they
+        do?"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 01 Nov 2025 15:15:09 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-01T15:15:09Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-01T15:15:10Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-01T15:15:08Z'
+      Retry-After:
+      - '52'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-01T15:15:09Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2283'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Server-Timing:
+      - cfReqDur;dur=2403.172
+      Cf-Team:
+      - 2ae195a5ae00011ea6cceb4400000001
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01KSCQMtcGoDmcht1tuvkXv4","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        fetch the Google website for you to see what they say about what they do."},{"type":"tool_use","id":"toolu_01GBopkWwBqdPv4RnzHfHrQC","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":473,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":78,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:15:09 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you fetch the website http://www.google.com and see if the site say what they
+        do?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll fetch
+        the Google website for you to see what they say about what they do."},{"type":"tool_use","id":"toolu_01GBopkWwBqdPv4RnzHfHrQC","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01GBopkWwBqdPv4RnzHfHrQC","content":"Tool
+        execution error: Error fetching website content: HTTP 429: Too Many Requests"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 01 Nov 2025 15:15:17 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-01T15:15:12Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-01T15:15:18Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-01T15:15:11Z'
+      Retry-After:
+      - '48'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-01T15:15:12Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '6823'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Server-Timing:
+      - cfReqDur;dur=6877.005
+      Cf-Team:
+      - 2ae195b12a00011ea6cceee400000001
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01G8xsxCqrxHqtJcQbUXBtyk","type":"message","role":"assistant","content":[{"type":"text","text":"I
+        encountered a \"Too Many Requests\" error when trying to fetch Google''s website,
+        which means there are rate limiting restrictions in place. This is common
+        for major websites like Google.\n\nHowever, I can tell you what Google typically
+        says about what they do based on general knowledge:\n\nGoogle''s mission statement
+        is \"to organize the world''s information and make it universally accessible
+        and useful.\" They describe themselves as a technology company that specializes
+        in:\n\n- Internet search and online advertising\n- Cloud computing services\n-
+        Software and hardware products\n- AI and machine learning technologies\n\nTheir
+        main homepage usually focuses on their search functionality rather than detailed
+        company descriptions, but their \"About\" pages typically contain their mission
+        statement and information about their various products and services.\n\nIf
+        you''d like to see specific content from Google''s website, you might want
+        to try visiting it directly in your browser, or we could try fetching a different,
+        less heavily trafficked website to demonstrate the functionality."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":581,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":200,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:15:17 GMT
+recorded_with: VCR 6.3.1

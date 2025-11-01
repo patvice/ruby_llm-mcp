@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:45:57 GMT
+      - Sat, 01 Nov 2025 14:54:18 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '6493'
+      - '10600'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '6466'
+      - '10620'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -62,13 +64,15 @@ http_interactions:
       - 1.568s
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -81,16 +85,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXT5SCeHv1QwJ4qouqOWmlKBxejq",
+          "id": "chatcmpl-CX7HTCiQnYRfnBMGBAmWpZ9Irj8ig",
           "object": "chat.completion",
-          "created": 1751384751,
+          "created": 1762008847,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "I have access to several types of resources and capabilities to assist you:\n\n1. **General Knowledge:** I have been trained on a wide range of topics up to my knowledge cutoffs (October 2023 for most general topics, June 2024 for some updates).\n\n2. **Text Analysis:** I can read, generate, summarize, and analyze text in multiple languages.\n\n3. **Image Capabilities:** I can describe, interpret, and analyze images (like the one you uploaded) but cannot identify specific people or private details.\n\n4. **Code Writing & Debugging:** I can write, explain, and debug code in many programming languages.\n\n5. **Creative Tasks:** I can help with creative writing, brainstorming, generating ideas, and more.\n\n6. **Conversation & Guidance:** I can answer questions, offer advice, and guide you through complex subjects.\n\n**What I *don't* have access to:**\n- Real-time internet browsing or live data.\n- Private databases or proprietary information not included in my training.\n- The ability to identify people in images or provide sensitive personal information.\n\nLet me know what you need help with!",
+                "content": "I have access to a wide range of resources and capabilities, including:\n\n### 1. **General Knowledge**\n- My knowledge base includes information up to June 2024 (with a focus on events, facts, and trends up to that date).\n- I can answer questions about science, technology, history, literature, pop culture, and much more.\n\n### 2. **Text Analysis and Generation**\n- I can help write, edit, and analyze text for grammar, style, and clarity.\n- I can summarize, paraphrase, or expand on documents and ideas.\n\n### 3. **Image Analysis**\n- I can analyze and describe the content of images you upload (e.g., identifying objects, animals, text, and some basic context).\n- **Note:** I cannot recognize people or identify them in images.\n\n### 4. **Programming and Technical Help**\n- I can assist with coding problems and debug code in various languages.\n- I can explain programming concepts, algorithms, and data structures.\n\n### 5. **Math and Science**\n- I can solve mathematical problems, explain scientific concepts, and help with homework or research.\n\n### 6. **Language Translation**\n- I can translate text between many major languages.\n\n### 7. **Creative Writing**\n- I can help write stories, poems, scripts, and creative works.\n\n### 8. **Study and Research Help**\n- I can help find reliable sources, summarize articles, and create study guides.\n\n---\n\n**Limitations:**\n- I do not have access to real-time internet or live data.\n- I cannot access or retrieve proprietary databases, paywalled articles, or private documents.\n- I cannot recognize or identify people in images or provide sensitive personal information.\n\nIf you have a specific task in mind, just let me know!",
                 "refusal": null,
                 "annotations": []
               },
@@ -100,8 +104,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 282,
-            "completion_tokens": 228,
-            "total_tokens": 510,
+            "completion_tokens": 363,
+            "total_tokens": 645,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -114,7 +118,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:57 GMT
+  recorded_at: Sat, 01 Nov 2025 14:54:18 GMT
 recorded_with: VCR 6.3.1

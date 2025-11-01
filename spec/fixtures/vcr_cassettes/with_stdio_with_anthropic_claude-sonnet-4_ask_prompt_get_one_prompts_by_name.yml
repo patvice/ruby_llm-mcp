@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you write me a beautiful poem about the current day? Make sure to include
+        the word ''poem'' in your response."}]}],"temperature":0.7,"stream":false,"max_tokens":64000}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 01 Nov 2025 14:53:12 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-01T14:53:05Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-01T14:53:13Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-01T14:53:05Z'
+      Retry-After:
+      - '58'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-01T14:53:05Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '7811'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Server-Timing:
+      - cfReqDur;dur=7855.984
+      Cf-Team:
+      - 2ae181752600011ea6c6ec4400000001
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxNnhFZm1Ra3AzUmYycXJ0Tnd6akJacSIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IioqVG9kYXkncyBDYW52YXMqKlxuXG5UaGlzIGRheSB1bmZvbGRzIGxpa2UgbW9ybmluZyBtaXN0LFxuQSBnZW50bGUgYnJlYXRoIG9mIHRpbWUgdGhhdCdzIGtpc3NlZFxuQnkgc3VubGlnaHQgc3RyZWFtaW5nIHRocm91Z2ggdGhlIGdsYXNzLFxuV2hpbGUgYXV0dW1uJ3MgZ29sZGVuIG1vbWVudHMgcGFzcy5cblxuVGhlIHdvcmxkIHNwaW5zIG9uIGluIHF1aWV0IGdyYWNlLFxuRWFjaCBoZWFydGJlYXQgbWFya2luZyB0aW1lIGFuZCBzcGFjZSxcbldoZXJlIG9yZGluYXJ5IG1hZ2ljIGR3ZWxsc+KAlFxuSW4gY29mZmVlIHN0ZWFtIGFuZCBkaXN0YW50IGJlbGxzLlxuXG5BIHN0cmFuZ2VyJ3Mgc21pbGUsIGEgY2hpbGQncyBicmlnaHQgbGF1Z2gsXG5UaGUgZGF5IGJlY29tZXMgYSBwaG90b2dyYXBoXG5PZiBzaW1wbGUgam95cyB3ZSBvZnRlbiBtaXNzXG5JbiBydXNoaW5nIHRvd2FyZCBzb21lIGZ1dHVyZSBibGlzcy5cblxuVGhlIGV2ZW5pbmcgc2V0dGxlcywgc29mdCBhbmQgZGVlcCxcbldoaWxlIHN0YXJzIHByZXBhcmUgdGhlaXIgbmlnaHRseSBzd2VlcFxuQWNyb3NzIHRoZSBjYW52YXMgb2YgdGhlIG5pZ2h0LFxuVG9tb3Jyb3cgd2FpdGluZywgZnJlc2ggYW5kIGJyaWdodC5cblxuVGhpcyBwb2VtIGNhcHR1cmVzIGp1c3Qgb25lIGRheeKAlFxuQnV0IGluIGl0cyBsaW5lcywgSSBob3BlIHRvIHNheVxuVGhhdCBldmVyeSBtb21lbnQgaG9sZHMgYSBnaWZ0XG5Gb3IgdGhvc2Ugd2hvIHBhdXNlIGFuZCBsZXQgaGVhcnRzIGxpZnQuXG5cblRvZGF5IGlzIGJlYXV0aWZ1bCBiZWNhdXNlIGl0J3MgaGVyZSwgaW1wZXJmZWN0IGFuZCByZWFsLCBmaWxsZWQgd2l0aCBib3RoIHRoZSBtdW5kYW5lIGFuZCB0aGUgbWlyYWN1bG91cyB0aGF0IG1ha2UgdXAgb3VyIGh1bWFuIGV4cGVyaWVuY2UuIn1dLCJzdG9wX3JlYXNvbiI6ImVuZF90dXJuIiwic3RvcF9zZXF1ZW5jZSI6bnVsbCwidXNhZ2UiOnsiaW5wdXRfdG9rZW5zIjozMywiY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zIjowLCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfY3JlYXRpb24iOnsiZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucyI6MCwiZXBoZW1lcmFsXzFoX2lucHV0X3Rva2VucyI6MH0sIm91dHB1dF90b2tlbnMiOjIxNiwic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0=
+  recorded_at: Sat, 01 Nov 2025 14:53:11 GMT
+recorded_with: VCR 6.3.1

@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 29 Jun 2025 19:14:40 GMT
+      - Sat, 01 Nov 2025 14:56:26 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,14 +41,48 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1342
+      - gfet4t7; dur=2081
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
       - chunked
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        ewogICJjYW5kaWRhdGVzIjogWwogICAgewogICAgICAiY29udGVudCI6IHsKICAgICAgICAicGFydHMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJ0ZXh0IjogIk9rYXksIGhlcmUgYXJlIGEgZmV3IGdyZWV0aW5ncyBmb3IgQWxpY2UgaW4gRnJlbmNoLCByYW5naW5nIGluIGZvcm1hbGl0eTpcblxuKiAgICoqQm9uam91ciBBbGljZToqKiAoRm9ybWFsL1N0YW5kYXJkKSAtIFwiSGVsbG8gQWxpY2VcIiAtIEdvb2QgZm9yIG1vc3Qgc2l0dWF0aW9ucy5cbiogICAqKlNhbHV0IEFsaWNlOioqIChJbmZvcm1hbCkgLSBcIkhpIEFsaWNlXCIgLSBHb29kIGZvciBmcmllbmRzIGFuZCBhY3F1YWludGFuY2VzLlxuKiAgICoqQ291Y291IEFsaWNlOioqIChWZXJ5IEluZm9ybWFsKSAtIFwiSGV5IEFsaWNlXCIgLSBHb29kIGZvciBjbG9zZSBmcmllbmRzLlxuKiAgICoqQmllbnZlbnVlIEFsaWNlOioqIChGb3JtYWwpIC0gXCJXZWxjb21lIEFsaWNlXCIgLSBJZiB5b3UgYXJlIHdlbGNvbWluZyBoZXIgdG8gYSBwbGFjZSBvciBncm91cC5cbiogICAqKkVuY2hhbnTDqShlKSBBbGljZToqKiAoRm9ybWFsKSAtIFwiUGxlYXNlZCB0byBtZWV0IHlvdSwgQWxpY2VcIiAtIFVzZSBcIkVuY2hhbnTDqVwiIGlmIHlvdSBhcmUgbWFsZSwgXCJFbmNoYW50w6llXCIgaWYgeW91IGFyZSBmZW1hbGUuXG5cblRoZSBiZXN0IGNob2ljZSBkZXBlbmRzIG9uIHlvdXIgcmVsYXRpb25zaGlwIHdpdGggQWxpY2UgYW5kIHRoZSBjb250ZXh0IG9mIHRoZSBzaXR1YXRpb24uXG4iCiAgICAgICAgICB9CiAgICAgICAgXSwKICAgICAgICAicm9sZSI6ICJtb2RlbCIKICAgICAgfSwKICAgICAgImZpbmlzaFJlYXNvbiI6ICJTVE9QIiwKICAgICAgImF2Z0xvZ3Byb2JzIjogLTAuMTk2MTE0MzE4MzE1MzcyOQogICAgfQogIF0sCiAgInVzYWdlTWV0YWRhdGEiOiB7CiAgICAicHJvbXB0VG9rZW5Db3VudCI6IDE5LAogICAgImNhbmRpZGF0ZXNUb2tlbkNvdW50IjogMTcyLAogICAgInRvdGFsVG9rZW5Db3VudCI6IDE5MSwKICAgICJwcm9tcHRUb2tlbnNEZXRhaWxzIjogWwogICAgICB7CiAgICAgICAgIm1vZGFsaXR5IjogIlRFWFQiLAogICAgICAgICJ0b2tlbkNvdW50IjogMTkKICAgICAgfQogICAgXSwKICAgICJjYW5kaWRhdGVzVG9rZW5zRGV0YWlscyI6IFsKICAgICAgewogICAgICAgICJtb2RhbGl0eSI6ICJURVhUIiwKICAgICAgICAidG9rZW5Db3VudCI6IDE3MgogICAgICB9CiAgICBdCiAgfSwKICAibW9kZWxWZXJzaW9uIjogImdlbWluaS0yLjAtZmxhc2giLAogICJyZXNwb25zZUlkIjogIm5wQmhhSXIyTXB1QzFka1A2ZlBwaUFFIgp9Cg==
-  recorded_at: Sun, 29 Jun 2025 19:14:40 GMT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "Okay, here are a few greeting options for Alice in French, ranging from casual to more formal:\n\n*   **Casual:**\n\n    *   \"Salut Alice !\" (Hi Alice!)\n    *   \"Coucou Alice !\" (Hey Alice!)\n    *   \"Bonjour Alice !\" (Hello Alice! - can be used any time of day)\n\n*   **Standard:**\n\n    *   \"Bonjour Alice.\" (Good morning/Good day Alice.) - Most versatile and appropriate for most situations.\n    *   \"Bonsoir Alice.\" (Good evening Alice.) - Use after sunset.\n\n*   **Slightly More Formal:**\n\n    *   \"Bonjour Madame Alice.\" (Good morning/Good day Mrs. Alice.) - Use if you know she's married and want to be respectful.\n    *   \"Bonjour Mademoiselle Alice.\" (Good morning/Good day Miss Alice.) - Use if you know she's unmarried. **Note:** This is becoming less common in France, as it can be seen as outdated.\n\n**Which greeting is best depends on your relationship with Alice and the time of day.** If you're unsure, \"Bonjour Alice\" is always a safe and polite option.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.25920357742929845
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 19,
+            "candidatesTokenCount": 246,
+            "totalTokenCount": 265,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 19
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 246
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "mB8GaZHgOfWR-8YPgsKD2Qg"
+        }
+  recorded_at: Sat, 01 Nov 2025 14:56:26 GMT
 recorded_with: VCR 6.3.1

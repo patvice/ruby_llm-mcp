@@ -5,17 +5,44 @@ http_interactions:
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
-      string: '{"contents":[{"role":"user","parts":[{"text":"Can you add 1 and 2?"}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"add","description":"Addes
-        two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":[]}},{"name":"return_set_evn","description":"Returns
-        the set environment variable"},{"name":"malformed_tool","description":"A malformed
-        tool"},{"name":"tool_error","description":"Returns an error","parameters":{"type":"OBJECT","properties":{"shouldError":{"type":"BOOLEAN"}},"required":[]}},{"name":"fetch_site","description":"Fetches
-        website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}},{"name":"get_jackhammer_audio","description":"Returns
-        the jackhammer audio file as a base64-encoded WAV"},{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded PNG"},{"name":"get_file_resource","description":"Returns
-        a file resource reference","parameters":{"type":"OBJECT","properties":{"filename":{"type":"STRING"}},"required":[]}},{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}},{"name":"upgrade_auth","description":"Upgrade
-        authentication permissions","parameters":{"type":"OBJECT","properties":{"permission":{"type":"STRING"}},"required":[]}},{"name":"get_weather_from_locations","description":"Get
-        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
-        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":[]}},"required":["geocode"]}}]}]}'
+      string: "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Can you add
+        1 and 2?\"}]}],\"generationConfig\":{\"temperature\":0.7},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
+        two numbers together\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"a\":{\"type\":\"NUMBER\"},\"b\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
+        the set environment variable\"},{\"name\":\"malformed_tool\",\"description\":\"A
+        malformed tool\"},{\"name\":\"tool_error\",\"description\":\"Returns an error\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"shouldError\":{\"type\":\"BOOLEAN\"}},\"required\":[]}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
+        for a given number of seconds\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"seconds\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"fetch_site\",\"description\":\"Fetches
+        website content and returns it as text\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"STRING\"},{\"type\":\"OBJECT\",\"properties\":{\"url\":{\"type\":\"STRING\"},\"headers\":{\"type\":\"ARRAY\",\"items\":{\"type\":\"OBJECT\",\"properties\":{\"name\":{\"type\":\"STRING\"},\"value\":{\"type\":\"STRING\"}}}}},\"required\":[]}]}},\"required\":[\"website\"]}},{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\"},{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\"},{\"name\":\"get_file_resource\",\"description\":\"Returns
+        a file resource reference\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"filename\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"list_messages\",\"description\":\"\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"channel\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
+        authentication permissions\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"permission\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"get_weather_from_locations\",\"description\":\"Get
+        the weather from a list of locations\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"locations\":{\"type\":\"ARRAY\",\"items\":{\"type\":\"STRING\"}}},\"required\":[]}},{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
+        the weather from a list of locations\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"geocode\":{\"type\":\"OBJECT\",\"properties\":{\"latitude\":{\"type\":\"NUMBER\"},\"longitude\":{\"type\":\"NUMBER\"}},\"required\":[]}},\"required\":[\"geocode\"]}},{\"name\":\"progress\",\"description\":\"Simulate
+        a multi-step operation with progress notifications\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"operation\":{\"type\":\"STRING\",\"description\":\"Name
+        of the operation to simulate\"},\"steps\":{\"type\":\"NUMBER\",\"description\":\"Number
+        of steps (default: 3)\"}},\"required\":[]}},{\"name\":\"simple_progress\",\"description\":\"Send
+        a single progress notification\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"progress\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"log_message\",\"description\":\"Logs
+        a message\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"message\":{\"type\":\"STRING\"},\"level\":{\"type\":\"STRING\"},\"logger\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
+        a resource\"},{\"name\":\"send_list_changed\",\"description\":\"List changed\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"type\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"client-capabilities\",\"description\":\"Get
+        the capabilities of the client and return them back\"},{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\"},{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\"},{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\"},{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        data and returns structured results\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"data\":{\"type\":\"STRING\"},\"format\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"invalid_structured_output\",\"description\":\"Tool
+        that returns invalid structured data\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"trigger_error\":{\"type\":\"BOOLEAN\"}},\"required\":[]}},{\"name\":\"create_report\",\"description\":\"Creates
+        a report and returns it as a resource\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"title\":{\"type\":\"STRING\"},\"content\":{\"type\":\"STRING\"},\"format\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"user_preference_collector\",\"description\":\"Collects
+        user preferences through elicitation\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"scenario\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"complex_calculation\",\"description\":\"\U0001F9EE
+        Advanced Calculator - Performs complex mathematical calculations\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"expression\":{\"type\":\"STRING\"},\"precision\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"long_running_task\",\"description\":\"Simulates
+        a long-running task with progress updates\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"duration\":{\"type\":\"NUMBER\"},\"steps\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"context_aware_suggestion\",\"description\":\"Provides
+        suggestions based on context\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"query\":{\"type\":\"STRING\"},\"context_type\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"user_preference_elicitation\",\"description\":\"Collects
+        user preferences through MCP elicitation (simulation)\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"scenario\":{\"type\":\"STRING\",\"description\":\"The
+        scenario for which to collect preferences\"}},\"required\":[]}},{\"name\":\"complex_elicitation\",\"description\":\"Tests
+        elicitation with complex validation schemas (simulation)\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"data_type\":{\"type\":\"STRING\",\"description\":\"Type
+        of data to collect\"}},\"required\":[]}},{\"name\":\"rejectable_elicitation\",\"description\":\"Tests
+        elicitation that can be rejected by the client (simulation)\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"request_type\":{\"type\":\"STRING\",\"description\":\"Type
+        of request\"}},\"required\":[]}},{\"name\":\"simple_elicitation\",\"description\":\"Simple
+        elicitation test tool\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"message\":{\"type\":\"STRING\",\"description\":\"Custom
+        message for elicitation\"}},\"required\":[]}}]}]}"
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -39,7 +66,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:47:14 GMT
+      - Sat, 01 Nov 2025 14:56:02 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -49,7 +76,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=539
+      - gfet4t7; dur=516
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -66,8 +93,8 @@ http_interactions:
                     "functionCall": {
                       "name": "add",
                       "args": {
-                        "b": 2,
-                        "a": 1
+                        "a": 1,
+                        "b": 2
                       }
                     }
                   }
@@ -75,17 +102,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0016336379572749137
+              "avgLogprobs": -0.0023709859699010847
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 182,
+            "promptTokenCount": 532,
             "candidatesTokenCount": 5,
-            "totalTokenCount": 187,
+            "totalTokenCount": 537,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 182
+                "tokenCount": 532
               }
             ],
             "candidatesTokensDetails": [
@@ -96,25 +123,52 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "AQNkaKP8JZK3mNAPh5HH0QM"
+          "responseId": "gR8GaZ_ANN2d-8YPn8Ou8Ag"
         }
-  recorded_at: Tue, 01 Jul 2025 15:47:13 GMT
+  recorded_at: Sat, 01 Nov 2025 14:56:02 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
-      string: '{"contents":[{"role":"user","parts":[{"text":"Can you add 1 and 2?"}]},{"role":"model","parts":[{"functionCall":{"name":"add","args":{"b":2,"a":1}}}]},{"role":"user","parts":[{"functionResponse":{"name":"7984415d-2890-4a9a-925c-217f1abf87a2","response":{"name":"7984415d-2890-4a9a-925c-217f1abf87a2","content":"3"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"add","description":"Addes
-        two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":[]}},{"name":"return_set_evn","description":"Returns
-        the set environment variable"},{"name":"malformed_tool","description":"A malformed
-        tool"},{"name":"tool_error","description":"Returns an error","parameters":{"type":"OBJECT","properties":{"shouldError":{"type":"BOOLEAN"}},"required":[]}},{"name":"fetch_site","description":"Fetches
-        website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}},{"name":"get_jackhammer_audio","description":"Returns
-        the jackhammer audio file as a base64-encoded WAV"},{"name":"get_dog_image","description":"Returns
-        the dog image as a base64-encoded PNG"},{"name":"get_file_resource","description":"Returns
-        a file resource reference","parameters":{"type":"OBJECT","properties":{"filename":{"type":"STRING"}},"required":[]}},{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}},{"name":"upgrade_auth","description":"Upgrade
-        authentication permissions","parameters":{"type":"OBJECT","properties":{"permission":{"type":"STRING"}},"required":[]}},{"name":"get_weather_from_locations","description":"Get
-        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
-        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":[]}},"required":["geocode"]}}]}]}'
+      string: "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Can you add
+        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"a\":1,\"b\":2}}}]},{\"role\":\"user\",\"parts\":[{\"functionResponse\":{\"name\":\"28ca27b4-83e4-455e-9179-0c891a23d733\",\"response\":{\"name\":\"28ca27b4-83e4-455e-9179-0c891a23d733\",\"content\":\"3\"}}}]}],\"generationConfig\":{\"temperature\":0.7},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
+        two numbers together\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"a\":{\"type\":\"NUMBER\"},\"b\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
+        the set environment variable\"},{\"name\":\"malformed_tool\",\"description\":\"A
+        malformed tool\"},{\"name\":\"tool_error\",\"description\":\"Returns an error\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"shouldError\":{\"type\":\"BOOLEAN\"}},\"required\":[]}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
+        for a given number of seconds\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"seconds\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"fetch_site\",\"description\":\"Fetches
+        website content and returns it as text\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"STRING\"},{\"type\":\"OBJECT\",\"properties\":{\"url\":{\"type\":\"STRING\"},\"headers\":{\"type\":\"ARRAY\",\"items\":{\"type\":\"OBJECT\",\"properties\":{\"name\":{\"type\":\"STRING\"},\"value\":{\"type\":\"STRING\"}}}}},\"required\":[]}]}},\"required\":[\"website\"]}},{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\"},{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\"},{\"name\":\"get_file_resource\",\"description\":\"Returns
+        a file resource reference\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"filename\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"list_messages\",\"description\":\"\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"channel\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
+        authentication permissions\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"permission\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"get_weather_from_locations\",\"description\":\"Get
+        the weather from a list of locations\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"locations\":{\"type\":\"ARRAY\",\"items\":{\"type\":\"STRING\"}}},\"required\":[]}},{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
+        the weather from a list of locations\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"geocode\":{\"type\":\"OBJECT\",\"properties\":{\"latitude\":{\"type\":\"NUMBER\"},\"longitude\":{\"type\":\"NUMBER\"}},\"required\":[]}},\"required\":[\"geocode\"]}},{\"name\":\"progress\",\"description\":\"Simulate
+        a multi-step operation with progress notifications\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"operation\":{\"type\":\"STRING\",\"description\":\"Name
+        of the operation to simulate\"},\"steps\":{\"type\":\"NUMBER\",\"description\":\"Number
+        of steps (default: 3)\"}},\"required\":[]}},{\"name\":\"simple_progress\",\"description\":\"Send
+        a single progress notification\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"progress\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"log_message\",\"description\":\"Logs
+        a message\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"message\":{\"type\":\"STRING\"},\"level\":{\"type\":\"STRING\"},\"logger\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
+        a resource\"},{\"name\":\"send_list_changed\",\"description\":\"List changed\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"type\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"client-capabilities\",\"description\":\"Get
+        the capabilities of the client and return them back\"},{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\"},{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\"},{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\"},{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        data and returns structured results\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"data\":{\"type\":\"STRING\"},\"format\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"invalid_structured_output\",\"description\":\"Tool
+        that returns invalid structured data\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"trigger_error\":{\"type\":\"BOOLEAN\"}},\"required\":[]}},{\"name\":\"create_report\",\"description\":\"Creates
+        a report and returns it as a resource\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"title\":{\"type\":\"STRING\"},\"content\":{\"type\":\"STRING\"},\"format\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"user_preference_collector\",\"description\":\"Collects
+        user preferences through elicitation\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"scenario\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"complex_calculation\",\"description\":\"\U0001F9EE
+        Advanced Calculator - Performs complex mathematical calculations\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"expression\":{\"type\":\"STRING\"},\"precision\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"long_running_task\",\"description\":\"Simulates
+        a long-running task with progress updates\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"duration\":{\"type\":\"NUMBER\"},\"steps\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"context_aware_suggestion\",\"description\":\"Provides
+        suggestions based on context\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"query\":{\"type\":\"STRING\"},\"context_type\":{\"type\":\"STRING\"}},\"required\":[]}},{\"name\":\"user_preference_elicitation\",\"description\":\"Collects
+        user preferences through MCP elicitation (simulation)\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"scenario\":{\"type\":\"STRING\",\"description\":\"The
+        scenario for which to collect preferences\"}},\"required\":[]}},{\"name\":\"complex_elicitation\",\"description\":\"Tests
+        elicitation with complex validation schemas (simulation)\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"data_type\":{\"type\":\"STRING\",\"description\":\"Type
+        of data to collect\"}},\"required\":[]}},{\"name\":\"rejectable_elicitation\",\"description\":\"Tests
+        elicitation that can be rejected by the client (simulation)\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"request_type\":{\"type\":\"STRING\",\"description\":\"Type
+        of request\"}},\"required\":[]}},{\"name\":\"simple_elicitation\",\"description\":\"Simple
+        elicitation test tool\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"message\":{\"type\":\"STRING\",\"description\":\"Custom
+        message for elicitation\"}},\"required\":[]}}]}]}"
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -138,7 +192,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:47:14 GMT
+      - Sat, 01 Nov 2025 14:56:02 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -148,7 +202,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=446
+      - gfet4t7; dur=514
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -162,34 +216,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "3\n"
+                    "text": "The sum of 1 and 2 is 3.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0053930007852613926
+              "avgLogprobs": -0.13073383844815767
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 260,
-            "candidatesTokenCount": 2,
-            "totalTokenCount": 262,
+            "promptTokenCount": 610,
+            "candidatesTokenCount": 13,
+            "totalTokenCount": 623,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 260
+                "tokenCount": 610
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 2
+                "tokenCount": 13
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "AgNkaJCiDqizxfcPvo3h8QI"
+          "responseId": "gh8GafelHcqljrEPoNSUuQE"
         }
-  recorded_at: Tue, 01 Jul 2025 15:47:14 GMT
+  recorded_at: Sat, 01 Nov 2025 14:56:02 GMT
 recorded_with: VCR 6.3.1

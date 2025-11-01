@@ -5,7 +5,8 @@ http_interactions:
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
-      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"test.txt:
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"plain_text.txt:
+        A plain text file\n\nPlan text information"},{"role":"user","content":"test.txt:
         A text file\n\nHello, this is a test file!\nThis content will be served by
         the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n"},{"role":"user","content":"second_file.txt:
         A second text file\n\nThis is the second file that I want to be able to use
@@ -31,7 +32,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:47:50 GMT
+      - Sat, 01 Nov 2025 14:56:43 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -43,11 +44,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '4481'
+      - '5006'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '4924'
+      - '5041'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -55,20 +58,22 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29759'
+      - '29843'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 481ms
+      - 314ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -79,42 +84,7 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: |
-        {
-          "id": "chatcmpl-BoXUvpKPytEGNBOqbTiLHL7InLCDk",
-          "object": "chat.completion",
-          "created": 1751384865,
-          "model": "gpt-4.1-2025-04-14",
-          "choices": [
-            {
-              "index": 0,
-              "message": {
-                "role": "assistant",
-                "content": "Here is a summary of the information from the provided resources:\n\n---\n\n### **test.txt**  \nA plain text file containing:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n\n**Key points:**\n- It is a test file.\n- Its content will be served by an MCP resource.\n- The file is cacheable for 5 minutes and can be modified.\n\n---\n\n### **second_file.txt**  \nAnother plain text file:\n\n```\nThis is the second file that I want to be able to use as a resource\n```\n\n**Key points:**\n- This is a second file meant to be used as a resource.\n\n---\n\n### **my.md**  \nA Markdown file containing:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\n**Key points:**\n- The file is titled \"My Markdown File\".\n- It contains two sections: \"Section 1\" and \"Section 2\", each with a short description.\n\n---\n\n**Summary:**  \nYou have provided three files: two plain text files and one Markdown file. All are meant to be used as resources, potentially to be served or processed in some way (such as by an MCP resource). The contents are simple test/demo data, with explicit mention of caching in `test.txt` and a structured outline in `my.md`.",
-                "refusal": null,
-                "annotations": []
-              },
-              "logprobs": null,
-              "finish_reason": "stop"
-            }
-          ],
-          "usage": {
-            "prompt_tokens": 152,
-            "completion_tokens": 331,
-            "total_tokens": 483,
-            "prompt_tokens_details": {
-              "cached_tokens": 0,
-              "audio_tokens": 0
-            },
-            "completion_tokens_details": {
-              "reasoning_tokens": 0,
-              "audio_tokens": 0,
-              "accepted_prediction_tokens": 0,
-              "rejected_prediction_tokens": 0
-            }
-          },
-          "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
-        }
-  recorded_at: Tue, 01 Jul 2025 15:47:50 GMT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DWDdKdTBSTnlVczNWaEdZMVQ3RGZyWkt5UmVzVyIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjAwODk5OCwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJIZXJl4oCZcyBhIHN1bW1hcnkgb2YgdGhlIGluZm9ybWF0aW9uIGZyb20gdGhlIHByb3ZpZGVkIHJlc291cmNlczpcblxuLS0tXG5cbiMjIyAxLiAqKnBsYWluX3RleHQudHh0Kipcbi0gKipUeXBlOioqIFBsYWluIHRleHQgZmlsZVxuLSAqKkNvbnRlbnQ6KiogIFxuICA+IFBsYW4gdGV4dCBpbmZvcm1hdGlvblxuXG4tLS1cblxuIyMjIDIuICoqdGVzdC50eHQqKlxuLSAqKlR5cGU6KiogVGV4dCBmaWxlXG4tICoqQ29udGVudDoqKiAgXG4gID4gSGVsbG8sIHRoaXMgaXMgYSB0ZXN0IGZpbGUhICBcbiAgPiBUaGlzIGNvbnRlbnQgd2lsbCBiZSBzZXJ2ZWQgYnkgdGhlIE1DUCByZXNvdXJjZS4gIFxuICA+IFlvdSBjYW4gbW9kaWZ5IHRoaXMgZmlsZSBhbmQgaXQgd2lsbCBiZSBjYWNoZWQgZm9yIDUgbWludXRlcy5cblxuLS0tXG5cbiMjIyAzLiAqKnNlY29uZF9maWxlLnR4dCoqXG4tICoqVHlwZToqKiBTZWNvbmQgdGV4dCBmaWxlXG4tICoqQ29udGVudDoqKiAgXG4gID4gVGhpcyBpcyB0aGUgc2Vjb25kIGZpbGUgdGhhdCBJIHdhbnQgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSByZXNvdXJjZVxuXG4tLS1cblxuIyMjIDQuICoqbXkubWQqKlxuLSAqKlR5cGU6KiogTWFya2Rvd24gZmlsZVxuLSAqKkNvbnRlbnQ6KipcbiAgYGBgbWFya2Rvd25cbiAgIyBNeSBNYXJrZG93biBGaWxlXG5cbiAgVGhpcyBpcyBhIG1hcmtkb3duIGZpbGUgdGhhdCBJIHdhbnQgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSByZXNvdXJjZVxuXG4gICMjIFNlY3Rpb24gMVxuXG4gIFRoaXMgaXMgYSBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcblxuICAjIyBTZWN0aW9uIDJcblxuICBUaGlzIGlzIGFub3RoZXIgc2VjdGlvbiBpbiBteSBtYXJrZG93biBmaWxlXG4gIGBgYFxuXG4tLS1cblxuSWYgeW91IG5lZWQgZGV0YWlscywgY29udGVudCwgb3Igc3VtbWFyaWVzIGZyb20gYW55IHNwZWNpZmljIGZpbGUsIGp1c3QgbGV0IG1lIGtub3chIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMTY4LAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMjQ5LAogICAgInRvdGFsX3Rva2VucyI6IDQxNywKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwXzE0NGVhM2I5NzQiCn0K
+  recorded_at: Sat, 01 Nov 2025 14:56:43 GMT
 recorded_with: VCR 6.3.1
