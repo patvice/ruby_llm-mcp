@@ -62,9 +62,8 @@ module RubyLLM
     end
 
     def support_complex_parameters!
-      require_relative "mcp/providers/openai/complex_parameter_support"
-      require_relative "mcp/providers/anthropic/complex_parameter_support"
-      require_relative "mcp/providers/gemini/complex_parameter_support"
+      warn "[DEPRECATION] RubyLLM::MCP.support_complex_parameters! is no longer needed and will be removed in version 0.8.0"
+      # No-op: Complex parameters are now supported by default
     end
 
     def configure

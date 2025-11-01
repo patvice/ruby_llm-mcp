@@ -201,14 +201,9 @@ RSpec.describe RubyLLM::Chat do
           describe "mixed parameter types" do
             it "handles both RubyLLM::Parameter and MCP::Parameter tools in same chat" do
               chat = RubyLLM.chat(model: config[:model])
-
-              # Get MCP tool with MCP::Parameter (add tool uses MCP::Parameter)
               mcp_tool = client.tool("add")
 
-              # Add both tools to chat
               chat.with_tools(SimpleMultiplyTool, mcp_tool)
-
-              # Ask question that uses both tools
               response = chat.ask("Can you multiply 3 and 4, then add 5 and 7?")
 
               # Verify response includes results from both tools

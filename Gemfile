@@ -6,6 +6,9 @@ gemspec
 
 group :development do
   # Development dependencies
+  # TODO: Remove this when ruby_llm 1.9 is released
+  gem "ruby_llm", git: "https://github.com/crmne/ruby_llm.git", branch: "main"
+
   gem "bundler", ">= 2.0"
   gem "debug"
   gem "dotenv", ">= 3.0"

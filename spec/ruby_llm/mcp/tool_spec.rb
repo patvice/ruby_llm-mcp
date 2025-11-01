@@ -322,10 +322,40 @@ RSpec.describe RubyLLM::MCP::Tool do
     end
   end
 
-  describe "complex anyOf parameter parsing" do
+  describe "params_schema" do
     let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
-    let(:tool_response_with_complex_anyof) do
-      {
+
+    it "returns the input schema as-is" do
+      tool_response = {
+        "name" => "test_tool",
+        "description" => "A test tool",
+        "inputSchema" => {
+          "type" => "object",
+          "properties" => {
+            "name" => {
+              "type" => "string",
+              "description" => "User name"
+            },
+            "age" => {
+              "type" => "integer",
+              "description" => "User age"
+            }
+          },
+          "required" => ["name"]
+        }
+      }
+
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+      expect(tool.params_schema).to eq(tool_response["inputSchema"])
+      expect(tool.params_schema["type"]).to eq("object")
+      expect(tool.params_schema["properties"]).to have_key("name")
+      expect(tool.params_schema["properties"]).to have_key("age")
+      expect(tool.params_schema["required"]).to eq(["name"])
+    end
+
+    it "handles complex anyOf schemas" do
+      tool_response = {
         "name" => "test_tool",
         "description" => "A test tool with complex anyOf parameter",
         "inputSchema" => {
@@ -334,312 +364,353 @@ RSpec.describe RubyLLM::MCP::Tool do
             "value" => {
               "anyOf" => [
                 {
-                  "type" => %w[string number boolean],
-                  "description" => "A filter value that can be a string, number, or boolean."
+                  "type" => "string",
+                  "description" => "A string value"
                 },
                 {
                   "type" => "array",
-                  "items" => {
-                    "$ref" => "#/properties/value/anyOf/0"
-                  }
+                  "items" => { "type" => "string" }
                 }
               ],
-              "description" => "The value or list of values for filtering."
+              "description" => "The value or list of values"
             }
           }
         }
       }
+
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+      expect(tool.params_schema["properties"]["value"]).to have_key("anyOf")
+      expect(tool.params_schema["properties"]["value"]["anyOf"]).to be_an(Array)
+      expect(tool.params_schema["properties"]["value"]["anyOf"].length).to eq(2)
     end
 
-    it "parses complex anyOf with shorthand array types and array with items" do # rubocop:disable RSpec/MultipleExpectations
-      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_complex_anyof)
-
-      expect(tool.parameters).to have_key("value")
-      param = tool.parameters["value"]
-
-      expect(param.type).to eq(:union)
-      expect(param.union_type).to eq("anyOf")
-      expect(param.properties).to be_an(Array)
-      expect(param.properties.length).to eq(2)
-
-      # First property should be a union from shorthand ["string", "number", "boolean"]
-      first_prop = param.properties[0]
-      expect(first_prop.type).to eq(:union)
-      expect(first_prop.union_type).to eq("anyOf")
-      expect(first_prop.properties).to be_an(Array)
-      expect(first_prop.properties.length).to eq(3)
-      expect(first_prop.properties.map(&:type)).to eq(%i[string number boolean])
-
-      # Second property should be an array type
-      second_prop = param.properties[1]
-      expect(second_prop.type).to eq(:array)
-      expect(second_prop.items).to be_a(Hash)
-      expect(second_prop.items).to have_key("$ref")
-    end
-  end
-
-  describe "Direct shorthand type parsing" do
-    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
-    let(:tool_response_with_direct_shorthand) do
-      {
+    it "handles schemas with title fields" do
+      tool_response = {
         "name" => "test_tool",
-        "description" => "A test tool with direct shorthand array type",
+        "description" => "A test tool with titles",
         "inputSchema" => {
           "type" => "object",
           "properties" => {
-            "value" => {
-              "type" => %w[string number boolean],
-              "description" => "A filter value that can be a string, number, or boolean."
-            }
-          }
-        }
-      }
-    end
-
-    it "parses direct shorthand array type without anyOf wrapper" do
-      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_direct_shorthand)
-
-      expect(tool.parameters).to have_key("value")
-      param = tool.parameters["value"]
-
-      # When type is an array directly, it should be converted to an implicit anyOf union
-      expect(param).to be_a(RubyLLM::MCP::Parameter)
-      expect(param.name).to eq("value")
-      expect(param.type).to eq(:union)
-      expect(param.union_type).to eq("anyOf")
-      expect(param.description).to eq("A filter value that can be a string, number, or boolean.")
-      expect(param.properties).to be_an(Array)
-      expect(param.properties.length).to eq(3)
-      expect(param.properties.map(&:type)).to eq(%i[string number boolean])
-    end
-  end
-
-  describe "Parameter with missing type field" do
-    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
-
-    context "when type is nil" do
-      let(:tool_response_with_nil_type) do
-        {
-          "name" => "test_tool",
-          "description" => "A test tool with nil type parameter",
-          "inputSchema" => {
-            "type" => "object",
-            "properties" => {
-              "param_without_type" => {
-                "title" => "Parameter Without Type",
-                "description" => "A parameter that has no type field"
-              }
-            }
-          }
-        }
-      end
-
-      it "defaults to string type when type is nil" do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_nil_type)
-
-        expect(tool.parameters).to have_key("param_without_type")
-        param = tool.parameters["param_without_type"]
-
-        expect(param).to be_a(RubyLLM::MCP::Parameter)
-        expect(param.type).to eq(:string) # Should default to string
-        expect(param.title).to eq("Parameter Without Type")
-        expect(param.description).to eq("A parameter that has no type field")
-      end
-
-      it "does not raise NoMethodError when calling to_sym on nil" do
-        expect do
-          RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_nil_type)
-        end.not_to raise_error
-      end
-    end
-
-    context "when type is missing entirely" do
-      let(:tool_response_missing_type) do
-        {
-          "name" => "test_tool",
-          "description" => "A test tool with missing type field",
-          "inputSchema" => {
-            "type" => "object",
-            "properties" => {
-              "service_param" => {
-                "title" => "Service Parameter"
-              }
-            }
-          }
-        }
-      end
-
-      it "defaults to string type when type field is missing" do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_missing_type)
-
-        expect(tool.parameters).to have_key("service_param")
-        param = tool.parameters["service_param"]
-
-        expect(param.type).to eq(:string)
-        expect(param.title).to eq("Service Parameter")
-      end
-    end
-  end
-
-  describe "Parameter title field support" do
-    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
-
-    context "with title on regular parameters" do
-      let(:tool_response_with_title) do
-        {
-          "name" => "test_tool",
-          "description" => "A test tool with titled parameters",
-          "inputSchema" => {
-            "type" => "object",
-            "properties" => {
-              "user_email" => {
-                "type" => "string",
-                "title" => "User's Email Address",
-                "description" => "The email address of the user"
-              },
-              "count" => {
-                "type" => "integer",
-                "title" => "Item Count",
-                "description" => "Number of items to process"
-              }
-            }
-          }
-        }
-      end
-
-      it "preserves title field on string parameters" do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_title)
-
-        param = tool.parameters["user_email"]
-        expect(param.title).to eq("User's Email Address")
-        expect(param.type).to eq(:string)
-        expect(param.description).to eq("The email address of the user")
-      end
-
-      it "preserves title field on integer parameters" do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_title)
-
-        param = tool.parameters["count"]
-        expect(param.title).to eq("Item Count")
-        expect(param.type).to eq(:integer)
-        expect(param.description).to eq("Number of items to process")
-      end
-    end
-
-    context "with title on union parameters" do
-      let(:tool_response_with_union_title) do
-        {
-          "name" => "test_tool",
-          "description" => "A test tool with titled union parameters",
-          "inputSchema" => {
-            "type" => "object",
-            "properties" => {
-              "optional_param" => {
-                "anyOf" => [
-                  { "type" => "string", "title" => "String Option" },
-                  { "type" => "null", "title" => "Null Option" }
-                ],
-                "title" => "Optional Parameter",
-                "description" => "An optional string parameter"
-              }
-            }
-          }
-        }
-      end
-
-      it "preserves title field on union parameters" do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_with_union_title)
-
-        param = tool.parameters["optional_param"]
-        expect(param.title).to eq("Optional Parameter")
-        expect(param.type).to eq(:union)
-        expect(param.union_type).to eq("anyOf")
-        expect(param.description).to eq("An optional string parameter")
-      end
-    end
-
-    context "without title field" do
-      let(:tool_response_without_title) do
-        {
-          "name" => "test_tool",
-          "description" => "A test tool without titles",
-          "inputSchema" => {
-            "type" => "object",
-            "properties" => {
-              "regular_param" => {
-                "type" => "string",
-                "description" => "A regular parameter without title"
-              }
-            }
-          }
-        }
-      end
-
-      it "sets title to nil when not provided" do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_without_title)
-
-        param = tool.parameters["regular_param"]
-        expect(param.title).to be_nil
-        expect(param.type).to eq(:string)
-      end
-    end
-  end
-
-  describe "Complex scenario: missing type with title" do
-    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
-    let(:tool_response_complex) do
-      {
-        "name" => "google_workspace_tool",
-        "description" => "A Google Workspace tool similar to the one that caused the bug",
-        "inputSchema" => {
-          "type" => "object",
-          "properties" => {
-            "docs_service" => {
-              "title" => "Docs Service"
-            },
-            "drive_service" => {
-              "title" => "Drive Service"
-            },
             "user_email" => {
               "type" => "string",
-              "title" => "User Email"
+              "title" => "User's Email Address",
+              "description" => "The email address of the user"
             },
-            "document_id" => {
-              "type" => "string"
+            "count" => {
+              "type" => "integer",
+              "title" => "Item Count",
+              "description" => "Number of items to process"
             }
           }
         }
       }
+
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+      expect(tool.params_schema["properties"]["user_email"]["title"]).to eq("User's Email Address")
+      expect(tool.params_schema["properties"]["count"]["title"]).to eq("Item Count")
     end
 
-    it "handles parameters with only title field" do
-      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_complex)
+    it "handles schemas with nested objects" do
+      tool_response = {
+        "name" => "test_tool",
+        "description" => "A test tool with nested schema",
+        "inputSchema" => {
+          "type" => "object",
+          "properties" => {
+            "user" => {
+              "type" => "object",
+              "properties" => {
+                "name" => { "type" => "string" },
+                "email" => { "type" => "string" }
+              },
+              "required" => ["name"]
+            }
+          }
+        }
+      }
 
-      # Parameters with title but no type should default to string
-      docs_service = tool.parameters["docs_service"]
-      expect(docs_service.type).to eq(:string)
-      expect(docs_service.title).to eq("Docs Service")
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
 
-      drive_service = tool.parameters["drive_service"]
-      expect(drive_service.type).to eq(:string)
-      expect(drive_service.title).to eq("Drive Service")
-
-      # Parameters with both type and title
-      user_email = tool.parameters["user_email"]
-      expect(user_email.type).to eq(:string)
-      expect(user_email.title).to eq("User Email")
-
-      # Parameters with type but no title
-      document_id = tool.parameters["document_id"]
-      expect(document_id.type).to eq(:string)
-      expect(document_id.title).to be_nil
+      expect(tool.params_schema["properties"]["user"]["type"]).to eq("object")
+      expect(tool.params_schema["properties"]["user"]["properties"]).to have_key("name")
+      expect(tool.params_schema["properties"]["user"]["properties"]).to have_key("email")
+      expect(tool.params_schema["properties"]["user"]["required"]).to eq(["name"])
     end
 
-    it "does not raise errors when processing all parameters" do
-      expect do
-        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response_complex)
-        expect(tool.parameters.count).to eq(4)
-      end.not_to raise_error
+    it "returns nil when no input schema is provided" do
+      tool_response = {
+        "name" => "test_tool",
+        "description" => "A test tool without input schema"
+      }
+
+      tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+      expect(tool.params_schema).to be_nil
+    end
+  end
+
+  describe "input schema validation and normalization" do
+    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+
+    describe "normalization for malformed schemas" do
+      it "normalizes object schema missing properties field" do
+        tool_response = {
+          "name" => "malformed_tool",
+          "description" => "A malformed tool",
+          "inputSchema" => {
+            "type" => "object"
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema["type"]).to eq("object")
+        expect(tool.params_schema).to have_key("properties")
+        expect(tool.params_schema["properties"]).to eq({})
+      end
+
+      it "normalizes nested object schemas missing properties" do
+        tool_response = {
+          "name" => "nested_malformed_tool",
+          "description" => "A tool with nested malformed schema",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "user" => {
+                "type" => "object"
+              }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema["properties"]["user"]["type"]).to eq("object")
+        expect(tool.params_schema["properties"]["user"]).to have_key("properties")
+        expect(tool.params_schema["properties"]["user"]["properties"]).to eq({})
+      end
+
+      it "normalizes object schemas in arrays" do
+        tool_response = {
+          "name" => "array_tool",
+          "description" => "A tool with array of objects",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "items" => {
+                "type" => "array",
+                "items" => {
+                  "type" => "object"
+                }
+              }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        item_schema = tool.params_schema["properties"]["items"]["items"]
+        expect(item_schema["type"]).to eq("object")
+        expect(item_schema).to have_key("properties")
+        expect(item_schema["properties"]).to eq({})
+      end
+    end
+
+    describe "validation using json-schema" do
+      it "does not normalize valid schemas" do
+        tool_response = {
+          "name" => "valid_tool",
+          "description" => "A valid tool",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "name" => { "type" => "string" }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Schema should be returned as-is since it's valid
+        expect(tool.params_schema).to eq(tool_response["inputSchema"])
+        expect(tool.params_schema["type"]).to eq("object")
+        expect(tool.params_schema["properties"]["name"]["type"]).to eq("string")
+      end
+
+      it "normalizes schemas that fail json-schema validation" do
+        # Create a schema that's structurally invalid (object without properties)
+        tool_response = {
+          "name" => "invalid_tool",
+          "description" => "An invalid tool",
+          "inputSchema" => {
+            "type" => "object"
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Should be normalized to include properties
+        expect(tool.params_schema["type"]).to eq("object")
+        expect(tool.params_schema).to have_key("properties")
+        expect(tool.params_schema["properties"]).to eq({})
+      end
+    end
+
+    describe "caching behavior" do
+      it "normalizes schema once during initialization" do
+        tool_response = {
+          "name" => "cached_tool",
+          "description" => "A tool to test caching",
+          "inputSchema" => {
+            "type" => "object"
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Store the normalized schema
+        first_call = tool.params_schema
+
+        # Call params_schema multiple times
+        second_call = tool.params_schema
+        third_call = tool.params_schema
+
+        # Should return the same normalized schema each time
+        expect(first_call).to eq(second_call)
+        expect(second_call).to eq(third_call)
+        expect(first_call).to have_key("properties")
+      end
+
+      it "does not mutate the original input schema" do
+        original_schema = {
+          "type" => "object"
+        }
+
+        tool_response = {
+          "name" => "immutable_tool",
+          "description" => "A tool to test immutability",
+          "inputSchema" => original_schema.dup
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        # Normalized schema should have properties
+        expect(tool.params_schema).to have_key("properties")
+
+        # Original schema should remain unchanged (no properties)
+        expect(original_schema).not_to have_key("properties")
+        expect(tool_response["inputSchema"]).not_to have_key("properties")
+      end
+    end
+
+    describe "edge cases" do
+      it "handles nil schema gracefully" do
+        tool_response = {
+          "name" => "nil_schema_tool",
+          "description" => "A tool with nil schema"
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema).to be_nil
+      end
+
+      it "handles empty hash schema" do
+        tool_response = {
+          "name" => "empty_tool",
+          "description" => "A tool with empty schema",
+          "inputSchema" => {}
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema).to eq({})
+      end
+
+      it "handles schema with type array" do
+        tool_response = {
+          "name" => "array_type_tool",
+          "description" => "A tool with array type schema",
+          "inputSchema" => {
+            "type" => "array",
+            "items" => { "type" => "string" }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        expect(tool.params_schema["type"]).to eq("array")
+        expect(tool.params_schema["items"]["type"]).to eq("string")
+      end
+
+      it "handles complex schemas with anyOf and nested objects" do
+        tool_response = {
+          "name" => "complex_tool",
+          "description" => "A tool with complex schema",
+          "inputSchema" => {
+            "type" => "object",
+            "properties" => {
+              "value" => {
+                "anyOf" => [
+                  {
+                    "type" => "object",
+                    "properties" => { "key" => { "type" => "string" } }
+                  },
+                  {
+                    "type" => "object"
+                  }
+                ]
+              }
+            }
+          }
+        }
+
+        tool = RubyLLM::MCP::Tool.new(mock_coordinator, tool_response)
+
+        any_of = tool.params_schema["properties"]["value"]["anyOf"]
+        expect(any_of.length).to eq(2)
+        # First anyOf option should remain unchanged (has properties)
+        expect(any_of[0]["properties"]).to have_key("key")
+        # Second anyOf option should be normalized (missing properties)
+        expect(any_of[1]["type"]).to eq("object")
+        expect(any_of[1]).to have_key("properties")
+        expect(any_of[1]["properties"]).to eq({})
+      end
+    end
+
+    describe "integration with real client" do
+      CLIENT_OPTIONS.each do |config|
+        context "with #{config[:name]}" do
+          let(:client) { ClientRunner.fetch_client(config[:name]) }
+
+          it "normalizes malformed_tool schema correctly" do
+            tool = client.tool("malformed_tool")
+
+            schema = tool.params_schema
+            expect(schema).not_to be_nil
+            expect(schema["type"]).to eq("object")
+
+            # Should have properties field even if original was malformed
+            expect(schema).to have_key("properties")
+            expect(schema["properties"]).to be_a(Hash)
+          end
+
+          it "preserves valid schemas without normalization" do
+            tool = client.tool("add")
+
+            schema = tool.params_schema
+            expect(schema).not_to be_nil
+            expect(schema["type"]).to eq("object")
+            expect(schema["properties"]).to have_key("a")
+            expect(schema["properties"]).to have_key("b")
+
+            # Valid schema should not be modified
+            expect(schema["required"]).to include("a", "b")
+          end
+        end
+      end
     end
   end
 end

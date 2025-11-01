@@ -24,9 +24,6 @@ Configure RubyLLM MCP globally before creating clients:
 
 ```ruby
 RubyLLM::MCP.configure do |config|
-  # Enable complex parameter support
-  config.support_complex_parameters!
-
   # Set logging options
   config.log_file = $stdout
   config.log_level = Logger::INFO
@@ -215,31 +212,6 @@ client.restart!
 
 # Stop when done
 client.stop
-```
-
-### Complex Parameter Support
-
-Enable support for complex parameters like arrays and nested objects:
-
-```ruby
-RubyLLM::MCP.configure do |config|
-  config.support_complex_parameters!
-end
-
-# Now you can use complex parameters in tools
-result = client.execute_tool(
-  name: "complex_tool",
-  parameters: {
-    items: [
-      { name: "item1", value: 100 },
-      { name: "item2", value: 200 }
-    ],
-    options: {
-      sort: true,
-      filter: { category: "active" }
-    }
-  }
-)
 ```
 
 ## Logging Configuration

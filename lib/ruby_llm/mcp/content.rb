@@ -13,7 +13,7 @@ module RubyLLM
       # This is a workaround to allow the content object to be passed as the tool call
       # to return audio or image attachments.
       def to_s
-        attachments.empty? ? text : self
+        text.to_s
       end
     end
   end

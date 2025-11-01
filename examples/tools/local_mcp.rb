@@ -12,7 +12,6 @@ RubyLLM.configure do |config|
 end
 
 RubyLLM::MCP.configure do |config|
-  config.support_complex_parameters!
   config.log_level = Logger::ERROR
 end
 

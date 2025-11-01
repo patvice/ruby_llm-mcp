@@ -40,7 +40,6 @@ module MCPTestConfiguration
       else
         config.logger = NullLogger.new
       end
-      config.support_complex_parameters!
     end
   end
 

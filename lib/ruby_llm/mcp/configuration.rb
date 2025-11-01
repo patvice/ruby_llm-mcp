@@ -111,6 +111,7 @@ module RubyLLM
       end
 
       def support_complex_parameters!
+        warn "[DEPRECATION] config.support_complex_parameters! is no longer needed and will be removed in version 0.8.0"
         return if @has_support_complex_parameters
 
         @has_support_complex_parameters = true
