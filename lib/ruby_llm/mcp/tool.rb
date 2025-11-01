@@ -88,7 +88,7 @@ module RubyLLM
         {
           name: @name,
           description: @description,
-          params_schema: @input_schema,
+          params_schema: @@normalized_input_schema,
           annotations: @annotations&.to_h
         }
       end
@@ -204,21 +204,16 @@ module RubyLLM
       end
 
       def valid_hash_schema?(schema)
-        # Check if object type has properties (required for valid JSON Schema)
         if schema["type"] == "object" && !schema.key?("properties")
           return false
         end
 
-        # Try to validate using JSON::Schema validator to catch other structural issues
-        # We catch SchemaError (schema is malformed) but ignore ValidationError (data doesn't match)
         begin
           JSON::Validator.validate!(schema, {})
           true
-        rescue JSON::Schema::SchemaError, StandardError
-          # Schema itself is malformed or validation failed unexpectedly
+        rescue JSON::Schema::SchemaError
           false
         rescue JSON::Schema::ValidationError
-          # Validation failed but schema structure is valid - that's fine for our purposes
           true
         end
       end
