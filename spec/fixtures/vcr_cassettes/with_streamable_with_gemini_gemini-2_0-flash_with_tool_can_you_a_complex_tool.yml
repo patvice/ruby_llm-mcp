@@ -6,7 +6,7 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
-        http://www.google.com and see if the site say what they do?"}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
+        https://www.example.com/ and see if the site say what they do?"}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}}]}]}'
     headers:
       User-Agent:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 15:15:17 GMT
+      - Sat, 01 Nov 2025 15:39:17 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=612
+      - gfet4t7; dur=650
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -58,7 +58,7 @@ http_interactions:
                     "functionCall": {
                       "name": "fetch_site",
                       "args": {
-                        "website": "http://www.google.com"
+                        "website": "https://www.example.com/"
                       }
                     }
                   }
@@ -66,38 +66,40 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.00049779462543400848
+              "avgLogprobs": -0.00084250203023354209
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 48,
-            "candidatesTokenCount": 11,
-            "totalTokenCount": 59,
+            "promptTokenCount": 49,
+            "candidatesTokenCount": 12,
+            "totalTokenCount": 61,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 48
+                "tokenCount": 49
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 11
+                "tokenCount": 12
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BSQGaeukE62S_uMP_IjW4As"
+          "responseId": "pCkGaabTHPfh_uMPtfyjgQU"
         }
-  recorded_at: Sat, 01 Nov 2025 15:15:17 GMT
+  recorded_at: Sat, 01 Nov 2025 15:39:16 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
-        http://www.google.com and see if the site say what they do?"}]},{"role":"model","parts":[{"functionCall":{"name":"fetch_site","args":{"website":"http://www.google.com"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"c5644871-8f92-4415-ab38-15140454369c","response":{"name":"c5644871-8f92-4415-ab38-15140454369c","content":"Tool
-        execution error: Error fetching website content: HTTP 429: Too Many Requests"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
+        https://www.example.com/ and see if the site say what they do?"}]},{"role":"model","parts":[{"functionCall":{"name":"fetch_site","args":{"website":"https://www.example.com/"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"6f2779fa-4f77-400f-869c-51015873b472","response":{"name":"6f2779fa-4f77-400f-869c-51015873b472","content":"Website
+        content from https://www.example.com/:\n\nExample Domain Example Domain This
+        domain is for use in documentation examples without needing permission. Avoid
+        use in operations. Learn more"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}}]}]}'
     headers:
       User-Agent:
@@ -122,7 +124,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 15:15:19 GMT
+      - Sat, 01 Nov 2025 15:39:17 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -132,7 +134,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=843
+      - gfet4t7; dur=658
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -146,34 +148,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I am sorry, I was not able to fetch the content of the website. I received a \"Too Many Requests\" error, which means the server is currently refusing requests. I am unable to determine what the site says.\n"
+                    "text": "The website example.com is a domain for use in documentation examples. They do not offer any specific services.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.12851303556691046
+              "avgLogprobs": -0.10814105946084727
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 149,
-            "candidatesTokenCount": 46,
-            "totalTokenCount": 195,
+            "promptTokenCount": 168,
+            "candidatesTokenCount": 23,
+            "totalTokenCount": 191,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 149
+                "tokenCount": 168
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 46
+                "tokenCount": 23
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BiQGaZnDHr67_uMPwIjKuQo"
+          "responseId": "pSkGaZbFDtzP_uMP0aTVoQU"
         }
-  recorded_at: Sat, 01 Nov 2025 15:15:19 GMT
+  recorded_at: Sat, 01 Nov 2025 15:39:17 GMT
 recorded_with: VCR 6.3.1

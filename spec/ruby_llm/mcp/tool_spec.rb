@@ -147,16 +147,16 @@ RSpec.describe RubyLLM::MCP::Tool do
 
         it "can call a complex union type tool" do
           tool = client.tool("fetch_site")
-          result = tool.execute(website: "https://www.google.com")
+          result = tool.execute(website: "https://www.example.com/")
 
           expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Google")
+          expect(result.to_s).to include("Example")
 
-          result = tool.execute(website: { url: "https://www.google.com",
+          result = tool.execute(website: { url: "https://www.example.com/",
                                            headers: [{ name: "User-Agent", value: "test" }] })
 
           expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Google")
+          expect(result.to_s).to include("Example Domain")
         end
       end
 

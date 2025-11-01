@@ -6,8 +6,8 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
-        you fetch the website http://www.google.com and see if the site say what they
-        do?"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
+        you fetch the website https://www.example.com/ and see if the site say what
+        they do?"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
         website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}]}'
     headers:
       User-Agent:
@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 15:14:52 GMT
+      - Sat, 01 Nov 2025 15:38:58 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,27 +40,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T15:14:52Z'
+      - '2025-11-01T15:38:57Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T15:14:53Z'
+      - '2025-11-01T15:38:58Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T15:14:51Z'
+      - '2025-11-01T15:38:56Z'
       Retry-After:
-      - '8'
+      - '3'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T15:14:52Z'
+      - '2025-11-01T15:38:57Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -68,7 +68,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2799'
+      - '3068'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -78,24 +78,28 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2894.116
+      - cfReqDur;dur=3136.244
       Cf-Team:
-      - 2ae195624600011ea6ccd65400000001
+      - 2ae1ab6e2200011ea6d5c11400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_011c82KKypBoY47FdJ9mGtBC","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        fetch the Google homepage for you to see what they say about what they do."},{"type":"tool_use","id":"toolu_018LEFBDEkF2g6upvz92AFZK","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":473,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":78,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 15:14:52 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01NUrMAgieM3zL5eYD5aNHTq","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        fetch the website https://www.example.com/ for you and check what they say
+        they do."},{"type":"tool_use","id":"toolu_01X6idwqRVyQKexTbhXRcfR2","name":"fetch_site","input":{"website":"https://www.example.com/"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":474,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":84,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:38:57 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
     body:
       encoding: UTF-8
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
-        you fetch the website http://www.google.com and see if the site say what they
-        do?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll fetch
-        the Google homepage for you to see what they say about what they do."},{"type":"tool_use","id":"toolu_018LEFBDEkF2g6upvz92AFZK","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_018LEFBDEkF2g6upvz92AFZK","content":"Tool
-        execution error: Error fetching website content: HTTP 429: Too Many Requests"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
+        you fetch the website https://www.example.com/ and see if the site say what
+        they do?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll fetch
+        the website https://www.example.com/ for you and check what they say they
+        do."},{"type":"tool_use","id":"toolu_01X6idwqRVyQKexTbhXRcfR2","name":"fetch_site","input":{"website":"https://www.example.com/"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01X6idwqRVyQKexTbhXRcfR2","content":"Website
+        content from https://www.example.com/:\n\nExample Domain Example Domain This
+        domain is for use in documentation examples without needing permission. Avoid
+        use in operations. Learn more"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
         website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}]}'
     headers:
       User-Agent:
@@ -116,7 +120,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 15:15:00 GMT
+      - Sat, 01 Nov 2025 15:39:03 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -128,27 +132,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T15:14:55Z'
+      - '2025-11-01T15:39:00Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T15:15:01Z'
+      - '2025-11-01T15:39:03Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T15:14:55Z'
+      - '2025-11-01T15:38:59Z'
       Retry-After:
-      - '5'
+      - '1'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T15:14:55Z'
+      - '2025-11-01T15:39:00Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -156,7 +160,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '6592'
+      - '4724'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -166,25 +170,20 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=6678.073
+      - cfReqDur;dur=4941.415
       Cf-Team:
-      - 2ae19570f800011ea6ccd9e400000001
+      - 2ae1ab7acc00011ea6d5c29400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_011XfhGKXp8HSAKDbkg2SQvq","type":"message","role":"assistant","content":[{"type":"text","text":"I
-        encountered a rate limiting error when trying to fetch the Google homepage.
-        This is a common protective measure that websites use to prevent too many
-        requests.\n\nHowever, I can tell you what Google typically says about what
-        they do based on general knowledge:\n\nGoogle''s mission statement is \"to
-        organize the world''s information and make it universally accessible and useful.\"
-        On their main website and About pages, they typically describe themselves
-        as:\n\n- A search engine company that helps people find information\n- A technology
-        company that builds products and services to help people connect, communicate,
-        and get things done\n- An organization focused on making information accessible
-        to everyone\n\nTheir homepage usually features their iconic search bar as
-        their primary service, and they offer various other services like Gmail, Google
-        Maps, Google Drive, YouTube, and many other products.\n\nIf you''d like to
-        see the current content, you might want to visit google.com directly in your
-        browser, or we could try fetching the site again after a brief wait."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":581,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":205,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 15:15:00 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01WeZR7yFbXPdHy9i7YhyC6E","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the content I fetched from https://www.example.com/, this is actually a
+        special example domain. The website states:\n\n**What they do:** This domain
+        is specifically designated \"for use in documentation examples without needing
+        permission.\"\n\nThe site also advises to \"Avoid use in operations\" and
+        provides a \"Learn more\" link for additional information.\n\nSo example.com
+        is not a commercial website with business operations - it''s a reserved domain
+        maintained for educational and documentation purposes, allowing developers,
+        writers, and educators to use it in examples without needing to request permission
+        from a real company."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":607,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":128,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:39:03 GMT
 recorded_with: VCR 6.3.1

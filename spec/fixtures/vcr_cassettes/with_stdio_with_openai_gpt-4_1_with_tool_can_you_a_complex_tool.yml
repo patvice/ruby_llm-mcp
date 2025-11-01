@@ -6,7 +6,7 @@ http_interactions:
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you fetch
-        the website http://www.google.com and see if the site say what they do?"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
+        the website https://www.example.com/ and see if the site say what they do?"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}}],"tool_choice":"auto"}'
     headers:
       User-Agent:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 15:15:03 GMT
+      - Sat, 01 Nov 2025 15:39:05 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '706'
+      - '442'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '877'
+      - '1118'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -79,9 +79,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CX7bjmxkFZ06LetthNbCDCtNnYLor",
+          "id": "chatcmpl-CX7yz5nnnzuODz4pJqKROoD5gc7y7",
           "object": "chat.completion",
-          "created": 1762010103,
+          "created": 1762011545,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -91,11 +91,11 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_RxW5HJsC9Z1dACy0ri4FFU5H",
+                    "id": "call_oATN0m6OqUFpNif6cTEMdhWy",
                     "type": "function",
                     "function": {
                       "name": "fetch_site",
-                      "arguments": "{\"website\":\"http://www.google.com\"}"
+                      "arguments": "{\"website\":\"https://www.example.com/\"}"
                     }
                   }
                 ],
@@ -107,9 +107,9 @@ http_interactions:
             }
           ],
           "usage": {
-            "prompt_tokens": 86,
-            "completion_tokens": 18,
-            "total_tokens": 104,
+            "prompt_tokens": 87,
+            "completion_tokens": 19,
+            "total_tokens": 106,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -124,15 +124,17 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Sat, 01 Nov 2025 15:15:03 GMT
+  recorded_at: Sat, 01 Nov 2025 15:39:05 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you fetch
-        the website http://www.google.com and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_RxW5HJsC9Z1dACy0ri4FFU5H","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"http://www.google.com\"}"}}]},{"role":"tool","content":"Tool
-        execution error: Error fetching website content: HTTP 429: Too Many Requests","tool_call_id":"call_RxW5HJsC9Z1dACy0ri4FFU5H"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
+        the website https://www.example.com/ and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_oATN0m6OqUFpNif6cTEMdhWy","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"https://www.example.com/\"}"}}]},{"role":"tool","content":"Website
+        content from https://www.example.com/:\n\nExample Domain Example Domain This
+        domain is for use in documentation examples without needing permission. Avoid
+        use in operations. Learn more","tool_call_id":"call_oATN0m6OqUFpNif6cTEMdhWy"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}}],"tool_choice":"auto"}'
     headers:
       User-Agent:
@@ -151,7 +153,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 15:15:07 GMT
+      - Sat, 01 Nov 2025 15:39:07 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -163,13 +165,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2764'
+      - '1336'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '2905'
+      - '1349'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -177,11 +179,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29954'
+      - '29926'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 92ms
+      - 148ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
       X-Openai-Proxy-Wasm:
@@ -205,16 +207,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CX7bklAtcpsF8qWSbzkh5srhAwQPC",
+          "id": "chatcmpl-CX7z0bBaZqhMG3jmgvayTLHTAQcKD",
           "object": "chat.completion",
-          "created": 1762010104,
+          "created": 1762011546,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "I wasn't able to fetch the content from http://www.google.com due to a \"Too Many Requests\" error (HTTP 429). This typically means that automated requests to the site are being limited or blocked.\n\nHowever, I can tell you that Google is a search engine that allows users to search for information across the web, including websites, images, news, videos, and much more. If you'd like more details or information from another source, let me know!",
+                "content": "The website https://www.example.com/ states that it is an \"Example Domain\" used for documentation examples without needing permission. It advises to avoid using it in actual operations. The site does not offer any services or products; its purpose is solely for demonstration or documentation.",
                 "refusal": null,
                 "annotations": []
               },
@@ -223,9 +225,9 @@ http_interactions:
             }
           ],
           "usage": {
-            "prompt_tokens": 128,
-            "completion_tokens": 94,
-            "total_tokens": 222,
+            "prompt_tokens": 147,
+            "completion_tokens": 55,
+            "total_tokens": 202,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -240,5 +242,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Sat, 01 Nov 2025 15:15:07 GMT
+  recorded_at: Sat, 01 Nov 2025 15:39:07 GMT
 recorded_with: VCR 6.3.1
