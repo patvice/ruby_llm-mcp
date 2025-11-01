@@ -62,13 +62,7 @@ module RubyLLM
           end
 
           def param_type_for_gemini(type)
-            case type.to_s.downcase
-            when "integer", "number", "float" then "NUMBER"
-            when "boolean" then "BOOLEAN"
-            when "array" then "ARRAY"
-            when "object" then "OBJECT"
-            else "STRING"
-            end
+            RubyLLM::Providers::Gemini::Tools.param_type_for_gemini(type)
           end
         end
       end
@@ -79,9 +73,7 @@ end
 module RubyLLM::Providers::Gemini::Tools
   alias original_format_parameters format_parameters
   module_function :original_format_parameters
-
-  alias original_param_type_for_gemini param_type_for_gemini
-  module_function :original_param_type_for_gemini
+  module_function :param_type_for_gemini
 
   def format_parameters(parameters)
     if parameters.is_a?(Hash) && parameters.values.all? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
@@ -91,9 +83,4 @@ module RubyLLM::Providers::Gemini::Tools
     original_format_parameters(parameters)
   end
   module_function :format_parameters
-
-  def param_type_for_gemini(type)
-    original_param_type_for_gemini(type)
-  end
-  module_function :param_type_for_gemini
 end

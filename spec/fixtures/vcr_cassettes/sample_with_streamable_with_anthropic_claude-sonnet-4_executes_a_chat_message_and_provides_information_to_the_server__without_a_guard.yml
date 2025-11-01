@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:57:31 GMT
+      - Sat, 01 Nov 2025 15:56:58 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:57:30Z'
+      - '2025-11-01T15:56:58Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:57:31Z'
+      - '2025-11-01T15:56:59Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:57:30Z'
+      - '2025-11-01T15:56:58Z'
       Retry-After:
-      - '30'
+      - '2'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:57:30Z'
+      - '2025-11-01T15:56:58Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '1758'
+      - '2092'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -77,14 +77,14 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=1812.701
+      - cfReqDur;dur=2147.19
       Cf-Team:
-      - 2ae185818900011ea6c84d8400000001
+      - 2ae1bbf05100011ea6db85d400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01LhGD6PKjn7u5xy9twipb3P","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01HU1wQAjYasnjXzEsmQtkph","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
         I''m doing well, thank you for asking. I''m here and ready to help with whatever
-        you might need. How are you doing today? Is there anything I can assist you
-        with?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":29,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":43,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:57:31 GMT
+        you might need - whether that''s answering questions, having a conversation,
+        helping with tasks, or just chatting. How are you doing today?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":29,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":54,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:56:58 GMT
 recorded_with: VCR 6.3.1

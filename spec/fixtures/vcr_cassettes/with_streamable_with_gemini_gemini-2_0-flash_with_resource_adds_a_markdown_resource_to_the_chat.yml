@@ -33,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:14 GMT
+      - Sat, 01 Nov 2025 15:55:44 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -43,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=902
+      - gfet4t7; dur=867
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -57,19 +57,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The markdown file \"my.md\" contains the following content:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nIt's a simple markdown document with a title \"My Markdown File\", a short description, and two sections labeled \"Section 1\" and \"Section 2\".\n"
+                    "text": "The markdown file \"my.md\" contains the following content:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nIt's a simple markdown file with a title, a short description, and two sections.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.079020536862886875
+              "avgLogprobs": -0.070311535610241838
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 65,
-            "candidatesTokenCount": 104,
-            "totalTokenCount": 169,
+            "candidatesTokenCount": 89,
+            "totalTokenCount": 154,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -79,12 +79,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 104
+                "tokenCount": 89
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "jR8GabP2Itqd-8YP0ZGy0Qk"
+          "responseId": "fy0Gaa6ED-fVjMcP_L2T6Ag"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:14 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:44 GMT
 recorded_with: VCR 6.3.1

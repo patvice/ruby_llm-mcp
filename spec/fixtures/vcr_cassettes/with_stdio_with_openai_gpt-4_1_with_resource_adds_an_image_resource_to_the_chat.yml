@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:54:23 GMT
+      - Sat, 01 Nov 2025 15:54:00 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1849'
+      - '3294'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '1877'
+      - '3328'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -85,16 +85,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CX7Hhlg3tGzCVsSOy2MUhRmDWbME8",
+          "id": "chatcmpl-CX8DNxn7RGoHrzzRbgAzlqh3Rc3aR",
           "object": "chat.completion",
-          "created": 1762008861,
+          "created": 1762012437,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The image you provided is of a light-colored puppy, possibly a Golden Retriever, standing and appearing to yawn or bark with its mouth open. The background is plain white, making the dog the clear focus of the picture.",
+                "content": "The image you provided is of a light-colored (possibly golden or cream) puppy with its mouth open, appearing to be yawning or playfully barking. The background is white, making the dog the main focus of the picture.",
                 "refusal": null,
                 "annotations": []
               },
@@ -104,8 +104,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 280,
-            "completion_tokens": 45,
-            "total_tokens": 325,
+            "completion_tokens": 46,
+            "total_tokens": 326,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -120,5 +120,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Sat, 01 Nov 2025 14:54:23 GMT
+  recorded_at: Sat, 01 Nov 2025 15:54:00 GMT
 recorded_with: VCR 6.3.1

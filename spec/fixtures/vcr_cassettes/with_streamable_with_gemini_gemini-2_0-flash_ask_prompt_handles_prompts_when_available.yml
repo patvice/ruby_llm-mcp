@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:17 GMT
+      - Sat, 01 Nov 2025 15:55:46 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=458
+      - gfet4t7; dur=452
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -54,19 +54,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Hello! I'm doing well, thank you for asking. How are you?\n"
+                    "text": "Hello! I'm doing well, thank you for asking. Hello to you too!\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.03378931019041273
+              "avgLogprobs": -0.1015629580146388
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 13,
-            "candidatesTokenCount": 18,
-            "totalTokenCount": 31,
+            "candidatesTokenCount": 19,
+            "totalTokenCount": 32,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -76,12 +76,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 18
+                "tokenCount": 19
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "kB8GaYO2JonfjrEP9tLBiAc"
+          "responseId": "gi0Gaa2aHLGI-sAPpbnLqQ4"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:17 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:46 GMT
 recorded_with: VCR 6.3.1

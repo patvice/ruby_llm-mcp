@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:53:40 GMT
+      - Sat, 01 Nov 2025 15:53:08 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=682
+      - gfet4t7; dur=736
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -56,19 +56,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The test file \"test.txt\" contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n"
+                    "text": "The `test.txt` file contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.023862496570304589
+              "avgLogprobs": -0.0068269608155736381
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 51,
-            "candidatesTokenCount": 54,
-            "totalTokenCount": 105,
+            "candidatesTokenCount": 53,
+            "totalTokenCount": 104,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -78,12 +78,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 54
+                "tokenCount": 53
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "8x4GadzBL8Kr-8YPla340As"
+          "responseId": "4ywGaeeCJ9fXjMcPmMTjmAk"
         }
-  recorded_at: Sat, 01 Nov 2025 14:53:40 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:08 GMT
 recorded_with: VCR 6.3.1

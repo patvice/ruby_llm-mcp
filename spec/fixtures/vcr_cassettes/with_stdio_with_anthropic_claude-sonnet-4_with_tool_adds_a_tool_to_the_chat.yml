@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:12 GMT
+      - Sat, 01 Nov 2025 15:51:44 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -36,29 +36,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Limit:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Remaining:
-      - '30000'
+      - '29000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:12Z'
+      - '2025-11-01T15:51:45Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:12Z'
+      - '2025-11-01T15:51:44Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:11Z'
+      - '2025-11-01T15:51:43Z'
       Retry-After:
-      - '51'
+      - '18'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
-      - '38000'
+      - '37000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:12Z'
+      - '2025-11-01T15:51:44Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -66,7 +66,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2356'
+      - '2362'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -76,14 +76,14 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2447.361
+      - cfReqDur;dur=2414.872
       Cf-Team:
-      - 2ae180a08900011ea6c6992400000001
+      - 2ae1b7225000011ea6d9f8b400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01NiQaZonZbH9CVKE9bR2vd7","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        retrieve the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01NKLudSb1T8D24JvUwV1TVj","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":376,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":66,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:12 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01KL4nK8YJThu9GGNWBK6xdA","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_016bWkCDQF6Cvt3SBKHynYQW","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":376,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":66,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:44 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -91,7 +91,7 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you pull messages for ruby channel and let me know what they say?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
-        retrieve the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01NKLudSb1T8D24JvUwV1TVj","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01NKLudSb1T8D24JvUwV1TVj","content":"Ruby
+        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_016bWkCDQF6Cvt3SBKHynYQW","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_016bWkCDQF6Cvt3SBKHynYQW","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
         community."}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":[]}}]}'
     headers:
@@ -113,7 +113,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:15 GMT
+      - Sat, 01 Nov 2025 15:51:47 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -125,27 +125,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:14Z'
+      - '2025-11-01T15:51:46Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:15Z'
+      - '2025-11-01T15:51:47Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:13Z'
+      - '2025-11-01T15:51:45Z'
       Retry-After:
-      - '47'
+      - '15'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:14Z'
+      - '2025-11-01T15:51:46Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -153,7 +153,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '3060'
+      - '3019'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -163,16 +163,16 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=3113.011
+      - cfReqDur;dur=3069.728
       Cf-Team:
-      - 2ae180aa6700011ea6c69be400000001
+      - 2ae1b72c1f00011ea6d9f9a400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01Rs2tXM21eXngmvnRotc3AL","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        ruby channel contains one message that says:\n\n\"Ruby is a great language
-        for web development. It''s easy to learn and has a large community.\"\n\nThis
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01PwtVZt5FgmVsE4KLiEtf42","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        ruby channel contains one message that says: \"Ruby is a great language for
+        web development. It''s easy to learn and has a large community.\"\n\nThis
         appears to be a positive comment about the Ruby programming language, highlighting
-        its benefits for web development and mentioning its accessibility for learners
-        and strong community support."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":473,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":67,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:15 GMT
+        its benefits for web development and its accessibility for learners, as well
+        as mentioning the supportive community around it."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":473,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":72,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:47 GMT
 recorded_with: VCR 6.3.1

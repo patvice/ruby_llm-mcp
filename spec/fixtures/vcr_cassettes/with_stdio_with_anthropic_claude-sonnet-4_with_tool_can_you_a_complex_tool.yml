@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 15:38:58 GMT
+      - Sat, 01 Nov 2025 15:51:50 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,27 +40,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T15:38:57Z'
+      - '2025-11-01T15:51:49Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T15:38:58Z'
+      - '2025-11-01T15:51:50Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T15:38:56Z'
+      - '2025-11-01T15:51:48Z'
       Retry-After:
-      - '3'
+      - '11'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T15:38:57Z'
+      - '2025-11-01T15:51:49Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -68,7 +68,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '3068'
+      - '2591'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -78,15 +78,15 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=3136.244
+      - cfReqDur;dur=2646.896
       Cf-Team:
-      - 2ae1ab6e2200011ea6d5c11400000001
+      - 2ae1b7387200011ea6d9ffa400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01NUrMAgieM3zL5eYD5aNHTq","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_012FEMMbQKwPuaYxmAreh449","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
         fetch the website https://www.example.com/ for you and check what they say
-        they do."},{"type":"tool_use","id":"toolu_01X6idwqRVyQKexTbhXRcfR2","name":"fetch_site","input":{"website":"https://www.example.com/"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":474,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":84,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 15:38:57 GMT
+        about what they do."},{"type":"tool_use","id":"toolu_01TmYh1NbK5YF5W3zmxe38DD","name":"fetch_site","input":{"website":"https://www.example.com/"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":474,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":86,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:50 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -95,8 +95,8 @@ http_interactions:
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you fetch the website https://www.example.com/ and see if the site say what
         they do?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll fetch
-        the website https://www.example.com/ for you and check what they say they
-        do."},{"type":"tool_use","id":"toolu_01X6idwqRVyQKexTbhXRcfR2","name":"fetch_site","input":{"website":"https://www.example.com/"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01X6idwqRVyQKexTbhXRcfR2","content":"Website
+        the website https://www.example.com/ for you and check what they say about
+        what they do."},{"type":"tool_use","id":"toolu_01TmYh1NbK5YF5W3zmxe38DD","name":"fetch_site","input":{"website":"https://www.example.com/"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01TmYh1NbK5YF5W3zmxe38DD","content":"Website
         content from https://www.example.com/:\n\nExample Domain Example Domain This
         domain is for use in documentation examples without needing permission. Avoid
         use in operations. Learn more"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
@@ -120,7 +120,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 15:39:03 GMT
+      - Sat, 01 Nov 2025 15:51:56 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -132,27 +132,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T15:39:00Z'
+      - '2025-11-01T15:51:53Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T15:39:03Z'
+      - '2025-11-01T15:51:57Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T15:38:59Z'
+      - '2025-11-01T15:51:51Z'
       Retry-After:
-      - '1'
+      - '8'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T15:39:00Z'
+      - '2025-11-01T15:51:53Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -160,7 +160,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '4724'
+      - '6172'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -170,20 +170,21 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=4941.415
+      - cfReqDur;dur=6231.216
       Cf-Team:
-      - 2ae1ab7acc00011ea6d5c29400000001
+      - 2ae1b7432c00011ea6da07c400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01WeZR7yFbXPdHy9i7YhyC6E","type":"message","role":"assistant","content":[{"type":"text","text":"Based
-        on the content I fetched from https://www.example.com/, this is actually a
-        special example domain. The website states:\n\n**What they do:** This domain
-        is specifically designated \"for use in documentation examples without needing
-        permission.\"\n\nThe site also advises to \"Avoid use in operations\" and
-        provides a \"Learn more\" link for additional information.\n\nSo example.com
-        is not a commercial website with business operations - it''s a reserved domain
-        maintained for educational and documentation purposes, allowing developers,
-        writers, and educators to use it in examples without needing to request permission
-        from a real company."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":607,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":128,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 15:39:03 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01NPfdXFAzMydKF1Xey9CD4K","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the website content I fetched, example.com is actually a special domain
+        that serves as a placeholder for documentation and examples. The site states:\n\n**What
+        they do:** This domain is specifically designated \"for use in documentation
+        examples without needing permission\" and they advise to \"avoid use in operations.\"\n\nSo
+        example.com isn''t a business or service - it''s maintained as a reserved
+        domain name that developers, writers, and educators can reference in examples,
+        tutorials, and documentation without worrying about linking to an actual company''s
+        website. It''s managed by the Internet Assigned Numbers Authority (IANA) for
+        this specific purpose.\n\nThe site is intentionally minimal and just explains
+        its role as a documentation example domain."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":609,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":153,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:56 GMT
 recorded_with: VCR 6.3.1

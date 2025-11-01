@@ -29,7 +29,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:55:20 GMT
+      - Sat, 01 Nov 2025 15:54:57 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -41,27 +41,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:55:17Z'
+      - '2025-11-01T15:54:54Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:55:21Z'
+      - '2025-11-01T15:54:58Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:55:16Z'
+      - '2025-11-01T15:54:54Z'
       Retry-After:
-      - '43'
+      - '6'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:55:17Z'
+      - '2025-11-01T15:54:54Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -69,7 +69,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '4569'
+      - '3530'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -79,18 +79,19 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=4616.989
+      - cfReqDur;dur=3585.772
       Cf-Team:
-      - 2ae18376a200011ea6c798e400000001
+      - 2ae1ba0ef700011ea6dada2400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01F8ySqEKg4DzzbAiW5oMnwn","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        markdown file contains:\n\n# Title\n**My Markdown File**\n\n# Content\nThe
-        file describes itself as \"a markdown file that I want to be able to use as
-        a resource\"\n\n# Structure\nIt has two main sections:\n\n## Section 1\nContains
-        the text: \"This is a section in my markdown file\"\n\n## Section 2\nContains
-        the text: \"This is another section in my markdown file\"\n\nThe file appears
-        to be a simple example or template markdown document with a basic hierarchical
-        structure using headers and descriptive content in each section."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":122,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:55:20 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01TxyVht9xRtz8fE3ZEMDhrz","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        markdown file is titled \"My Markdown File\" and contains the following content:\n\n-
+        **Title**: \"My Markdown File\"\n- **Introduction**: \"This is a markdown
+        file that I want to be able to use as a resource\"\n- **Section 1**: Contains
+        the text \"This is a section in my markdown file\"\n- **Section 2**: Contains
+        the text \"This is another section in my markdown file\"\n\nThe file appears
+        to be a basic template or example markdown document with a simple structure
+        consisting of a main heading, an introductory paragraph, and two sections
+        with descriptive content."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":131,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:54:57 GMT
 recorded_with: VCR 6.3.1

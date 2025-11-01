@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 15:39:03 GMT
+      - Sat, 01 Nov 2025 15:53:02 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=554
+      - gfet4t7; dur=535
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -66,7 +66,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.000701213488355279
+              "avgLogprobs": -0.00084250203023354209
             }
           ],
           "usageMetadata": {
@@ -87,16 +87,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "lykGab79E_KM_uMPmeeU6Qs"
+          "responseId": "3SwGafqrONusjMcP-b-9gQ0"
         }
-  recorded_at: Sat, 01 Nov 2025 15:39:03 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:02 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
-        https://www.example.com/ and see if the site say what they do?"}]},{"role":"model","parts":[{"functionCall":{"name":"fetch_site","args":{"website":"https://www.example.com/"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"7ad49e52-6155-4252-ba41-2ca716693b7c","response":{"name":"7ad49e52-6155-4252-ba41-2ca716693b7c","content":"Website
+        https://www.example.com/ and see if the site say what they do?"}]},{"role":"model","parts":[{"functionCall":{"name":"fetch_site","args":{"website":"https://www.example.com/"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"cce8f7e6-1286-4691-a503-877d36ece259","response":{"name":"cce8f7e6-1286-4691-a503-877d36ece259","content":"Website
         content from https://www.example.com/:\n\nExample Domain Example Domain This
         domain is for use in documentation examples without needing permission. Avoid
         use in operations. Learn more"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
@@ -124,7 +124,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 15:39:04 GMT
+      - Sat, 01 Nov 2025 15:53:03 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -134,7 +134,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=523
+      - gfet4t7; dur=626
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -154,17 +154,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.010012577772140503
+              "avgLogprobs": -0.017300493717193603
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 164,
+            "promptTokenCount": 162,
             "candidatesTokenCount": 25,
-            "totalTokenCount": 189,
+            "totalTokenCount": 187,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 164
+                "tokenCount": 162
               }
             ],
             "candidatesTokensDetails": [
@@ -175,7 +175,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "mCkGafkfuLf-4w_Fv7KxAQ"
+          "responseId": "3iwGaa7dJsCPjMcPyOi5uA0"
         }
-  recorded_at: Sat, 01 Nov 2025 15:39:04 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:03 GMT
 recorded_with: VCR 6.3.1

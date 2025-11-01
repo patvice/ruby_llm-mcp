@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:04 GMT
+      - Sat, 01 Nov 2025 15:55:35 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=507
+      - gfet4t7; dur=479
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -65,7 +65,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.00039330129511654376
+              "avgLogprobs": -0.00027506416663527491
             }
           ],
           "usageMetadata": {
@@ -86,16 +86,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "hB8GaY2yGeujjrEPp7vdoA4"
+          "responseId": "di0Gaa_kKJKJ-sAPs7G5yQE"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:04 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:35 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you pull messages
-        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"7b25bdbc-443e-47ea-83e6-31fbfe98668e","response":{"name":"7b25bdbc-443e-47ea-83e6-31fbfe98668e","content":"Ruby
+        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"f68b1b75-2c80-48e3-9ad1-b601f534fe2e","response":{"name":"f68b1b75-2c80-48e3-9ad1-b601f534fe2e","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
         community."}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
     headers:
@@ -121,7 +121,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:05 GMT
+      - Sat, 01 Nov 2025 15:55:35 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -131,7 +131,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=557
+      - gfet4t7; dur=535
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -151,17 +151,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.070100661247007312
+              "avgLogprobs": -0.0020186816973070945
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 111,
+            "promptTokenCount": 117,
             "candidatesTokenCount": 31,
-            "totalTokenCount": 142,
+            "totalTokenCount": 148,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 111
+                "tokenCount": 117
               }
             ],
             "candidatesTokensDetails": [
@@ -172,7 +172,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "hR8GaaDcAv2r-8YPo86foQw"
+          "responseId": "dy0GaYeGEq6ZjMcPmemq8Q4"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:05 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:35 GMT
 recorded_with: VCR 6.3.1

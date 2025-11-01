@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:41 GMT
+      - Sat, 01 Nov 2025 15:52:09 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:36Z'
+      - '2025-11-01T15:52:05Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:43Z'
+      - '2025-11-01T15:52:11Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:36Z'
+      - '2025-11-01T15:52:04Z'
       Retry-After:
-      - '25'
+      - '59'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:36Z'
+      - '2025-11-01T15:52:05Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '7057'
+      - '6322'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -77,24 +77,24 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=7115.195
+      - cfReqDur;dur=6404.992
       Cf-Team:
-      - 2ae181028100011ea6c6c36400000001
+      - 2ae1b775f300011ea6da135400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_012u7jHeF92ZuyvZGQF7dffJ","type":"message","role":"assistant","content":[{"type":"text","text":"I
-        can see and analyze images that you share with me (like the adorable puppy
-        photo you just sent!), but I don''t have access to browse the internet, run
-        code, or access external databases or files beyond what you directly provide
-        in our conversation.\n\nHere''s what I can do:\n- View and analyze images,
-        documents, and text you share\n- Have conversations and answer questions using
-        my training knowledge\n- Help with writing, analysis, math, coding problems,
-        and creative tasks\n- Provide information based on what I learned during training
-        (with a knowledge cutoff)\n\nHere''s what I can''t do:\n- Browse the web or
-        access real-time information\n- Run code or access external systems\n- Remember
-        conversations after they end\n- Access files or databases outside our chat\n-
-        Make phone calls, send emails, or interact with other services\n\nIs there
-        something specific you''d like help with? I''m happy to assist within these
-        capabilities!"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":201,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:41 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01TisNa56wDsbi2m8hVb846X","type":"message","role":"assistant","content":[{"type":"text","text":"I
+        have access to several types of resources:\n\n**Text Processing:**\n- I can
+        read, analyze, and generate text in many languages\n- Access to training data
+        up to my knowledge cutoff (April 2024)\n- Ability to help with writing, analysis,
+        math, coding, research, and many other text-based tasks\n\n**Image Analysis:**\n-
+        I can view and analyze images that are shared with me (like the adorable Golden
+        Retriever puppy you just showed me!)\n- I can describe what I see, identify
+        objects, read text in images, and answer questions about visual content\n\n**What
+        I don''t have access to:**\n- Real-time internet browsing or current information
+        beyond my training\n- The ability to generate, create, edit or produce images\n-
+        Access to external databases, APIs, or live data feeds\n- The ability to remember
+        conversations after they end\n- Audio processing capabilities\n\nIs there
+        something specific you''d like help with? I''d be happy to assist with analysis,
+        questions, or tasks within these capabilities!"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":223,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:52:09 GMT
 recorded_with: VCR 6.3.1

@@ -38,7 +38,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:09 GMT
+      - Sat, 01 Nov 2025 15:55:39 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -48,7 +48,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1840
+      - gfet4t7; dur=1555
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,19 +62,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, based on the files you provided, here's a summary of the information I have:\n\n*   **plain_text.txt:**\n    *   Contains the text: \"Plan text information\"\n\n*   **test.txt:**\n    *   Contains the text:\n        \"Hello, this is a test file!\n        This content will be served by the MCP resource.\n        You can modify this file and it will be cached for 5 minutes.\"\n    *   Indicates that it will be served by an \"MCP resource\" and cached for 5 minutes.\n\n*   **second_file.txt:**\n    *   Contains the text: \"This is the second file that I want to be able to use as a resource\"\n\n*   **my.md:**\n    *   A markdown file containing:\n        *   A main heading: \"My Markdown File\"\n        *   Introductory text: \"This is a markdown file that I want to be able to use as a resource\"\n        *   Section 1 with text: \"This is a section in my markdown file\"\n        *   Section 2 with text: \"This is another section in my markdown file\"\n"
+                    "text": "I have the following information from the provided resources:\n\n*   **plain_text.txt:** Contains the text \"A plain text file\" on the first line and \"Plan text information\" on the second line.\n\n*   **test.txt:** Contains the text \"Hello, this is a test file!\\nThis content will be served by the MCP resource.\\nYou can modify this file and it will be cached for 5 minutes.\"\n\n*   **second_file.txt:** Contains the text \"This is the second file that I want to be able to use as a resource\"\n\n*   **my.md:** Contains markdown content including a title \"# My Markdown File\", a description, and two sections (\"## Section 1\" and \"## Section 2\") with content within them.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.098116424140029065
+              "avgLogprobs": -0.13774059479495129
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 154,
-            "candidatesTokenCount": 254,
-            "totalTokenCount": 408,
+            "candidatesTokenCount": 166,
+            "totalTokenCount": 320,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -84,12 +84,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 254
+                "tokenCount": 166
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "hx8GadDyItqd-8YP0ZGy0Qk"
+          "responseId": "eS0GafPlINXUjMcPtZzrmAc"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:09 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:39 GMT
 recorded_with: VCR 6.3.1

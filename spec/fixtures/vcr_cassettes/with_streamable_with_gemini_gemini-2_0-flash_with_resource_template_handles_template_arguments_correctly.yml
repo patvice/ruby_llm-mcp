@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:16 GMT
+      - Sat, 01 Nov 2025 15:55:46 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=491
+      - gfet4t7; dur=385
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, using the greeting template:\n\n**Hello, Bob!**\n"
+                    "text": "Hello, Bob!\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.23166826566060383
+              "avgLogprobs": -0.22071828842163085
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 23,
-            "candidatesTokenCount": 15,
-            "totalTokenCount": 38,
+            "candidatesTokenCount": 5,
+            "totalTokenCount": 28,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 15
+                "tokenCount": 5
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "kB8GafnSAZTRjrEP1PzyqAw"
+          "responseId": "gS0GaYr1OoPRjMcPlu208Qg"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:16 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:46 GMT
 recorded_with: VCR 6.3.1

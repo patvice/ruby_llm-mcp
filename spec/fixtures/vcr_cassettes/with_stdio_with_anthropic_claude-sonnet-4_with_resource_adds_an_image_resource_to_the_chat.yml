@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:53 GMT
+      - Sat, 01 Nov 2025 15:52:23 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:50Z'
+      - '2025-11-01T15:52:20Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:54Z'
+      - '2025-11-01T15:52:24Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:50Z'
+      - '2025-11-01T15:52:18Z'
       Retry-After:
-      - '10'
+      - '40'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:50Z'
+      - '2025-11-01T15:52:20Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '4713'
+      - '5767'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -77,18 +77,18 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=4771.226
+      - cfReqDur;dur=5839.485
       Cf-Team:
-      - 2ae1813a5800011ea6c6da7400000001
+      - 2ae1b7ad8300011ea6da2bd400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01DkFN3GzEJKvJCCZRpd1UK3","type":"message","role":"assistant","content":[{"type":"text","text":"I
-        can see an image of an adorable golden retriever puppy. The puppy appears
-        to be very young with fluffy, light-colored fur. It has its mouth wide open
-        in what looks like a happy, playful expression - almost like it''s yawning,
-        barking, or panting with excitement. The puppy is standing and photographed
-        against a white background, giving it a clean, professional look. It''s a
-        very cute and endearing photo that captures the playful, joyful nature typical
-        of golden retriever puppies."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":117,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:53 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01149aevMdb6aGUQPn14yhdC","type":"message","role":"assistant","content":[{"type":"text","text":"I
+        can see an image of an adorable golden retriever puppy. The puppy has light
+        cream or pale golden colored fur and appears to be very young. What''s particularly
+        charming about this photo is that the puppy has its mouth wide open in what
+        looks like a big yawn or possibly a playful bark. The puppy is standing and
+        photographed against a white background, giving it a clean, professional portrait
+        look. It''s a very cute and endearing image that captures the playful, innocent
+        nature of a young golden retriever."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":115,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:52:23 GMT
 recorded_with: VCR 6.3.1

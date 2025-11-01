@@ -38,7 +38,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:53:36 GMT
+      - Sat, 01 Nov 2025 15:53:05 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -48,7 +48,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1972
+      - gfet4t7; dur=2466
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,19 +62,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, I have information from the following files:\n\n*   **plain_text.txt:**\n    *   Contains the text: \"A plain text file\\n\\nPlan text information\"\n\n*   **test.txt:**\n    *   Contains the text: \"Hello, this is a test file!\\nThis content will be served by the MCP resource.\\nYou can modify this file and it will be cached for 5 minutes.\"\n\n*   **second_file.txt:**\n    *   Contains the text: \"This is the second file that I want to be able to use as a resource\"\n\n*   **my.md:**\n    *   Contains the following markdown content:\n        ```markdown\n        # My Markdown File\n\n        This is a markdown file that I want to be able to use as a resource\n\n        ## Section 1\n\n        This is a section in my markdown file\n\n        ## Section 2\n\n        This is another section in my markdown file\n        ```\n\nIn summary, I have the content of four different text-based files, including a markdown file. These files are intended to be used as resources, potentially served by an \"MCP resource\" with some caching mechanism.\n"
+                    "text": "Okay, here's a summary of the information I have from the files you've provided:\n\n*   **plain_text.txt:** This file contains the following text:\n    ```\n    A plain text file\n\n    Plan text information\n    ```\n\n*   **test.txt:** This file contains the following text:\n    ```\n    Hello, this is a test file!\n    This content will be served by the MCP resource.\n    You can modify this file and it will be cached for 5 minutes.\n    ```\n\n*   **second_file.txt:** This file contains the following text:\n    ```\n    This is the second file that I want to be able to use as a resource\n    ```\n\n*   **my.md:** This is a markdown file containing:\n    ```markdown\n    # My Markdown File\n\n    This is a markdown file that I want to be able to use as a resource\n\n    ## Section 1\n\n    This is a section in my markdown file\n\n    ## Section 2\n\n    This is another section in my markdown file\n    ```\n\nIn essence, you've provided four text files, one of which is specifically formatted as Markdown. You intend to use these files as resources within an application or system, potentially served through an \"MCP resource\" (as indicated in `test.txt`), with some caching mechanism in place (5 minutes for `test.txt`).\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.10637347651462929
+              "avgLogprobs": -0.15969819483962963
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 154,
-            "candidatesTokenCount": 255,
-            "totalTokenCount": 409,
+            "candidatesTokenCount": 301,
+            "totalTokenCount": 455,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -84,12 +84,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 255
+                "tokenCount": 301
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "7h4GaZGNDaCH-8YPy5DH4Qs"
+          "responseId": "3ywGaZXZF5u0jMcPm8-4iAE"
         }
-  recorded_at: Sat, 01 Nov 2025 14:53:36 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:05 GMT
 recorded_with: VCR 6.3.1

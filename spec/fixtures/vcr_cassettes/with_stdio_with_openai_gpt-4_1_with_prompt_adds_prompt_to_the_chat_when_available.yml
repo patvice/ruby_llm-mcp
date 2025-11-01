@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:54:29 GMT
+      - Sat, 01 Nov 2025 15:54:08 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '428'
+      - '431'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '441'
+      - '444'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -79,16 +79,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CX7HoY27xe8vqTMV53HGO0IT9ZcKu",
+          "id": "chatcmpl-CX8DXN1VUAJVUvNrj3vs4Kp6homnr",
           "object": "chat.completion",
-          "created": 1762008868,
+          "created": 1762012447,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Hello! I'm doing well, thank you for asking. How are you?",
+                "content": "Hello! I'm here and ready to help you. How can I assist you today?",
                 "refusal": null,
                 "annotations": []
               },
@@ -98,8 +98,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 32,
-            "completion_tokens": 15,
-            "total_tokens": 47,
+            "completion_tokens": 17,
+            "total_tokens": 49,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -114,5 +114,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Sat, 01 Nov 2025 14:54:29 GMT
+  recorded_at: Sat, 01 Nov 2025 15:54:08 GMT
 recorded_with: VCR 6.3.1

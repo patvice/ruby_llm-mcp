@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:55:12 GMT
+      - Sat, 01 Nov 2025 15:54:50 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:55:07Z'
+      - '2025-11-01T15:54:47Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:55:13Z'
+      - '2025-11-01T15:54:51Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:55:05Z'
+      - '2025-11-01T15:54:46Z'
       Retry-After:
-      - '55'
+      - '13'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:55:07Z'
+      - '2025-11-01T15:54:47Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '7861'
+      - '4976'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -77,25 +77,20 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=7962.74
+      - cfReqDur;dur=5034.058
       Cf-Team:
-      - 2ae1834a1900011ea6c78c8400000001
+      - 2ae1b9eea500011ea6dad20400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01MHRpWVg4K72Y66tX7HKPza","type":"message","role":"assistant","content":[{"type":"text","text":"I
-        have access to several types of resources:\n\n**Text-based information:**\n-
-        A large knowledge base trained on diverse text sources (up to my training
-        cutoff)\n- Ability to analyze, summarize, and discuss written content\n- Knowledge
-        across many domains like science, history, literature, etc.\n\n**Image analysis:**\n-
-        I can view and analyze images you share (like the adorable puppy photo you
-        just sent!)\n- I can describe visual content, identify objects, read text
-        in images, etc.\n\n**What I can help with:**\n- Answering questions and having
-        conversations\n- Writing, editing, and creative tasks\n- Problem-solving and
-        analysis\n- Code writing and debugging\n- Math and logical reasoning\n\n**What
-        I don''t have access to:**\n- Real-time internet browsing\n- External databases
-        or live data\n- Ability to generate, create, edit or manipulate images\n-
-        Memory of previous conversations\n- Personal data about users\n\nIs there
-        something specific you''d like help with? I''d be happy to assist using the
-        capabilities I do have!"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":232,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:55:12 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_013V6GTKi1pGo4N2QPGH14qQ","type":"message","role":"assistant","content":[{"type":"text","text":"I
+        can see and analyze images that you share with me, like the adorable Golden
+        Retriever puppy in your photo! However, I don''t have access to:\n\n- The
+        internet or real-time information\n- External databases or files beyond our
+        conversation\n- The ability to browse websites or search online\n- Access
+        to your device''s files or other applications\n\nWhat I can do is:\n- View
+        and analyze images you upload\n- Have conversations and answer questions based
+        on my training\n- Help with writing, analysis, math, coding, and many other
+        tasks\n- Remember our conversation within this chat session\n\nIs there something
+        specific you''d like help with regarding the puppy photo or anything else?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":147,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:54:50 GMT
 recorded_with: VCR 6.3.1

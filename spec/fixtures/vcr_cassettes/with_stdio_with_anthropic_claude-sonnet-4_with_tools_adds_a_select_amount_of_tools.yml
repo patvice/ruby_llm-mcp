@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:07 GMT
+      - Sat, 01 Nov 2025 15:51:39 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,27 +40,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '28000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:10Z'
+      - '2025-11-01T15:51:43Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:07Z'
+      - '2025-11-01T15:51:39Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:06Z'
+      - '2025-11-01T15:51:38Z'
       Retry-After:
-      - '55'
+      - '22'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '36000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:07Z'
+      - '2025-11-01T15:51:39Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -68,7 +68,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2214'
+      - '2033'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -78,15 +78,15 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2259.929
+      - cfReqDur;dur=2110.85
       Cf-Team:
-      - 2ae1808e0300011ea6c68e0400000001
+      - 2ae1b7104900011ea6d9f71400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01Y6uefZjx6LYUyUFheikRrb","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_018vHUazJxatBwNNJXSHdcui","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01Mw4m3s5dk8iCPJd9N3iETg","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01K9nwdAsAtD59X65pVkzHbw","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
         Francisco"]}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":490,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":78,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:07 GMT
+  recorded_at: Sat, 01 Nov 2025 15:51:39 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -94,8 +94,8 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you tell me the weather for Ottawa and San Francisco?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
-        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_018vHUazJxatBwNNJXSHdcui","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
-        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_018vHUazJxatBwNNJXSHdcui","content":"Weather
+        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01K9nwdAsAtD59X65pVkzHbw","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01K9nwdAsAtD59X65pVkzHbw","content":"Weather
         for Ottawa, San Francisco is great!"}]}],"temperature":0.7,"stream":false,"max_tokens":64000,"tools":[{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}},{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":[]}},"required":["geocode"]}}]}'
@@ -118,7 +118,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:09 GMT
+      - Sat, 01 Nov 2025 15:51:41 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -128,29 +128,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Limit:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Remaining:
-      - '29000'
+      - '28000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:11Z'
+      - '2025-11-01T15:51:44Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:09Z'
+      - '2025-11-01T15:51:41Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:08Z'
+      - '2025-11-01T15:51:40Z'
       Retry-After:
-      - '53'
+      - '20'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
-      - '37000'
+      - '36000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:09Z'
+      - '2025-11-01T15:51:41Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -158,7 +158,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2268'
+      - '2147'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -168,13 +168,14 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2315.362
+      - cfReqDur;dur=2200.73
       Cf-Team:
-      - 2ae180972700011ea6c6967400000001
+      - 2ae1b7192500011ea6d9f79400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01V7yk5tfrjm2d7hReJpZzXW","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        weather for both Ottawa and San Francisco is great! Both cities are experiencing
-        pleasant weather conditions right now."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":588,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":24,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:09 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01TH9JdJzj7pj7jc9PbJf8KK","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the weather information I retrieved, the weather for both Ottawa and San
+        Francisco is great! Both cities are currently experiencing pleasant weather
+        conditions."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":588,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":31,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:41 GMT
 recorded_with: VCR 6.3.1

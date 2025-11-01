@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:53:04 GMT
+      - Sat, 01 Nov 2025 15:52:31 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,27 +38,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:53:03Z'
+      - '2025-11-01T15:52:30Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:53:04Z'
+      - '2025-11-01T15:52:31Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:53:03Z'
+      - '2025-11-01T15:52:30Z'
       Retry-After:
-      - '61'
+      - '30'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:53:03Z'
+      - '2025-11-01T15:52:30Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -66,7 +66,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '1655'
+      - '1761'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -76,13 +76,13 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=1707.511
+      - cfReqDur;dur=1817.345
       Cf-Team:
-      - 2ae1816e2700011ea6c6e8f400000001
+      - 2ae1b7dbe400011ea6da3d1400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01TpYm9YSmKR7dPh49aGzeza","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01CZkpSuhwQXK3JjMFhZPD8m","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
         I''m doing well, thank you for asking. It''s nice to meet you! How are you
         doing today?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":20,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":28,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:53:04 GMT
+  recorded_at: Sat, 01 Nov 2025 15:52:31 GMT
 recorded_with: VCR 6.3.1

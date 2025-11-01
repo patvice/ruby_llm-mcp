@@ -66,7 +66,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:53:28 GMT
+      - Sat, 01 Nov 2025 15:52:58 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -76,7 +76,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=628
+      - gfet4t7; dur=558
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -123,16 +123,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "6B4GaZ-2A42e-8YP0dvw8Ag"
+          "responseId": "2SwGafavNuWJ-sAPoqGUmAk"
         }
-  recorded_at: Sat, 01 Nov 2025 14:53:28 GMT
+  recorded_at: Sat, 01 Nov 2025 15:52:58 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Can you add
-        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"b\":2,\"a\":1}}}]},{\"role\":\"user\",\"parts\":[{\"functionResponse\":{\"name\":\"20066bf0-38b4-4845-9bce-c1cdcd2e56d6\",\"response\":{\"name\":\"20066bf0-38b4-4845-9bce-c1cdcd2e56d6\",\"content\":\"3\"}}}]}],\"generationConfig\":{\"temperature\":0.7},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
+        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"b\":2,\"a\":1}}}]},{\"role\":\"user\",\"parts\":[{\"functionResponse\":{\"name\":\"0ad49f1f-8fe7-436e-a050-8d48a77d33a8\",\"response\":{\"name\":\"0ad49f1f-8fe7-436e-a050-8d48a77d33a8\",\"content\":\"3\"}}}]}],\"generationConfig\":{\"temperature\":0.7},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
         two numbers together\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"a\":{\"type\":\"NUMBER\"},\"b\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
         the set environment variable\"},{\"name\":\"malformed_tool\",\"description\":\"A
         malformed tool\"},{\"name\":\"tool_error\",\"description\":\"Returns an error\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"shouldError\":{\"type\":\"BOOLEAN\"}},\"required\":[]}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
@@ -192,7 +192,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:53:29 GMT
+      - Sat, 01 Nov 2025 15:52:58 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -202,7 +202,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=524
+      - gfet4t7; dur=502
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -222,17 +222,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.027994795487477228
+              "avgLogprobs": -0.023938057514337394
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 604,
+            "promptTokenCount": 608,
             "candidatesTokenCount": 13,
-            "totalTokenCount": 617,
+            "totalTokenCount": 621,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 604
+                "tokenCount": 608
               }
             ],
             "candidatesTokensDetails": [
@@ -243,7 +243,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "6B4GabfUL7iY-8YPgvnxoAg"
+          "responseId": "2iwGacaXItGI-sAP8qiIgQw"
         }
-  recorded_at: Sat, 01 Nov 2025 14:53:29 GMT
+  recorded_at: Sat, 01 Nov 2025 15:52:58 GMT
 recorded_with: VCR 6.3.1

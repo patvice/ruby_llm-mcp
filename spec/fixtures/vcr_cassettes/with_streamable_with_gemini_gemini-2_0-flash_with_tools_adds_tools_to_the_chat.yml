@@ -66,7 +66,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:02 GMT
+      - Sat, 01 Nov 2025 15:55:32 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -76,7 +76,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=516
+      - gfet4t7; dur=547
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -93,8 +93,8 @@ http_interactions:
                     "functionCall": {
                       "name": "add",
                       "args": {
-                        "a": 1,
-                        "b": 2
+                        "b": 2,
+                        "a": 1
                       }
                     }
                   }
@@ -123,16 +123,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "gR8GaZ_ANN2d-8YPn8Ou8Ag"
+          "responseId": "cy0GaeeUOLDWjMcP5_qGuAg"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:02 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:32 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Can you add
-        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"a\":1,\"b\":2}}}]},{\"role\":\"user\",\"parts\":[{\"functionResponse\":{\"name\":\"28ca27b4-83e4-455e-9179-0c891a23d733\",\"response\":{\"name\":\"28ca27b4-83e4-455e-9179-0c891a23d733\",\"content\":\"3\"}}}]}],\"generationConfig\":{\"temperature\":0.7},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
+        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"b\":2,\"a\":1}}}]},{\"role\":\"user\",\"parts\":[{\"functionResponse\":{\"name\":\"ec9a8c94-2777-4fc1-b01f-71181db67e7d\",\"response\":{\"name\":\"ec9a8c94-2777-4fc1-b01f-71181db67e7d\",\"content\":\"3\"}}}]}],\"generationConfig\":{\"temperature\":0.7},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
         two numbers together\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"a\":{\"type\":\"NUMBER\"},\"b\":{\"type\":\"NUMBER\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
         the set environment variable\"},{\"name\":\"malformed_tool\",\"description\":\"A
         malformed tool\"},{\"name\":\"tool_error\",\"description\":\"Returns an error\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"shouldError\":{\"type\":\"BOOLEAN\"}},\"required\":[]}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
@@ -192,7 +192,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:02 GMT
+      - Sat, 01 Nov 2025 15:55:33 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -202,7 +202,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=514
+      - gfet4t7; dur=493
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -222,17 +222,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.13073383844815767
+              "avgLogprobs": -0.034909248352050781
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 610,
+            "promptTokenCount": 606,
             "candidatesTokenCount": 13,
-            "totalTokenCount": 623,
+            "totalTokenCount": 619,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 610
+                "tokenCount": 606
               }
             ],
             "candidatesTokensDetails": [
@@ -243,7 +243,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "gh8GafelHcqljrEPoNSUuQE"
+          "responseId": "dC0Gacj_KOfVjMcPuu2WkAY"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:02 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:33 GMT
 recorded_with: VCR 6.3.1

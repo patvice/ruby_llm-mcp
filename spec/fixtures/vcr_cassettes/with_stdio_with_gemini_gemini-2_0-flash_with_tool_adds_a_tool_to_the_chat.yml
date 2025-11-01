@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:53:31 GMT
+      - Sat, 01 Nov 2025 15:53:00 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=554
+      - gfet4t7; dur=569
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -65,7 +65,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.00027506416663527491
+              "avgLogprobs": -0.00039330129511654376
             }
           ],
           "usageMetadata": {
@@ -86,16 +86,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "6h4GacihJ8f_jrEP1OzNqQo"
+          "responseId": "3CwGae2sHMOXjMcPn9WN8QU"
         }
-  recorded_at: Sat, 01 Nov 2025 14:53:31 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:00 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you pull messages
-        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"7a2e5208-9cfa-4fde-be39-1eb7183b405b","response":{"name":"7a2e5208-9cfa-4fde-be39-1eb7183b405b","content":"Ruby
+        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"18a03e36-a853-47ed-9949-37b3b0081163","response":{"name":"18a03e36-a853-47ed-9949-37b3b0081163","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
         community."}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
     headers:
@@ -121,7 +121,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:53:31 GMT
+      - Sat, 01 Nov 2025 15:53:01 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -131,7 +131,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=601
+      - gfet4t7; dur=646
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -145,34 +145,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "OK. I retrieved one message from the ruby channel. It says, \"Ruby is a great language for web development. It's easy to learn and has a large community.\"\n"
+                    "text": "The message in the ruby channel says: \"Ruby is a great language for web development. It's easy to learn and has a large community.\"\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.020639983383384911
+              "avgLogprobs": -0.0084965709717042988
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 109,
-            "candidatesTokenCount": 37,
-            "totalTokenCount": 146,
+            "promptTokenCount": 119,
+            "candidatesTokenCount": 31,
+            "totalTokenCount": 150,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 109
+                "tokenCount": 119
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 37
+                "tokenCount": 31
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "6x4GaZnIE6CH-8YPy5DH4Qs"
+          "responseId": "3SwGafGCCufVjMcPuu2WkAY"
         }
-  recorded_at: Sat, 01 Nov 2025 14:53:31 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:01 GMT
 recorded_with: VCR 6.3.1

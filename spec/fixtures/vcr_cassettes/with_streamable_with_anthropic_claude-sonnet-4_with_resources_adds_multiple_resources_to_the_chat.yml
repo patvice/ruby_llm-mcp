@@ -34,7 +34,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:55:04 GMT
+      - Sat, 01 Nov 2025 15:54:45 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -46,27 +46,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:54:59Z'
+      - '2025-11-01T15:54:41Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:55:06Z'
+      - '2025-11-01T15:54:47Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:54:59Z'
+      - '2025-11-01T15:54:40Z'
       Retry-After:
-      - '1'
+      - '20'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:54:59Z'
+      - '2025-11-01T15:54:41Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -74,7 +74,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '5676'
+      - '5723'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -84,25 +84,24 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=5738.392
+      - cfReqDur;dur=5773.5
       Cf-Team:
-      - 2ae183332c00011ea6c786a400000001
+      - 2ae1b9d79100011ea6dacd9400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01SKgdqzjPYnfkszqhJUaSye","type":"message","role":"assistant","content":[{"type":"text","text":"Based
-        on the provided resources, I have access to the following information:\n\n##
-        File: plain_text.txt\n- Contains: \"Plan text information\"\n- Description:
-        A plain text file\n\n## File: test.txt  \n- Contains: \"Hello, this is a test
-        file! This content will be served by the MCP resource. You can modify this
-        file and it will be cached for 5 minutes.\"\n- Description: A text file (appears
-        to be related to MCP resource serving with caching)\n\n## File: second_file.txt\n-
-        Contains: \"This is the second file that I want to be able to use as a resource\"\n-
-        Description: A second text file\n\n## File: my.md\n- Contains: A markdown
-        document with:\n  - Title: \"My Markdown File\" \n  - Two sections (Section
-        1 and Section 2)\n  - Content describing it as a markdown file intended for
-        use as a resource\n- Description: A markdown file\n\nIn total, I have access
-        to 4 files - 3 plain text files and 1 markdown file. The files appear to be
-        test/example resources, with some specifically mentioning their intended use
-        as MCP (Model Context Protocol) resources."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":165,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":271,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:55:04 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01Xi8GDKoqujhjW468zJCjhF","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the provided resources, I have access to information from 4 files:\n\n##
+        1. plain_text.txt\n- Contains: \"Plan text information\"\n\n## 2. test.txt  \n-
+        Contains: \"Hello, this is a test file!\"\n- Additional context: \"This content
+        will be served by the MCP resource.\"\n- Note: \"You can modify this file
+        and it will be cached for 5 minutes.\"\n\n## 3. second_file.txt\n- Contains:
+        \"This is the second file that I want to be able to use as a resource\"\n\n##
+        4. my.md (Markdown file)\n- Title: \"My Markdown File\"\n- Description: \"This
+        is a markdown file that I want to be able to use as a resource\"\n- Contains
+        two sections:\n  - **Section 1**: \"This is a section in my markdown file\"\n  -
+        **Section 2**: \"This is another section in my markdown file\"\n\nThese appear
+        to be sample files demonstrating different types of text resources (plain
+        text, test content, and markdown) that can be accessed through an MCP (Model
+        Context Protocol) resource system with caching capabilities."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":165,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":262,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:54:45 GMT
 recorded_with: VCR 6.3.1

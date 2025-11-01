@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sat, 01 Nov 2025 14:56:24 GMT
+      - Sat, 01 Nov 2025 15:55:53 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1966
+      - gfet4t7; dur=2093
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -56,19 +56,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The dawn unfurls, a silken, pearly grey,\nA canvas brushed with promises of day.\nThe birds awake, a chorus sweet and clear,\nDispelling shadows, banishing all fear.\n\nThe sun ascends, a painter bold and bright,\nKissing the dew with golden, liquid light.\nThe wind, a whisper through the leafy trees,\nCarries the scent of blossoms on the breeze.\n\nThe world awakens, stretches, yawns, and sighs,\nReflecting in its heart the azure skies.\nA tapestry of moments, woven tight,\nWith threads of laughter, struggle, and delight.\n\nThe ordinary blooms, a hidden grace,\nIn every smile, in every weathered face.\nThe simple beauty shines, a constant gleam,\nA silent, hopeful, ever-flowing stream.\n\nAnd in this hour, I pause, and I can see,\nThe magic held within this present decree.\nA fleeting moment, precious and so rare,\nInspired by life, a whispered, hopeful prayer.\n\nThis **poem** tries to capture, if it can,\nThe exquisite beauty of the human plan.\nA day to cherish, breathe, and truly live,\nFor all the gifts that it has yet to give.\n"
+                    "text": "The sun, a painter, splashed the canvas east,\nWith hues of apricot and blushing rose.\nThe world awoke, a slumbering, gentle beast,\nAnd stretched its limbs as morning gently flows.\n\nA robin's song, a silver, liquid chime,\nAnnounced the day with joyful, vibrant grace.\nThe dew-kissed grass, a tapestry of time,\nReflected skies within its fragile space.\n\nThe wind, a whisper, rustled through the trees,\nA secret language spoken to the air.\nThe promise held within the gentle breeze,\nOf moments waiting, burdens light to bear.\n\nThe coffee steams, a fragrant, warm embrace,\nA simple pleasure in this fleeting hour.\nAnd in this quiet, I can find my place,\nTo cultivate a blossoming, strong flower.\n\nThis ordinary day, a gift untold,\nA chance to write a **poem** with my life.\nA story waiting, brave and bright and bold,\nTo banish shadows, conquer every strife.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.49553028987004205
+              "avgLogprobs": -0.46407243247344115
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 33,
-            "candidatesTokenCount": 260,
-            "totalTokenCount": 293,
+            "candidatesTokenCount": 214,
+            "totalTokenCount": 247,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -78,12 +78,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 260
+                "tokenCount": 214
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "lh8GacmLMsqf-8YP5tnN2A0"
+          "responseId": "hy0Gae2AN9usjMcPk5-nyQo"
         }
-  recorded_at: Sat, 01 Nov 2025 14:56:24 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:53 GMT
 recorded_with: VCR 6.3.1

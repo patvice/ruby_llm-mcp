@@ -32,7 +32,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:56:43 GMT
+      - Sat, 01 Nov 2025 15:56:08 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -44,13 +44,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '5006'
+      - '3108'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '5041'
+      - '3123'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -84,7 +84,42 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        ewogICJpZCI6ICJjaGF0Y21wbC1DWDdKdTBSTnlVczNWaEdZMVQ3RGZyWkt5UmVzVyIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjAwODk5OCwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJIZXJl4oCZcyBhIHN1bW1hcnkgb2YgdGhlIGluZm9ybWF0aW9uIGZyb20gdGhlIHByb3ZpZGVkIHJlc291cmNlczpcblxuLS0tXG5cbiMjIyAxLiAqKnBsYWluX3RleHQudHh0Kipcbi0gKipUeXBlOioqIFBsYWluIHRleHQgZmlsZVxuLSAqKkNvbnRlbnQ6KiogIFxuICA+IFBsYW4gdGV4dCBpbmZvcm1hdGlvblxuXG4tLS1cblxuIyMjIDIuICoqdGVzdC50eHQqKlxuLSAqKlR5cGU6KiogVGV4dCBmaWxlXG4tICoqQ29udGVudDoqKiAgXG4gID4gSGVsbG8sIHRoaXMgaXMgYSB0ZXN0IGZpbGUhICBcbiAgPiBUaGlzIGNvbnRlbnQgd2lsbCBiZSBzZXJ2ZWQgYnkgdGhlIE1DUCByZXNvdXJjZS4gIFxuICA+IFlvdSBjYW4gbW9kaWZ5IHRoaXMgZmlsZSBhbmQgaXQgd2lsbCBiZSBjYWNoZWQgZm9yIDUgbWludXRlcy5cblxuLS0tXG5cbiMjIyAzLiAqKnNlY29uZF9maWxlLnR4dCoqXG4tICoqVHlwZToqKiBTZWNvbmQgdGV4dCBmaWxlXG4tICoqQ29udGVudDoqKiAgXG4gID4gVGhpcyBpcyB0aGUgc2Vjb25kIGZpbGUgdGhhdCBJIHdhbnQgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSByZXNvdXJjZVxuXG4tLS1cblxuIyMjIDQuICoqbXkubWQqKlxuLSAqKlR5cGU6KiogTWFya2Rvd24gZmlsZVxuLSAqKkNvbnRlbnQ6KipcbiAgYGBgbWFya2Rvd25cbiAgIyBNeSBNYXJrZG93biBGaWxlXG5cbiAgVGhpcyBpcyBhIG1hcmtkb3duIGZpbGUgdGhhdCBJIHdhbnQgdG8gYmUgYWJsZSB0byB1c2UgYXMgYSByZXNvdXJjZVxuXG4gICMjIFNlY3Rpb24gMVxuXG4gIFRoaXMgaXMgYSBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcblxuICAjIyBTZWN0aW9uIDJcblxuICBUaGlzIGlzIGFub3RoZXIgc2VjdGlvbiBpbiBteSBtYXJrZG93biBmaWxlXG4gIGBgYFxuXG4tLS1cblxuSWYgeW91IG5lZWQgZGV0YWlscywgY29udGVudCwgb3Igc3VtbWFyaWVzIGZyb20gYW55IHNwZWNpZmljIGZpbGUsIGp1c3QgbGV0IG1lIGtub3chIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMTY4LAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMjQ5LAogICAgInRvdGFsX3Rva2VucyI6IDQxNywKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwXzE0NGVhM2I5NzQiCn0K
-  recorded_at: Sat, 01 Nov 2025 14:56:43 GMT
+      string: |
+        {
+          "id": "chatcmpl-CX8FR2Tn4BLoZuyFoxGHMlmcGaFoX",
+          "object": "chat.completion",
+          "created": 1762012565,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Based on the provided resources, here is the information I have:\n\n---\n\n**plain_text.txt:**  \n*A plain text file*  \nContents:  \n> Plan text information\n\n---\n\n**test.txt:**  \n*A text file*  \nContents:  \n> Hello, this is a test file!  \n> This content will be served by the MCP resource.  \n> You can modify this file and it will be cached for 5 minutes.\n\n---\n\n**second_file.txt:**  \n*A second text file*  \nContents:  \n> This is the second file that I want to be able to use as a resource\n\n---\n\n**my.md:**  \n*A markdown file*  \nContents (Markdown format):  \n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\n---\n\n**Summary:**  \n- You have provided four files: three plain text files and one markdown file.\n- Each file contains a short message or sectioned content.\n- The files are intended to be used as resources, possibly for reference, display, or retrieval.\n- The markdown file contains headings and structured sections, while the text files contain short, descriptive text.",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 168,
+            "completion_tokens": 265,
+            "total_tokens": 433,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_144ea3b974"
+        }
+  recorded_at: Sat, 01 Nov 2025 15:56:08 GMT
 recorded_with: VCR 6.3.1

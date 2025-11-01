@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:53:27 GMT
+      - Sat, 01 Nov 2025 15:52:57 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:53:27Z'
+      - '2025-11-01T15:52:57Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:53:28Z'
+      - '2025-11-01T15:52:57Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:53:26Z'
+      - '2025-11-01T15:52:55Z'
       Retry-After:
-      - '34'
+      - '3'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:53:27Z'
+      - '2025-11-01T15:52:57Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2885'
+      - '3777'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -77,12 +77,12 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2945.107
+      - cfReqDur;dur=3836.426
       Cf-Team:
-      - 2ae181c65000011ea6c7083400000001
+      - 2ae1b83b3900011ea6da501400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_018hZDFwW97CtQTeRVrPhVxk","type":"message","role":"assistant","content":[{"type":"text","text":"Bonjour
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01FgBATKtk3uCNSWE2AZKdCJ","type":"message","role":"assistant","content":[{"type":"text","text":"Bonjour
         Alice ! Comment allez-vous aujourd''hui ?\n\n(Hello Alice! How are you today?)"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":27,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":28,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:53:27 GMT
+  recorded_at: Sat, 01 Nov 2025 15:52:57 GMT
 recorded_with: VCR 6.3.1

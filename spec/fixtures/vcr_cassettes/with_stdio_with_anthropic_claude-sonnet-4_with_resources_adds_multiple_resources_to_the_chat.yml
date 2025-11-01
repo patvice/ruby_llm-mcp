@@ -34,7 +34,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:34 GMT
+      - Sat, 01 Nov 2025 15:52:03 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -46,27 +46,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:29Z'
+      - '2025-11-01T15:51:58Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:36Z'
+      - '2025-11-01T15:52:05Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:28Z'
+      - '2025-11-01T15:51:57Z'
       Retry-After:
-      - '33'
+      - '2'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:29Z'
+      - '2025-11-01T15:51:58Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -74,7 +74,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '7761'
+      - '6386'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -84,27 +84,26 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=7832.531
+      - cfReqDur;dur=6444.371
       Cf-Team:
-      - 2ae180e38e00011ea6c6bdf400000001
+      - 2ae1b75be700011ea6da0e7400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_0123Q5kmJz7TMftAWvTUZXRJ","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01XkvsLXbph5Qqyj8Yvk82NS","type":"message","role":"assistant","content":[{"type":"text","text":"Based
         on the provided resources, I have access to the following information:\n\n##
-        Files Available:\n\n### 1. **plain_text.txt**\n- Contains: \"Plan text information\"\n-
-        A simple plain text file with basic content\n\n### 2. **test.txt** \n- Contains:
-        \"Hello, this is a test file! This content will be served by the MCP resource.
-        You can modify this file and it will be cached for 5 minutes.\"\n- Appears
-        to be a test file for demonstrating MCP (Model Context Protocol) resource
-        functionality with caching capabilities\n\n### 3. **second_file.txt**\n- Contains:
-        \"This is the second file that I want to be able to use as a resource\"\n-
-        Another text file intended for use as a resource\n\n### 4. **my.md**\n- A
-        markdown file with structured content including:\n  - Title: \"My Markdown
-        File\"\n  - Two sections (Section 1 and Section 2)\n  - Each section contains
-        descriptive text about being part of the markdown file\n\n## Summary:\nI have
-        access to 4 files total - 3 plain text files and 1 markdown file. These appear
-        to be test/example files set up to demonstrate resource access capabilities,
-        with one specifically mentioning MCP resource serving and caching functionality.
-        The files contain simple descriptive content about their purpose as resources."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":165,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":307,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:34 GMT
+        File: plain_text.txt\n- Contains: \"Plan text information\"\n- Description:
+        A plain text file\n\n## File: test.txt  \n- Contains: \"Hello, this is a test
+        file! This content will be served by the MCP resource. You can modify this
+        file and it will be cached for 5 minutes.\"\n- Description: A text file\n-
+        Note: Mentions MCP (Model Context Protocol) resource serving with 5-minute
+        caching\n\n## File: second_file.txt\n- Contains: \"This is the second file
+        that I want to be able to use as a resource\"\n- Description: A second text
+        file\n\n## File: my.md\n- Contains: A markdown document with:\n  - Title:
+        \"My Markdown File\"\n  - Two sections (Section 1 and Section 2)\n  - Each
+        section contains descriptive text\n- Description: A markdown file intended
+        as a resource\n\nIn summary, I have access to 4 files total - 3 plain text
+        files and 1 markdown file. The files appear to be test resources, with one
+        specifically mentioning MCP resource serving functionality. The content suggests
+        these are sample files being used to test resource access capabilities."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":165,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":282,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:52:03 GMT
 recorded_with: VCR 6.3.1

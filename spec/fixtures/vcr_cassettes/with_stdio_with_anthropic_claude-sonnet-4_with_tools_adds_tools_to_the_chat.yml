@@ -64,7 +64,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:02 GMT
+      - Sat, 01 Nov 2025 15:51:35 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -74,29 +74,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Limit:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Remaining:
-      - '29000'
+      - '28000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:04Z'
+      - '2025-11-01T15:51:37Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:02Z'
+      - '2025-11-01T15:51:35Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:01Z'
+      - '2025-11-01T15:51:33Z'
       Retry-After:
-      - '64'
+      - '26'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
-      - '37000'
+      - '36000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:02Z'
+      - '2025-11-01T15:51:35Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -104,7 +104,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2630'
+      - '2292'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -114,14 +114,14 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2678.214
+      - cfReqDur;dur=2383.748
       Cf-Team:
-      - 2ae180798100011ea6c68a3400000001
+      - 2ae1b6fe4e00011ea6d9f2c400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01Y91zqDfp3tJZeTdFxowxrF","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        add 1 and 2 for you using the add function."},{"type":"tool_use","id":"toolu_01ADWtwq6yowzaFcs8wJhJug","name":"add","input":{"a":1,"b":2}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":2353,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":86,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:02 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_0155Whu9Mzkx77Hgp1RreUhm","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        add 1 and 2 for you using the add function."},{"type":"tool_use","id":"toolu_01RxxTo3ak5Cm4ScCTNjXuq7","name":"add","input":{"a":1,"b":2}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":2353,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":86,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:35 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -129,7 +129,7 @@ http_interactions:
       encoding: UTF-8
       string: "{\"model\":\"claude-sonnet-4-20250514\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Can
         you add 1 and 2?\"}]},{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"I'll
-        add 1 and 2 for you using the add function.\"},{\"type\":\"tool_use\",\"id\":\"toolu_01ADWtwq6yowzaFcs8wJhJug\",\"name\":\"add\",\"input\":{\"a\":1,\"b\":2}}]},{\"role\":\"user\",\"content\":[{\"type\":\"tool_result\",\"tool_use_id\":\"toolu_01ADWtwq6yowzaFcs8wJhJug\",\"content\":\"3\"}]}],\"temperature\":0.7,\"stream\":false,\"max_tokens\":64000,\"tools\":[{\"name\":\"add\",\"description\":\"Addes
+        add 1 and 2 for you using the add function.\"},{\"type\":\"tool_use\",\"id\":\"toolu_01RxxTo3ak5Cm4ScCTNjXuq7\",\"name\":\"add\",\"input\":{\"a\":1,\"b\":2}}]},{\"role\":\"user\",\"content\":[{\"type\":\"tool_result\",\"tool_use_id\":\"toolu_01RxxTo3ak5Cm4ScCTNjXuq7\",\"content\":\"3\"}]}],\"temperature\":0.7,\"stream\":false,\"max_tokens\":64000,\"tools\":[{\"name\":\"add\",\"description\":\"Addes
         two numbers together\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
         the set environment variable\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"malformed_tool\",\"description\":\"A
         malformed tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"tool_error\",\"description\":\"Returns
@@ -187,7 +187,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 01 Nov 2025 14:52:04 GMT
+      - Sat, 01 Nov 2025 15:51:37 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -197,29 +197,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Limit:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Remaining:
-      - '28000'
+      - '27000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-01T14:52:09Z'
+      - '2025-11-01T15:51:42Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-01T14:52:04Z'
+      - '2025-11-01T15:51:37Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-01T14:52:03Z'
+      - '2025-11-01T15:51:36Z'
       Retry-After:
-      - '57'
+      - '25'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
-      - '36000'
+      - '35000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-01T14:52:04Z'
+      - '2025-11-01T15:51:37Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -227,7 +227,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2239'
+      - '1871'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -237,12 +237,12 @@ http_interactions:
       Cf-Ray:
       - "<CF_RAY>"
       Server-Timing:
-      - cfReqDur;dur=2285.876
+      - cfReqDur;dur=1971.961
       Cf-Team:
-      - 2ae180846b00011ea6c68c4400000001
+      - 2ae1b7083f00011ea6d9f59400000001
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_014E6jWScHcjfX9CLqxjpUfx","type":"message","role":"assistant","content":[{"type":"text","text":"The
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01BVTGKN4ykZyBVm9cUjirDW","type":"message","role":"assistant","content":[{"type":"text","text":"The
         result of adding 1 and 2 is 3."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":2452,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":18,"service_tier":"standard"}}'
-  recorded_at: Sat, 01 Nov 2025 14:52:04 GMT
+  recorded_at: Sat, 01 Nov 2025 15:51:37 GMT
 recorded_with: VCR 6.3.1
