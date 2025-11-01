@@ -204,8 +204,14 @@ module RubyLLM
       end
 
       def valid_hash_schema?(schema)
+        # Check if this level has missing properties for object type
         if schema["type"] == "object" && !schema.key?("properties")
           return false
+        end
+
+        # Recursively check nested schemas
+        schema.each_value do |value|
+          return false unless valid_schema?(value)
         end
 
         begin
