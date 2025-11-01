@@ -31,10 +31,17 @@ VCR.configure do |config|
 
   config.ignore_hosts("localhost")
 
+  record_mode = if ENV["CI"]
+                  :none
+                elsif ENV["VCR_REFRESH"] == "true"
+                  :all
+                else
+                  :new_episodes
+                end
+
   # Don't record new HTTP interactions when running in CI
   config.default_cassette_options = {
-    # record: ENV["CI"] ? :none : :new_episodes
-    record: :all
+    record: record_mode
   }
 
   # Create new cassette directory if it doesn't exist
