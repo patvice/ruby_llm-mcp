@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:46:01 GMT
+      - Sat, 01 Nov 2025 15:53:56 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,11 +39,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '706'
+      - '1745'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '714'
+      - '1760'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -58,13 +60,15 @@ http_interactions:
       - 134ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -75,42 +79,7 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: |
-        {
-          "id": "chatcmpl-BoXTECCYnLSKaQcqmq00573hhqGcZ",
-          "object": "chat.completion",
-          "created": 1751384760,
-          "model": "gpt-4.1-2025-04-14",
-          "choices": [
-            {
-              "index": 0,
-              "message": {
-                "role": "assistant",
-                "content": "Your markdown file contains the following text:\n\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file",
-                "refusal": null,
-                "annotations": []
-              },
-              "logprobs": null,
-              "finish_reason": "stop"
-            }
-          ],
-          "usage": {
-            "prompt_tokens": 75,
-            "completion_tokens": 57,
-            "total_tokens": 132,
-            "prompt_tokens_details": {
-              "cached_tokens": 0,
-              "audio_tokens": 0
-            },
-            "completion_tokens_details": {
-              "reasoning_tokens": 0,
-              "audio_tokens": 0,
-              "accepted_prediction_tokens": 0,
-              "rejected_prediction_tokens": 0
-            }
-          },
-          "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
-        }
-  recorded_at: Tue, 01 Jul 2025 15:46:01 GMT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DWDhETFJ4TElkbUNGaFF5aG9OV3ZXYVpqTmtYeiIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjAxMjQzNSwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJZb3VyIG1hcmtkb3duIGZpbGUgKG15Lm1kKSBjb250YWlucyB0aGUgZm9sbG93aW5nIHRleHQ6XG5cbmBgYFxuIyBNeSBNYXJrZG93biBGaWxlXG5cblRoaXMgaXMgYSBtYXJrZG93biBmaWxlIHRoYXQgSSB3YW50IHRvIGJlIGFibGUgdG8gdXNlIGFzIGEgcmVzb3VyY2VcblxuIyMgU2VjdGlvbiAxXG5cblRoaXMgaXMgYSBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcblxuIyMgU2VjdGlvbiAyXG5cblRoaXMgaXMgYW5vdGhlciBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcbmBgYFxuXG5IZXJl4oCZcyB3aGF0IGl0IHNheXMsIG9yZ2FuaXplZCBieSBzZWN0aW9uczpcblxuLS0tXG5cbioqVGl0bGU6KiogIFxuTXkgTWFya2Rvd24gRmlsZVxuXG4qKkludHJvZHVjdGlvbjoqKiAgXG5UaGlzIGlzIGEgbWFya2Rvd24gZmlsZSB0aGF0IEkgd2FudCB0byBiZSBhYmxlIHRvIHVzZSBhcyBhIHJlc291cmNlXG5cbioqU2VjdGlvbiAxOioqICBcblRoaXMgaXMgYSBzZWN0aW9uIGluIG15IG1hcmtkb3duIGZpbGVcblxuKipTZWN0aW9uIDI6KiogIFxuVGhpcyBpcyBhbm90aGVyIHNlY3Rpb24gaW4gbXkgbWFya2Rvd24gZmlsZSIsCiAgICAgICAgInJlZnVzYWwiOiBudWxsLAogICAgICAgICJhbm5vdGF0aW9ucyI6IFtdCiAgICAgIH0sCiAgICAgICJsb2dwcm9icyI6IG51bGwsCiAgICAgICJmaW5pc2hfcmVhc29uIjogInN0b3AiCiAgICB9CiAgXSwKICAidXNhZ2UiOiB7CiAgICAicHJvbXB0X3Rva2VucyI6IDc1LAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMTM1LAogICAgInRvdGFsX3Rva2VucyI6IDIxMCwKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwXzE0NGVhM2I5NzQiCn0K
+  recorded_at: Sat, 01 Nov 2025 15:53:56 GMT
 recorded_with: VCR 6.3.1

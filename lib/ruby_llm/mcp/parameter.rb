@@ -7,6 +7,14 @@ module RubyLLM
     class Parameter < RubyLLM::Parameter
       attr_accessor :items, :properties, :enum, :union_type, :default, :title
 
+      class << self
+        def all_mcp_parameters?(parameters)
+          parameters.is_a?(Hash) &&
+            parameters.any? &&
+            parameters.values.all? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+        end
+      end
+
       def initialize(name, type: "string", title: nil, desc: nil, required: true, default: nil, union_type: nil) # rubocop:disable Metrics/ParameterLists
         super(name, type: type.to_sym, desc: desc, required: required)
         @title = title

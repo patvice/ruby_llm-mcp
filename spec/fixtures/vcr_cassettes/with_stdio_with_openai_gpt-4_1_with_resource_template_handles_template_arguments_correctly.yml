@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:46:04 GMT
+      - Sat, 01 Nov 2025 15:54:02 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '255'
+      - '862'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '260'
+      - '878'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -56,13 +58,15 @@ http_interactions:
       - 58ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -75,9 +79,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXTIFpEOH3jXOGTyUY9BquJMQq7v",
+          "id": "chatcmpl-CX8DRTAinA9esqmQ19WSLx02HfXVh",
           "object": "chat.completion",
-          "created": 1751384764,
+          "created": 1762012441,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -108,7 +112,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_799e4ca3f1"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:46:04 GMT
+  recorded_at: Sat, 01 Nov 2025 15:54:02 GMT
 recorded_with: VCR 6.3.1

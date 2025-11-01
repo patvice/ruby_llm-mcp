@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:47:16 GMT
+      - Sat, 01 Nov 2025 15:55:35 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=537
+      - gfet4t7; dur=479
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -86,16 +86,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "AwNkaLisPPLhmNAPpebBuQM"
+          "responseId": "di0Gaa_kKJKJ-sAPs7G5yQE"
         }
-  recorded_at: Tue, 01 Jul 2025 15:47:16 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:35 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you pull messages
-        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"41004953-15c4-437f-839e-53687c1565b9","response":{"name":"41004953-15c4-437f-839e-53687c1565b9","content":"Ruby
+        for ruby channel and let me know what they say?"}]},{"role":"model","parts":[{"functionCall":{"name":"list_messages","args":{"channel":"ruby"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"f68b1b75-2c80-48e3-9ad1-b601f534fe2e","response":{"name":"f68b1b75-2c80-48e3-9ad1-b601f534fe2e","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
         community."}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":[]}}]}]}'
     headers:
@@ -121,7 +121,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:47:17 GMT
+      - Sat, 01 Nov 2025 15:55:35 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -131,7 +131,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=679
+      - gfet4t7; dur=535
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -151,17 +151,17 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.02087466755220967
+              "avgLogprobs": -0.0020186816973070945
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 121,
+            "promptTokenCount": 117,
             "candidatesTokenCount": 31,
-            "totalTokenCount": 152,
+            "totalTokenCount": 148,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 121
+                "tokenCount": 117
               }
             ],
             "candidatesTokensDetails": [
@@ -172,7 +172,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BANkaMTKJJK3mNAPh5HH0QM"
+          "responseId": "dy0GaYeGEq6ZjMcPmemq8Q4"
         }
-  recorded_at: Tue, 01 Jul 2025 15:47:17 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:35 GMT
 recorded_with: VCR 6.3.1

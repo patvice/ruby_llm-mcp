@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:47:37 GMT
+      - Sat, 01 Nov 2025 15:55:59 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,11 +38,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '938'
+      - '913'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '946'
+      - '934'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -50,20 +52,22 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29767'
+      - '29740'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 465ms
+      - 518ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -76,9 +80,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXUm4xf911horfVsyAg1fCa8qNwh",
+          "id": "chatcmpl-CX8FKISVgLrnWUHuAjOZ3hmEAyn5W",
           "object": "chat.completion",
-          "created": 1751384856,
+          "created": 1762012558,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -88,7 +92,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_63xnG4XSvZQPuJd5IDPqa2ln",
+                    "id": "call_v59iuJ4uBvbpHb3E93czGnHN",
                     "type": "function",
                     "function": {
                       "name": "get_weather_from_locations",
@@ -96,7 +100,7 @@ http_interactions:
                     }
                   },
                   {
-                    "id": "call_EzUN89LQNq2oTR8TsqhLNy08",
+                    "id": "call_T3IiR6KAbEMQBW5kqnu5bcO8",
                     "type": "function",
                     "function": {
                       "name": "get_weather_from_locations",
@@ -127,18 +131,18 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:47:37 GMT
+  recorded_at: Sat, 01 Nov 2025 15:55:59 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you tell
-        me the weather for Ottawa and San Francisco?"},{"role":"assistant","tool_calls":[{"id":"call_63xnG4XSvZQPuJd5IDPqa2ln","type":"function","function":{"name":"get_weather_from_locations","arguments":"{\"locations\":[\"Ottawa\"]}"}},{"id":"call_EzUN89LQNq2oTR8TsqhLNy08","type":"function","function":{"name":"get_weather_from_locations","arguments":"{\"locations\":[\"San
-        Francisco\"]}"}}]},{"role":"tool","content":"Weather for Ottawa is great!","tool_call_id":"call_63xnG4XSvZQPuJd5IDPqa2ln"},{"role":"tool","content":"Weather
-        for San Francisco is great!","tool_call_id":"call_EzUN89LQNq2oTR8TsqhLNy08"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"get_weather_from_locations","description":"Get
+        me the weather for Ottawa and San Francisco?"},{"role":"assistant","tool_calls":[{"id":"call_v59iuJ4uBvbpHb3E93czGnHN","type":"function","function":{"name":"get_weather_from_locations","arguments":"{\"locations\":[\"Ottawa\"]}"}},{"id":"call_T3IiR6KAbEMQBW5kqnu5bcO8","type":"function","function":{"name":"get_weather_from_locations","arguments":"{\"locations\":[\"San
+        Francisco\"]}"}}]},{"role":"tool","content":"Weather for Ottawa is great!","tool_call_id":"call_v59iuJ4uBvbpHb3E93czGnHN"},{"role":"tool","content":"Weather
+        for San Francisco is great!","tool_call_id":"call_T3IiR6KAbEMQBW5kqnu5bcO8"}],"stream":false,"temperature":0.7,"tools":[{"type":"function","function":{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","parameters":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":[]}}},{"type":"function","function":{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","parameters":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":[]}},"required":["geocode"]}}}],"tool_choice":"auto"}'
     headers:
@@ -158,7 +162,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:47:38 GMT
+      - Sat, 01 Nov 2025 15:56:01 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -170,11 +174,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1065'
+      - '1262'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '1079'
+      - '1289'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -182,20 +188,22 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29965'
+      - '29126'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 70ms
+      - 1.746s
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -208,16 +216,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXUn0l4MCT4jYMri8QqJn61RfW8R",
+          "id": "chatcmpl-CX8FMQtqrED3djj7VT5g36hsz5VcL",
           "object": "chat.completion",
-          "created": 1751384857,
+          "created": 1762012560,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The weather for Ottawa and San Francisco is currently great in both cities! If you need more specific details like temperature, humidity, or forecast, please let me know.",
+                "content": "The weather in both Ottawa and San Francisco is great! If you need more detailed information such as temperature, precipitation, or forecasts, let me know.",
                 "refusal": null,
                 "annotations": []
               },
@@ -227,8 +235,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 174,
-            "completion_tokens": 34,
-            "total_tokens": 208,
+            "completion_tokens": 31,
+            "total_tokens": 205,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -241,7 +249,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:47:38 GMT
+  recorded_at: Sat, 01 Nov 2025 15:56:01 GMT
 recorded_with: VCR 6.3.1

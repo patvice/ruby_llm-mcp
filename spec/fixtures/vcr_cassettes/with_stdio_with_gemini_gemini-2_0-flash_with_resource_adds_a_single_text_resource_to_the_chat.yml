@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:45:26 GMT
+      - Sat, 01 Nov 2025 15:53:08 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=657
+      - gfet4t7; dur=736
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,7 +62,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.04049713206741045
+              "avgLogprobs": -0.0068269608155736381
             }
           ],
           "usageMetadata": {
@@ -83,7 +83,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "lQJkaIfNLqizxfcPvo3h8QI"
+          "responseId": "4ywGaeeCJ9fXjMcPmMTjmAk"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:26 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:08 GMT
 recorded_with: VCR 6.3.1

@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:48:10 GMT
+      - Sat, 01 Nov 2025 15:56:24 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2315'
+      - '1879'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '2256'
+      - '1926'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -62,13 +64,15 @@ http_interactions:
       - 1.562s
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -81,16 +85,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoXVIIG5Z63VDevTxq8e2ZMo90o50",
+          "id": "chatcmpl-CX8FiLLbIjPgsNqg0Pv2Y636vV0VU",
           "object": "chat.completion",
-          "created": 1751384888,
+          "created": 1762012582,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The image you provided is of a light-colored puppy, possibly a Golden Retriever, with its mouth open as if it is yawning or happily barking. The background is white, making the puppy the clear focal point of the image.",
+                "content": "The image you provided is of a light-colored puppy, possibly a Golden Retriever, standing and appearing to be yawning or barking. The background is white, making the dog the clear focus of the image.",
                 "refusal": null,
                 "annotations": []
               },
@@ -100,8 +104,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 280,
-            "completion_tokens": 46,
-            "total_tokens": 326,
+            "completion_tokens": 41,
+            "total_tokens": 321,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -114,7 +118,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Tue, 01 Jul 2025 15:48:10 GMT
+  recorded_at: Sat, 01 Nov 2025 15:56:24 GMT
 recorded_with: VCR 6.3.1

@@ -24,7 +24,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 02 Jul 2025 19:30:39 GMT
+      - Sat, 01 Nov 2025 15:56:54 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -36,11 +36,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2233'
+      - '534'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '2239'
+      - '557'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -55,13 +57,15 @@ http_interactions:
       - 30ms
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -74,16 +78,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-BoxS9oMvOJwhiQE2V5H0X7ibD6Zp0",
+          "id": "chatcmpl-CX8GDiCVfaDwzzZMny24C6cSoKzlq",
           "object": "chat.completion",
-          "created": 1751484637,
+          "created": 1762012613,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Hello! I'm just a virtual assistant, so I don't have feelings, but I'm here and ready to help you. How can I assist you today?",
+                "content": "Hello! I'm just a computer program, so I don't have feelings, but I'm here and ready to help you. How can I assist you today?",
                 "refusal": null,
                 "annotations": []
               },
@@ -107,7 +111,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
+          "system_fingerprint": "fp_144ea3b974"
         }
-  recorded_at: Wed, 02 Jul 2025 19:30:39 GMT
+  recorded_at: Sat, 01 Nov 2025 15:56:54 GMT
 recorded_with: VCR 6.3.1

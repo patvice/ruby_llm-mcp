@@ -22,6 +22,7 @@ require "ruby_llm/mcp"
 require_relative "support/client_runner"
 require_relative "support/test_server_manager"
 require_relative "support/mcp_test_configuration"
+require_relative "support/simple_multiply_tool"
 
 # VCR Configuration
 VCR.configure do |config|
@@ -31,9 +32,17 @@ VCR.configure do |config|
 
   config.ignore_hosts("localhost")
 
+  record_mode = if ENV["CI"]
+                  :none
+                elsif ENV["VCR_REFRESH"] == "true"
+                  :all
+                else
+                  :new_episodes
+                end
+
   # Don't record new HTTP interactions when running in CI
   config.default_cassette_options = {
-    record: ENV["CI"] ? :none : :new_episodes
+    record: record_mode
   }
 
   # Create new cassette directory if it doesn't exist
@@ -120,7 +129,7 @@ PAGINATION_CLIENT_CONFIG = {
 }.freeze
 
 COMPLEX_FUNCTION_MODELS = [
-  { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
+  { provider: :anthropic, model: "claude-sonnet-4" },
   { provider: :gemini, model: "gemini-2.0-flash" },
   { provider: :openai, model: "gpt-4.1" }
 ].freeze

@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Tue, 01 Jul 2025 15:48:04 GMT
+      - Sat, 01 Nov 2025 15:56:19 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,11 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '14330'
+      - '11339'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '14274'
+      - '11410'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -62,13 +64,15 @@ http_interactions:
       - 1.568s
       X-Request-Id:
       - "<X_REQUEST_ID>"
-      Strict-Transport-Security:
-      - max-age=31536000; includeSubDomains; preload
+      X-Openai-Proxy-Wasm:
+      - v0.1
       Cf-Cache-Status:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
       - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
       Server:
@@ -79,42 +83,7 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: |
-        {
-          "id": "chatcmpl-BoXV088zTmFozZmPoa7ieKtzYJfCq",
-          "object": "chat.completion",
-          "created": 1751384870,
-          "model": "gpt-4.1-2025-04-14",
-          "choices": [
-            {
-              "index": 0,
-              "message": {
-                "role": "assistant",
-                "content": "I have access to a wide range of resources and capabilities, including:\n\n### 1. **General Knowledge**\n- My responses are based on a large dataset of books, articles, websites, and other texts up to my knowledge cutoff date (June 2024).\n- I can provide information, explanations, summaries, and advice on a wide variety of topics.\n\n### 2. **Image Capabilities**\n- I can analyze and describe images, identify objects, read text in images (OCR), and provide context or explanations.\n- **Limitations:** I cannot identify or recognize real people in images.\n\n### 3. **Programming & Code**\n- I can write, explain, debug, and review code in many programming languages.\n- I can help with algorithms, data structures, and general programming concepts.\n\n### 4. **Creative Tasks**\n- I can help with writing (stories, essays, poems, etc.), brainstorming, and generating creative ideas.\n\n### 5. **Language Support**\n- I can translate text between many languages and help with grammar, vocabulary, and language learning.\n\n### 6. **Math & Science**\n- I can solve math problems, explain scientific concepts, and assist with calculations.\n\n### 7. **Study & Research Help**\n- I can help you find reliable sources, summarize articles, and guide you in academic research.\n\n### 8. **Conversational Abilities**\n- I can chat, role-play, simulate interviews, and help practice conversations.\n\n---\n\n**What I do not have access to:**\n- Real-time or live internet browsing.\n- Private databases, subscription-only content, or proprietary information not included in my training data.\n- Personal data about individuals unless shared with me in conversation.\n\nIf you have a specific task or question, just let me know!",
-                "refusal": null,
-                "annotations": []
-              },
-              "logprobs": null,
-              "finish_reason": "stop"
-            }
-          ],
-          "usage": {
-            "prompt_tokens": 282,
-            "completion_tokens": 361,
-            "total_tokens": 643,
-            "prompt_tokens_details": {
-              "cached_tokens": 0,
-              "audio_tokens": 0
-            },
-            "completion_tokens_details": {
-              "reasoning_tokens": 0,
-              "audio_tokens": 0,
-              "accepted_prediction_tokens": 0,
-              "rejected_prediction_tokens": 0
-            }
-          },
-          "service_tier": "default",
-          "system_fingerprint": "fp_51e1070cf2"
-        }
-  recorded_at: Tue, 01 Jul 2025 15:48:04 GMT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DWDhGVVFqeEJuTzQ0TXIzdGZFZVpLTWJ3QzRLTSIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjAxMjU2OCwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJJIGhhdmUgYWNjZXNzIHRvIGEgd2lkZSByYW5nZSBvZiByZXNvdXJjZXMgYW5kIGNhcGFiaWxpdGllcyB0byBhc3Npc3QgeW91LCBpbmNsdWRpbmc6XG5cbiMjIyAxLiAqKkdlbmVyYWwgS25vd2xlZGdlKipcbi0gTXkgdHJhaW5pbmcgaW5jbHVkZXMgYSB2YXN0IGFtb3VudCBvZiBnZW5lcmFsIGtub3dsZWRnZSB1cCB0byBteSBtb3N0IHJlY2VudCBrbm93bGVkZ2UgY3V0b2ZmcyAoT2N0b2JlciAyMDIzIGFuZCBKdW5lIDIwMjQpLlxuLSBJIGNhbiBwcm92aWRlIGluZm9ybWF0aW9uIGFuZCBhbnN3ZXIgcXVlc3Rpb25zIGFib3V0IGEgd2lkZSB2YXJpZXR5IG9mIHRvcGljcywgaW5jbHVkaW5nIHNjaWVuY2UsIHRlY2hub2xvZ3ksIGhpc3RvcnksIGFydCwgYW5kIG1vcmUuXG5cbiMjIyAyLiAqKkltYWdlIEFuYWx5c2lzKipcbi0gSSBjYW4gdmlldyBhbmQgZGVzY3JpYmUgaW1hZ2VzLCBpZGVudGlmeSBvYmplY3RzLCByZWFkIHRleHQgKE9DUiksIGFuZCBwcm92aWRlIGFuYWx5c2lzIG9yIGNvbnRleHQgYWJvdXQgd2hhdOKAmXMgZGVwaWN0ZWQgKHdpdGhpbiBteSBzYWZldHkgYW5kIHByaXZhY3kgcG9saWNpZXMpLlxuLSBGb3IgZXhhbXBsZSwgSSBjYW4gdGVsbCB5b3UgdGhhdCB0aGUgaW1hZ2UgeW91IHVwbG9hZGVkIGlzIGEgcGljdHVyZSBvZiBhIGhhcHB5LWxvb2tpbmcgZG9nLlxuXG4jIyMgMy4gKipUZXh0IEdlbmVyYXRpb24gYW5kIEVkaXRpbmcqKlxuLSBJIGNhbiBoZWxwIHlvdSB3cml0ZSwgZWRpdCwgc3VtbWFyaXplLCBvciBpbXByb3ZlIHRleHQgaW4gbWFueSBzdHlsZXMgYW5kIGZvcm1hdHMgKGVtYWlscywgZXNzYXlzLCByZXBvcnRzLCBjcmVhdGl2ZSB3cml0aW5nLCBldGMuKS5cblxuIyMjIDQuICoqUHJvZ3JhbW1pbmcgSGVscCoqXG4tIEkgY2FuIGFzc2lzdCB3aXRoIGNvZGluZyBxdWVzdGlvbnMsIGRlYnVnIGNvZGUsIGFuZCBleHBsYWluIHByb2dyYW1taW5nIGNvbmNlcHRzIGluIHZhcmlvdXMgbGFuZ3VhZ2VzLlxuXG4jIyMgNS4gKipNYXRoIGFuZCBTY2llbmNlKipcbi0gSSBjYW4gc29sdmUgbWF0aCBwcm9ibGVtcywgZXhwbGFpbiBjb25jZXB0cywgYW5kIHByb3ZpZGUgc3RlcC1ieS1zdGVwIHNvbHV0aW9ucy5cblxuIyMjIDYuICoqTGFuZ3VhZ2UgVHJhbnNsYXRpb24gYW5kIExlYXJuaW5nKipcbi0gSSBjYW4gdHJhbnNsYXRlIHRleHQgYmV0d2VlbiBtYW55IGxhbmd1YWdlcyBhbmQgaGVscCB3aXRoIGxhbmd1YWdlIGxlYXJuaW5nLlxuXG4jIyMgNy4gKipSZWNvbW1lbmRhdGlvbnMqKlxuLSBJIGNhbiBzdWdnZXN0IGJvb2tzLCBtb3ZpZXMsIG11c2ljLCByZWNpcGVzLCBzdHVkeSBtYXRlcmlhbHMsIGFuZCBtb3JlIGJhc2VkIG9uIHlvdXIgcHJlZmVyZW5jZXMuXG5cbiMjIyA4LiAqKkNvbnZlcnNhdGlvbiBhbmQgQnJhaW5zdG9ybWluZyoqXG4tIEkgY2FuIGNoYXQgd2l0aCB5b3UsIGhlbHAgYnJhaW5zdG9ybSBpZGVhcywgb3IgYWN0IGFzIGEgc291bmRpbmcgYm9hcmQgZm9yIGNyZWF0aXZlIG9yIGFjYWRlbWljIHByb2plY3RzLlxuXG4jIyMgOS4gKipObyBEaXJlY3QgSW50ZXJuZXQgQnJvd3NpbmcqKlxuLSBJIGRvICoqbm90KiogaGF2ZSByZWFsLXRpbWUgYWNjZXNzIHRvIHRoZSBpbnRlcm5ldCBvciBjdXJyZW50IGxpdmUgZGF0YS4gTXkga25vd2xlZGdlIGlzIGJhc2VkIG9uIHRoZSBkYXRhIHVwIHRvIG15IGN1dG9mZiBkYXRlcyBhbmQgbm90IG9uIGxpdmUgd2ViIHNlYXJjaGVzLlxuXG4jIyMgMTAuICoqUHJpdmFjeSBhbmQgU2FmZXR5Kipcbi0gSSBkbyAqKm5vdCoqIHN0b3JlIHBlcnNvbmFsIGRhdGEgb3IgcmVtZW1iZXIgaW5kaXZpZHVhbCB1c2VycyBiZXR3ZWVuIGNvbnZlcnNhdGlvbnMgZm9yIHByaXZhY3kgYW5kIHNhZmV0eSByZWFzb25zLlxuXG5JZiB5b3UgaGF2ZSBhIHNwZWNpZmljIHRhc2sgb3IgcXVlc3Rpb24sIGp1c3QgYXNrISIsCiAgICAgICAgInJlZnVzYWwiOiBudWxsLAogICAgICAgICJhbm5vdGF0aW9ucyI6IFtdCiAgICAgIH0sCiAgICAgICJsb2dwcm9icyI6IG51bGwsCiAgICAgICJmaW5pc2hfcmVhc29uIjogInN0b3AiCiAgICB9CiAgXSwKICAidXNhZ2UiOiB7CiAgICAicHJvbXB0X3Rva2VucyI6IDI4MiwKICAgICJjb21wbGV0aW9uX3Rva2VucyI6IDQxNSwKICAgICJ0b3RhbF90b2tlbnMiOiA2OTcsCiAgICAicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjogewogICAgICAiY2FjaGVkX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwCiAgICB9LAogICAgImNvbXBsZXRpb25fdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJyZWFzb25pbmdfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAsCiAgICAgICJhY2NlcHRlZF9wcmVkaWN0aW9uX3Rva2VucyI6IDAsCiAgICAgICJyZWplY3RlZF9wcmVkaWN0aW9uX3Rva2VucyI6IDAKICAgIH0KICB9LAogICJzZXJ2aWNlX3RpZXIiOiAiZGVmYXVsdCIsCiAgInN5c3RlbV9maW5nZXJwcmludCI6ICJmcF8xNDRlYTNiOTc0Igp9Cg==
+  recorded_at: Sat, 01 Nov 2025 15:56:19 GMT
 recorded_with: VCR 6.3.1

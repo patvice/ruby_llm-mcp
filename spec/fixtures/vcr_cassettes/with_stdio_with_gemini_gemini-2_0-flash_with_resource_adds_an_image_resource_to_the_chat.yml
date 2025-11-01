@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Tue, 01 Jul 2025 15:45:28 GMT
+      - Sat, 01 Nov 2025 15:53:11 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=974
+      - gfet4t7; dur=1079
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,38 +55,38 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have an image of a light-colored dog, likely a puppy, with its mouth wide open as if yawning or barking. It's standing on a white background.\n"
+                    "text": "I have an image titled \"dog.png\" that shows a picture of a dog. The dog appears to be a light-colored puppy, possibly a golden retriever, with its mouth wide open, seemingly yawning or possibly making a happy expression. It is standing on a white background.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.28053757879469132
+              "avgLogprobs": -0.36029457223826439
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 273,
-            "candidatesTokenCount": 36,
-            "totalTokenCount": 309,
+            "candidatesTokenCount": 58,
+            "totalTokenCount": 331,
             "promptTokensDetails": [
-              {
-                "modality": "TEXT",
-                "tokenCount": 15
-              },
               {
                 "modality": "IMAGE",
                 "tokenCount": 258
+              },
+              {
+                "modality": "TEXT",
+                "tokenCount": 15
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 36
+                "tokenCount": 58
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "lwJkaN7bJ6izxfcPvo3h8QI"
+          "responseId": "5iwGab7eEI-OjMcP-6DWmQg"
         }
-  recorded_at: Tue, 01 Jul 2025 15:45:28 GMT
+  recorded_at: Sat, 01 Nov 2025 15:53:11 GMT
 recorded_with: VCR 6.3.1

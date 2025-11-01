@@ -1,0 +1,248 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: "{\"model\":\"claude-sonnet-4-20250514\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Can
+        you add 1 and 2?\"}]}],\"temperature\":0.7,\"stream\":false,\"max_tokens\":64000,\"tools\":[{\"name\":\"add\",\"description\":\"Addes
+        two numbers together\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
+        the set environment variable\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"malformed_tool\",\"description\":\"A
+        malformed tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"tool_error\",\"description\":\"Returns
+        an error\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"shouldError\":{\"type\":\"boolean\"}},\"required\":[]}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
+        for a given number of seconds\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"seconds\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"fetch_site\",\"description\":\"Fetches
+        website content and returns it as text\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\"},\"headers\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"value\":{\"type\":\"string\"}}}}},\"required\":[]}]}},\"required\":[\"website\"]}},{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"get_file_resource\",\"description\":\"Returns
+        a file resource reference\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"filename\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"list_messages\",\"description\":\"\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"channel\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
+        authentication permissions\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"permission\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"get_weather_from_locations\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"locations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[]}},{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"geocode\":{\"type\":\"object\",\"properties\":{\"latitude\":{\"type\":\"number\"},\"longitude\":{\"type\":\"number\"}},\"required\":[]}},\"required\":[\"geocode\"]}},{\"name\":\"progress\",\"description\":\"Simulate
+        a multi-step operation with progress notifications\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"operation\":{\"type\":\"string\",\"description\":\"Name
+        of the operation to simulate\"},\"steps\":{\"type\":\"number\",\"description\":\"Number
+        of steps (default: 3)\"}},\"required\":[]}},{\"name\":\"simple_progress\",\"description\":\"Send
+        a single progress notification\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"progress\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"log_message\",\"description\":\"Logs
+        a message\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"level\":{\"type\":\"string\"},\"logger\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
+        a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"send_list_changed\",\"description\":\"List
+        changed\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"client-capabilities\",\"description\":\"Get
+        the capabilities of the client and return them back\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        data and returns structured results\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"format\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"invalid_structured_output\",\"description\":\"Tool
+        that returns invalid structured data\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"trigger_error\":{\"type\":\"boolean\"}},\"required\":[]}},{\"name\":\"create_report\",\"description\":\"Creates
+        a report and returns it as a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"title\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"format\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"user_preference_collector\",\"description\":\"Collects
+        user preferences through elicitation\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"complex_calculation\",\"description\":\"\U0001F9EE
+        Advanced Calculator - Performs complex mathematical calculations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"expression\":{\"type\":\"string\"},\"precision\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"long_running_task\",\"description\":\"Simulates
+        a long-running task with progress updates\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"duration\":{\"type\":\"number\"},\"steps\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"context_aware_suggestion\",\"description\":\"Provides
+        suggestions based on context\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\"},\"context_type\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"user_preference_elicitation\",\"description\":\"Collects
+        user preferences through MCP elicitation (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\",\"description\":\"The
+        scenario for which to collect preferences\"}},\"required\":[]}},{\"name\":\"complex_elicitation\",\"description\":\"Tests
+        elicitation with complex validation schemas (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data_type\":{\"type\":\"string\",\"description\":\"Type
+        of data to collect\"}},\"required\":[]}},{\"name\":\"rejectable_elicitation\",\"description\":\"Tests
+        elicitation that can be rejected by the client (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"request_type\":{\"type\":\"string\",\"description\":\"Type
+        of request\"}},\"required\":[]}},{\"name\":\"simple_elicitation\",\"description\":\"Simple
+        elicitation test tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\",\"description\":\"Custom
+        message for elicitation\"}},\"required\":[]}}]}"
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 01 Nov 2025 15:51:35 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '28000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-01T15:51:37Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-01T15:51:35Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-01T15:51:33Z'
+      Retry-After:
+      - '26'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '36000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-01T15:51:35Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2292'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Server-Timing:
+      - cfReqDur;dur=2383.748
+      Cf-Team:
+      - 2ae1b6fe4e00011ea6d9f2c400000001
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_0155Whu9Mzkx77Hgp1RreUhm","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        add 1 and 2 for you using the add function."},{"type":"tool_use","id":"toolu_01RxxTo3ak5Cm4ScCTNjXuq7","name":"add","input":{"a":1,"b":2}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":2353,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":86,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:35 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: "{\"model\":\"claude-sonnet-4-20250514\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Can
+        you add 1 and 2?\"}]},{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"I'll
+        add 1 and 2 for you using the add function.\"},{\"type\":\"tool_use\",\"id\":\"toolu_01RxxTo3ak5Cm4ScCTNjXuq7\",\"name\":\"add\",\"input\":{\"a\":1,\"b\":2}}]},{\"role\":\"user\",\"content\":[{\"type\":\"tool_result\",\"tool_use_id\":\"toolu_01RxxTo3ak5Cm4ScCTNjXuq7\",\"content\":\"3\"}]}],\"temperature\":0.7,\"stream\":false,\"max_tokens\":64000,\"tools\":[{\"name\":\"add\",\"description\":\"Addes
+        two numbers together\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
+        the set environment variable\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"malformed_tool\",\"description\":\"A
+        malformed tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"tool_error\",\"description\":\"Returns
+        an error\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"shouldError\":{\"type\":\"boolean\"}},\"required\":[]}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
+        for a given number of seconds\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"seconds\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"fetch_site\",\"description\":\"Fetches
+        website content and returns it as text\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\"},\"headers\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"value\":{\"type\":\"string\"}}}}},\"required\":[]}]}},\"required\":[\"website\"]}},{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"get_file_resource\",\"description\":\"Returns
+        a file resource reference\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"filename\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"list_messages\",\"description\":\"\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"channel\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
+        authentication permissions\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"permission\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"get_weather_from_locations\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"locations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[]}},{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"geocode\":{\"type\":\"object\",\"properties\":{\"latitude\":{\"type\":\"number\"},\"longitude\":{\"type\":\"number\"}},\"required\":[]}},\"required\":[\"geocode\"]}},{\"name\":\"progress\",\"description\":\"Simulate
+        a multi-step operation with progress notifications\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"operation\":{\"type\":\"string\",\"description\":\"Name
+        of the operation to simulate\"},\"steps\":{\"type\":\"number\",\"description\":\"Number
+        of steps (default: 3)\"}},\"required\":[]}},{\"name\":\"simple_progress\",\"description\":\"Send
+        a single progress notification\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"progress\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"log_message\",\"description\":\"Logs
+        a message\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"level\":{\"type\":\"string\"},\"logger\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
+        a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"send_list_changed\",\"description\":\"List
+        changed\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"client-capabilities\",\"description\":\"Get
+        the capabilities of the client and return them back\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"required\":[]}},{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        data and returns structured results\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"format\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"invalid_structured_output\",\"description\":\"Tool
+        that returns invalid structured data\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"trigger_error\":{\"type\":\"boolean\"}},\"required\":[]}},{\"name\":\"create_report\",\"description\":\"Creates
+        a report and returns it as a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"title\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"format\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"user_preference_collector\",\"description\":\"Collects
+        user preferences through elicitation\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"complex_calculation\",\"description\":\"\U0001F9EE
+        Advanced Calculator - Performs complex mathematical calculations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"expression\":{\"type\":\"string\"},\"precision\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"long_running_task\",\"description\":\"Simulates
+        a long-running task with progress updates\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"duration\":{\"type\":\"number\"},\"steps\":{\"type\":\"number\"}},\"required\":[]}},{\"name\":\"context_aware_suggestion\",\"description\":\"Provides
+        suggestions based on context\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\"},\"context_type\":{\"type\":\"string\"}},\"required\":[]}},{\"name\":\"user_preference_elicitation\",\"description\":\"Collects
+        user preferences through MCP elicitation (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\",\"description\":\"The
+        scenario for which to collect preferences\"}},\"required\":[]}},{\"name\":\"complex_elicitation\",\"description\":\"Tests
+        elicitation with complex validation schemas (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data_type\":{\"type\":\"string\",\"description\":\"Type
+        of data to collect\"}},\"required\":[]}},{\"name\":\"rejectable_elicitation\",\"description\":\"Tests
+        elicitation that can be rejected by the client (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"request_type\":{\"type\":\"string\",\"description\":\"Type
+        of request\"}},\"required\":[]}},{\"name\":\"simple_elicitation\",\"description\":\"Simple
+        elicitation test tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\",\"description\":\"Custom
+        message for elicitation\"}},\"required\":[]}}]}"
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 01 Nov 2025 15:51:37 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '27000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-01T15:51:42Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-01T15:51:37Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-01T15:51:36Z'
+      Retry-After:
+      - '25'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '35000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-01T15:51:37Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '1871'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Server-Timing:
+      - cfReqDur;dur=1971.961
+      Cf-Team:
+      - 2ae1b7083f00011ea6d9f59400000001
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01BVTGKN4ykZyBVm9cUjirDW","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        result of adding 1 and 2 is 3."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":2452,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":18,"service_tier":"standard"}}'
+  recorded_at: Sat, 01 Nov 2025 15:51:37 GMT
+recorded_with: VCR 6.3.1
