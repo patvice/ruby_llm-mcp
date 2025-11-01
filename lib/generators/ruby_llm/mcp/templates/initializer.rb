@@ -11,9 +11,6 @@ RubyLLM::MCP.configure do |config|
   # Pool timeout in seconds
   config.pool_timeout = 5
 
-  # Enable complex parameter support for various providers
-  config.support_complex_parameters!
-
   # Path to MCPs configuration file
   config.config_path = Rails.root.join("config", "mcps.yml")
 
@@ -31,7 +28,7 @@ RubyLLM::MCP.configure do |config|
   # Set preferred model for sampling
   # config.sampling.preferred_model do
   #   # Return the preferred model name
-  #   "claude-3-5-sonnet-20240620"
+  #   "claude-sonnet-4"
   # end
 
   # Set a guard for sampling
