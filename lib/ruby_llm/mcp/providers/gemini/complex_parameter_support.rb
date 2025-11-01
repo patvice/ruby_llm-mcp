@@ -76,7 +76,7 @@ module RubyLLM::Providers::Gemini::Tools
   module_function :param_type_for_gemini
 
   def format_parameters(parameters)
-    if parameters.is_a?(Hash) && parameters.values.all? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+    if RubyLLM::MCP::Parameter.all_mcp_parameters?(parameters)
       return RubyLLM::MCP::Providers::Gemini::ComplexParameterSupport.format_parameters(parameters)
     end
 

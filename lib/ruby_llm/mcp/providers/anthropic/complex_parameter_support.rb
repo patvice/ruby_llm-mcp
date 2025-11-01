@@ -68,7 +68,7 @@ module RubyLLM::Providers::Anthropic::Tools
   module_function :original_clean_parameters, :original_required_parameters
 
   def clean_parameters(parameters)
-    if parameters.is_a?(Hash) && parameters.values.any? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+    if RubyLLM::MCP::Parameter.all_mcp_parameters?(parameters)
       return RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.clean_parameters(parameters)
     end
 
@@ -77,7 +77,7 @@ module RubyLLM::Providers::Anthropic::Tools
   module_function :clean_parameters
 
   def required_parameters(parameters)
-    if parameters.is_a?(Hash) && parameters.values.any? { |p| p.is_a?(RubyLLM::MCP::Parameter) }
+    if RubyLLM::MCP::Parameter.all_mcp_parameters?(parameters)
       return RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.required_parameters(parameters)
     end
 

@@ -197,6 +197,25 @@ RSpec.describe RubyLLM::Chat do
               expect(response.content).to include("Alice")
             end
           end
+
+          describe "mixed parameter types" do
+            it "handles both RubyLLM::Parameter and MCP::Parameter tools in same chat" do
+              chat = RubyLLM.chat(model: config[:model])
+
+              # Get MCP tool with MCP::Parameter (add tool uses MCP::Parameter)
+              mcp_tool = client.tool("add")
+
+              # Add both tools to chat
+              chat.with_tools(SimpleMultiplyTool, mcp_tool)
+
+              # Ask question that uses both tools
+              response = chat.ask("Can you multiply 3 and 4, then add 5 and 7?")
+
+              # Verify response includes results from both tools
+              # 3 * 4 = 12, 5 + 7 = 12
+              expect(response.content).to include("12")
+            end
+          end
         end
       end
     end

@@ -22,6 +22,13 @@ RSpec.describe RubyLLM::MCP::Providers do
     }
   end
 
+  let(:mixed_parameters) do
+    {
+      name: RubyLLM::Parameter.new(:name, type: :string, desc: "User name", required: true),
+      age: RubyLLM::MCP::Parameter.new(:age, type: :integer, title: "Age", desc: "User age", required: false)
+    }
+  end
+
   describe "Anthropic::Tools monkey patches" do
     let(:tools_module) { RubyLLM::Providers::Anthropic::Tools }
 
@@ -57,6 +64,15 @@ RSpec.describe RubyLLM::MCP::Providers do
       expect(result).to include(:name)
       expect(result).not_to include(:age)
     end
+
+    it "falls back to original implementation with mixed parameters" do
+      expect do
+        result = tools_module.clean_parameters(mixed_parameters)
+        expect(result).to be_a(Hash)
+        expect(result[:name]).to have_key(:type)
+        expect(result[:name]).to have_key(:description)
+      end.not_to raise_error
+    end
   end
 
   describe "Gemini::Tools monkey patches" do
@@ -79,6 +95,16 @@ RSpec.describe RubyLLM::MCP::Providers do
       expect(result[:properties][:name][:title]).to eq("Name")
       expect(result[:properties][:name][:description]).to eq("User name")
       expect(result[:required]).to include("name")
+    end
+
+    it "falls back to original implementation with mixed parameters" do
+      ## Likely should not be possible, but just in case we will resolve gracefully but reducing what is passed
+      expect do
+        result = tools_module.format_parameters(mixed_parameters)
+        expect(result).to be_a(Hash)
+        expect(result).to have_key(:type)
+        expect(result).to have_key(:properties)
+      end.not_to raise_error
     end
   end
 
