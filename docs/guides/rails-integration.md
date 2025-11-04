@@ -44,9 +44,6 @@ RubyLLM::MCP.configure do |config|
   config.log_level = Rails.env.production? ? Logger::WARN : Logger::INFO
   config.logger = Rails.logger
 
-  # Enable complex parameter support
-  config.support_complex_parameters!
-
   # Configure roots for filesystem access
   config.roots = [Rails.root] if Rails.env.development?
 

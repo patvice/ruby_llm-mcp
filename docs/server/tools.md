@@ -282,33 +282,6 @@ chat.ask("Analyze all files in the project") do |chunk|
 end
 ```
 
-## Complex Parameters
-
-Enable support for complex parameters like arrays and nested objects:
-
-```ruby
-# Enable complex parameter support globally
-RubyLLM::MCP.configure do |config|
-  config.support_complex_parameters!
-end
-
-# Use complex parameters in tools
-result = client.execute_tool(
-  name: "process_data",
-  parameters: {
-    items: [
-      { name: "item1", value: 100, tags: ["important", "urgent"] },
-      { name: "item2", value: 200, tags: ["normal"] }
-    ],
-    options: {
-      sort: { field: "value", order: "desc" },
-      filter: { category: "active", min_value: 50 },
-      pagination: { page: 1, per_page: 10 }
-    }
-  }
-)
-```
-
 ## Error Handling
 
 ### Tool Execution Errors

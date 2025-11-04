@@ -18,3 +18,7 @@ This section contains guides for using RubyLLM MCP.
 2. **[Configuration]({% link configuration.md %})** - Configure clients and transports
 3. **[Rails Integration]({% link guides/rails-integration.md %})** - Use with Rails applications
 4. **[Transports]({% link guides/transports.md %})** - Build custom transport implementations
+
+## Upgrading
+
+- **[Upgrading from 0.6 to 0.7]({% link guides/upgrading-0.6-to-0.7.md %})** - Migration guide for version 0.7

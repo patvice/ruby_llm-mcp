@@ -25,7 +25,7 @@ module RubyLLM
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :title, :description, :parameters, :coordinator, :tool_response, :with_prefix
+      attr_reader :name, :title, :description, :coordinator, :tool_response, :with_prefix
 
       def initialize(coordinator, tool_response, with_prefix: false)
         super()
@@ -35,16 +35,21 @@ module RubyLLM
         @name = format_name(tool_response["name"])
         @mcp_name = tool_response["name"]
         @description = tool_response["description"].to_s
-        @parameters = create_parameters(tool_response["inputSchema"])
 
         @input_schema = tool_response["inputSchema"]
         @output_schema = tool_response["outputSchema"]
 
         @annotations = tool_response["annotations"] ? Annotation.new(tool_response["annotations"]) : nil
+
+        @normalized_input_schema = normalize_if_invalid(@input_schema)
       end
 
       def display_name
         "#{@coordinator.name}: #{@name}"
+      end
+
+      def params_schema
+        @normalized_input_schema
       end
 
       def execute(**params)
@@ -83,7 +88,7 @@ module RubyLLM
         {
           name: @name,
           description: @description,
-          parameters: @parameters.to_h,
+          params_schema: @@normalized_input_schema,
           annotations: @annotations&.to_h
         }
       end
@@ -91,76 +96,6 @@ module RubyLLM
       alias to_json to_h
 
       private
-
-      def create_parameters(schema)
-        params = {}
-        return params if schema["properties"].nil?
-
-        schema["properties"].each_key do |key|
-          param_data = schema.dig("properties", key)
-          param_data = expand_shorthand_type_to_anyof(param_data)
-
-          param = if param_data.key?("oneOf") || param_data.key?("anyOf") || param_data.key?("allOf")
-                    process_union_parameter(key, param_data)
-                  else
-                    process_parameter(key, param_data)
-                  end
-
-          params[key] = param
-        end
-
-        params
-      end
-
-      def process_union_parameter(key, param_data)
-        union_type = param_data.keys.first
-        param = RubyLLM::MCP::Parameter.new(
-          key,
-          type: :union,
-          title: param_data["title"],
-          desc: param_data["description"],
-          union_type: union_type
-        )
-
-        param.properties = param_data[union_type].map do |value|
-          expanded_value = expand_shorthand_type_to_anyof(value)
-          if expanded_value.key?("anyOf")
-            process_union_parameter(key, expanded_value)
-          else
-            process_parameter(key, value, lifted_type: param_data["type"])
-          end
-        end.compact
-
-        param
-      end
-
-      def process_parameter(key, param_data, lifted_type: nil)
-        param = RubyLLM::MCP::Parameter.new(
-          key,
-          type: param_data["type"] || lifted_type || "string",
-          title: param_data["title"],
-          desc: param_data["description"],
-          required: param_data["required"],
-          default: param_data["default"]
-        )
-
-        if param.type == :array
-          items = param_data["items"]
-          param.items = items
-          if items.key?("properties")
-            param.properties = create_parameters(items)
-          end
-          if items.key?("enum")
-            param.enum = items["enum"]
-          end
-        elsif param.type == :object
-          if param_data.key?("properties")
-            param.properties = create_parameters(param_data)
-          end
-        end
-
-        param
-      end
 
       def create_content_for_message(content)
         case content["type"]
@@ -205,19 +140,88 @@ module RubyLLM
         end
       end
 
-      # Expands shorthand type arrays into explicit anyOf unions
-      # Converts { "type": ["string", "number"] } into { "anyOf": [{"type": "string"}, {"type": "number"}] }
-      # This keeps $ref references clean and provides a consistent structure for union types
-      #
-      # @param param_data [Hash] The parameter data that may contain a shorthand type array
-      # @return [Hash] The expanded parameter data with anyOf, or the original if not a shorthand
-      def expand_shorthand_type_to_anyof(param_data)
-        type = param_data["type"]
-        return param_data unless type.is_a?(Array)
+      def normalize_schema(schema)
+        return schema if schema.nil?
 
-        {
-          "anyOf" => type.map { |t| { "type" => t } }
-        }.merge(param_data.except("type"))
+        case schema
+        when Hash
+          normalize_hash_schema(schema)
+        when Array
+          normalize_array_schema(schema)
+        else
+          schema
+        end
+      end
+
+      def normalize_hash_schema(schema)
+        normalized = schema.transform_values { |value| normalize_schema_value(value) }
+        ensure_object_properties(normalized)
+        normalized
+      end
+
+      def normalize_array_schema(schema)
+        schema.map { |item| normalize_schema_value(item) }
+      end
+
+      def normalize_schema_value(value)
+        case value
+        when Hash
+          normalize_schema(value)
+        when Array
+          normalize_array_schema(value)
+        else
+          value
+        end
+      end
+
+      def ensure_object_properties(schema)
+        if schema["type"] == "object" && !schema.key?("properties")
+          schema["properties"] = {}
+        end
+      end
+
+      def normalize_if_invalid(schema)
+        return schema if schema.nil?
+
+        if valid_schema?(schema)
+          schema
+        else
+          normalize_schema(schema)
+        end
+      end
+
+      def valid_schema?(schema)
+        return true if schema.nil?
+
+        case schema
+        when Hash
+          valid_hash_schema?(schema)
+        when Array
+          schema.all? { |item| valid_schema?(item) }
+        else
+          true
+        end
+      end
+
+      def valid_hash_schema?(schema)
+        # Check if this level has missing properties for object type
+        if schema["type"] == "object" && !schema.key?("properties")
+          return false
+        end
+
+        # Recursively check nested schemas
+        schema.each_value do |value|
+          return false unless valid_schema?(value)
+        end
+
+        begin
+          JSON::Validator.validate!(schema, {})
+          true
+        rescue JSON::Schema::SchemaError
+          false
+        rescue JSON::Schema::ValidationError
+          true
+        end
       end
     end
   end
