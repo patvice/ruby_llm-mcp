@@ -164,9 +164,15 @@ module RubyLLM
 
                 process_response(line.strip)
               rescue IOError, Errno::EPIPE => e
-                RubyLLM::MCP.logger.error "Reader error: #{e.message}. Restarting in 1 second..."
-                sleep 1
-                restart_process if @running
+                if @running
+                  RubyLLM::MCP.logger.error "Reader error: #{e.message}. Restarting in 1 second..."
+                  sleep 1
+                  restart_process
+                else
+                  # Graceful shutdown in progress
+                  RubyLLM::MCP.logger.debug "Reader thread exiting during shutdown"
+                  break
+                end
               rescue StandardError => e
                 RubyLLM::MCP.logger.error "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
                 sleep 1
@@ -191,8 +197,14 @@ module RubyLLM
 
                 RubyLLM::MCP.logger.info(line.strip)
               rescue IOError, Errno::EPIPE => e
-                RubyLLM::MCP.logger.error "Stderr reader error: #{e.message}"
-                sleep 1
+                if @running
+                  RubyLLM::MCP.logger.error "Stderr reader error: #{e.message}"
+                  sleep 1
+                else
+                  # Graceful shutdown in progress
+                  RubyLLM::MCP.logger.debug "Stderr reader thread exiting during shutdown"
+                  break
+                end
               rescue StandardError => e
                 RubyLLM::MCP.logger.error "Error in stderr thread: #{e.message}"
                 sleep 1

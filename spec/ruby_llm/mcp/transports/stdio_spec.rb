@@ -303,4 +303,176 @@ RSpec.describe RubyLLM::MCP::Transports::Stdio do
       expect { mock_transport.send(:restart_process) }.not_to raise_error
     end
   end
+
+  describe "graceful shutdown" do
+    let(:real_stdin) { IO.pipe[1] }
+    let(:real_stdout) { IO.pipe[0] }
+    let(:real_stderr) { IO.pipe[0] }
+    let(:real_wait_thread) { instance_double(Process::Waiter, alive?: true) }
+
+    let(:transport_with_threads) do
+      transport = described_class.allocate
+      transport.instance_variable_set(:@request_timeout, request_timeout)
+      transport.instance_variable_set(:@command, command)
+      transport.instance_variable_set(:@coordinator, coordinator)
+      transport.instance_variable_set(:@args, args)
+      transport.instance_variable_set(:@env, env)
+      transport.instance_variable_set(:@client_id, SecureRandom.uuid)
+      transport.instance_variable_set(:@id_counter, 0)
+      transport.instance_variable_set(:@id_mutex, Mutex.new)
+      transport.instance_variable_set(:@pending_requests, {})
+      transport.instance_variable_set(:@pending_mutex, Mutex.new)
+      transport.instance_variable_set(:@running, true)
+      transport.instance_variable_set(:@stdin, real_stdin)
+      transport.instance_variable_set(:@stdout, real_stdout)
+      transport.instance_variable_set(:@stderr, real_stderr)
+      transport.instance_variable_set(:@wait_thread, real_wait_thread)
+      transport
+    end
+
+    after do
+      real_stdin.close rescue nil
+      real_stdout.close rescue nil
+      real_stderr.close rescue nil
+    end
+
+    it "does not log ERROR messages during normal shutdown" do
+      # Start the reader threads
+      transport_with_threads.send(:start_reader_thread)
+      transport_with_threads.send(:start_stderr_thread)
+
+      # Give threads time to start
+      sleep 0.1
+
+      # Mock the logger to capture log calls
+      error_logs = []
+      allow(RubyLLM::MCP.logger).to receive(:error) do |message|
+        error_logs << message
+      end
+      allow(RubyLLM::MCP.logger).to receive(:debug)
+      allow(RubyLLM::MCP.logger).to receive(:info)
+
+      # Close the transport gracefully
+      transport_with_threads.close
+
+      # Verify no ERROR logs were emitted during shutdown
+      expect(error_logs).to be_empty, "Expected no ERROR logs during graceful shutdown, but got: #{error_logs.inspect}"
+    end
+
+    it "checks @running flag before logging errors in stdout reader" do
+      # Start the reader thread
+      transport_with_threads.send(:start_reader_thread)
+
+      # Give thread time to start
+      sleep 0.1
+
+      # Track logger calls
+      error_calls = 0
+      debug_calls = 0
+      allow(RubyLLM::MCP.logger).to receive(:error) { error_calls += 1 }
+      allow(RubyLLM::MCP.logger).to receive(:debug) { debug_calls += 1 }
+
+      # Set @running to false before closing streams to simulate graceful shutdown
+      transport_with_threads.instance_variable_set(:@running, false)
+
+      # Close stdout to trigger IOError in reader thread
+      real_stdout.close
+
+      # Give thread time to exit
+      sleep 0.2
+
+      # Verify: should have debug logs but NO error logs
+      expect(error_calls).to eq(0), "Expected no ERROR logs during graceful shutdown"
+      expect(debug_calls).to be > 0, "Expected DEBUG logs during graceful shutdown"
+    end
+
+    it "checks @running flag before logging errors in stderr reader" do
+      # Start the stderr thread
+      transport_with_threads.send(:start_stderr_thread)
+
+      # Give thread time to start
+      sleep 0.1
+
+      # Track logger calls
+      error_calls = 0
+      debug_calls = 0
+      allow(RubyLLM::MCP.logger).to receive(:error) { error_calls += 1 }
+      allow(RubyLLM::MCP.logger).to receive(:debug) { debug_calls += 1 }
+      allow(RubyLLM::MCP.logger).to receive(:info)
+
+      # Set @running to false before closing streams to simulate graceful shutdown
+      transport_with_threads.instance_variable_set(:@running, false)
+
+      # Close stderr to trigger IOError in stderr thread
+      real_stderr.close
+
+      # Give thread time to exit
+      sleep 0.2
+
+      # Verify: should have debug logs but NO error logs
+      expect(error_calls).to eq(0), "Expected no ERROR logs during graceful shutdown"
+      expect(debug_calls).to be > 0, "Expected DEBUG logs during graceful shutdown"
+    end
+
+    it "allows reader threads to exit cleanly during shutdown" do
+      # Start both reader threads
+      transport_with_threads.send(:start_reader_thread)
+      transport_with_threads.send(:start_stderr_thread)
+
+      # Give threads time to start
+      sleep 0.1
+
+      # Get references to the threads
+      reader_thread = transport_with_threads.instance_variable_get(:@reader_thread)
+      stderr_thread = transport_with_threads.instance_variable_get(:@stderr_thread)
+
+      expect(reader_thread).to be_alive
+      expect(stderr_thread).to be_alive
+
+      # Mock logger to suppress output
+      allow(RubyLLM::MCP.logger).to receive(:error)
+      allow(RubyLLM::MCP.logger).to receive(:debug)
+      allow(RubyLLM::MCP.logger).to receive(:info)
+
+      # Close the transport
+      transport_with_threads.close
+
+      # Verify threads exit within reasonable time
+      expect(reader_thread.join(2)).to eq(reader_thread), "Reader thread should exit cleanly"
+      expect(stderr_thread.join(2)).to eq(stderr_thread), "Stderr thread should exit cleanly"
+    end
+
+    it "logs errors and restarts when @running is true and stream closes unexpectedly" do
+      # Start the reader thread
+      transport_with_threads.send(:start_reader_thread)
+
+      # Give thread time to start
+      sleep 0.1
+
+      # Mock logger to capture calls
+      error_logs = []
+      allow(RubyLLM::MCP.logger).to receive(:error) do |message|
+        error_logs << message
+      end
+
+      # Mock restart_process to avoid actually restarting
+      restart_called = false
+      allow(transport_with_threads).to receive(:restart_process) do
+        restart_called = true
+        # Set @running to false to allow thread to exit after restart attempt
+        transport_with_threads.instance_variable_set(:@running, false)
+      end
+
+      # Close stdout while @running is still true to simulate unexpected closure
+      real_stdout.close
+
+      # Give thread time to react
+      sleep 0.5
+
+      # Verify: should have ERROR logs and restart was attempted
+      expect(error_logs).not_to be_empty, "Expected ERROR logs when stream closes unexpectedly while running"
+      expect(error_logs.any? { |log| log.include?("Reader error") }).to be(true)
+      expect(restart_called).to be(true), "Expected restart_process to be called"
+    end
+  end
 end
