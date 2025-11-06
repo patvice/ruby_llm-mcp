@@ -27,20 +27,6 @@ module RubyLLM
         end
       end
 
-      class OAuthOptions
-        attr_reader :issuer, :client_id, :client_secret, :scope
-
-        def initialize(issuer:, client_id:, client_secret:, scopes:)
-          @issuer = issuer
-          @client_id = client_id
-          @client_secret = client_secret
-          @scope = scopes
-        end
-
-        def enabled?
-          @issuer && @client_id && @client_secret && @scope
-        end
-      end
 
       # Options for starting SSE connections
       class StartSSEOptions
@@ -57,7 +43,7 @@ module RubyLLM
       class StreamableHTTP
         include Support::Timeout
 
-        attr_reader :session_id, :protocol_version, :coordinator
+        attr_reader :session_id, :protocol_version, :coordinator, :oauth_provider
 
         def initialize( # rubocop:disable Metrics/ParameterLists
           url:,
@@ -66,7 +52,7 @@ module RubyLLM
           headers: {},
           reconnection: {},
           version: :http2,
-          oauth: nil,
+          oauth_provider: nil,
           rate_limit: nil,
           reconnection_options: nil,
           session_id: nil
@@ -76,6 +62,7 @@ module RubyLLM
           @request_timeout = request_timeout
           @headers = headers || {}
           @session_id = session_id
+          @oauth_provider = oauth_provider
 
           @version = version
           @reconnection_options = reconnection_options || ReconnectionOptions.new
@@ -86,7 +73,6 @@ module RubyLLM
           @client_id = SecureRandom.uuid
 
           @reconnection_options = ReconnectionOptions.new(**reconnection)
-          @oauth_options = OAuthOptions.new(**oauth) unless oauth.nil?
           @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
           @id_counter = 0
@@ -103,6 +89,8 @@ module RubyLLM
           @clients_mutex = Mutex.new
 
           @connection = create_connection
+
+          RubyLLM::MCP.logger.debug "OAuth provider: #{@oauth_provider ? 'present' : 'none'}" if @oauth_provider
         end
 
         def request(body, add_id: true, wait_for_response: true)
@@ -242,17 +230,6 @@ module RubyLLM
             }
           )
 
-          if @oauth_options&.enabled?
-            client = client.plugin(:oauth).oauth_auth(
-              issuer: @oauth_options.issuer,
-              client_id: @oauth_options.client_id,
-              client_secret: @oauth_options.client_secret,
-              scope: @oauth_options.scope
-            )
-
-            client.with_access_token
-          end
-
           register_client(client)
         end
 
@@ -262,7 +239,18 @@ module RubyLLM
           headers["mcp-session-id"] = @session_id if @session_id
           headers["mcp-protocol-version"] = @protocol_version if @protocol_version
           headers["X-CLIENT-ID"] = @client_id
-          headers["Origin"] = @uri.to_s
+          headers["Origin"] = @url.to_s
+
+          # Apply OAuth authorization if available
+          if @oauth_provider
+            token = @oauth_provider.access_token
+            if token
+              headers["Authorization"] = token.to_header
+              RubyLLM::MCP.logger.debug "Applied OAuth authorization header"
+            else
+              RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available"
+            end
+          end
 
           headers
         end
@@ -320,16 +308,6 @@ module RubyLLM
             }
           )
 
-          if @oauth_options&.enabled?
-            client = client.plugin(:oauth).oauth_auth(
-              issuer: @oauth_options.issuer,
-              client_id: @oauth_options.client_id,
-              client_secret: @oauth_options.client_secret,
-              scope: @oauth_options.scope
-            )
-
-            client.with_access_token
-          end
           register_client(client)
         end
 

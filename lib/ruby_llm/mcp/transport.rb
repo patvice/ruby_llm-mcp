@@ -50,8 +50,44 @@ module RubyLLM
           raise Errors::InvalidTransportType.new(message: message)
         end
 
+        transport_config = config.dup
+        oauth_provider = create_oauth_provider(transport_config) if oauth_config_present?(transport_config)
+
         transport_klass = RubyLLM::MCP::Transport.transports[transport_type]
-        transport_klass.new(coordinator: coordinator, **config)
+        transport_klass.new(coordinator: coordinator, oauth_provider: oauth_provider, **transport_config)
+      end
+
+      # Check if OAuth configuration is present
+      def oauth_config_present?(config)
+        oauth_config = config[:oauth] || config["oauth"]
+        !oauth_config.nil? && !oauth_config.empty?
+      end
+
+      # Create OAuth provider from configuration
+      def create_oauth_provider(config)
+        oauth_config = config.delete(:oauth) || config.delete("oauth")
+        return nil unless oauth_config
+
+        # Determine server URL based on transport type
+        server_url = determine_server_url(config)
+        return nil unless server_url
+
+        redirect_uri = oauth_config[:redirect_uri] || oauth_config["redirect_uri"] || "http://localhost:8080/callback"
+        scope = oauth_config[:scope] || oauth_config["scope"]
+        storage = oauth_config[:storage] || oauth_config["storage"]
+
+        RubyLLM::MCP::Auth::OAuthProvider.new(
+          server_url: server_url,
+          redirect_uri: redirect_uri,
+          scope: scope,
+          logger: MCP.logger,
+          storage: storage
+        )
+      end
+
+      # Determine server URL from transport config
+      def determine_server_url(config)
+        config[:url] || config["url"]
       end
     end
   end
