@@ -78,51 +78,23 @@ module RubyLLM
           @running = true
         end
 
-        def close # rubocop:disable Metrics/MethodLength
+        def close
           @running = false
 
-          begin
-            @stdin&.close
+          [@stdin, @stdout, @stderr].each do |stream|
+            stream&.close
+          rescue IOError, Errno::EBADF
+            nil
+          end
+
+          [@wait_thread, @reader_thread, @stderr_thread].each do |thread|
+            thread&.join(1)
           rescue StandardError
             nil
           end
 
-          begin
-            @wait_thread&.join(1)
-          rescue StandardError
-            nil
-          end
-
-          begin
-            @stdout&.close
-          rescue StandardError
-            nil
-          end
-
-          begin
-            @stderr&.close
-          rescue StandardError
-            nil
-          end
-
-          begin
-            @reader_thread&.join(1)
-          rescue StandardError
-            nil
-          end
-
-          begin
-            @stderr_thread&.join(1)
-          rescue StandardError
-            nil
-          end
-
-          @stdin = nil
-          @stdout = nil
-          @stderr = nil
-          @wait_thread = nil
-          @reader_thread = nil
-          @stderr_thread = nil
+          @stdin = @stdout = @stderr = nil
+          @wait_thread = @reader_thread = @stderr_thread = nil
         end
 
         def set_protocol_version(version)
@@ -151,56 +123,86 @@ module RubyLLM
 
         def start_reader_thread
           @reader_thread = Thread.new do
-            while @running
-              begin
-                if @stdout.closed? || @wait_thread.nil? || !@wait_thread.alive?
-                  sleep 1
-                  restart_process if @running
-                  next
-                end
-
-                line = @stdout.gets
-                next unless line && !line.strip.empty?
-
-                process_response(line.strip)
-              rescue IOError, Errno::EPIPE => e
-                RubyLLM::MCP.logger.error "Reader error: #{e.message}. Restarting in 1 second..."
-                sleep 1
-                restart_process if @running
-              rescue StandardError => e
-                RubyLLM::MCP.logger.error "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
-                sleep 1
-              end
-            end
+            read_stdout_loop
           end
 
           @reader_thread.abort_on_exception = true
         end
 
+        def read_stdout_loop
+          while @running
+            begin
+              handle_stdout_read
+            rescue IOError, Errno::EPIPE => e
+              handle_stream_error(e, "Reader")
+              break unless @running
+            rescue StandardError => e
+              RubyLLM::MCP.logger.error "Error in reader thread: #{e.message}, #{e.backtrace.join("\n")}"
+              sleep 1
+            end
+          end
+        end
+
+        def handle_stdout_read
+          if @stdout.closed? || @wait_thread.nil? || !@wait_thread.alive?
+            if @running
+              sleep 1
+              restart_process
+            end
+            return
+          end
+
+          line = @stdout.gets
+          return unless line && !line.strip.empty?
+
+          process_response(line.strip)
+        end
+
+        def handle_stream_error(error, stream_name)
+          # Check @running to distinguish graceful shutdown from unexpected errors.
+          # During shutdown, streams are closed intentionally and shouldn't trigger restarts.
+          if @running
+            RubyLLM::MCP.logger.error "#{stream_name} error: #{error.message}. Restarting in 1 second..."
+            sleep 1
+            restart_process
+          else
+            # Graceful shutdown in progress
+            RubyLLM::MCP.logger.debug "#{stream_name} thread exiting during shutdown"
+          end
+        end
+
         def start_stderr_thread
           @stderr_thread = Thread.new do
-            while @running
-              begin
-                if @stderr.closed? || @wait_thread.nil? || !@wait_thread.alive?
-                  sleep 1
-                  next
-                end
-
-                line = @stderr.gets
-                next unless line && !line.strip.empty?
-
-                RubyLLM::MCP.logger.info(line.strip)
-              rescue IOError, Errno::EPIPE => e
-                RubyLLM::MCP.logger.error "Stderr reader error: #{e.message}"
-                sleep 1
-              rescue StandardError => e
-                RubyLLM::MCP.logger.error "Error in stderr thread: #{e.message}"
-                sleep 1
-              end
-            end
+            read_stderr_loop
           end
 
           @stderr_thread.abort_on_exception = true
+        end
+
+        def read_stderr_loop
+          while @running
+            begin
+              handle_stderr_read
+            rescue IOError, Errno::EPIPE => e
+              handle_stream_error(e, "Stderr reader")
+              break unless @running
+            rescue StandardError => e
+              RubyLLM::MCP.logger.error "Error in stderr thread: #{e.message}"
+              sleep 1
+            end
+          end
+        end
+
+        def handle_stderr_read
+          if @stderr.closed? || @wait_thread.nil? || !@wait_thread.alive?
+            sleep 1
+            return
+          end
+
+          line = @stderr.gets
+          return unless line && !line.strip.empty?
+
+          RubyLLM::MCP.logger.info(line.strip)
         end
 
         def process_response(line)
