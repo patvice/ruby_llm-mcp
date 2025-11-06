@@ -10,7 +10,7 @@ group :development do
   gem "debug"
   gem "dotenv", ">= 3.0"
   gem "rake", ">= 13.0"
-  gem "rdoc"
+  gem "rdoc", "~> 6.15"
   gem "reline"
   gem "rspec", "~> 3.12"
   gem "rubocop", ">= 1.76"
