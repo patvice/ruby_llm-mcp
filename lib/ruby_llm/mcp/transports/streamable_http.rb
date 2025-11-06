@@ -27,7 +27,6 @@ module RubyLLM
         end
       end
 
-
       # Options for starting SSE connections
       class StartSSEOptions
         attr_reader :resumption_token, :on_resumption_token, :replay_message_id

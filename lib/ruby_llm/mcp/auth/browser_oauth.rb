@@ -224,7 +224,11 @@ module RubyLLM
         # @param content_type [String] content type
         # @param body [String] response body
         def send_http_response(client, status, content_type, body)
-          status_text = status == 200 ? "OK" : (status == 400 ? "Bad Request" : "Not Found")
+          status_text = if status == 200
+                          "OK"
+                        else
+                          (status == 400 ? "Bad Request" : "Not Found")
+                        end
 
           response = "HTTP/1.1 #{status} #{status_text}\r\n"
           response += "Content-Type: #{content_type}\r\n"
@@ -424,7 +428,7 @@ module RubyLLM
             @stop_proc.call
             @server.close unless @server.closed?
             @thread.join(5) # Wait max 5 seconds for thread to finish
-          rescue StandardError => e
+          rescue StandardError
             # Ignore shutdown errors
             nil
           end

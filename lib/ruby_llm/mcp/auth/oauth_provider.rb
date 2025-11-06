@@ -13,10 +13,11 @@ module RubyLLM
       # Supports RFC 7636 (PKCE), RFC 7591 (Dynamic Registration),
       # RFC 8414 (Server Metadata), RFC 8707 (Resource Indicators), RFC 9728 (Protected Resource Metadata)
       class OAuthProvider
-        attr_accessor :server_url, :redirect_uri, :scope, :logger, :storage
+        attr_reader :server_url
+        attr_accessor :redirect_uri, :scope, :logger, :storage
 
         def initialize(server_url:, redirect_uri: "http://localhost:8080/callback", scope: nil, logger: nil,
-storage: nil)
+                       storage: nil)
           self.server_url = server_url # Normalizes URL
           self.redirect_uri = redirect_uri
           self.scope = scope
@@ -216,8 +217,11 @@ storage: nil)
           origin += ":#{uri.port}" if uri.port && !default_port?(uri)
 
           # Two discovery endpoints supported
-          endpoint = discovery_type == :authorization_server ?
-            "oauth-authorization-server" : "oauth-protected-resource"
+          endpoint = if discovery_type == :authorization_server
+                       "oauth-authorization-server"
+                     else
+                       "oauth-protected-resource"
+                     end
 
           "#{origin}/.well-known/#{endpoint}"
         end
@@ -311,7 +315,7 @@ storage: nil)
             json: metadata.to_h
           )
 
-          unless response.status == 201 || response.status == 200
+          unless [201, 200].include?(response.status)
             raise Errors::TransportError.new("Client registration failed: HTTP #{response.status}", nil, nil)
           end
 

@@ -28,7 +28,7 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do
     end
 
     it "accepts custom storage" do
-      custom_storage = double("storage")
+      custom_storage = instance_double(RubyLLM::MCP::Auth::OAuthProvider::MemoryStorage)
       provider = described_class.new(
         server_url: server_url,
         redirect_uri: redirect_uri,
