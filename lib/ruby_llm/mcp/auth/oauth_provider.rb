@@ -251,10 +251,12 @@ module RubyLLM
             issuer: data["issuer"],
             authorization_endpoint: data["authorization_endpoint"],
             token_endpoint: data["token_endpoint"],
-            registration_endpoint: data["registration_endpoint"],
-            scopes_supported: data["scopes_supported"],
-            response_types_supported: data["response_types_supported"],
-            grant_types_supported: data["grant_types_supported"]
+            options: {
+              registration_endpoint: data["registration_endpoint"],
+              scopes_supported: data["scopes_supported"],
+              response_types_supported: data["response_types_supported"],
+              grant_types_supported: data["grant_types_supported"]
+            }
           )
         end
 
@@ -301,53 +303,71 @@ module RubyLLM
         def register_client(server_metadata)
           logger.debug("Registering OAuth client at: #{server_metadata.registration_endpoint}")
 
-          metadata = ClientMetadata.new(
+          metadata = build_client_metadata
+          response = post_client_registration(server_metadata, metadata)
+          data = parse_registration_response(response)
+
+          registered_metadata = parse_registered_metadata(data)
+          warn_redirect_uri_mismatch(registered_metadata)
+
+          client_info = create_client_info_from_response(data, registered_metadata)
+          storage.set_client_info(server_url, client_info)
+          logger.debug("Client registered successfully: #{client_info.client_id}")
+          client_info
+        end
+
+        def build_client_metadata
+          ClientMetadata.new(
             redirect_uris: [redirect_uri],
-            token_endpoint_auth_method: "none", # Public client
+            token_endpoint_auth_method: "none",
             grant_types: %w[authorization_code refresh_token],
             response_types: ["code"],
             scope: scope
           )
+        end
 
-          response = @http_client.post(
+        def post_client_registration(server_metadata, metadata)
+          @http_client.post(
             server_metadata.registration_endpoint,
             headers: { "Content-Type" => "application/json" },
             json: metadata.to_h
           )
+        end
 
+        def parse_registration_response(response)
           unless [201, 200].include?(response.status)
             raise Errors::TransportError.new("Client registration failed: HTTP #{response.status}", nil, nil)
           end
 
-          data = JSON.parse(response.body.to_s)
+          JSON.parse(response.body.to_s)
+        end
 
-          # Parse server's registered metadata (may differ from requested)
-          registered_metadata = ClientMetadata.new(
+        def parse_registered_metadata(data)
+          ClientMetadata.new(
             redirect_uris: data["redirect_uris"] || [redirect_uri],
             token_endpoint_auth_method: data["token_endpoint_auth_method"] || "none",
             grant_types: data["grant_types"] || %w[authorization_code refresh_token],
             response_types: data["response_types"] || ["code"],
             scope: data["scope"]
           )
+        end
 
-          # Warn if server changed redirect_uri
-          if registered_metadata.redirect_uris.first != redirect_uri
-            logger.warn("OAuth server changed redirect_uri:")
-            logger.warn("  Requested:  #{redirect_uri}")
-            logger.warn("  Registered: #{registered_metadata.redirect_uris.first}")
-          end
+        def warn_redirect_uri_mismatch(registered_metadata)
+          return if registered_metadata.redirect_uris.first == redirect_uri
 
-          client_info = ClientInfo.new(
+          logger.warn("OAuth server changed redirect_uri:")
+          logger.warn("  Requested:  #{redirect_uri}")
+          logger.warn("  Registered: #{registered_metadata.redirect_uris.first}")
+        end
+
+        def create_client_info_from_response(data, registered_metadata)
+          ClientInfo.new(
             client_id: data["client_id"],
             client_secret: data["client_secret"],
             client_id_issued_at: data["client_id_issued_at"],
             client_secret_expires_at: data["client_secret_expires_at"],
             metadata: registered_metadata
           )
-
-          storage.set_client_info(server_url, client_info)
-          logger.debug("Client registered successfully: #{client_info.client_id}")
-          client_info
         end
 
         # Build OAuth authorization URL
@@ -385,51 +405,66 @@ module RubyLLM
         def exchange_authorization_code(server_metadata, client_info, code, pkce)
           logger.debug("Exchanging authorization code for access token")
 
-          # Use registered redirect_uri (critical!)
           registered_redirect_uri = client_info.metadata.redirect_uris.first
+          params = build_token_exchange_params(client_info, code, pkce, registered_redirect_uri)
 
+          response = post_token_exchange(server_metadata, params)
+          response = retry_token_exchange_if_redirect_mismatch(
+            response, server_metadata, params, registered_redirect_uri
+          )
+
+          validate_token_response!(response)
+          parse_token_response(response)
+        end
+
+        def build_token_exchange_params(client_info, code, pkce, registered_redirect_uri)
           params = {
             grant_type: "authorization_code",
             code: code,
             redirect_uri: registered_redirect_uri,
             client_id: client_info.client_id,
-            code_verifier: pkce.code_verifier, # PKCE verification
-            resource: server_url # RFC 8707
+            code_verifier: pkce.code_verifier,
+            resource: server_url
           }
 
-          # Add client_secret if using confidential client auth
-          if client_info.client_secret &&
-             client_info.metadata.token_endpoint_auth_method == "client_secret_post"
-            params[:client_secret] = client_info.client_secret
-          end
+          add_client_secret_if_needed(params, client_info)
+          params
+        end
 
-          response = @http_client.post(
+        def add_client_secret_if_needed(params, client_info)
+          return unless client_info.client_secret
+          return unless client_info.metadata.token_endpoint_auth_method == "client_secret_post"
+
+          params[:client_secret] = client_info.client_secret
+        end
+
+        def post_token_exchange(server_metadata, params)
+          @http_client.post(
             server_metadata.token_endpoint,
             headers: { "Content-Type" => "application/x-www-form-urlencoded" },
             form: params
           )
+        end
 
-          # Handle redirect_uri mismatch errors with retry logic
-          unless response.status == 200
-            redirect_hint = extract_redirect_mismatch(response.body.to_s)
+        def retry_token_exchange_if_redirect_mismatch(response, server_metadata, params, registered_redirect_uri)
+          return response if response.status == 200
 
-            if redirect_hint && redirect_hint[:expected] != registered_redirect_uri
-              logger.warn("Redirect URI mismatch, retrying with: #{redirect_hint[:expected]}")
-              params[:redirect_uri] = redirect_hint[:expected]
+          redirect_hint = extract_redirect_mismatch(response.body.to_s)
+          return response unless redirect_hint
+          return response if redirect_hint[:expected] == registered_redirect_uri
 
-              response = @http_client.post(
-                server_metadata.token_endpoint,
-                headers: { "Content-Type" => "application/x-www-form-urlencoded" },
-                form: params
-              )
-            end
-          end
+          logger.warn("Redirect URI mismatch, retrying with: #{redirect_hint[:expected]}")
+          params[:redirect_uri] = redirect_hint[:expected]
+          post_token_exchange(server_metadata, params)
+        end
 
-          unless response.status == 200
-            raise Errors::TransportError.new("Token exchange failed: HTTP #{response.status}", nil, nil)
-          end
+        def validate_token_response!(response)
+          return if response.status == 200
 
-          # Parse token response
+          raise Errors::TransportError.new("Token exchange failed: HTTP #{response.status}", nil, nil)
+        end
+
+        def parse_token_response(response)
           data = JSON.parse(response.body.to_s)
           Token.new(
             access_token: data["access_token"],
@@ -450,51 +485,61 @@ module RubyLLM
 
           server_metadata = discover_authorization_server
           client_info = storage.get_client_info(server_url)
-
           return nil unless server_metadata && client_info
 
-          params = {
-            grant_type: "refresh_token",
-            refresh_token: token.refresh_token,
-            client_id: client_info.client_id,
-            resource: server_url # RFC 8707
-          }
-
-          # Add client_secret if required
-          if client_info.client_secret &&
-             client_info.metadata.token_endpoint_auth_method == "client_secret_post"
-            params[:client_secret] = client_info.client_secret
-          end
-
-          response = @http_client.post(
-            server_metadata.token_endpoint,
-            headers: { "Content-Type" => "application/x-www-form-urlencoded" },
-            form: params
-          )
-
-          unless response.status == 200
-            logger.warn("Token refresh failed: HTTP #{response.status}")
-            return nil
-          end
-
-          data = JSON.parse(response.body.to_s)
-          new_token = Token.new(
-            access_token: data["access_token"],
-            token_type: data["token_type"] || "Bearer",
-            expires_in: data["expires_in"],
-            scope: data["scope"],
-            refresh_token: data["refresh_token"] || token.refresh_token # Use old if not provided
-          )
-
-          storage.set_token(server_url, new_token)
-          logger.debug("Token refreshed successfully")
-          new_token
+          execute_token_refresh(server_metadata, client_info, token)
         rescue JSON::ParserError => e
           logger.warn("Invalid token refresh response: #{e.message}")
           nil
         rescue HTTPX::Error => e
           logger.warn("Network error during token refresh: #{e.message}")
           nil
+        end
+
+        def execute_token_refresh(server_metadata, client_info, token)
+          params = build_refresh_params(client_info, token)
+          response = post_token_refresh(server_metadata, params)
+
+          return nil unless response.status == 200
+
+          new_token = parse_refresh_response(response, token)
+          storage.set_token(server_url, new_token)
+          logger.debug("Token refreshed successfully")
+          new_token
+        end
+
+        def build_refresh_params(client_info, token)
+          params = {
+            grant_type: "refresh_token",
+            refresh_token: token.refresh_token,
+            client_id: client_info.client_id,
+            resource: server_url
+          }
+
+          add_client_secret_if_needed(params, client_info)
+          params
+        end
+
+        def post_token_refresh(server_metadata, params)
+          response = @http_client.post(
+            server_metadata.token_endpoint,
+            headers: { "Content-Type" => "application/x-www-form-urlencoded" },
+            form: params
+          )
+
+          logger.warn("Token refresh failed: HTTP #{response.status}") unless response.status == 200
+          response
+        end
+
+        def parse_refresh_response(response, old_token)
+          data = JSON.parse(response.body.to_s)
+          Token.new(
+            access_token: data["access_token"],
+            token_type: data["token_type"] || "Bearer",
+            expires_in: data["expires_in"],
+            scope: data["scope"],
+            refresh_token: data["refresh_token"] || old_token.refresh_token
+          )
         end
 
         # Extract redirect URI mismatch details from error response

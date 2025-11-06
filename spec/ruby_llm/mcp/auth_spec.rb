@@ -214,7 +214,7 @@ RSpec.describe RubyLLM::MCP::Auth do
           issuer: issuer,
           authorization_endpoint: authorization_endpoint,
           token_endpoint: token_endpoint,
-          registration_endpoint: registration_endpoint
+          options: { registration_endpoint: registration_endpoint }
         )
 
         expect(metadata.issuer).to eq(issuer)
@@ -228,7 +228,7 @@ RSpec.describe RubyLLM::MCP::Auth do
           issuer: issuer,
           authorization_endpoint: authorization_endpoint,
           token_endpoint: token_endpoint,
-          registration_endpoint: registration_endpoint
+          options: { registration_endpoint: registration_endpoint }
         )
 
         expect(metadata.supports_registration?).to be(true)
@@ -238,7 +238,8 @@ RSpec.describe RubyLLM::MCP::Auth do
         metadata = described_class.new(
           issuer: issuer,
           authorization_endpoint: authorization_endpoint,
-          token_endpoint: token_endpoint
+          token_endpoint: token_endpoint,
+          options: {}
         )
 
         expect(metadata.supports_registration?).to be(false)

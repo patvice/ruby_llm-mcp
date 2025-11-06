@@ -115,7 +115,7 @@ module RubyLLM
         attr_reader :client_id, :client_secret, :client_id_issued_at, :client_secret_expires_at, :metadata
 
         def initialize(client_id:, client_secret: nil, client_id_issued_at: nil, client_secret_expires_at: nil,
-metadata: nil)
+                       metadata: nil)
           @client_id = client_id
           @client_secret = client_secret
           @client_id_issued_at = client_id_issued_at
@@ -167,22 +167,14 @@ metadata: nil)
         attr_reader :issuer, :authorization_endpoint, :token_endpoint, :registration_endpoint,
                     :scopes_supported, :response_types_supported, :grant_types_supported
 
-        def initialize(
-          issuer:,
-          authorization_endpoint:,
-          token_endpoint:,
-          registration_endpoint: nil,
-          scopes_supported: nil,
-          response_types_supported: nil,
-          grant_types_supported: nil
-        )
+        def initialize(issuer:, authorization_endpoint:, token_endpoint:, options: {})
           @issuer = issuer
           @authorization_endpoint = authorization_endpoint
           @token_endpoint = token_endpoint
-          @registration_endpoint = registration_endpoint
-          @scopes_supported = scopes_supported
-          @response_types_supported = response_types_supported
-          @grant_types_supported = grant_types_supported
+          @registration_endpoint = options[:registration_endpoint] || options["registration_endpoint"]
+          @scopes_supported = options[:scopes_supported] || options["scopes_supported"]
+          @response_types_supported = options[:response_types_supported] || options["response_types_supported"]
+          @grant_types_supported = options[:grant_types_supported] || options["grant_types_supported"]
         end
 
         # Check if dynamic client registration is supported

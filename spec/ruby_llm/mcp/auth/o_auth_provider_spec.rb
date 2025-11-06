@@ -83,7 +83,7 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do
         issuer: "https://auth.example.com",
         authorization_endpoint: "https://auth.example.com/authorize",
         token_endpoint: "https://auth.example.com/token",
-        registration_endpoint: "https://auth.example.com/register"
+        options: { registration_endpoint: "https://auth.example.com/register" }
       )
     end
 
@@ -99,14 +99,20 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do
     let(:pkce) { RubyLLM::MCP::Auth::PKCE.new }
     let(:state) { "test_state" }
 
-    it "builds valid authorization URL" do
+    it "builds valid authorization URL with correct endpoint" do
       url = provider.send(:build_authorization_url, server_metadata, client_info, pkce, state)
       uri = URI.parse(url)
-      params = URI.decode_www_form(uri.query).to_h
 
       expect(uri.scheme).to eq("https")
       expect(uri.host).to eq("auth.example.com")
       expect(uri.path).to eq("/authorize")
+    end
+
+    it "includes all required OAuth parameters in authorization URL" do
+      url = provider.send(:build_authorization_url, server_metadata, client_info, pkce, state)
+      uri = URI.parse(url)
+      params = URI.decode_www_form(uri.query).to_h
+
       expect(params["response_type"]).to eq("code")
       expect(params["client_id"]).to eq("test_client_id")
       expect(params["redirect_uri"]).to eq(redirect_uri)
@@ -183,7 +189,8 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do
         RubyLLM::MCP::Auth::ServerMetadata.new(
           issuer: "https://auth.example.com",
           authorization_endpoint: "https://auth.example.com/authorize",
-          token_endpoint: "https://auth.example.com/token"
+          token_endpoint: "https://auth.example.com/token",
+          options: {}
         )
       end
 

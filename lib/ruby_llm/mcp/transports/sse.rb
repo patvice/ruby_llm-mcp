@@ -14,25 +14,26 @@ module RubyLLM
 
         attr_reader :headers, :id, :coordinator, :oauth_provider
 
-        def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {}, oauth_provider: nil)
+        def initialize(url:, coordinator:, request_timeout:, options: {})
           @event_url = url
           @messages_url = nil
           @coordinator = coordinator
           @request_timeout = request_timeout
-          @version = version
-          @oauth_provider = oauth_provider
+          @version = options[:version] || options["version"] || :http2
+          @oauth_provider = options[:oauth_provider] || options["oauth_provider"]
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
           @root_url += ":#{uri.port}" if uri.port != uri.default_port
 
           @client_id = SecureRandom.uuid
-          @headers = headers.merge({
-                                     "Accept" => "text/event-stream",
-                                     "Content-Type" => "application/json",
-                                     "Cache-Control" => "no-cache",
-                                     "X-CLIENT-ID" => @client_id
-                                   })
+          custom_headers = options[:headers] || options["headers"] || {}
+          @headers = custom_headers.merge({
+                                            "Accept" => "text/event-stream",
+                                            "Content-Type" => "application/json",
+                                            "Cache-Control" => "no-cache",
+                                            "X-CLIENT-ID" => @client_id
+                                          })
 
           @id_counter = 0
           @id_mutex = Mutex.new

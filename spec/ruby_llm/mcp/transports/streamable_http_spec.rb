@@ -20,7 +20,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       url: TestServerManager::HTTP_SERVER_URL,
       request_timeout: 5000,
       coordinator: mock_coordinator,
-      headers: {}
+      options: { headers: {} }
     )
   end
   let(:logger) { instance_double(Logger) }
@@ -579,7 +579,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
             url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 5000,
             coordinator: mock_coordinator,
-            reconnection: reconnection_options
+            options: { reconnection: reconnection_options }
           )
         end
 
@@ -598,7 +598,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
             url: TestServerManager::HTTP_SERVER_URL,
             request_timeout: 1000,
             coordinator: mock_coordinator,
-            reconnection: reconnection_options
+            options: { reconnection: reconnection_options }
           )
         end
 

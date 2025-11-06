@@ -44,52 +44,50 @@ module RubyLLM
 
         attr_reader :session_id, :protocol_version, :coordinator, :oauth_provider
 
-        def initialize( # rubocop:disable Metrics/ParameterLists
-          url:,
-          request_timeout:,
-          coordinator:,
-          headers: {},
-          reconnection: {},
-          version: :http2,
-          oauth_provider: nil,
-          rate_limit: nil,
-          reconnection_options: nil,
-          session_id: nil
-        )
+        def initialize(url:, request_timeout:, coordinator:, options: {})
           @url = URI(url)
           @coordinator = coordinator
           @request_timeout = request_timeout
-          @headers = headers || {}
-          @session_id = session_id
-          @oauth_provider = oauth_provider
 
-          @version = version
-          @reconnection_options = reconnection_options || ReconnectionOptions.new
-          @protocol_version = nil
-          @session_id = session_id
-
-          @resource_metadata_url = nil
-          @client_id = SecureRandom.uuid
-
-          @reconnection_options = ReconnectionOptions.new(**reconnection)
-          @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
-
-          @id_counter = 0
-          @id_mutex = Mutex.new
-          @pending_requests = {}
-          @pending_mutex = Mutex.new
-          @running = true
-          @abort_controller = nil
-          @sse_thread = nil
-          @sse_mutex = Mutex.new
-
-          # Thread-safe collection of all HTTPX clients
-          @clients = []
-          @clients_mutex = Mutex.new
+          extract_options(options)
+          initialize_state_variables
+          initialize_mutexes
 
           @connection = create_connection
 
           RubyLLM::MCP.logger.debug "OAuth provider: #{@oauth_provider ? 'present' : 'none'}" if @oauth_provider
+        end
+
+        def extract_options(options)
+          @headers = options[:headers] || options["headers"] || {}
+          @session_id = options[:session_id] || options["session_id"]
+          @oauth_provider = options[:oauth_provider] || options["oauth_provider"]
+          @version = options[:version] || options["version"] || :http2
+          @protocol_version = nil
+
+          reconnection = options[:reconnection] || options["reconnection"] || {}
+          @reconnection_options = options[:reconnection_options] || ReconnectionOptions.new(**reconnection)
+
+          rate_limit = options[:rate_limit] || options["rate_limit"]
+          @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
+        end
+
+        def initialize_state_variables
+          @resource_metadata_url = nil
+          @client_id = SecureRandom.uuid
+          @id_counter = 0
+          @pending_requests = {}
+          @running = true
+          @abort_controller = nil
+          @sse_thread = nil
+          @clients = []
+        end
+
+        def initialize_mutexes
+          @id_mutex = Mutex.new
+          @pending_mutex = Mutex.new
+          @sse_mutex = Mutex.new
+          @clients_mutex = Mutex.new
         end
 
         def request(body, add_id: true, wait_for_response: true)

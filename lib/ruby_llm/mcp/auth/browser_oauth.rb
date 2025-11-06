@@ -136,72 +136,101 @@ module RubyLLM
         # @param mutex [Mutex] synchronization mutex
         # @param condition [ConditionVariable] wait condition
         def handle_http_request(client, result, mutex, condition)
-          # Set read timeout
-          client.setsockopt(Socket::SOL_SOCKET, Socket::SO_RCVTIMEO, [5, 0].pack("l_2"))
+          configure_client_socket(client)
 
-          # Read request line
-          request_line = client.gets
+          request_line = read_request_line(client)
           return unless request_line
 
+          method_name, path = extract_request_parts(request_line)
+          return unless method_name && path
+
+          @logger.debug("Received #{method_name} request: #{path}")
+          read_http_headers(client)
+
+          return unless valid_callback_path?(client, path)
+
+          params = parse_callback_params(path)
+          oauth_params = extract_oauth_params(params)
+
+          update_result_with_oauth_params(oauth_params, result, mutex, condition)
+          send_callback_response(client, result)
+        ensure
+          client&.close
+        end
+
+        def configure_client_socket(client)
+          client.setsockopt(Socket::SOL_SOCKET, Socket::SO_RCVTIMEO, [5, 0].pack("l_2"))
+        end
+
+        def read_request_line(client)
+          client.gets
+        end
+
+        def extract_request_parts(request_line)
           parts = request_line.split
-          return unless parts.length >= 2
+          return nil unless parts.length >= 2
 
-          method, path = parts[0..1]
-          @logger.debug("Received #{method} request: #{path}")
+          parts[0..1]
+        end
 
-          # Read headers (with limit to prevent memory exhaustion)
+        def read_http_headers(client)
           header_count = 0
           loop do
-            break if header_count >= 100 # Limit header count
+            break if header_count >= 100
 
             line = client.gets
             break if line.nil? || line.strip.empty?
 
             header_count += 1
           end
+        end
 
-          # Parse path and query parameters
-          uri_path, query_string = path.split("?", 2)
+        def valid_callback_path?(client, path)
+          uri_path, = path.split("?", 2)
 
-          # Only handle our callback path
-          unless uri_path == @callback_path
-            send_http_response(client, 404, "text/plain", "Not Found")
-            return
-          end
+          return true if uri_path == @callback_path
 
-          # Parse query parameters
+          send_http_response(client, 404, "text/plain", "Not Found")
+          false
+        end
+
+        def parse_callback_params(path)
+          _, query_string = path.split("?", 2)
           params = parse_query_params(query_string || "")
           @logger.debug("Callback params: #{params.keys.join(', ')}")
+          params
+        end
 
-          # Extract OAuth parameters
-          code = params["code"]
-          state = params["state"]
-          error = params["error"]
-          error_description = params["error_description"]
+        def extract_oauth_params(params)
+          {
+            code: params["code"],
+            state: params["state"],
+            error: params["error"],
+            error_description: params["error_description"]
+          }
+        end
 
-          # Update result and signal waiting thread
+        def update_result_with_oauth_params(oauth_params, result, mutex, condition)
           mutex.synchronize do
-            if error
-              result[:error] = error_description || error
-            elsif code && state
-              result[:code] = code
-              result[:state] = state
+            if oauth_params[:error]
+              result[:error] = oauth_params[:error_description] || oauth_params[:error]
+            elsif oauth_params[:code] && oauth_params[:state]
+              result[:code] = oauth_params[:code]
+              result[:state] = oauth_params[:state]
             else
               result[:error] = "Invalid callback: missing code or state parameter"
             end
             result[:completed] = true
-
-            condition.signal # Wake up waiting thread
+            condition.signal
           end
+        end
 
-          # Send response to browser
+        def send_callback_response(client, result)
           if result[:error]
             send_http_response(client, 400, "text/html", error_page(result[:error]))
           else
             send_http_response(client, 200, "text/html", success_page)
           end
-        ensure
-          client&.close
         end
 
         # Parse URL query parameters
