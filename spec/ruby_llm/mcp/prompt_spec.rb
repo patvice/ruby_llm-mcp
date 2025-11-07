@@ -29,52 +29,54 @@ RSpec.describe RubyLLM::MCP::Prompt do
     end
   end
 
-  CLIENT_OPTIONS.each do |config|
-    context "with #{config[:name]}" do
-      let(:client) { ClientRunner.fetch_client(config[:name]) }
+  # Prompt tests - only run on adapters that support prompts
+  each_client_supporting(:prompts) do |config|
+    describe "prompts_list" do
+      it "returns array of prompts" do
+        prompts = client.prompts
+        expect(prompts).to be_a(Array)
+      end
+    end
 
-      describe "prompts_list" do
-        it "returns array of prompts" do
-          prompts = client.prompts
-          expect(prompts).to be_a(Array)
-        end
+    describe "#execute_prompt" do
+      it "returns prompt messages" do
+        prompt = client.prompt("say_hello")
+        messages = prompt.fetch
 
-        it "refreshes prompts when requested" do
-          tool = client.tool("send_list_changed")
-          prompt_count = client.prompts.count
-          tool.execute(type: "prompts")
-
-          expect(client.prompts.count).to eq(prompt_count + 1)
-        end
+        expect(messages).to be_a(Array)
+        expect(messages.first).to be_a(RubyLLM::Message)
+        expect(messages.first.role).to eq(:user)
+        expect(messages.first.content).to eq("Hello, how are you? Can you also say Hello back?")
       end
 
-      describe "#execute_prompt" do
-        it "returns prompt messages" do
-          prompt = client.prompt("say_hello")
-          messages = prompt.fetch
+      it "returns multiple messages" do
+        prompt = client.prompt("multiple_messages")
+        messages = prompt.fetch
 
-          expect(messages).to be_a(Array)
-          expect(messages.first).to be_a(RubyLLM::Message)
-          expect(messages.first.role).to eq(:user)
-          expect(messages.first.content).to eq("Hello, how are you? Can you also say Hello back?")
-        end
+        expect(messages).to be_a(Array)
 
-        it "returns multiple messages" do
-          prompt = client.prompt("multiple_messages")
-          messages = prompt.fetch
+        message = messages.first
+        expect(message).to be_a(RubyLLM::Message)
+        expect(message.role).to eq(:assistant)
+        expect(message.content).to eq("You are great at saying hello, the best in the world at it.")
 
-          expect(messages).to be_a(Array)
+        message = messages.last
+        expect(message).to be_a(RubyLLM::Message)
+        expect(message.role).to eq(:user)
+        expect(message.content).to eq("Hello, how are you?")
+      end
+    end
+  end
 
-          message = messages.first
-          expect(message).to be_a(RubyLLM::Message)
-          expect(message.role).to eq(:assistant)
-          expect(message.content).to eq("You are great at saying hello, the best in the world at it.")
+  # Refresh via notifications - only supported by adapters with notification support
+  each_client_supporting(:notifications) do |config|
+    describe "prompts_list" do
+      it "refreshes prompts when requested" do
+        tool = client.tool("send_list_changed")
+        prompt_count = client.prompts.count
+        tool.execute(type: "prompts")
 
-          message = messages.last
-          expect(message).to be_a(RubyLLM::Message)
-          expect(message.role).to eq(:user)
-          expect(message.content).to eq("Hello, how are you?")
-        end
+        expect(client.prompts.count).to eq(prompt_count + 1)
       end
     end
   end

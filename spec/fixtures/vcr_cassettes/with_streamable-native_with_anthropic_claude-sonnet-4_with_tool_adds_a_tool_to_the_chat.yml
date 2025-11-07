@@ -1,0 +1,170 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you pull messages for ruby channel and let me know what they say?"}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 06 Nov 2025 20:43:26 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '28000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-06T20:43:29Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-06T20:43:26Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-06T20:43:24Z'
+      Retry-After:
+      - '36'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '36000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-06T20:43:26Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2462'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_015xRpYuGrQeEDE1idpeqVN9","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01TBnY1djS2UzZssEe1eZBuN","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":405,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":66,"service_tier":"standard"}}'
+  recorded_at: Thu, 06 Nov 2025 20:43:26 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you pull messages for ruby channel and let me know what they say?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
+        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01TBnY1djS2UzZssEe1eZBuN","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01TBnY1djS2UzZssEe1eZBuN","content":[{"type":"text","text":"Ruby
+        is a great language for web development. It''s easy to learn and has a large
+        community."}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 06 Nov 2025 20:43:29 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '28000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-06T20:43:30Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-06T20:43:29Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-06T20:43:27Z'
+      Retry-After:
+      - '36'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '36000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-06T20:43:29Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '3000'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01FANTGuSJbNDu88Qptbj3Ka","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        messages from the ruby channel say: \"Ruby is a great language for web development.
+        It''s easy to learn and has a large community.\"\n\nThis appears to be a positive
+        comment about the Ruby programming language, highlighting its strengths for
+        web development and its accessibility for newcomers, as well as mentioning
+        the supportive community around it."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":502,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":72,"service_tier":"standard"}}'
+  recorded_at: Thu, 06 Nov 2025 20:43:29 GMT
+recorded_with: VCR 6.3.1

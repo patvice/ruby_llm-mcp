@@ -1,0 +1,95 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"plain_text.txt: A plain
+        text file\n\nPlan text information"}]},{"role":"user","parts":[{"text":"test.txt:
+        A text file\n\nHello, this is a test file!\nThis content will be served by
+        the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n"}]},{"role":"user","parts":[{"text":"second_file.txt:
+        A second text file\n\nThis is the second file that I want to be able to use
+        as a resource\n"}]},{"role":"user","parts":[{"text":"my.md: A markdown file\n\n#
+        My Markdown File\n\nThis is a markdown file that I want to be able to use
+        as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n##
+        Section 2\n\nThis is another section in my markdown file\n"}]},{"role":"user","parts":[{"text":"What
+        information do you have from the provided resources?"}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:47:32 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1295
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "Okay, I have information from the following files:\n\n*   **plain_text.txt:** Contains the text \"A plain text file\" followed by \"Plan text information\".\n\n*   **test.txt:** Contains the text \"Hello, this is a test file! This content will be served by the MCP resource. You can modify this file and it will be cached for 5 minutes.\"\n\n*   **second_file.txt:** Contains the text \"This is the second file that I want to be able to use as a resource\"\n\n*   **my.md:** Contains a markdown file with a title \"My Markdown File\", two sections titled \"Section 1\" and \"Section 2\", and associated descriptive text for each section.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.16965143757481729
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 154,
+            "candidatesTokenCount": 155,
+            "totalTokenCount": 309,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 154
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 155
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "YwkNaaehC67g_uMPqez24Qs"
+        }
+  recorded_at: Thu, 06 Nov 2025 20:47:32 GMT
+recorded_with: VCR 6.3.1

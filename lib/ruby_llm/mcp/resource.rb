@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-require "httpx"
-
 module RubyLLM
   module MCP
     class Resource
-      attr_reader :uri, :name, :description, :mime_type, :coordinator, :subscribed
+      attr_reader :uri, :name, :description, :mime_type, :adapter, :subscribed
 
-      def initialize(coordinator, resource)
-        @coordinator = coordinator
+      def initialize(adapter, resource)
+        @adapter = adapter
         @uri = resource["uri"]
         @name = resource["name"]
         @description = resource["description"]
@@ -36,8 +34,8 @@ module RubyLLM
       end
 
       def subscribe!
-        if @coordinator.capabilities.resource_subscribe?
-          @coordinator.resources_subscribe(uri: @uri)
+        if @adapter.capabilities.resource_subscribe?
+          @adapter.resources_subscribe(uri: @uri)
           @subscribed = true
         else
           message = "Resource subscribe is not available for this MCP server"
@@ -101,7 +99,7 @@ module RubyLLM
         when "http", "https"
           fetch_uri_content(uri)
         else # file:// or git://
-          @coordinator.resource_read(uri: uri)
+          @adapter.resource_read(uri: uri)
         end
       end
 

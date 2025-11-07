@@ -1,0 +1,89 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]},{"role":"user","parts":[{"text":"Please provide the content
+        from the prompt."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:45:28 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2401
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The sun, a drowsy painter, starts the day,\nWith hues of rose and gold upon the gray.\nA gentle breeze, a whisper through the trees,\nAwakens slumbering leaves with morning ease.\n\nThe world unfolds, a canvas fresh and bright,\nWhere birdsong spills a melody of light.\nEach dewdrop holds a tiny, shimmering star,\nReflecting skies, both near and oh, so far.\n\nThe scent of earth, a promise in the air,\nOf blooming things and beauty everywhere.\nThe hurried steps, the slow and thoughtful pace,\nA tapestry of lives in time and space.\n\nA million dreams are woven, hope takes flight,\nThrough shadows cast and victories won outright.\nAnd in this moment, captured and held fast,\nA fleeting beauty, destined not to last.\n\nSo breathe it in, this canvas, newly made,\nThis living, breathing, vibrant serenade.\nFor in this day, this single, precious span,\nA humble **poem** unfolds for every woman and man.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.61870350968947108
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 33,
+            "candidatesTokenCount": 218,
+            "totalTokenCount": 251,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 33
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 218
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "5QgNacOOO_G-_uMP7OXQuQE"
+        }
+  recorded_at: Thu, 06 Nov 2025 20:45:28 GMT
+recorded_with: VCR 6.3.1

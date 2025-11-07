@@ -2,6 +2,11 @@
 
 # Configure RubyLLM MCP
 RubyLLM::MCP.configure do |config|
+  # Default SDK adapter to use (:ruby_llm or :mcp_sdk)
+  # - :ruby_llm: Full-featured, supports all MCP features + extensions
+  # - :mcp_sdk: Official SDK, limited features but maintained by Anthropic
+  config.default_adapter = :ruby_llm
+
   # Request timeout in milliseconds
   config.request_timeout = 8000
 
@@ -17,23 +22,35 @@ RubyLLM::MCP.configure do |config|
   # Launch MCPs (:automatic, :manual)
   config.launch_control = :automatic
 
-  # Configure roots for file system access
+  # Configure roots for file system access (RubyLLM adapter only)
   # config.roots = [
   #   Rails.root.to_s
   # ]
 
-  # Configure sampling (optional)
+  # Configure sampling (RubyLLM adapter only)
   config.sampling.enabled = false
 
   # Set preferred model for sampling
   # config.sampling.preferred_model do
-  #   # Return the preferred model name
   #   "claude-sonnet-4"
   # end
 
   # Set a guard for sampling
   # config.sampling.guard do
-  #   # Return true to enable sampling, false to disable
   #   Rails.env.development?
+  # end
+
+  # Event handlers (RubyLLM adapter only)
+  # config.on_progress do |progress_token, progress, total|
+  #   # Handle progress updates
+  # end
+
+  # config.on_human_in_the_loop do |tool_name, arguments|
+  #   # Return true to allow, false to deny
+  #   true
+  # end
+
+  # config.on_logging do |level, logger_name, data|
+  #   # Handle logging from MCP servers
   # end
 end

@@ -130,42 +130,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
     end
   end
 
-  describe "support_complex_parameters!" do
-    it "sets has_support_complex_parameters to true" do
-      config = RubyLLM::MCP::Configuration.new
-      expect(config.has_support_complex_parameters).to be(false)
-
-      config.support_complex_parameters!
-      expect(config.has_support_complex_parameters).to be(true)
-    end
-
-    it "calls RubyLLM::MCP.support_complex_parameters!" do
-      config = RubyLLM::MCP::Configuration.new
-      allow(RubyLLM::MCP).to receive(:support_complex_parameters!)
-
-      config.support_complex_parameters!
-
-      expect(RubyLLM::MCP).to have_received(:support_complex_parameters!)
-    end
-
-    it "does not call RubyLLM::MCP.support_complex_parameters! if already enabled" do
-      config = RubyLLM::MCP::Configuration.new
-      config.support_complex_parameters!
-
-      allow(RubyLLM::MCP).to receive(:support_complex_parameters!)
-
-      config.support_complex_parameters!
-
-      expect(RubyLLM::MCP).not_to have_received(:support_complex_parameters!)
-    end
-  end
-
-  it "can be configured with support_complex_parameters!" do
-    RubyLLM::MCP.configure(&:support_complex_parameters!)
-
-    expect(RubyLLM::MCP.configuration.has_support_complex_parameters).to be(true)
-  end
-
   it "can be configured with a custom logger" do
     RubyLLM::MCP.configure do |config|
       config.logger = Logger.new($stdout)

@@ -60,6 +60,12 @@ module RubyLLM
       class UnknownRequest < BaseError; end
 
       class UnsupportedProtocolVersion < BaseError; end
+
+      class UnsupportedFeature < BaseError; end
+
+      class UnsupportedTransport < BaseError; end
+
+      class AdapterConfigurationError < BaseError; end
     end
   end
 end

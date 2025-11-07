@@ -25,11 +25,11 @@ module RubyLLM
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :title, :description, :coordinator, :tool_response, :with_prefix
+      attr_reader :name, :title, :description, :adapter, :tool_response, :with_prefix
 
-      def initialize(coordinator, tool_response, with_prefix: false)
+      def initialize(adapter, tool_response, with_prefix: false)
         super()
-        @coordinator = coordinator
+        @adapter = adapter
 
         @with_prefix = with_prefix
         @name = format_name(tool_response["name"])
@@ -45,7 +45,7 @@ module RubyLLM
       end
 
       def display_name
-        "#{@coordinator.name}: #{@name}"
+        "#{@adapter.client.name}: #{@name}"
       end
 
       def params_schema
@@ -53,7 +53,7 @@ module RubyLLM
       end
 
       def execute(**params)
-        result = @coordinator.execute_tool(
+        result = @adapter.execute_tool(
           name: @mcp_name,
           parameters: params
         )
@@ -116,7 +116,7 @@ module RubyLLM
             }
           }
 
-          resource = Resource.new(coordinator, resource_data)
+          resource = Resource.new(adapter, resource_data)
           resource.to_content
         when "resource_link"
           resource_data = {
@@ -126,15 +126,15 @@ module RubyLLM
             "mimeType" => content["mimeType"]
           }
 
-          resource = Resource.new(coordinator, resource_data)
-          @coordinator.register_resource(resource)
+          resource = Resource.new(adapter, resource_data)
+          @adapter.register_resource(resource)
           resource.to_content
         end
       end
 
       def format_name(name)
         if @with_prefix
-          "#{@coordinator.name}_#{name}"
+          "#{@adapter.client.name}_#{name}"
         else
           name
         end

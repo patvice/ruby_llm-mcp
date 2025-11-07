@@ -5,6 +5,8 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
+  gem "mcp", "~> 0.4"
+
   # Development dependencies
   gem "bundler", ">= 2.0"
   gem "debug"

@@ -1,8 +1,21 @@
 # frozen_string_literal: true
 
-require "ruby_llm"
+# Standard Libraries
+require "erb"
+require "json"
+require "logger"
+require "open3"
+require "securerandom"
+require "timeout"
+require "uri"
+require "yaml"
+
+# Gems
+require "httpx"
 require "json-schema"
+require "ruby_llm"
 require "zeitwerk"
+
 require_relative "chat"
 
 module RubyLLM
@@ -92,5 +105,8 @@ loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 loader.inflector.inflect("http_client" => "HTTPClient")
+loader.inflector.inflect("ruby_llm_adapter" => "RubyLLMAdapter")
+loader.inflector.inflect("mcp_sdk_adapter" => "MCPSDKAdapter")
+loader.inflector.inflect("mcp_transports" => "MCPTransports")
 
 loader.setup

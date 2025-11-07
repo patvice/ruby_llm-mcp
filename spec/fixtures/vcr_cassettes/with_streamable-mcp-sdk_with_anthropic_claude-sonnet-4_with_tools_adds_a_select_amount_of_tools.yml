@@ -1,0 +1,172 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you tell me the weather for Ottawa and San Francisco?"}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"get_weather_from_locations","description":"Get
+        the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":["locations"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}},{"name":"get_weather_from_geocode","description":"Get
+        the weather from a list of locations","input_schema":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":["latitude","longitude"],"additionalProperties":false}},"required":["geocode"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 07 Nov 2025 01:22:34 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '26000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-07T01:22:41Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-07T01:22:35Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-07T01:22:33Z'
+      Retry-After:
+      - '27'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '34000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-07T01:22:35Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2254'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01GizABrkVpPzpCseV8JjD7T","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01Pr6Qh8N1T5dARLrVV7W7WJ","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+        Francisco"]}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":558,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":78,"service_tier":"standard"}}'
+  recorded_at: Fri, 07 Nov 2025 01:22:34 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you tell me the weather for Ottawa and San Francisco?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
+        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01Pr6Qh8N1T5dARLrVV7W7WJ","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01Pr6Qh8N1T5dARLrVV7W7WJ","content":[{"type":"text","text":"Weather
+        for Ottawa, San Francisco is great!"}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"get_weather_from_locations","description":"Get
+        the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":["locations"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}},{"name":"get_weather_from_geocode","description":"Get
+        the weather from a list of locations","input_schema":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":["latitude","longitude"],"additionalProperties":false}},"required":["geocode"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 07 Nov 2025 01:22:39 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '28000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-07T01:22:42Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-07T01:22:39Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-07T01:22:36Z'
+      Retry-After:
+      - '23'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '36000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-07T01:22:39Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '4390'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01BNde8enfXdxexx8jc2F3pq","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        weather for both Ottawa and San Francisco is great! Both cities are experiencing
+        pleasant weather conditions."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":656,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":22,"service_tier":"standard"}}'
+  recorded_at: Fri, 07 Nov 2025 01:22:39 GMT
+recorded_with: VCR 6.3.1

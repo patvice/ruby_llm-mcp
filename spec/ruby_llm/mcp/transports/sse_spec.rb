@@ -27,7 +27,7 @@ class Runner
   end
 end
 
-RSpec.describe RubyLLM::MCP::Transports::SSE do
+RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
   let(:client) { Runner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
@@ -64,8 +64,8 @@ RSpec.describe RubyLLM::MCP::Transports::SSE do
 
   describe "HTTP/2 compatibility" do
     it "does not include Connection header (forbidden in HTTP/2)" do
-      coordinator = instance_double(RubyLLM::MCP::Coordinator)
-      transport = RubyLLM::MCP::Transports::SSE.new(
+      coordinator = instance_double(RubyLLM::MCP::Native::Client)
+      transport = RubyLLM::MCP::Native::Transports::SSE.new(
         url: "http://localhost:3000/sse",
         coordinator: coordinator,
         request_timeout: 5000
@@ -86,9 +86,9 @@ RSpec.describe RubyLLM::MCP::Transports::SSE do
 
   describe "#parse_event" do
     let(:transport) do
-      RubyLLM::MCP::Transports::SSE.new(
+      RubyLLM::MCP::Native::Transports::SSE.new(
         url: "http://localhost:3000/sse",
-        coordinator: instance_double(RubyLLM::MCP::Coordinator),
+        coordinator: instance_double(RubyLLM::MCP::Native::Client),
         request_timeout: 5000
       )
     end

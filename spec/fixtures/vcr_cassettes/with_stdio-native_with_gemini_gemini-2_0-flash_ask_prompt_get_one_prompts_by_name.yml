@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:42:11 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=3175
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The sun, a painter, splashed the dawn with gold,\nAnd chased the indigo where shadows held\nA quiet meeting. Now the day unfolds,\nA tapestry where stories are compelled\nTo breathe and bloom. The air, a silken thread,\nWoven with whispers of a gentle breeze,\nCarries the scent of blossoms, newly bred,\nAnd rustling secrets whispered through the trees.\n\nA robin's song, a liquid, silver chime,\nDances upon the airwaves, light and free,\nMarking the rhythm of the measured time.\nA humble bee drones industriously.\nThe sky, a canvas vast and bright and blue,\nReflects the promise in each hopeful eye.\n\nThis day, a gift, presented fresh and new,\nA blank-paged book beneath a boundless sky.\nLet's fill its pages with compassion's art,\nWith kindness painted on each passing face,\nAnd leave a legacy within the heart,\nA gentle echo in this hallowed space.\n\nSo let us cherish every fleeting hour,\nAnd find the beauty hidden in the small,\nFor even in a single, fragile flower,\nA universe unfolds, embracing all.\nAnd when the twilight paints the west in fire,\nAnd stars begin to shimmer, silver bright,\nWe'll look back on this day with true desire,\nAnd weave its moments into a loving light.\n\nThis simple **poem**, a tribute to the now,\nA whispered promise, softly spoken low.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.63831550844254037
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 25,
+            "candidatesTokenCount": 310,
+            "totalTokenCount": 335,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 25
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 310
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "IAgNaeBNnI3-4w-CwbSYBQ"
+        }
+  recorded_at: Thu, 06 Nov 2025 20:42:11 GMT
+recorded_with: VCR 6.3.1

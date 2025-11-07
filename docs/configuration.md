@@ -75,6 +75,38 @@ RubyLLM::MCP.configure do |config|
 end
 ```
 
+## Adapter Selection
+
+{: .label .label-green }
+0.8+
+
+RubyLLM MCP supports multiple SDK adapters. Choose between the native full-featured implementation or the official MCP SDK.
+
+### Default Adapter
+
+Set the default adapter for all clients:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Options: :ruby_llm (default), :mcp_sdk
+  config.default_adapter = :ruby_llm
+end
+```
+
+### Adapter Options
+
+**`:ruby_llm`** (default)
+- Full MCP protocol implementation
+- All transport types (stdio, SSE, HTTP)
+- Advanced features (sampling, roots, progress tracking, etc.)
+
+**`:mcp_sdk`**
+- Official Anthropic-maintained SDK
+- Core features only (tools, resources, prompts)
+- Limited transport support (stdio, HTTP - no SSE)
+
+See the [Adapters Guide]({% link guides/adapters.md %}) for detailed feature comparison and usage examples.
+
 ## Client Configuration
 
 ### Basic Client Options
@@ -85,6 +117,7 @@ All MCP clients support these common options:
 client = RubyLLM::MCP.client(
   name: "unique-client-name",          # Required: unique identifier
   transport_type: :stdio,              # Required: :stdio, :sse, or :streamable
+  adapter: :ruby_llm,                  # Optional: :ruby_llm (default) or :mcp_sdk
   start: true,                         # Optional: auto-start connection (default: true)
   request_timeout: 8000,               # Optional: timeout in milliseconds (default: 8000)
   config: {                            # Required: transport-specific configuration
@@ -142,9 +175,13 @@ config: {
 
 Best for web-based MCP servers using Server-Sent Events:
 
+{: .warning }
+> SSE transport is only supported with `adapter: :ruby_llm`. The `:mcp_sdk` adapter does not support SSE.
+
 ```ruby
 client = RubyLLM::MCP.client(
   name: "web-server",
+  adapter: :ruby_llm,  # Required for SSE
   transport_type: :sse,
   config: {
     url: "https://api.example.com/mcp/sse",  # Required: SSE endpoint

@@ -1,0 +1,84 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you write
+        me a beautiful poem about the current day? Make sure to include the word ''poem''
+        in your response."},{"role":"user","content":"Please provide the content from
+        the prompt."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 06 Nov 2025 20:43:08 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '4249'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '4283'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29958'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 84ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DWjE2dUhqVk1DemViSjI5SmpsU1RvTVA4ZHltbCIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjQ2MTc4NCwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJDZXJ0YWlubHkhIEhlcmUgaXMgYSBiZWF1dGlmdWwgcG9lbSBhYm91dCB0aGUgY3VycmVudCBkYXksIHdpdGggdGhlIHdvcmQgJ3BvZW0nIGluY2x1ZGVkOlxuXG5Ub2RheSB1bnNwb29scyBhIGdvbGRlbiB0aHJlYWTigJQgIFxuTW9ybmluZyBkcmlmdHMgb24gc3VtbWVy4oCZcyBicmVhdGgsICBcbkNsb3VkcyB3aGlzcGVyIHNlY3JldHMgb3ZlcmhlYWQsICBcblN1bmxpZ2h0IGNvbXBvc2VzIHZlcnNlcyBpbiBpdHMgc3RlYWQuXG5cbkVhY2ggaG91ciwgYSBzdGFuemEgYnJpZ2h0IGFuZCBuZXcsICBcbkJpcmRzb25nIHNjcmliYmxlcyBmb3J0dW5l4oCZcyByaHltZSwgIFxuVGhpcyBnZW50bGUgYnJlZXplIHJlY2l0ZXMgaXQsIHRvbzogIFxuQSBsaXZpbmcgcG9lbSBzaGFwZWQgYnkgdGltZS5cblxuSW4gdGhpcyBtb21lbnQsIGxldCB3b3JyaWVzIHN0cmF5LCAgXG5IZWFyIGxhdWdodGVyIGJsb3Nzb20sIGZyZXNoIGFuZCBjbGVhci4gIFxuVGhlIHN0b3J5IG9mIHRoZSB3b3JsZCB0b2RheSAgXG5JcyBhIHBvZW0gd3JpdHRlbiBub3cgYW5kIGhlcmUuIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogNDUsCiAgICAiY29tcGxldGlvbl90b2tlbnMiOiAxMjQsCiAgICAidG90YWxfdG9rZW5zIjogMTY5LAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfZDM4YzdmNGZhNyIKfQo=
+  recorded_at: Thu, 06 Nov 2025 20:43:08 GMT
+recorded_with: VCR 6.3.1

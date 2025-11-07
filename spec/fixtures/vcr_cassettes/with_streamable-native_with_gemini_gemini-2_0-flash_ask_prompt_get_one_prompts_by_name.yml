@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:45:23 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=3058
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "Sunrise spills, a honeyed, amber hue,\nAcross the fields, still beaded with the dew.\nThe robin sings a trill, a vibrant call,\nAnd shadows shrink, embracing one and all.\n\nA gentle breeze, a whispered, leafy sigh,\nKisses the cheeks of clouds that drift on high.\nThe world awakens, stretches, yawning wide,\nPrepared to meet the day, with naught to hide.\n\nA farmer sows his seeds, with hopeful hand,\nWhile bees hum softly, in this fertile land.\nA river flows, a silver, winding thread,\nBearing secrets whispered, overheard.\n\nThe children laugh, their voices bright and clear,\nDispelling doubts, and banishing all fear.\nThey chase the butterflies, with wings so frail,\nAnd paint their dreams upon the morning gale.\n\nThe simple joy, a comfort, sweet and deep,\nTo linger here, the promises to keep.\nAnd in this moment, born of light and grace,\nI find the seeds of beauty, in this place.\n\nSo let me write this **poem**, for today,\nBefore its golden moments fade away.\nA testament to beauty, found anew,\nIn every sunrise, fresh and pure and true.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.72860504860101749
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 25,
+            "candidatesTokenCount": 258,
+            "totalTokenCount": 283,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 25
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 258
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "4AgNaeOqD4Ke_uMPpqS7uQw"
+        }
+  recorded_at: Thu, 06 Nov 2025 20:45:23 GMT
+recorded_with: VCR 6.3.1

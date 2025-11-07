@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "json-schema"
-
 module RubyLLM
   module MCP
     class Elicitation
@@ -21,16 +19,19 @@ module RubyLLM
       end
 
       def execute
-        success = @coordinator.client.on[:elicitation].call(self)
+        success = @coordinator.elicitation_callback&.call(self)
         if success
           valid = validate_response
           if valid
-            @coordinator.elicitation_response(id: @id, action: ACCEPT_ACTION, content: @structured_response)
+            @coordinator.elicitation_response(id: @id,
+                                              elicitation: {
+                                                action: ACCEPT_ACTION, content: @structured_response
+                                              })
           else
-            @coordinator.elicitation_response(id: @id, action: CANCEL_ACTION, content: nil)
+            @coordinator.elicitation_response(id: @id, elicitation: { action: CANCEL_ACTION, content: nil })
           end
         else
-          @coordinator.elicitation_response(id: @id, action: REJECT_ACTION, content: nil)
+          @coordinator.elicitation_response(id: @id, elicitation: { action: REJECT_ACTION, content: nil })
         end
       end
 

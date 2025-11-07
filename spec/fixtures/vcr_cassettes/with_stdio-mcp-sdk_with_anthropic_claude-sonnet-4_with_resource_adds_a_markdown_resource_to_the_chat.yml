@@ -1,0 +1,92 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"my.md:
+        A markdown file\n\n# My Markdown File\n\nThis is a markdown file that I want
+        to be able to use as a resource\n\n## Section 1\n\nThis is a section in my
+        markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n"}]},{"role":"user","content":[{"type":"text","text":"What
+        does the markdown file say?"}]}],"stream":false,"max_tokens":64000}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 06 Nov 2025 20:47:14 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-06T20:47:12Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-06T20:47:15Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-06T20:47:10Z'
+      Retry-After:
+      - '51'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-06T20:47:12Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '6323'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01M8uqQt24pKXsEn96CxjEJL","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        markdown file contains:\n\n# Title\n\"My Markdown File\"\n\n# Content\nThe
+        file describes itself as \"a markdown file that I want to be able to use as
+        a resource\"\n\n# Structure\nIt has two main sections:\n\n**Section 1:** Contains
+        the text \"This is a section in my markdown file\"\n\n**Section 2:** Contains
+        the text \"This is another section in my markdown file\"\n\nThe file appears
+        to be a simple example or template markdown document with a basic two-section
+        structure."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":112,"service_tier":"standard"}}'
+  recorded_at: Thu, 06 Nov 2025 20:47:14 GMT
+recorded_with: VCR 6.3.1

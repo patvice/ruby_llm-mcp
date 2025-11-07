@@ -12,7 +12,8 @@ Gem::Specification.new do |spec|
   spec.summary = "A RubyLLM MCP Client"
   spec.description = <<~DESC
     A Ruby client for the Model Context Protocol (MCP) that seamlessly integrates with RubyLLM.
-    Connect to MCP servers via SSE or stdio transports, automatically convert MCP tools into
+    Supports both native full-featured implementation and the official mcp-sdk gem.
+    Connect to MCP servers via SSE, stdio, or HTTP transports, automatically convert MCP tools into
     RubyLLM-compatible tools, and enable AI models to interact with external data sources and
     services. Makes using MCP with RubyLLM as easy as possible.
   DESC
@@ -41,5 +42,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "json-schema", "~> 5.0"
   spec.add_dependency "ruby_llm", "~> 1.9"
   spec.add_dependency "zeitwerk", "~> 2"
+
+  # Optional dependency for mcp_sdk adapter
+  # Users who want to use adapter: :mcp_sdk should add to their Gemfile:
+  #   gem 'mcp', '~> 0.4'
 end
 # rubocop:enable Metrics/BlockLength

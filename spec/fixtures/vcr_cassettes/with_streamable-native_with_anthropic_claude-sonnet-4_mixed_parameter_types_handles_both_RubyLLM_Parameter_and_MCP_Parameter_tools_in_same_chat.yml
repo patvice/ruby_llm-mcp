@@ -1,0 +1,170 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you multiply 3 and 4, then add 5 and 7?"}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"simple_multiply","description":"Multiply
+        two numbers together","input_schema":{"type":"object","properties":{"x":{"type":"number","description":"First
+        number"},"y":{"type":"number","description":"Second number"}},"required":["x","y"],"additionalProperties":false,"strict":true}},{"name":"add","description":"Addes
+        two numbers together","input_schema":{"type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 06 Nov 2025 20:45:02 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-06T20:45:01Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-06T20:45:03Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-06T20:45:00Z'
+      Retry-After:
+      - '60'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-06T20:45:01Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '3349'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01YVMEUPQDf2G4wYJhhdDNfp","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        help you with both calculations. Let me multiply 3 and 4, then add 5 and 7."},{"type":"tool_use","id":"toolu_01CL1cdwHYYswKtJiNgkESLH","name":"simple_multiply","input":{"x":3,"y":4}},{"type":"tool_use","id":"toolu_01MSnXpQt1XJuSdHuKqTkv62","name":"add","input":{"a":5,"b":7}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":523,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":149,"service_tier":"standard"}}'
+  recorded_at: Thu, 06 Nov 2025 20:45:02 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you multiply 3 and 4, then add 5 and 7?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
+        help you with both calculations. Let me multiply 3 and 4, then add 5 and 7."},{"type":"tool_use","id":"toolu_01CL1cdwHYYswKtJiNgkESLH","name":"simple_multiply","input":{"x":3,"y":4}},{"type":"tool_use","id":"toolu_01MSnXpQt1XJuSdHuKqTkv62","name":"add","input":{"a":5,"b":7}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01CL1cdwHYYswKtJiNgkESLH","content":[{"type":"text","text":"12"}]}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01MSnXpQt1XJuSdHuKqTkv62","content":[{"type":"text","text":"12"}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"simple_multiply","description":"Multiply
+        two numbers together","input_schema":{"type":"object","properties":{"x":{"type":"number","description":"First
+        number"},"y":{"type":"number","description":"Second number"}},"required":["x","y"],"additionalProperties":false,"strict":true}},{"name":"add","description":"Addes
+        two numbers together","input_schema":{"type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 06 Nov 2025 20:45:05 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-06T20:45:05Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-06T20:45:05Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-06T20:45:03Z'
+      Retry-After:
+      - '59'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-06T20:45:05Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2915'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxQkJjWGZkaHhrVXkza1VDRjhwWGdwSCIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IlRoZSByZXN1bHRzIGFyZTpcbi0gMyDDlyA0ID0gMTJcbi0gNSArIDcgPSAxMlxuXG5Cb3RoIGNhbGN1bGF0aW9ucyBnaXZlIHlvdSB0aGUgc2FtZSByZXN1bHQgb2YgMTIhIn1dLCJzdG9wX3JlYXNvbiI6ImVuZF90dXJuIiwic3RvcF9zZXF1ZW5jZSI6bnVsbCwidXNhZ2UiOnsiaW5wdXRfdG9rZW5zIjo3MzUsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjo0Mywic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0=
+  recorded_at: Thu, 06 Nov 2025 20:45:05 GMT
+recorded_with: VCR 6.3.1

@@ -5,10 +5,10 @@ require "httpx"
 module RubyLLM
   module MCP
     class ResourceTemplate
-      attr_reader :uri, :name, :description, :mime_type, :coordinator, :template
+      attr_reader :uri, :name, :description, :mime_type, :adapter, :template
 
-      def initialize(coordinator, resource)
-        @coordinator = coordinator
+      def initialize(adapter, resource)
+        @adapter = adapter
         @uri = resource["uriTemplate"]
         @name = resource["name"]
         @description = resource["description"]
@@ -20,7 +20,7 @@ module RubyLLM
         result = read_response(uri)
         content_response = result.value.dig("contents", 0)
 
-        Resource.new(coordinator, {
+        Resource.new(adapter, {
                        "uri" => uri,
                        "name" => "#{@name} (#{uri})",
                        "description" => @description,
@@ -34,8 +34,8 @@ module RubyLLM
       end
 
       def complete(argument, value, context: nil)
-        if @coordinator.capabilities.completion?
-          result = @coordinator.completion_resource(uri: @uri, argument: argument, value: value, context: context)
+        if @adapter.capabilities.completion?
+          result = @adapter.completion_resource(uri: @uri, argument: argument, value: value, context: context)
           result.raise_error! if result.error?
 
           response = result.value["completion"]
@@ -64,7 +64,7 @@ module RubyLLM
         when "http", "https"
           fetch_uri_content(uri)
         else # file:// or git://
-          @coordinator.resource_read(uri: uri)
+          @adapter.resource_read(uri: uri)
         end
       end
 

@@ -18,11 +18,13 @@ end
 require "bundler/setup"
 require "ruby_llm"
 require "ruby_llm/mcp"
+require "mcp"
 
 require_relative "support/client_runner"
 require_relative "support/test_server_manager"
 require_relative "support/mcp_test_configuration"
 require_relative "support/simple_multiply_tool"
+require_relative "support/adapter_test_helpers"
 
 # VCR Configuration
 VCR.configure do |config|
@@ -90,11 +92,46 @@ FILESYSTEM_CLIENT = {
   }
 }.freeze
 
+# MCP Adapter Testing Configuration
+#
+# The test suite supports testing against multiple MCP adapters:
+#
+# 1. RubyLLMAdapter (Native) - Full-featured native implementation
+#    - Supports: tools, prompts, resources, resource_templates, completions,
+#                logging, sampling, roots, notifications, progress_tracking,
+#                human_in_the_loop, elicitation, subscriptions
+#    - Transports: stdio, sse, streamable, streamable_http
+#
+# 2. MCPSDKAdapter - Wrapper around the official MCP SDK gem
+#    - Supports: tools, prompts, resources, resource_templates (basic features only)
+#    - Transports: stdio, http, streamable, streamable_http
+#    - Requires: gem 'mcp', '~> 0.4' (optional - tests will skip if not installed)
+#
+# Testing DSL:
+#   Use `each_client` to run tests on all available adapters
+#   Use `each_client(adapter: :native)` to run only on RubyLLMAdapter
+#   Use `each_client_supporting(:logging, :sampling)` to run only on adapters with specific features
+#
+# Example:
+#   each_client do |config|
+#     it "runs on all 4 clients" do
+#       # Test code here
+#     end
+#   end
+#
+#   each_client_supporting(:logging) do |config|
+#     it "runs only on native clients" do
+#       # Test code that requires logging feature
+#     end
+#   end
+#
 CLIENT_OPTIONS = [
   {
-    name: "stdio",
+    name: "stdio-native",
+    adapter: :ruby_llm,
     options: {
-      name: "stdio-server",
+      name: "stdio-native-server",
+      adapter: :ruby_llm,
       transport_type: :stdio,
       request_timeout: 10_000,
       config: {
@@ -109,15 +146,52 @@ CLIENT_OPTIONS = [
       }
     }
   },
-  { name: "streamable",
+  {
+    name: "streamable-native",
+    adapter: :ruby_llm,
     options: {
-      name: "streamable-server",
+      name: "streamable-native-server",
+      adapter: :ruby_llm,
       transport_type: :streamable,
       config: {
         url: TestServerManager::HTTP_SERVER_URL
       },
       request_timeout: 10_000
-    } }
+    }
+  },
+  {
+    name: "stdio-mcp-sdk",
+    adapter: :mcp_sdk,
+    options: {
+      name: "stdio-mcp-sdk-server",
+      adapter: :mcp_sdk,
+      transport_type: :stdio,
+      request_timeout: 10_000,
+      config: {
+        command: "bun",
+        args: [
+          "spec/fixtures/typescript-mcp/index.ts",
+          "--stdio"
+        ],
+        env: {
+          "TEST_ENV" => "this_is_a_test"
+        }
+      }
+    }
+  },
+  {
+    name: "streamable-mcp-sdk",
+    adapter: :mcp_sdk,
+    options: {
+      name: "streamable-mcp-sdk-server",
+      adapter: :mcp_sdk,
+      transport_type: :streamable,
+      config: {
+        url: TestServerManager::HTTP_SERVER_URL
+      },
+      request_timeout: 10_000
+    }
+  }
 ].freeze
 
 PAGINATION_CLIENT_CONFIG = {

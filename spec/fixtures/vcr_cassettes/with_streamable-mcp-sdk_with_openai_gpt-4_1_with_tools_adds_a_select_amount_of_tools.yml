@@ -1,0 +1,220 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you tell
+        me the weather for Ottawa and San Francisco?"}],"stream":false,"tools":[{"type":"function","function":{"name":"get_weather_from_locations","description":"Get
+        the weather from a list of locations","parameters":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":["locations"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}},{"type":"function","function":{"name":"get_weather_from_geocode","description":"Get
+        the weather from a list of locations","parameters":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":["latitude","longitude"],"additionalProperties":false}},"required":["geocode"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 07 Nov 2025 01:23:41 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '687'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '840'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29732'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 535ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "id": "chatcmpl-CZ5UThpfzF9CBLWCLGZQ1ZdVeSBTX",
+          "object": "chat.completion",
+          "created": 1762478621,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": null,
+                "tool_calls": [
+                  {
+                    "id": "call_y0JaTLm4UZBCO2QjkwYLrAAn",
+                    "type": "function",
+                    "function": {
+                      "name": "get_weather_from_locations",
+                      "arguments": "{\"locations\": [\"Ottawa\"]}"
+                    }
+                  },
+                  {
+                    "id": "call_8E6ARF5qOwEbmpoC5AgJflZg",
+                    "type": "function",
+                    "function": {
+                      "name": "get_weather_from_locations",
+                      "arguments": "{\"locations\": [\"San Francisco\"]}"
+                    }
+                  }
+                ],
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "tool_calls"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 96,
+            "completion_tokens": 52,
+            "total_tokens": 148,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_d38c7f4fa7"
+        }
+  recorded_at: Fri, 07 Nov 2025 01:23:41 GMT
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you tell
+        me the weather for Ottawa and San Francisco?"},{"role":"assistant","tool_calls":[{"id":"call_y0JaTLm4UZBCO2QjkwYLrAAn","type":"function","function":{"name":"get_weather_from_locations","arguments":"{\"locations\":[\"Ottawa\"]}"}},{"id":"call_8E6ARF5qOwEbmpoC5AgJflZg","type":"function","function":{"name":"get_weather_from_locations","arguments":"{\"locations\":[\"San
+        Francisco\"]}"}}]},{"role":"tool","content":"Weather for Ottawa is great!","tool_call_id":"call_y0JaTLm4UZBCO2QjkwYLrAAn"},{"role":"tool","content":"Weather
+        for San Francisco is great!","tool_call_id":"call_8E6ARF5qOwEbmpoC5AgJflZg"}],"stream":false,"tools":[{"type":"function","function":{"name":"get_weather_from_locations","description":"Get
+        the weather from a list of locations","parameters":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":["locations"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}},{"type":"function","function":{"name":"get_weather_from_geocode","description":"Get
+        the weather from a list of locations","parameters":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":["latitude","longitude"],"additionalProperties":false}},"required":["geocode"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 07 Nov 2025 01:23:43 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '1176'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '1188'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29915'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 169ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DWjVVVFprN3M5M3doOFZCeVRNUkFucWFvZlVHTCIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjQ3ODYyMSwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJIZXJl4oCZcyB0aGUgbGF0ZXN0IHdlYXRoZXIgdXBkYXRlOlxuXG4tIE90dGF3YTogVGhlIHdlYXRoZXIgaXMgZ3JlYXQhXG4tIFNhbiBGcmFuY2lzY286IFRoZSB3ZWF0aGVyIGlzIGdyZWF0IVxuXG5JZiB5b3UgbmVlZCBtb3JlIGRldGFpbGVkIGluZm9ybWF0aW9uIChsaWtlIHRlbXBlcmF0dXJlLCB3aW5kLCBvciBmb3JlY2FzdCksIGp1c3QgbGV0IG1lIGtub3chIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMTc0LAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogNDUsCiAgICAidG90YWxfdG9rZW5zIjogMjE5LAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfZDM4YzdmNGZhNyIKfQo=
+  recorded_at: Fri, 07 Nov 2025 01:23:42 GMT
+recorded_with: VCR 6.3.1

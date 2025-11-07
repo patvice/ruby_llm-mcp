@@ -9,11 +9,12 @@ class FakeLogger
 end
 
 RSpec.describe RubyLLM::MCP::NotificationHandler do
-  let(:coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
-  let(:notification_handler) { RubyLLM::MCP::NotificationHandler.new(coordinator) }
+  let(:client) { instance_double(RubyLLM::MCP::Client) }
+  let(:notification_handler) { RubyLLM::MCP::NotificationHandler.new(client) }
 
   before do
-    allow(coordinator).to receive(:client)
+    # Allow client methods that NotificationHandler might call
+    allow(client).to receive(:tracking_progress?).and_return(false)
   end
 
   after do
@@ -22,7 +23,7 @@ RSpec.describe RubyLLM::MCP::NotificationHandler do
 
   it "calling cancelled at the moment will do nothing" do
     notification = RubyLLM::MCP::Notification.new(
-      { "type" => "notifications/cancelled" }
+      { "method" => "notifications/cancelled" }
     )
 
     expect { notification_handler.execute(notification) }.not_to raise_error

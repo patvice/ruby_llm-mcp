@@ -1,0 +1,53 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you create a greeting
+        for John in Spanish?"}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:42:13 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2475
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJjYW5kaWRhdGVzIjogWwogICAgewogICAgICAiY29udGVudCI6IHsKICAgICAgICAicGFydHMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJ0ZXh0IjogIkhlcmUgYXJlIGEgZmV3IG9wdGlvbnMsIHJhbmdpbmcgZnJvbSBjYXN1YWwgdG8gbW9yZSBmb3JtYWwsIHdpdGggZXhwbGFuYXRpb25zOlxuXG4qKkNhc3VhbDoqKlxuXG4qICAgKirCoUhvbGEsIEpvaG4hKiogKEhpLCBKb2huISkgLSBUaGlzIGlzIHRoZSBtb3N0IGNvbW1vbiBhbmQgdmVyc2F0aWxlIG9wdGlvbi5cbiogICAqKsKhUXXDqSBvbmRhLCBKb2huISoqIChXaGF0J3MgdXAsIEpvaG4hKSAtICBNb3JlIGluZm9ybWFsLCBjb21tb24gaW4gTWV4aWNvIGFuZCBzb21lIG90aGVyIExhdGluIEFtZXJpY2FuIGNvdW50cmllcy5cbiogICAqKsK/UXXDqSB0YWwsIEpvaG4/KiogKFdoYXQncyB1cCwgSm9obj8gSG93J3MgaXQgZ29pbmcsIEpvaG4/KSAtICBBbm90aGVyIGNvbW1vbiBhbmQgZmFpcmx5IGNhc3VhbCBvcHRpb24uXG5cbioqTW9yZSBGb3JtYWw6KipcblxuKiAgICoqQnVlbm9zIGTDrWFzL3RhcmRlcy9ub2NoZXMsIEpvaG4uKiogKEdvb2QgbW9ybmluZy9hZnRlcm5vb24vZXZlbmluZywgSm9obi4pIC0gQXBwcm9wcmlhdGUgaWYgdGhlIHRpbWUgb2YgZGF5IG1hdHRlcnMgYW5kIHlvdSB3YW50IHRvIGJlIG1vcmUgcG9saXRlLlxuKiAgICoqSG9sYSwgU3IuIEpvaG4uKiogKEhlbGxvLCBNci4gSm9obi4pIC0gIFVzZSBvbmx5IGlmIHlvdSdkIG5vcm1hbGx5IGFkZHJlc3MgaGltIGFzIE1yLiBKb2huIGluIEVuZ2xpc2gsIHNpZ25hbGluZyByZXNwZWN0LlxuXG4qKkZyaWVuZGx5L0VudGh1c2lhc3RpYzoqKlxuXG4qICAgKirCoUhvbGEgSm9obiEgwqFRdcOpIGd1c3RvIHZlcnRlL2VuY29udHJhcnRlISoqIChIaSBKb2huISBOaWNlIHRvIHNlZSB5b3UvbWVldCB5b3UhKSAtIE1vcmUgZW50aHVzaWFzdGljLCBzdWl0YWJsZSBmb3Igc29tZW9uZSB5b3Uga25vdy5cblxuKipXaGljaCBvbmUgaXMgYmVzdD8qKlxuXG5UaGUgYmVzdCBvcHRpb24gZGVwZW5kcyBvbiB5b3VyIHJlbGF0aW9uc2hpcCB3aXRoIEpvaG4gYW5kIHRoZSBjb250ZXh0IG9mIHRoZSBncmVldGluZy4gIElmIGluIGRvdWJ0LCAqKsKhSG9sYSwgSm9obiEqKiBpcyBhbHdheXMgYSBzYWZlIGFuZCBhcHByb3ByaWF0ZSBjaG9pY2UuXG4iCiAgICAgICAgICB9CiAgICAgICAgXSwKICAgICAgICAicm9sZSI6ICJtb2RlbCIKICAgICAgfSwKICAgICAgImZpbmlzaFJlYXNvbiI6ICJTVE9QIiwKICAgICAgImF2Z0xvZ3Byb2JzIjogLTAuMzM5MjE5MjA3MjQyODk0MTIKICAgIH0KICBdLAogICJ1c2FnZU1ldGFkYXRhIjogewogICAgInByb21wdFRva2VuQ291bnQiOiAxMCwKICAgICJjYW5kaWRhdGVzVG9rZW5Db3VudCI6IDI5MywKICAgICJ0b3RhbFRva2VuQ291bnQiOiAzMDMsCiAgICAicHJvbXB0VG9rZW5zRGV0YWlscyI6IFsKICAgICAgewogICAgICAgICJtb2RhbGl0eSI6ICJURVhUIiwKICAgICAgICAidG9rZW5Db3VudCI6IDEwCiAgICAgIH0KICAgIF0sCiAgICAiY2FuZGlkYXRlc1Rva2Vuc0RldGFpbHMiOiBbCiAgICAgIHsKICAgICAgICAibW9kYWxpdHkiOiAiVEVYVCIsCiAgICAgICAgInRva2VuQ291bnQiOiAyOTMKICAgICAgfQogICAgXQogIH0sCiAgIm1vZGVsVmVyc2lvbiI6ICJnZW1pbmktMi4wLWZsYXNoIiwKICAicmVzcG9uc2VJZCI6ICJJd2dOYWZUdUNzUy1fdU1QbnJhYjRRMCIKfQo=
+  recorded_at: Thu, 06 Nov 2025 20:42:13 GMT
+recorded_with: VCR 6.3.1

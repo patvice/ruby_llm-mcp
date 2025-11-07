@@ -1,0 +1,96 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"dog.png:
+        A picture of a dog"}]},{"role":"user","content":[{"type":"text","text":"What
+        resources do you have access to?"}]}],"stream":false,"max_tokens":64000}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 07 Nov 2025 01:23:05 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-07T01:23:00Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-07T01:23:06Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-07T01:22:59Z'
+      Retry-After:
+      - '62'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-07T01:23:00Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '6256'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01NfbDphe9qDT9umrstFDw8W","type":"message","role":"assistant","content":[{"type":"text","text":"I
+        have access to several types of resources:\n\n**Text processing capabilities:**\n-
+        I can read, analyze, and generate text\n- I can help with writing, editing,
+        research, coding, math, analysis, and creative tasks\n- I can work in many
+        languages\n\n**Image analysis:**\n- I can view and analyze images that you
+        share with me (like the dog.png you mentioned)\n- I can describe what I see,
+        answer questions about images, and help with visual tasks\n\n**Knowledge base:**\n-
+        I have training data up to April 2024, covering a wide range of topics\n-
+        However, I can''t browse the internet or access real-time information\n\n**What
+        I cannot do:**\n- Browse the web or access external websites\n- Generate,
+        edit, or create images\n- Access other files on your device beyond what you
+        directly share\n- Remember conversations after they end\n- Run code or access
+        external systems\n\nIs there something specific you''d like help with regarding
+        the dog image or any other task?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":25,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":216,"service_tier":"standard"}}'
+  recorded_at: Fri, 07 Nov 2025 01:23:04 GMT
+recorded_with: VCR 6.3.1

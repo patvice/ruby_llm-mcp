@@ -1,0 +1,181 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
+        https://www.example.com/ and see if the site say what they do?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"type":"STRING"}},"required":["website"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:47:30 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=552
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "fetch_site",
+                      "args": {
+                        "website": "https://www.example.com/"
+                      }
+                    }
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -3.2858761187526397e-06
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 39,
+            "candidatesTokenCount": 12,
+            "totalTokenCount": 51,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 39
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 12
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "YQkNaa27NK7g_uMPqez24Qs"
+        }
+  recorded_at: Thu, 06 Nov 2025 20:47:30 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
+        https://www.example.com/ and see if the site say what they do?"}]},{"role":"model","parts":[{"functionCall":{"name":"fetch_site","args":{"website":"https://www.example.com/"}}}]},{"role":"function","parts":[{"functionResponse":{"name":"fetch_site","response":{"name":"fetch_site","content":[{"text":"Website
+        content from https://www.example.com/:\n\nExample Domain Example Domain This
+        domain is for use in documentation examples without needing permission. Avoid
+        use in operations. Learn more"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"type":"STRING"}},"required":["website"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Thu, 06 Nov 2025 20:47:31 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=637
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The website example.com is a domain for use in documentation examples. They do not specify what they do other than that.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.05092569956412682
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 95,
+            "candidatesTokenCount": 26,
+            "totalTokenCount": 121,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 95
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 26
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "YgkNacyuHYCm_uMP1fqeuA0"
+        }
+  recorded_at: Thu, 06 Nov 2025 20:47:31 GMT
+recorded_with: VCR 6.3.1

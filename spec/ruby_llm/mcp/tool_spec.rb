@@ -10,15 +10,14 @@ RSpec.describe RubyLLM::MCP::Tool do
     ClientRunner.stop_all
   end
 
-  CLIENT_OPTIONS.select { |config| config[:name] == "stdio" }.each do |config|
-    context "with #{config[:name]}" do
-      let(:client) { ClientRunner.fetch_client(config[:name]) }
+  # Test environment variable only on stdio clients
+  each_client do |config|
+    next unless config[:name].include?("stdio")
 
-      it "returns the environment variable" do
-        tool = client.tool("return_set_evn")
-        result = tool.execute
-        expect(result.to_s).to eq("Test Env = this_is_a_test")
-      end
+    it "returns the environment variable" do
+      tool = client.tool("return_set_evn")
+      result = tool.execute
+      expect(result.to_s).to eq("Test Env = this_is_a_test")
     end
   end
 
@@ -41,283 +40,262 @@ RSpec.describe RubyLLM::MCP::Tool do
     end
   end
 
-  CLIENT_OPTIONS.each do |config|
-    context "with #{config[:name]}" do
-      let(:client) { ClientRunner.fetch_client(config[:name]) }
-
-      describe "tool_list" do
-        it "returns a list of tools" do
-          tools = client.tools
-          expect(tools).to be_a(Array)
-          expect(tools.first.name).to eq("add")
-        end
-
-        it "get specific tool by name" do
-          tools = client.tool("add")
-          expect(tools).to be_a(RubyLLM::MCP::Tool)
-          expect(tools.name).to eq("add")
-        end
-
-        it "listences to tool list updates notifications" do
-          tools_count = client.tools.count
-          tool = client.tool("upgrade_auth")
-          tool.execute(permission: "read")
-
-          expect(client.tools.count).to eq(tools_count + 1)
-        end
+  each_client do
+    describe "tool_list" do
+      it "returns a list of tools" do
+        tools = client.tools
+        expect(tools).to be_a(Array)
+        expect(tools.first.name).to eq("add")
       end
 
-      describe "tool_call" do
-        it "calls a tool" do
-          tools = client.tools
-          add_tool = tools.find { |tool| tool.name == "add" }
-          result = add_tool.execute(a: 1, b: 2)
+      it "get specific tool by name" do
+        tools = client.tool("add")
+        expect(tools).to be_a(RubyLLM::MCP::Tool)
+        expect(tools.name).to eq("add")
+      end
+    end
 
-          expect(result.to_s).to eq("3")
-        end
+    describe "tool_call" do
+      it "calls a tool" do
+        tools = client.tools
+        add_tool = tools.find { |tool| tool.name == "add" }
+        result = add_tool.execute(a: 1, b: 2)
 
-        it "calls a tool with an array of parameters" do
-          weather_tool = client.tool("get_weather_from_locations")
-          result = weather_tool.execute(locations: ["Ottawa", "San Francisco"])
-
-          expect(result.to_s).to eq("Weather for Ottawa, San Francisco is great!")
-        end
-
-        it "calls a tool with an object of parameters" do
-          weather_tool = client.tool("get_weather_from_geocode")
-          result = weather_tool.execute(geocode: { latitude: 45.4201, longitude: 75.7003 })
-
-          expect(result.to_s).to eq("Weather for 45.4201, 75.7003 is great!")
-        end
-
-        it "still load if tool is malformed" do
-          tool = client.tool("malformed_tool")
-
-          expect(tool).not_to be_nil
-        end
-
-        it "calls a tool and get back an image" do
-          image_tool = client.tool("get_dog_image")
-          result = image_tool.execute
-
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.attachments.first).to be_a(RubyLLM::MCP::Attachment)
-          expect(result.attachments.first.mime_type).to eq("image/png")
-          expect(result.attachments.first.content).not_to be_nil
-        end
-
-        it "calls a tool and get back an audio" do
-          audio_tool = client.tool("get_jackhammer_audio")
-          result = audio_tool.execute
-
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.attachments).not_to be_nil
-          expect(result.attachments.first).to be_a(RubyLLM::MCP::Attachment)
-          expect(result.attachments.first.mime_type).to eq("audio/wav")
-          expect(result.attachments.first.content).not_to be_nil
-        end
-
-        it "calls a tool and get back a resource" do
-          resource_tool = client.tool("get_file_resource")
-          result = resource_tool.execute(filename: "test.txt")
-
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          value = <<~TODO
-            get_file_resource: Returns a file resource reference
-
-            This is the content of test.txt
-          TODO
-
-          expect(result.to_s).to eq(value.strip)
-        end
-
-        it "handles tool errors gracefully" do
-          error_tool = client.tool("tool_error")
-
-          # Test when tool returns an error
-          result = error_tool.execute(shouldError: true)
-          expect(result).to eq({ error: "Tool execution error: Error: Tool error" })
-          expect(result.to_s).to include("Error: Tool error")
-
-          # Test when tool doesn't return an error
-          result = error_tool.execute(shouldError: false)
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to eq("No error")
-        end
-
-        it "can call a complex union type tool" do
-          tool = client.tool("fetch_site")
-          result = tool.execute(website: "https://www.example.com/")
-
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Example")
-
-          result = tool.execute(website: { url: "https://www.example.com/",
-                                           headers: [{ name: "User-Agent", value: "test" }] })
-
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Example Domain")
-        end
+        expect(result.to_s).to eq("3")
       end
 
-      describe "on_human_in_the_loop" do
-        it "calls a human in the loop and cancels the tool call if returns false" do
-          called = false
-          client.on_human_in_the_loop do |name, params|
-            called = true
-            name == "add" && params[:a] == 1 && params[:b] == 2
-          end
+      it "calls a tool with an array of parameters" do
+        weather_tool = client.tool("get_weather_from_locations")
+        result = weather_tool.execute(locations: ["Ottawa", "San Francisco"])
 
-          tool = client.tool("add")
-          result = tool.execute(a: 1, b: 2)
-          expect(result.to_s).to eq("3")
-          expect(called).to be(true)
-          client.on_human_in_the_loop
+        expect(result.to_s).to eq("Weather for Ottawa, San Francisco is great!")
+      end
+
+      it "calls a tool with an object of parameters" do
+        weather_tool = client.tool("get_weather_from_geocode")
+        result = weather_tool.execute(geocode: { latitude: 45.4201, longitude: 75.7003 })
+
+        expect(result.to_s).to eq("Weather for 45.4201, 75.7003 is great!")
+      end
+
+      it "still load if tool is malformed" do
+        tool = client.tool("malformed_tool")
+
+        expect(tool).not_to be_nil
+      end
+
+      it "calls a tool and get back an image" do
+        image_tool = client.tool("get_dog_image")
+        result = image_tool.execute
+
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.attachments.first).to be_a(RubyLLM::MCP::Attachment)
+        expect(result.attachments.first.mime_type).to eq("image/png")
+        expect(result.attachments.first.content).not_to be_nil
+      end
+
+      it "calls a tool and get back an audio" do
+        audio_tool = client.tool("get_jackhammer_audio")
+        result = audio_tool.execute
+
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.attachments).not_to be_nil
+        expect(result.attachments.first).to be_a(RubyLLM::MCP::Attachment)
+        expect(result.attachments.first.mime_type).to eq("audio/wav")
+        expect(result.attachments.first.content).not_to be_nil
+      end
+
+      it "calls a tool and get back a resource" do
+        resource_tool = client.tool("get_file_resource")
+        result = resource_tool.execute(filename: "test.txt")
+
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        value = <<~TODO
+          get_file_resource: Returns a file resource reference
+
+          This is the content of test.txt
+        TODO
+
+        expect(result.to_s).to eq(value.strip)
+      end
+
+      it "handles tool errors gracefully" do
+        error_tool = client.tool("tool_error")
+
+        # Test when tool returns an error
+        result = error_tool.execute(shouldError: true)
+        expect(result).to eq({ error: "Tool execution error: Error: Tool error" })
+        expect(result.to_s).to include("Error: Tool error")
+
+        # Test when tool doesn't return an error
+        result = error_tool.execute(shouldError: false)
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to eq("No error")
+      end
+
+      it "can call a complex union type tool" do
+        tool = client.tool("fetch_site")
+        result = tool.execute(website: "https://www.example.com/")
+
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("Example")
+
+        result = tool.execute(website: { url: "https://www.example.com/",
+                                         headers: [{ name: "User-Agent", value: "test" }] })
+
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("Example Domain")
+      end
+    end
+  end
+
+  # Human in the loop tests - only run on adapters that support this feature
+  each_client_supporting(:human_in_the_loop) do |config|
+    describe "on_human_in_the_loop" do
+      it "calls a human in the loop and cancels the tool call if returns false" do
+        called = false
+        client.on_human_in_the_loop do |name, params|
+          called = true
+          name == "add" && params[:a] == 1 && params[:b] == 2
         end
 
-        it "calls a human in the loop and calls the tool if returns true" do
-          called = false
-          client.on_human_in_the_loop do |name, params|
-            called = true
-            name == "add" && params[:a] == 1 && params[:b] == 2
-          end
+        tool = client.tool("add")
+        result = tool.execute(a: 1, b: 2)
+        expect(result.to_s).to eq("3")
+        expect(called).to be(true)
+        client.on_human_in_the_loop
+      end
 
-          tool = client.tool("add")
-          result = tool.execute(a: 2, b: 2)
-          message = "Tool execution error: Tool call was cancelled by the client"
-          expect(result).to eq({ error: message })
-          expect(called).to be(true)
-
-          client.on_human_in_the_loop
+      it "calls a human in the loop and calls the tool if returns true" do
+        called = false
+        client.on_human_in_the_loop do |name, params|
+          called = true
+          name == "add" && params[:a] == 1 && params[:b] == 2
         end
+
+        tool = client.tool("add")
+        result = tool.execute(a: 2, b: 2)
+        message = "Tool execution error: Tool call was cancelled by the client"
+        expect(result).to eq({ error: message })
+        expect(called).to be(true)
+
+        client.on_human_in_the_loop
       end
     end
   end
 
   describe "Structured Tool Output (2025-06-18)" do
-    CLIENT_OPTIONS.each do |config|
-      context "with #{config[:name]}" do
-        let(:client) { ClientRunner.fetch_client(config[:name]) }
+    each_client do |config|
+      it "validates structured output against output schema" do
+        tool = client.tool("structured_data_analyzer")
+        expect(tool).to be_a(RubyLLM::MCP::Tool)
 
-        it "validates structured output against output schema" do
-          tool = client.tool("structured_data_analyzer")
-          expect(tool).to be_a(RubyLLM::MCP::Tool)
+        result = tool.execute(data: "Hello world this is a test", format: "summary")
+        expect(result).to be_a(RubyLLM::MCP::Content)
 
-          result = tool.execute(data: "Hello world this is a test", format: "summary")
-          expect(result).to be_a(RubyLLM::MCP::Content)
-
-          # Check if structured content is available and validated
-          if result.respond_to?(:structured_content)
-            expect(result.structured_content).to be_a(Hash)
-            expect(result.structured_content).to have_key("word_count")
-            expect(result.structured_content).to have_key("character_count")
-            expect(result.structured_content).to have_key("analysis_type")
-            expect(result.structured_content["word_count"]).to be_a(Numeric)
-            expect(result.structured_content["character_count"]).to be_a(Numeric)
-          end
+        # Check if structured content is available and validated
+        if result.respond_to?(:structured_content)
+          expect(result.structured_content).to be_a(Hash)
+          expect(result.structured_content).to have_key("word_count")
+          expect(result.structured_content).to have_key("character_count")
+          expect(result.structured_content).to have_key("analysis_type")
+          expect(result.structured_content["word_count"]).to be_a(Numeric)
+          expect(result.structured_content["character_count"]).to be_a(Numeric)
         end
+      end
 
-        it "handles invalid structured output gracefully" do
-          tool = client.tool("invalid_structured_output")
-          expect(tool).to be_a(RubyLLM::MCP::Tool)
+      it "handles invalid structured output gracefully" do
+        tool = client.tool("invalid_structured_output")
+        expect(tool).to be_a(RubyLLM::MCP::Tool)
 
-          # This should trigger validation error for structured output
-          result = tool.execute(trigger_error: true)
+        # This should trigger validation error for structured output
+        result = tool.execute(trigger_error: true)
 
-          # The tool should still return content, but structured validation may fail
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Invalid structured data")
-        end
+        # The tool should still return content, but structured validation may fail
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("Invalid structured data")
+      end
 
-        it "returns valid structured output when schema is satisfied" do
-          tool = client.tool("invalid_structured_output")
+      it "returns valid structured output when schema is satisfied" do
+        tool = client.tool("invalid_structured_output")
 
-          result = tool.execute(trigger_error: false)
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Valid output")
-        end
+        result = tool.execute(trigger_error: false)
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("Valid output")
       end
     end
   end
 
   describe "Human-Friendly Display Names (2025-06-18)" do
-    CLIENT_OPTIONS.each do |config|
-      context "with #{config[:name]}" do
-        let(:client) { ClientRunner.fetch_client(config[:name]) }
+    each_client do |config|
+      it "provides human-friendly titles for tools" do
+        tool = client.tool("complex_calculation")
+        expect(tool).to be_a(RubyLLM::MCP::Tool)
 
-        it "provides human-friendly titles for tools" do
-          tool = client.tool("complex_calculation")
-          expect(tool).to be_a(RubyLLM::MCP::Tool)
+        # Check if tool has a human-friendly description or title
+        expect(tool.description).to include("🧮 Advanced Calculator")
+      end
 
-          # Check if tool has a human-friendly description or title
-          expect(tool.description).to include("🧮 Advanced Calculator")
-        end
+      it "executes tools with human-friendly names" do
+        tool = client.tool("complex_calculation")
 
-        it "executes tools with human-friendly names" do
-          tool = client.tool("complex_calculation")
+        result = tool.execute(expression: "2 + 2", precision: 1)
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("Result: 4.0")
+      end
 
-          result = tool.execute(expression: "2 + 2", precision: 1)
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("Result: 4.0")
-        end
+      it "handles calculation errors gracefully" do
+        tool = client.tool("complex_calculation")
 
-        it "handles calculation errors gracefully" do
-          tool = client.tool("complex_calculation")
-
-          result = tool.execute(expression: "invalid_expression")
-          error_message = "Tool execution error: Error evaluating expression: invalid_expression is not defined"
-          expect(result).to eq({ error: error_message })
-          expect(result.to_s).to include("Error evaluating expression")
-        end
+        result = tool.execute(expression: "invalid_expression")
+        error_message = "Tool execution error: Error evaluating expression: invalid_expression is not defined"
+        expect(result).to eq({ error: error_message })
+        expect(result.to_s).to include("Error evaluating expression")
       end
     end
   end
 
   describe "Tool Annotations and Enhanced Metadata (2025-06-18)" do
-    CLIENT_OPTIONS.each do |config|
-      context "with #{config[:name]}" do
-        let(:client) { ClientRunner.fetch_client(config[:name]) }
+    each_client do
+      it "supports tool annotations for better UX" do
+        tool = client.tool("complex_calculation")
+        expect(tool).to be_a(RubyLLM::MCP::Tool)
 
-        it "supports tool annotations for better UX" do
-          tool = client.tool("complex_calculation")
-          expect(tool).to be_a(RubyLLM::MCP::Tool)
-
-          # Check if tool provides annotation information
-          if tool.respond_to?(:annotations)
-            annotations = tool.annotations
-            expect(annotations).to be_a(Hash) if annotations
-          end
+        # Check if tool provides annotation information
+        if tool.respond_to?(:annotations)
+          annotations = tool.annotations
+          expect(annotations).to be_a(Hash) if annotations
         end
+      end
 
-        it "executes annotated tools correctly" do
-          tool = client.tool("complex_calculation")
+      it "executes annotated tools correctly" do
+        tool = client.tool("complex_calculation")
 
-          result = tool.execute(expression: "10 * 5", precision: 0)
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("50")
+        result = tool.execute(expression: "10 * 5", precision: 0)
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("50")
+      end
+
+      it "supports _meta field in tool responses" do
+        tool = client.tool("long_running_task")
+        expect(tool).to be_a(RubyLLM::MCP::Tool)
+
+        result = tool.execute(duration: 500, steps: 3)
+        expect(result).to be_a(RubyLLM::MCP::Content)
+
+        # Check for metadata in response
+        if result.respond_to?(:metadata) || result.respond_to?(:meta)
+          meta = result.respond_to?(:metadata) ? result.metadata : result.meta
+          expect(meta).to be_a(Hash) if meta
         end
+      end
 
-        it "supports _meta field in tool responses" do
-          tool = client.tool("long_running_task")
-          expect(tool).to be_a(RubyLLM::MCP::Tool)
+      it "handles progress tracking metadata" do
+        tool = client.tool("long_running_task")
 
-          result = tool.execute(duration: 500, steps: 3)
-          expect(result).to be_a(RubyLLM::MCP::Content)
-
-          # Check for metadata in response
-          if result.respond_to?(:metadata) || result.respond_to?(:meta)
-            meta = result.respond_to?(:metadata) ? result.metadata : result.meta
-            expect(meta).to be_a(Hash) if meta
-          end
-        end
-
-        it "handles progress tracking metadata" do
-          tool = client.tool("long_running_task")
-
-          result = tool.execute(duration: 1000, steps: 5)
-          expect(result).to be_a(RubyLLM::MCP::Content)
-          expect(result.to_s).to include("long-running task")
-        end
+        result = tool.execute(duration: 1000, steps: 5)
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("long-running task")
       end
     end
   end
@@ -681,34 +659,30 @@ RSpec.describe RubyLLM::MCP::Tool do
     end
 
     describe "integration with real client" do
-      CLIENT_OPTIONS.each do |config|
-        context "with #{config[:name]}" do
-          let(:client) { ClientRunner.fetch_client(config[:name]) }
+      each_client do |config|
+        it "normalizes malformed_tool schema correctly" do
+          tool = client.tool("malformed_tool")
 
-          it "normalizes malformed_tool schema correctly" do
-            tool = client.tool("malformed_tool")
+          schema = tool.params_schema
+          expect(schema).not_to be_nil
+          expect(schema["type"]).to eq("object")
 
-            schema = tool.params_schema
-            expect(schema).not_to be_nil
-            expect(schema["type"]).to eq("object")
+          # Should have properties field even if original was malformed
+          expect(schema).to have_key("properties")
+          expect(schema["properties"]).to be_a(Hash)
+        end
 
-            # Should have properties field even if original was malformed
-            expect(schema).to have_key("properties")
-            expect(schema["properties"]).to be_a(Hash)
-          end
+        it "preserves valid schemas without normalization" do
+          tool = client.tool("add")
 
-          it "preserves valid schemas without normalization" do
-            tool = client.tool("add")
+          schema = tool.params_schema
+          expect(schema).not_to be_nil
+          expect(schema["type"]).to eq("object")
+          expect(schema["properties"]).to have_key("a")
+          expect(schema["properties"]).to have_key("b")
 
-            schema = tool.params_schema
-            expect(schema).not_to be_nil
-            expect(schema["type"]).to eq("object")
-            expect(schema["properties"]).to have_key("a")
-            expect(schema["properties"]).to have_key("b")
-
-            # Valid schema should not be modified
-            expect(schema["required"]).to include("a", "b")
-          end
+          # Valid schema should not be modified
+          expect(schema["required"]).to include("a", "b")
         end
       end
     end
