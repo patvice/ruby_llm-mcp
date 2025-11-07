@@ -84,6 +84,84 @@ RSpec.describe RubyLLM::MCP::Transports::SSE do
     end
   end
 
+  describe "OAuth integration" do
+    let(:coordinator) { instance_double(RubyLLM::MCP::Coordinator) }
+    let(:server_url) { "http://localhost:3000/sse" }
+    let(:storage) { RubyLLM::MCP::Auth::OAuthProvider::MemoryStorage.new }
+
+    it "accepts OAuth provider in options" do
+      oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+
+      transport = RubyLLM::MCP::Transports::SSE.new(
+        url: server_url,
+        coordinator: coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+
+      expect(transport.oauth_provider).to eq(oauth_provider)
+    end
+
+    it "applies OAuth authorization header when token available" do
+      oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+
+      token = RubyLLM::MCP::Auth::Token.new(
+        access_token: "test_access_token",
+        expires_in: 3600
+      )
+      storage.set_token(server_url, token)
+
+      transport = RubyLLM::MCP::Transports::SSE.new(
+        url: server_url,
+        coordinator: coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+
+      headers = transport.send(:build_request_headers)
+
+      expect(headers["Authorization"]).to eq("Bearer test_access_token")
+    end
+
+    it "does not apply OAuth header when no token available" do
+      oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+
+      transport = RubyLLM::MCP::Transports::SSE.new(
+        url: server_url,
+        coordinator: coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+
+      headers = transport.send(:build_request_headers)
+
+      expect(headers["Authorization"]).to be_nil
+    end
+
+    it "works without OAuth provider" do
+      transport = RubyLLM::MCP::Transports::SSE.new(
+        url: server_url,
+        coordinator: coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      expect(transport.oauth_provider).to be_nil
+
+      headers = transport.send(:build_request_headers)
+      expect(headers["Authorization"]).to be_nil
+    end
+  end
+
   describe "#parse_event" do
     let(:transport) do
       RubyLLM::MCP::Transports::SSE.new(
