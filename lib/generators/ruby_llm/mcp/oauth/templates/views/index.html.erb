@@ -1,0 +1,137 @@
+<div class="mcp-connections">
+  <h1>MCP Server Connections</h1>
+
+  <% if @credentials.any? %>
+    <h2>Connected Servers</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Server</th>
+          <th>Status</th>
+          <th>Scopes</th>
+          <th>Expires</th>
+          <th>Last Refreshed</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @credentials.each do |credential| %>
+          <tr>
+            <td>
+              <code><%= credential.server_url %></code>
+            </td>
+            <td>
+              <% if credential.expired? %>
+                <span class="badge badge-danger">Expired</span>
+              <% elsif credential.expires_soon? %>
+                <span class="badge badge-warning">Expiring Soon</span>
+              <% else %>
+                <span class="badge badge-success">Active</span>
+              <% end %>
+            </td>
+            <td>
+              <% if credential.token&.scope %>
+                <code class="text-muted"><%= credential.token.scope %></code>
+              <% else %>
+                <span class="text-muted">N/A</span>
+              <% end %>
+            </td>
+            <td>
+              <% if credential.token_expires_at %>
+                <%= time_tag credential.token_expires_at, credential.token_expires_at.to_s(:short) %>
+                <br>
+                <small class="text-muted">
+                  (<%= time_ago_in_words(credential.token_expires_at) %>
+                  <%= credential.token_expires_at > Time.current ? "from now" : "ago" %>)
+                </small>
+              <% else %>
+                <span class="text-muted">Never</span>
+              <% end %>
+            </td>
+            <td>
+              <% if credential.last_refreshed_at %>
+                <%= time_ago_in_words(credential.last_refreshed_at) %> ago
+              <% else %>
+                <span class="text-muted">Never</span>
+              <% end %>
+            </td>
+            <td>
+              <div class="btn-group">
+                <% if credential.expired? || credential.expires_soon? %>
+                  <%= link_to "Refresh",
+                      refresh_mcp_connection_path(credential),
+                      class: "btn btn-sm btn-warning",
+                      method: :get %>
+                <% end %>
+                <%= button_to "Disconnect",
+                    disconnect_mcp_connection_path(credential),
+                    method: :delete,
+                    data: { confirm: "Are you sure you want to disconnect this MCP server?" },
+                    class: "btn btn-sm btn-danger" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="alert alert-info">
+      <h4>No MCP Servers Connected</h4>
+      <p>Connect to an MCP server to enable AI-powered features in your account.</p>
+    </div>
+  <% end %>
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <h3>Add New Server</h3>
+      <p>Connect to an MCP server to access tools, resources, and AI capabilities.</p>
+
+      <% if @server_url %>
+        <%= link_to "Connect to #{@server_url}",
+            connect_mcp_connections_path(server_url: @server_url),
+            class: "btn btn-primary" %>
+      <% else %>
+        <p class="text-warning">
+          <strong>Configuration Required:</strong>
+          Set <code>DEFAULT_MCP_SERVER_URL</code> environment variable.
+        </p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h3>What is MCP?</h3>
+    <p>
+      Model Context Protocol (MCP) allows AI models to securely access external
+      data and tools. By connecting your account, you grant AI features permission
+      to access specific resources on your behalf.
+    </p>
+
+    <h4>Security & Privacy</h4>
+    <ul>
+      <li>Tokens are encrypted and stored securely</li>
+      <li>Each connection is specific to your account</li>
+      <li>You can disconnect at any time</li>
+      <li>Tokens automatically refresh when possible</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+.mcp-connections .badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.mcp-connections .table code {
+  background-color: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.875rem;
+}
+
+.mcp-connections .btn-group {
+  display: flex;
+  gap: 0.5rem;
+}
+</style>
