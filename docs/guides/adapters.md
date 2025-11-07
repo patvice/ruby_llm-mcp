@@ -69,8 +69,8 @@ Wraps the official MCP SDK maintained by Anthropic.
 | **Core Features** |
 | Tools (list/call) | ✅ | ✅ |
 | Resources (list/read) | ✅ | ✅ |
-| Prompts (list/get) | ✅ | ✅ |
-| Resource Templates | ✅ | ✅ |
+| Prompts (list/get) | ✅ | ❌ |
+| Resource Templates | ✅ | ❌ |
 | **Transports** |
 | stdio | ✅ | ✅ |
 | HTTP/Streamable | ✅ | ✅ |

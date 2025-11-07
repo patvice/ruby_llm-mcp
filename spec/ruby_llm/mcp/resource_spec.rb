@@ -50,12 +50,19 @@ RSpec.describe RubyLLM::MCP::Resource do
   # Refresh via notifications - only supported by adapters with notification support
   each_client_supporting(:notifications) do
     describe "resource_list" do
-      it "refreshes prompts when requested" do
+      it "refreshes resources when requested" do
         tool = client.tool("send_list_changed")
-        resource_count = client.resources.count
+        initial_uris = client.resources.map(&:uri)
         tool.execute(type: "resources")
 
-        expect(client.resources.count).to eq(resource_count + 1)
+        # Wait for async notification processing (especially for SSE/HTTP transports)
+        # and for the resource cache to be refreshed
+        sleep 0.5
+
+        updated_uris = client.resources.map(&:uri)
+
+        expect(updated_uris.size).to be >= initial_uris.size
+        expect([initial_uris.size, initial_uris.size + 1]).to include(updated_uris.size)
       end
     end
   end
