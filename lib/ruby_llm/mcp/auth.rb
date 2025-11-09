@@ -8,6 +8,19 @@ require "time"
 module RubyLLM
   module MCP
     module Auth
+      # OAuth configuration constants
+      # Token refresh buffer time in seconds (5 minutes)
+      TOKEN_REFRESH_BUFFER = 300
+
+      # Default OAuth timeout in seconds (30 seconds)
+      DEFAULT_OAUTH_TIMEOUT = 30
+
+      # CSRF state parameter size in bytes (32 bytes)
+      CSRF_STATE_SIZE = 32
+
+      # PKCE code verifier size in bytes (32 bytes)
+      PKCE_VERIFIER_SIZE = 32
+
       # Represents an OAuth 2.1 access token with expiration tracking
       class Token
         attr_reader :access_token, :token_type, :expires_in, :scope, :refresh_token, :expires_at
@@ -29,13 +42,13 @@ module RubyLLM
           Time.now >= @expires_at
         end
 
-        # Check if token expires soon (within 5-minute buffer)
+        # Check if token expires soon (within configured buffer)
         # This enables proactive token refresh
-        # @return [Boolean] true if token expires within 5 minutes
+        # @return [Boolean] true if token expires within the buffer period
         def expires_soon?
           return false unless @expires_at
 
-          Time.now >= (@expires_at - 300) # 5-minute buffer
+          Time.now >= (@expires_at - TOKEN_REFRESH_BUFFER)
         end
 
         # Format token for Authorization header
@@ -80,21 +93,44 @@ module RubyLLM
       end
 
       # Client metadata for dynamic client registration (RFC 7591)
+      # Supports all optional parameters from the specification
       class ClientMetadata
-        attr_reader :redirect_uris, :token_endpoint_auth_method, :grant_types, :response_types, :scope
+        attr_reader :redirect_uris, :token_endpoint_auth_method, :grant_types, :response_types, :scope,
+                    :client_name, :client_uri, :logo_uri, :contacts, :tos_uri, :policy_uri,
+                    :jwks_uri, :jwks, :software_id, :software_version
 
-        def initialize(
+        def initialize( # rubocop:disable Metrics/ParameterLists
           redirect_uris:,
           token_endpoint_auth_method: "none",
           grant_types: %w[authorization_code refresh_token],
           response_types: ["code"],
-          scope: nil
+          scope: nil,
+          client_name: nil,
+          client_uri: nil,
+          logo_uri: nil,
+          contacts: nil,
+          tos_uri: nil,
+          policy_uri: nil,
+          jwks_uri: nil,
+          jwks: nil,
+          software_id: nil,
+          software_version: nil
         )
           @redirect_uris = redirect_uris
           @token_endpoint_auth_method = token_endpoint_auth_method
           @grant_types = grant_types
           @response_types = response_types
           @scope = scope
+          @client_name = client_name
+          @client_uri = client_uri
+          @logo_uri = logo_uri
+          @contacts = contacts
+          @tos_uri = tos_uri
+          @policy_uri = policy_uri
+          @jwks_uri = jwks_uri
+          @jwks = jwks
+          @software_id = software_id
+          @software_version = software_version
         end
 
         # Convert to hash for registration request
@@ -105,7 +141,17 @@ module RubyLLM
             token_endpoint_auth_method: @token_endpoint_auth_method,
             grant_types: @grant_types,
             response_types: @response_types,
-            scope: @scope
+            scope: @scope,
+            client_name: @client_name,
+            client_uri: @client_uri,
+            logo_uri: @logo_uri,
+            contacts: @contacts,
+            tos_uri: @tos_uri,
+            policy_uri: @policy_uri,
+            jwks_uri: @jwks_uri,
+            jwks: @jwks,
+            software_id: @software_id,
+            software_version: @software_version
           }.compact
         end
       end
@@ -279,9 +325,9 @@ module RubyLLM
         private
 
         # Generate cryptographically secure code verifier
-        # @return [String] base64url-encoded random 32 bytes
+        # @return [String] base64url-encoded random bytes
         def generate_code_verifier
-          Base64.urlsafe_encode64(SecureRandom.random_bytes(32), padding: false)
+          Base64.urlsafe_encode64(SecureRandom.random_bytes(PKCE_VERIFIER_SIZE), padding: false)
         end
 
         # Generate code challenge from verifier using SHA256

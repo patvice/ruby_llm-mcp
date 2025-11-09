@@ -67,6 +67,12 @@ module RubyLLM
       # No-op: Complex parameters are now supported by default
     end
 
+    def mcp_configurations
+      config.mcp_configuration.each_with_object({}) do |config, acc|
+        acc[config[:name]] = config
+      end
+    end
+
     def configure
       yield config
     end
@@ -93,5 +99,6 @@ loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 loader.inflector.inflect("http_client" => "HTTPClient")
 loader.inflector.inflect("oauth_provider" => "OAuthProvider")
+loader.inflector.inflect("browser_oauth" => "BrowserOAuth")
 
 loader.setup

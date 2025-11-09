@@ -42,6 +42,32 @@ module RubyLLM
         end
       end
 
+      class OAuth
+        attr_accessor :client_name,
+                      :client_uri,
+                      :software_id,
+                      :software_version,
+                      :logo_uri,
+                      :contacts,
+                      :tos_uri,
+                      :policy_uri,
+                      :jwks_uri,
+                      :jwks
+
+        def initialize
+          @client_name = "RubyLLM MCP Client"
+          @client_uri = nil
+          @software_id = "ruby_llm-mcp"
+          @software_version = RubyLLM::MCP::VERSION
+          @logo_uri = nil
+          @contacts = nil
+          @tos_uri = nil
+          @policy_uri = nil
+          @jwks_uri = nil
+          @jwks = nil
+        end
+      end
+
       class ConfigFile
         attr_reader :file_path
 
@@ -95,7 +121,8 @@ module RubyLLM
                     :protocol_version,
                     :config_path,
                     :launch_control,
-                    :on_logging_level
+                    :on_logging_level,
+                    :oauth
 
       attr_writer :logger, :mcp_configuration
 
@@ -103,6 +130,7 @@ module RubyLLM
 
       def initialize
         @sampling = Sampling.new
+        @oauth = OAuth.new
         set_defaults
       end
 
@@ -200,6 +228,12 @@ module RubyLLM
 
         # Roots configuration
         @roots = []
+
+        # Protocol configuration
+        @protocol_version = Protocol.latest_version
+
+        # OAuth configuration
+        @oauth = OAuth.new
 
         # Sampling configuration
         @sampling.reset!

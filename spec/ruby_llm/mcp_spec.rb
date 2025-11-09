@@ -302,4 +302,83 @@ RSpec.describe RubyLLM::MCP do
       expect(result).to eq(logger)
     end
   end
+
+  describe "#mcp_configurations" do
+    before do
+      RubyLLM::MCP.instance_variable_set(:@config, nil)
+    end
+
+    after do
+      MCPTestConfiguration.reset_config!
+    end
+
+    it "returns an empty hash when no configurations are set" do
+      RubyLLM::MCP.config.mcp_configuration = []
+
+      result = RubyLLM::MCP.mcp_configurations
+
+      expect(result).to eq({})
+    end
+
+    it "converts array of configurations into hash keyed by name" do
+      RubyLLM::MCP.config.mcp_configuration = [
+        { name: "client1", transport_type: "stdio", command: "test" }
+      ]
+
+      result = RubyLLM::MCP.mcp_configurations
+
+      expect(result).to eq({
+                             "client1" => { name: "client1", transport_type: "stdio", command: "test" }
+                           })
+    end
+
+    it "handles multiple configurations" do
+      RubyLLM::MCP.config.mcp_configuration = [
+        { name: "client1", transport_type: "stdio", command: "test1" },
+        { name: "client2", transport_type: "sse", url: "http://example.com" },
+        { name: "client3", transport_type: "streamable_http", url: "http://example2.com" }
+      ]
+
+      result = RubyLLM::MCP.mcp_configurations
+
+      expect(result).to eq({
+                             "client1" => { name: "client1", transport_type: "stdio", command: "test1" },
+                             "client2" => { name: "client2", transport_type: "sse", url: "http://example.com" },
+                             "client3" => { name: "client3", transport_type: "streamable_http", url: "http://example2.com" }
+                           })
+    end
+
+    it "preserves all configuration options" do
+      RubyLLM::MCP.config.mcp_configuration = [
+        {
+          name: "complex_client",
+          transport_type: "stdio",
+          command: "node",
+          args: ["server.js"],
+          env: { "NODE_ENV" => "production" }
+        }
+      ]
+
+      result = RubyLLM::MCP.mcp_configurations
+
+      expect(result["complex_client"]).to eq({
+                                               name: "complex_client",
+                                               transport_type: "stdio",
+                                               command: "node",
+                                               args: ["server.js"],
+                                               env: { "NODE_ENV" => "production" }
+                                             })
+    end
+
+    it "uses the name as the key for lookup" do
+      RubyLLM::MCP.config.mcp_configuration = [
+        { name: "test_client", transport_type: "stdio" }
+      ]
+
+      result = RubyLLM::MCP.mcp_configurations
+
+      expect(result.keys).to eq(["test_client"])
+      expect(result["test_client"][:name]).to eq("test_client")
+    end
+  end
 end

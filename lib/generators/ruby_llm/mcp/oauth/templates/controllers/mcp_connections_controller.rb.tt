@@ -1,0 +1,207 @@
+# frozen_string_literal: true
+
+# Controller for managing MCP OAuth connections
+<% if namespace_name -%>
+class <%= namespace_name %>::McpConnectionsController < ApplicationController
+<% else -%>
+class McpConnectionsController < ApplicationController
+<% end -%>
+  before_action :<%= authenticate_method %>
+  OAUTH_FLOW_TIMEOUT_SECONDS = 10.minutes.to_i
+
+  def index
+    @credentials = <%= current_user_method %>.mcp_oauth_credentials.order(created_at: :desc)
+  end
+
+  def create
+    client_name = params[:client_name]
+    name = params[:name]
+    server_url = params[:server_url]
+
+    unless name.present?
+      redirect_to mcp_connections_path, alert: "Please provide a server name"
+      return
+    end
+
+    unless server_url.present?
+      redirect_to mcp_connections_path, alert: "Please provide an MCP server URL"
+      return
+    end
+
+    scope = params[:scope] || "mcp:read mcp:write"
+
+    # Create OAuth provider with user's token storage
+    oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+      client_name: client_name,
+      server_url: server_url,
+      redirect_uri: mcp_connections_callback_url,
+      scope: scope,
+      storage: token_storage(server_url, name),
+      logger: Rails.logger
+    )
+
+    # Start OAuth flow
+    begin
+      auth_url = oauth_provider.start_authorization_flow
+
+      # Store context in session for callback
+      session[:mcp_oauth_context] = {
+        <%= user_table_name.singularize %>_id: <%= current_user_method %>.id,
+        name: name,
+        server_url: server_url,
+        scope: scope,
+        started_at: Time.current.to_i
+      }
+
+      redirect_to auth_url, allow_other_host: true
+    rescue StandardError => e
+      Rails.logger.error "MCP OAuth flow start failed: #{e.message}"
+      redirect_to mcp_connections_path,
+                  alert: "Failed to start OAuth flow: #{e.message}"
+    end
+  end
+
+  def callback
+    oauth_context = retrieve_and_validate_oauth_context
+    return unless oauth_context
+
+    return if oauth_error_present?
+
+    complete_oauth_flow_for_user(oauth_context)
+  end
+
+  def disconnect
+    credential = <%= current_user_method %>.mcp_oauth_credentials.find(params[:id])
+    server_url = credential.server_url
+    credential.destroy
+
+    Rails.logger.info "<%= user_model_name %> #{<%= current_user_method %>.id} disconnected from MCP server: #{server_url}"
+
+    redirect_to mcp_connections_path,
+                notice: "MCP server disconnected successfully"
+  rescue ActiveRecord::RecordNotFound
+    redirect_to mcp_connections_path,
+                alert: "Connection not found"
+  end
+
+  def refresh
+    credential = <%= current_user_method %>.mcp_oauth_credentials.find(params[:id])
+
+    oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+      server_url: credential.server_url,
+      storage: token_storage(credential.server_url, credential.name)
+    )
+
+    refreshed_token = oauth_provider.access_token
+
+    if refreshed_token
+      redirect_to mcp_connections_path,
+                  notice: "Token refreshed successfully"
+    else
+      redirect_to mcp_connections_path,
+                  alert: "Token refresh failed. Please reconnect."
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to mcp_connections_path,
+                alert: "Connection not found"
+  end
+
+  private
+
+  def retrieve_and_validate_oauth_context
+    oauth_context = session.delete(:mcp_oauth_context)
+
+    unless oauth_context
+      redirect_to mcp_connections_path, alert: "OAuth session expired. Please try again."
+      return nil
+    end
+
+    if oauth_flow_timed_out?(oauth_context)
+      redirect_to mcp_connections_path, alert: "OAuth flow timed out. Please try again."
+      return nil
+    end
+
+    oauth_context
+  end
+
+  def oauth_flow_timed_out?(context)
+    Time.current.to_i - context["started_at"] > OAUTH_FLOW_TIMEOUT_SECONDS
+  end
+
+  def oauth_error_present?
+    return false unless params[:error]
+
+    error_message = params[:error_description] || params[:error]
+    redirect_to mcp_connections_path, alert: "OAuth authorization failed: #{error_message}"
+    true
+  end
+
+  def complete_oauth_flow_for_user(oauth_context)
+    oauth_provider = create_oauth_provider_from_context(oauth_context)
+
+    oauth_provider.complete_authorization_flow(params[:code], params[:state])
+    log_successful_oauth(oauth_context)
+    redirect_after_success
+  rescue StandardError => e
+    handle_oauth_callback_error(e)
+  end
+
+  def create_oauth_provider_from_context(oauth_context)
+    RubyLLM::MCP::Auth::OAuthProvider.new(
+      server_url: oauth_context["server_url"],
+      redirect_uri: mcp_connections_callback_url,
+      scope: oauth_context["scope"],
+      storage: token_storage(oauth_context["server_url"], oauth_context["name"]),
+      logger: Rails.logger
+    )
+  end
+
+  def log_successful_oauth(oauth_context)
+    Rails.logger.info "MCP OAuth completed for <%= user_variable_name %> #{<%= current_user_method %>.id}, " \
+                      "server: #{oauth_context['server_url']}"
+  end
+
+  def redirect_after_success
+    return_path = session.delete(:mcp_return_to) || mcp_connections_path
+    redirect_to return_path, notice: "Successfully connected to MCP server!"
+  end
+
+  def handle_oauth_callback_error(error)
+    Rails.logger.error "MCP OAuth callback failed: #{error.message}"
+    redirect_to mcp_connections_path, alert: "OAuth authorization failed: #{error.message}"
+  end
+
+  def token_storage(server_url, name = nil)
+    <%= current_user_method %>.mcp_token_storage(server_url, name)
+  end
+
+  def mcp_connections_callback_url
+<% if namespace_name -%>
+    callback_<%= namespace_name.underscore %>_mcp_connections_url
+<% else -%>
+    callback_mcp_connections_url
+<% end -%>
+  end
+
+<% if namespace_name -%>
+  # Route helper methods for namespaced routes
+  def mcp_connections_path
+    <%= namespace_name.underscore %>_mcp_connections_path
+  end
+
+  def mcp_connection_path(credential)
+    <%= namespace_name.underscore %>_mcp_connection_path(credential)
+  end
+
+  def refresh_mcp_connection_path(credential)
+    refresh_<%= namespace_name.underscore %>_mcp_connection_path(credential)
+  end
+
+  def disconnect_mcp_connection_path(credential)
+    disconnect_<%= namespace_name.underscore %>_mcp_connection_path(credential)
+  end
+
+  helper_method :mcp_connections_path, :mcp_connection_path,
+                :refresh_mcp_connection_path, :disconnect_mcp_connection_path
+<% end -%>
+end

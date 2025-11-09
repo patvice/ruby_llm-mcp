@@ -63,11 +63,11 @@ module RubyLLM
             end
 
             unless result[:completed]
-              raise Errors::TimeoutError.new("OAuth authorization timed out after #{timeout} seconds", nil)
+              raise Errors::TimeoutError.new(message: "OAuth authorization timed out after #{timeout} seconds")
             end
 
             if result[:error]
-              raise Errors::TransportError.new("OAuth authorization failed: #{result[:error]}", nil, nil)
+              raise Errors::TransportError.new(message: "OAuth authorization failed: #{result[:error]}")
             end
 
             # 6. Complete OAuth flow
@@ -95,14 +95,12 @@ module RubyLLM
             @logger.debug("Started callback server on http://127.0.0.1:#{@callback_port}#{@callback_path}")
           rescue Errno::EADDRINUSE
             raise Errors::TransportError.new(
-              "Cannot start OAuth callback server: port #{@callback_port} is already in use. " \
-              "Please close the application using this port or choose a different callback_port.",
-              nil, nil
+              message: "Cannot start OAuth callback server: port #{@callback_port} is already in use. " \
+                       "Please close the application using this port or choose a different callback_port."
             )
           rescue StandardError => e
             raise Errors::TransportError.new(
-              "Failed to start OAuth callback server on port #{@callback_port}: #{e.message}",
-              nil, nil
+              message: "Failed to start OAuth callback server on port #{@callback_port}: #{e.message}"
             )
           end
 

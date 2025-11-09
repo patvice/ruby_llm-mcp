@@ -117,13 +117,43 @@ module RubyLLM
                                        context: { location: "message endpoint request", request_id: request_id })
 
           unless [200, 202].include?(response.status)
-            message = "Failed to have a successful request to #{@messages_url}: #{response.status} - #{response.body}"
-            RubyLLM::MCP.logger.error(message)
+            handle_send_request_error(response)
+          end
+        end
+
+        def handle_send_request_error(response)
+          response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
+          status_code = response.respond_to?(:status) ? response.status : "Unknown"
+
+          # Try to parse JSON error
+          error_message = begin
+            error_body = JSON.parse(response_body)
+            if error_body.is_a?(Hash) && error_body["error"]
+              msg = error_body["error"]["message"] || error_body["error"]["code"] || error_body["error"].to_s
+              msg.to_s.strip.empty? ? "Empty error (full response: #{response_body})" : msg
+            else
+              response_body
+            end
+          rescue JSON::ParserError
+            response_body
+          end
+
+          full_message = "Failed to have a successful request to #{@messages_url}: #{status_code} - #{error_message}"
+          RubyLLM::MCP.logger.error(full_message)
+
+          # Special handling for 403 with OAuth
+          if status_code == 403 && @oauth_provider
             raise Errors::TransportError.new(
-              message: message,
-              code: response.status
+              message: "Authorization failed (403 Forbidden): #{error_message}. Check token scope and resource \
+                permissions at #{@oauth_provider.server_url}.",
+              code: status_code
             )
           end
+
+          raise Errors::TransportError.new(
+            message: full_message,
+            code: status_code
+          )
         end
 
         def start_sse_listener
@@ -191,13 +221,20 @@ module RubyLLM
           headers = @headers.dup
 
           if @oauth_provider
+            RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
+            RubyLLM::MCP.logger.debug "  Server URL: #{@oauth_provider.server_url}"
+
             token = @oauth_provider.access_token
             if token
               headers["Authorization"] = token.to_header
-              RubyLLM::MCP.logger.debug "Applied OAuth authorization header"
+              RubyLLM::MCP.logger.debug "✓ Applied OAuth authorization header: #{token.to_header[0..30]}..."
             else
-              RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available"
+              RubyLLM::MCP.logger.warn "✗ OAuth provider present but no valid token available!"
+              RubyLLM::MCP.logger.warn "  This means the token is not in storage or has expired"
+              RubyLLM::MCP.logger.warn "  Check that authentication completed successfully"
             end
+          else
+            RubyLLM::MCP.logger.debug "No OAuth provider configured for this transport"
           end
 
           headers
@@ -207,18 +244,51 @@ module RubyLLM
           return unless response.status >= 400
 
           error_body = read_error_body(response)
-          error_message = "HTTP #{response.status} error from SSE endpoint: #{error_body}"
-          RubyLLM::MCP.logger.error error_message
 
-          handle_client_error!(error_message, response.status) if response.status < 500
+          # Try to parse as JSON to get better error details
+          error_message = begin
+            error_data = JSON.parse(error_body)
+            if error_data.is_a?(Hash) && error_data["error"]
+              msg = error_data["error"]["message"] || error_data["error"]["code"] || error_data["error"].to_s
+              # If we still don't have a message, include the full error object
+              msg.to_s.strip.empty? ? "Empty error (full response: #{error_body})" : msg
+            else
+              error_body
+            end
+          rescue JSON::ParserError
+            error_body
+          end
 
-          raise StandardError, error_message
+          full_error_message = "HTTP #{response.status} error from SSE endpoint: #{error_message}"
+          RubyLLM::MCP.logger.error full_error_message
+
+          handle_client_error!(full_error_message, response.status, error_message) if response.status < 500
+
+          raise StandardError, full_error_message
         end
 
-        def handle_client_error!(error_message, status_code)
+        def handle_client_error!(full_error_message, status_code, error_message)
           @running = false
+
+          # Special handling for 401 Unauthorized - OAuth authentication required
+          if status_code == 401
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required. Server returned 401 Unauthorized.",
+              code: 401
+            )
+          end
+
+          # Special handling for 403 Forbidden with OAuth
+          if status_code == 403 && @oauth_provider
+            raise Errors::TransportError.new(
+              message: "Authorization failed (403 Forbidden): #{error_message}. \
+                Check token scope and resource permissions at #{@oauth_provider.server_url}.",
+              code: status_code
+            )
+          end
+
           raise Errors::TransportError.new(
-            message: error_message,
+            message: full_error_message,
             code: status_code
           )
         end

@@ -240,13 +240,20 @@ module RubyLLM
 
           # Apply OAuth authorization if available
           if @oauth_provider
+            RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
+            RubyLLM::MCP.logger.debug "  Server URL: #{@oauth_provider.server_url}"
+
             token = @oauth_provider.access_token
             if token
               headers["Authorization"] = token.to_header
-              RubyLLM::MCP.logger.debug "Applied OAuth authorization header"
+              RubyLLM::MCP.logger.debug "✓ Applied OAuth authorization header: #{token.to_header[0..30]}..."
             else
-              RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available"
+              RubyLLM::MCP.logger.warn "✗ OAuth provider present but no valid token available!"
+              RubyLLM::MCP.logger.warn "  This means the token is not in storage or has expired"
+              RubyLLM::MCP.logger.warn "  Check that authentication completed successfully"
             end
+          else
+            RubyLLM::MCP.logger.debug "No OAuth provider configured for this transport"
           end
 
           headers
@@ -323,8 +330,12 @@ module RubyLLM
             handle_accepted_response(original_message)
           when 404
             handle_session_expired
-          when 405, 401
-            # TODO: Implement 401 handling this once we are adding authorization
+          when 401
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required. Server returned 401 Unauthorized.",
+              code: 401
+            )
+          when 405
             # Method not allowed - acceptable for some endpoints
             nil
           when 400...500
@@ -380,33 +391,44 @@ module RubyLLM
         end
 
         def handle_client_error(response)
+          response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
+          status_code = response.respond_to?(:status) ? response.status : "Unknown"
+
           begin
-            # Safely access response body
-            response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
             error_body = JSON.parse(response_body)
 
             if error_body.is_a?(Hash) && error_body["error"]
-              error_message = error_body["error"]["message"] || error_body["error"]["code"]
+              error_message = error_body["error"]["message"] || error_body["error"]["code"] || error_body["error"].to_s
+
+              # If we still don't have a message, include the full error object
+              if error_message.to_s.strip.empty?
+                error_message = "Empty error (full response: #{response_body})"
+              end
 
               if error_message.to_s.downcase.include?("session")
                 raise Errors::TransportError.new(
-                  code: response.status,
+                  code: status_code,
                   message: "Server error: #{error_message} (Current session ID: #{@session_id || 'none'})"
                 )
               end
 
+              # Special handling for 403 Forbidden with OAuth
+              if status_code == 403 && @oauth_provider
+                raise Errors::TransportError.new(
+                  code: status_code,
+                  message: "Authorization failed (403 Forbidden): #{error_message}. \
+                    Check token scope and resource permissions at #{@oauth_provider.server_url}."
+                )
+              end
+
               raise Errors::TransportError.new(
-                code: response.status,
+                code: status_code,
                 message: "Server error: #{error_message}"
               )
             end
           rescue JSON::ParserError
             # Fall through to generic error
           end
-
-          # Safely access response attributes
-          response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
-          status_code = response.respond_to?(:status) ? response.status : "Unknown"
 
           raise Errors::TransportError.new(
             code: status_code,
@@ -467,7 +489,12 @@ module RubyLLM
               # SSE stream established successfully
               RubyLLM::MCP.logger.debug "SSE stream established"
               # Response will be processed through callbacks
-            when 405, 401
+            when 401
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication required. Server returned 401 Unauthorized.",
+                code: 401
+              )
+            when 405
               # Server doesn't support SSE - this is acceptable
               RubyLLM::MCP.logger.info "Server does not support SSE streaming"
               nil

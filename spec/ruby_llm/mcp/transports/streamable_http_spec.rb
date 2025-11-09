@@ -51,7 +51,8 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       coordinator = client.instance_variable_get(:@coordinator)
       expect(coordinator.protocol_version).to be_a(String)
       expect(coordinator.protocol_version).to match(/\d{4}-\d{2}-\d{2}/)
-      expect(coordinator.protocol_version).to eq("2025-03-26")
+      # Server negotiates its preferred version - should be one of the supported versions
+      expect(RubyLLM::MCP::Protocol.supported_versions).to include(coordinator.protocol_version)
 
       client.stop
     end
@@ -126,8 +127,11 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       coordinator = client.instance_variable_get(:@coordinator)
       transport = coordinator.transport
 
-      # The transport should have a protocol version set
-      expect(transport.transport_protocol.protocol_version).to eq(RubyLLM::MCP::Protocol::DEFAULT_NEGOTIATED_PROTOCOL_VERSION)
+      # The transport should have a protocol version set to whatever was negotiated
+      negotiated_version = transport.transport_protocol.protocol_version
+      expect(negotiated_version).to be_a(String)
+      expect(negotiated_version).to match(/\d{4}-\d{2}-\d{2}/)
+      expect(RubyLLM::MCP::Protocol.supported_versions).to include(negotiated_version)
 
       client.stop
     end
@@ -221,12 +225,13 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /HTTP client error: 400/)
       end
 
-      it "handles 401 Unauthorized" do
+      it "handles 401 Unauthorized by raising AuthenticationRequiredError" do
         stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(status: 401)
 
-        result = transport.request({ "method" => "initialize", "id" => 1 }, wait_for_response: false)
-        expect(result).to be_nil
+        expect do
+          transport.request({ "method" => "initialize", "id" => 1 }, wait_for_response: false)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /OAuth authentication required/)
       end
 
       it "handles 404 Not Found (session expired)" do
@@ -952,6 +957,241 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       expect(result.to_s).to eq("8")
 
       client.stop
+    end
+  end
+
+  describe "OAuth integration" do
+    let(:server_url) { "http://localhost:3000/mcp" }
+    let(:storage) { RubyLLM::MCP::Auth::MemoryStorage.new }
+
+    it "accepts OAuth provider in options" do
+      oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+
+      transport = described_class.new(
+        url: server_url,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+
+      expect(transport.oauth_provider).to eq(oauth_provider)
+    end
+
+    it "applies OAuth authorization header when token available" do
+      oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+
+      token = RubyLLM::MCP::Auth::Token.new(
+        access_token: "test_access_token",
+        expires_in: 3600
+      )
+      storage.set_token(server_url, token)
+
+      transport = described_class.new(
+        url: server_url,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+
+      headers = transport.send(:build_common_headers)
+
+      expect(headers["Authorization"]).to eq("Bearer test_access_token")
+    end
+
+    it "does not apply OAuth header when no token available" do
+      oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+
+      transport = described_class.new(
+        url: server_url,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+
+      headers = transport.send(:build_common_headers)
+
+      expect(headers["Authorization"]).to be_nil
+    end
+
+    it "works without OAuth provider" do
+      transport = described_class.new(
+        url: server_url,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      expect(transport.oauth_provider).to be_nil
+
+      headers = transport.send(:build_common_headers)
+      expect(headers["Authorization"]).to be_nil
+    end
+
+    context "with enhanced OAuth logging" do
+      before do
+        allow(logger).to receive(:debug)
+        allow(logger).to receive(:warn)
+        allow(logger).to receive(:info)
+        allow(logger).to receive(:error)
+      end
+
+      it "logs detailed information when OAuth provider present and token available" do
+        oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+          server_url: server_url,
+          storage: storage
+        )
+
+        token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "test_access_token_12345",
+          expires_in: 3600
+        )
+        storage.set_token(server_url, token)
+
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: { oauth_provider: oauth_provider }
+        )
+
+        transport.send(:build_common_headers)
+
+        expect(logger).to have_received(:debug).with(/OAuth provider present, attempting to get token/)
+        expect(logger).to have_received(:debug).with(/Server URL:/)
+        expect(logger).to have_received(:debug)
+          .with(/Applied OAuth authorization header: Bearer test_access_token_12345/)
+      end
+
+      it "logs warning when OAuth provider present but no token available" do
+        oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+          server_url: server_url,
+          storage: storage
+        )
+
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: { oauth_provider: oauth_provider }
+        )
+
+        transport.send(:build_common_headers)
+
+        expect(logger).to have_received(:warn).with(/OAuth provider present but no valid token available/)
+        expect(logger).to have_received(:warn).with(/This means the token is not in storage or has expired/)
+        expect(logger).to have_received(:warn).with(/Check that authentication completed successfully/)
+      end
+
+      it "logs debug when no OAuth provider configured" do
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: {}
+        )
+
+        transport.send(:build_common_headers)
+
+        expect(logger).to have_received(:debug).with("No OAuth provider configured for this transport")
+      end
+    end
+
+    context "with enhanced error handling" do
+      let(:response) { instance_double(HTTPX::Response) }
+
+      before do
+        allow(logger).to receive(:debug)
+        allow(logger).to receive(:warn)
+        allow(logger).to receive(:info)
+        allow(logger).to receive(:error)
+      end
+
+      it "handles 403 Forbidden with OAuth provider and provides helpful error" do
+        oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+          server_url: server_url,
+          storage: storage
+        )
+
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: { oauth_provider: oauth_provider }
+        )
+
+        error_body = '{"error": {"message": "Invalid scope"}}'
+        allow(response).to receive_messages(status: 403, body: error_body)
+        allow(response).to receive(:respond_to?).with(:body).and_return(true)
+        allow(response).to receive(:respond_to?).with(:status).and_return(true)
+
+        expect do
+          transport.send(:handle_client_error, response)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError,
+                           /Authorization failed \(403 Forbidden\).*Invalid scope.*Check token scope/)
+      end
+
+      it "parses JSON error responses and extracts error message" do
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: {}
+        )
+
+        error_body = '{"error": {"message": "Token expired", "code": "token_expired"}}'
+        allow(response).to receive_messages(status: 401, body: error_body)
+        allow(response).to receive(:respond_to?).with(:body).and_return(true)
+        allow(response).to receive(:respond_to?).with(:status).and_return(true)
+
+        expect do
+          transport.send(:handle_client_error, response)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Token expired/)
+      end
+
+      it "handles empty error messages gracefully" do
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: {}
+        )
+
+        error_body = '{"error": {"message": "", "code": ""}}'
+        allow(response).to receive_messages(status: 400, body: error_body)
+        allow(response).to receive(:respond_to?).with(:body).and_return(true)
+        allow(response).to receive(:respond_to?).with(:status).and_return(true)
+
+        expect do
+          transport.send(:handle_client_error, response)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Empty error \(full response:/)
+      end
+
+      it "handles non-JSON error responses" do
+        transport = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: {}
+        )
+
+        error_body = "Plain text error message"
+        allow(response).to receive_messages(status: 500, body: error_body)
+        allow(response).to receive(:respond_to?).with(:body).and_return(true)
+        allow(response).to receive(:respond_to?).with(:status).and_return(true)
+
+        expect do
+          transport.send(:handle_client_error, response)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Plain text error message/)
+      end
     end
   end
 end

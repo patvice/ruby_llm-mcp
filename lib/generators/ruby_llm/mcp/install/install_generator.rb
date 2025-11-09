@@ -2,11 +2,13 @@
 
 require "rails/generators/base"
 
-module RubyLlm
-  module Mcp
+module RubyLLM
+  module MCP
     module Generators
       class InstallGenerator < Rails::Generators::Base
         source_root File.expand_path("templates", __dir__)
+
+        namespace "ruby_llm:mcp:install"
 
         desc "Install RubyLLM MCP configuration files"
 

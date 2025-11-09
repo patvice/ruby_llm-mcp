@@ -36,6 +36,15 @@ module RubyLLM
         end
       end
 
+      class AuthenticationRequiredError < BaseError
+        attr_reader :code
+
+        def initialize(message: "Authentication required", code: 401)
+          @code = code
+          super(message: message)
+        end
+      end
+
       class SessionExpiredError < BaseError; end
 
       class TimeoutError < BaseError

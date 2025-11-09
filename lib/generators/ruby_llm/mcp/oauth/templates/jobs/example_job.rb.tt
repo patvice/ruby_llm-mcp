@@ -1,0 +1,78 @@
+# frozen_string_literal: true
+
+# Example background job using MCP with per-<%= user_variable_name %> OAuth
+class AiResearchJob < ApplicationJob
+  queue_as :default
+
+  # Retry on authentication errors (<%= user_variable_name %> might reconnect)
+  retry_on McpClient::NotAuthenticatedError,
+           wait: 1.hour,
+           attempts: 3 do |job, _exception|
+    # After retries exhausted, notify <%= user_variable_name %>
+    <%= user_variable_name %> = <%= user_model_name %>.find(job.arguments.first)
+    <%= user_model_name %>Mailer.mcp_auth_required(<%= user_variable_name %>).deliver_now
+  end
+
+  # Retry on transient network errors
+  retry_on RubyLLM::MCP::Errors::TransportError,
+           wait: :exponentially_longer,
+           attempts: 5
+
+  # Perform AI research using <%= user_variable_name %>'s MCP connection
+  # @param <%= user_variable_name %>_id [Integer] ID of the <%= user_variable_name %>
+  # @param server_url [String] MCP server URL to use
+  # @param query [String] research query
+  # @param options [Hash] additional options
+  def perform(<%= user_variable_name %>_id, server_url, query, options = {})
+    <%= user_variable_name %> = <%= user_model_name %>.find(<%= user_variable_name %>_id)
+
+    # Create MCP client with <%= user_variable_name %>'s OAuth token
+    client = McpClient.for(<%= user_variable_name %>, server_url: server_url)
+
+    begin
+      # Get tools with <%= user_variable_name %>'s permissions
+      tools = client.tools
+      Rails.logger.info "Loaded #{tools.count} MCP tools for <%= user_variable_name %> #{<%= user_variable_name %>_id}"
+
+      # Create AI chat with <%= user_variable_name %>'s MCP context
+      chat = RubyLLM.chat(provider: options[:provider] || "anthropic/claude-sonnet-4")
+                    .with_tools(*tools)
+
+      # Execute research
+      response = chat.ask(query)
+
+      # Save results
+      save_research_results(<%= user_variable_name %>, query, response)
+
+      # Notify <%= user_variable_name %> of completion
+      notify_completion(<%= user_variable_name %>, query)
+
+      Rails.logger.info "Completed AI research for <%= user_variable_name %> #{<%= user_variable_name %>_id}"
+    ensure
+      # Always close client connection
+      client&.stop
+    end
+  end
+
+  private
+
+  def save_research_results(<%= user_variable_name %>, query, response)
+    # Customize based on your schema
+    <%= user_variable_name %>.research_results.create!(
+      query: query,
+      result: response.text,
+      completed_at: Time.current
+    )
+  end
+
+  def notify_completion(<%= user_variable_name %>, query)
+    # Notify via email, ActionCable, or other mechanism
+    ActionCable.server.broadcast(
+      "<%= user_variable_name %>_#{<%= user_variable_name %>.id}_notifications",
+      {
+        type: "research_complete",
+        message: "Research completed: #{query.truncate(50)}"
+      }
+    )
+  end
+end

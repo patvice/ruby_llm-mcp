@@ -449,6 +449,38 @@ Ensure exact match (no trailing slash, correct protocol):
 "http://127.0.0.1:8080/callback"   # Different host
 ```
 
+### Handling Authentication Required Errors
+
+When a server requires OAuth authentication, it returns HTTP 401. Handle this to trigger OAuth flow:
+
+```ruby
+require "ruby_llm/mcp"
+require "ruby_llm/mcp/auth/browser_oauth"
+
+begin
+  tools = client.tools
+rescue RubyLLM::MCP::Errors::AuthenticationRequiredError => e
+  puts "Authentication required: #{e.message}"
+
+  # Get OAuth provider from transport
+  transport_wrapper = client.instance_variable_get(:@coordinator).send(:transport)
+  actual_transport = transport_wrapper.transport_protocol
+  oauth_provider = actual_transport.oauth_provider
+
+  # Trigger browser OAuth flow
+  browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(oauth_provider)
+  token = browser_oauth.authenticate
+
+  puts "Authenticated! Token expires: #{token.expires_at}"
+
+  # Retry the operation
+  client.restart!
+  tools = client.tools
+end
+
+puts "Available tools: #{tools.map(&:name).join(', ')}"
+```
+
 ## Advanced Topics
 
 ### Custom OAuth Provider
@@ -494,11 +526,103 @@ end
 ENV["RUBYLLM_MCP_DEBUG"] = "1"
 ```
 
+### Client Credentials Flow
+
+For application-to-application authentication without user interaction:
+
+```ruby
+require "ruby_llm/mcp"
+require "ruby_llm/mcp/auth/oauth_provider"
+
+# Create OAuth provider with client credentials grant
+provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+  server_url: "https://api.example.com/mcp",
+  scope: "mcp:read mcp:write",
+  grant_type: :client_credentials
+)
+
+# Authenticate with client credentials (no browser needed)
+token = provider.client_credentials_flow
+puts "Authenticated! Token expires: #{token.expires_at}"
+
+# Use with MCP client
+client = RubyLLM::MCP.client(
+  name: "app-client",
+  transport_type: :streamable,
+  config: {
+    url: "https://api.example.com/mcp",
+    oauth: {
+      grant_type: :client_credentials,
+      scope: "mcp:read mcp:write"
+    }
+  }
+)
+
+# Manually authenticate before using client
+transport_wrapper = client.instance_variable_get(:@coordinator).send(:transport)
+actual_transport = transport_wrapper.transport_protocol
+oauth_provider = actual_transport.oauth_provider
+
+# Perform client credentials authentication
+token = oauth_provider.client_credentials_flow
+puts "Token obtained: #{token.access_token[0..10]}..."
+
+# Start the client (now authenticated)
+client.start
+
+# Use the client
+puts "Available tools: #{client.tools.map(&:name).join(', ')}"
+```
+
+**Note**: Client credentials flow requires:
+- Server support for `client_credentials` grant type
+- A `client_secret` from dynamic registration (confidential client)
+- Application-level authorization (no user context)
+
+**Configuration Options**:
+
+```ruby
+# In client config
+config: {
+  oauth: {
+    grant_type: :client_credentials,  # Default: :authorization_code
+    scope: "api:read api:write"
+  }
+}
+```
+
 ## Multi-User Applications
 
 For Rails applications with multiple users, see:
-- **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** - Complete multi-tenant setup
-- Generator: `rails generate ruby_llm:mcp:oauth:install`
+- **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** - Complete multi-tenant setup with customizable generator
+
+### Rails Generator Features
+
+The OAuth generator supports full customization for different Rails architectures:
+
+```bash
+# Basic installation
+rails generate ruby_llm:mcp:oauth:install
+
+# Custom user model (Account, Member, etc.)
+rails generate ruby_llm:mcp:oauth:install Account
+
+# Namespaced (Admin panel, multi-tenant)
+rails generate ruby_llm:mcp:oauth:install User --namespace=Admin
+
+# With options
+rails generate ruby_llm:mcp:oauth:install User \
+  --namespace=Admin \
+  --controller-name=OAuthConnectionsController \
+  --skip-routes
+```
+
+The generator automatically:
+- Creates migrations with proper foreign keys for your user model
+- Generates models with correct associations
+- Updates controllers with your authentication methods
+- Injects routes (unless `--skip-routes`)
+- Customizes all service objects and jobs
 
 ## Next Steps
 

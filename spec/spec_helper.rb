@@ -23,6 +23,7 @@ require_relative "support/client_runner"
 require_relative "support/test_server_manager"
 require_relative "support/mcp_test_configuration"
 require_relative "support/simple_multiply_tool"
+require_relative "support/time_support"
 
 # VCR Configuration
 VCR.configure do |config|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class McpOauthState < ApplicationRecord
-  belongs_to :user
+class <%= state_model_name %> < ApplicationRecord
+  belongs_to :<%= user_table_name.singularize %>
 
   encrypts :pkce_data
 
@@ -9,7 +9,7 @@ class McpOauthState < ApplicationRecord
   validates :expires_at, presence: true
 
   scope :expired, -> { where("expires_at < ?", Time.current) }
-  scope :for_user, ->(user_id) { where(user_id: user_id) }
+  scope :for_<%= user_table_name.singularize %>, ->(<%= user_table_name.singularize %>_id) { where(<%= user_table_name.singularize %>_id: <%= user_table_name.singularize %>_id) }
 
   # Clean up expired OAuth flow states
   def self.cleanup_expired

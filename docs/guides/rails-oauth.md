@@ -44,16 +44,35 @@ User Browser (Foreground)          Background Jobs (Headless)
 ### Step 1: Run the Generator
 
 ```bash
+# Basic installation (uses User model)
 rails generate ruby_llm:mcp:oauth:install
+
+# Custom user model
+rails generate ruby_llm:mcp:oauth:install Account
+
+# With namespace
+rails generate ruby_llm:mcp:oauth:install User --namespace=Admin
+
+# Custom controller name
+rails generate ruby_llm:mcp:oauth:install User --controller-name=OAuthConnectionsController
+
+# Skip automatic route injection
+rails generate ruby_llm:mcp:oauth:install User --skip-routes
+
+# Skip view generation
+rails generate ruby_llm:mcp:oauth:install User --skip-views
 ```
 
 This creates:
 - Database migrations for OAuth credentials
 - Models (`McpOauthCredential`, `McpOauthState`)
-- Controller (`McpConnectionsController`)
-- Storage adapter (`OauthStorage::UserTokenStorage`)
-- Routes for OAuth flow
-- Initializer for configuration
+- Controller (`McpConnectionsController` or custom name)
+- Token storage concern (`McpTokenStorage`)
+- User concern for OAuth methods (`UserMcpOauth`)
+- MCP client class (`McpClient`)
+- Routes for OAuth flow (automatically injected unless `--skip-routes`)
+- Example background job
+- Cleanup job for expired OAuth states
 
 ### Step 2: Run Migrations
 
@@ -93,7 +112,7 @@ end
 class AiResearchJob < ApplicationJob
   def perform(user_id, query)
     user = User.find(user_id)
-    client = McpClientFactory.for_user(user)
+    client = McpClient.for(user)
 
     tools = client.tools
     chat = RubyLLM.chat(provider: "anthropic/claude-sonnet-4")
@@ -104,6 +123,47 @@ class AiResearchJob < ApplicationJob
   end
 end
 ```
+
+## Generator Customization
+
+The generator supports full customization for different application architectures:
+
+### Custom User Model
+
+If your application uses a different model for authentication (e.g., `Account`, `Member`):
+
+```bash
+rails generate ruby_llm:mcp:oauth:install Account
+```
+
+This automatically:
+- Updates foreign keys in migrations (`account_id` instead of `user_id`)
+- Adjusts model associations (`belongs_to :account`)
+- Updates controller authentication (`current_account`, `authenticate_account!`)
+- Customizes service methods (`McpClient.for(account)`)
+
+### Namespaced Installation
+
+For admin or multi-tenant applications:
+
+```bash
+rails generate ruby_llm:mcp:oauth:install User --namespace=Admin
+```
+
+This creates:
+- Controllers in `app/controllers/admin/mcp_connections_controller.rb`
+- Views in `app/views/admin/mcp_connections/`
+- Routes under `/admin/mcp_connections`
+
+### Options Reference
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `UserModel` | Authentication model name | `Account`, `Member`, `Admin` |
+| `--namespace` | Namespace for controllers/views | `--namespace=Admin` |
+| `--controller-name` | Custom controller name | `--controller-name=OAuthConnectionsController` |
+| `--skip-routes` | Don't inject routes automatically | `--skip-routes` |
+| `--skip-views` | Don't generate view files | `--skip-views` |
 
 ## Complete Architecture
 
@@ -182,18 +242,28 @@ class McpOauthState < ApplicationRecord
 end
 ```
 
-### Storage Adapter
+### Token Storage Concern
 
-#### OauthStorage::UserTokenStorage
+#### McpTokenStorage
 
-Per-user OAuth token storage that implements the RubyLLM::MCP storage interface:
+A concern that provides OAuth token storage capabilities to any model (typically User):
 
 ```ruby
-module OauthStorage
-  class UserTokenStorage
-    def initialize(user_id, server_url)
+# app/models/concerns/mcp_token_storage.rb
+module McpTokenStorage
+  extend ActiveSupport::Concern
+
+  # Create token storage instance for a specific server URL
+  def mcp_token_storage(server_url)
+    TokenStorageAdapter.new(self.id, server_url, self.class.name.underscore)
+  end
+
+  # Internal adapter class that implements the OAuth storage interface
+  class TokenStorageAdapter
+    def initialize(user_id, server_url, user_type = "user")
       @user_id = user_id
       @server_url = server_url
+      @user_type = user_type
     end
 
     def get_token(_server_url)
@@ -217,6 +287,18 @@ module OauthStorage
     # Implements full storage interface...
   end
 end
+```
+
+This concern is automatically included via the `UserMcpOauth` concern:
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include UserMcpOauth  # This includes McpTokenStorage
+end
+
+# Now you can use it directly:
+user.mcp_token_storage(server_url)
 ```
 
 ### Controller
@@ -268,7 +350,7 @@ class AiAnalysisJob < ApplicationJob
     user = User.find(user_id)
 
     # Create MCP client with user's OAuth token
-    client = McpClientFactory.for_user(user)
+    client = McpClient.for(user)
 
     # Use client with user's permissions
     tools = client.tools
@@ -314,7 +396,7 @@ class SearchController < ApplicationController
   def create
     ensure_mcp_connected!
 
-    client = McpClientFactory.for_user(current_user)
+    client = McpClient.for(current_user)
 
     result = client.tool("search").execute(
       params: { query: params[:query] }
@@ -343,7 +425,7 @@ end
 class AnalyzeStreamJob < ApplicationJob
   def perform(user_id, query)
     user = User.find(user_id)
-    client = McpClientFactory.for_user(user)
+    client = McpClient.for(user)
 
     chat = RubyLLM.chat(provider: "anthropic/claude-sonnet-4")
       .with_tools(*client.tools)
@@ -361,14 +443,16 @@ end
 
 ## Client Factory Pattern
 
-### McpClientFactory Service
+### McpClient
+
+The generator creates an `McpClient` class that provides a simple interface for creating per-user MCP clients:
 
 ```ruby
-# app/services/mcp_client_factory.rb
-class McpClientFactory
+# app/lib/mcp_client.rb
+class McpClient
   class NotAuthenticatedError < StandardError; end
 
-  def self.for_user(user, server_url: nil, scope: nil)
+  def self.for(user, server_url: nil, scope: nil)
     server_url ||= ENV["DEFAULT_MCP_SERVER_URL"]
     scope ||= ENV["MCP_OAUTH_SCOPES"]
 
@@ -377,7 +461,7 @@ class McpClientFactory
             "User has not connected to MCP server: #{server_url}"
     end
 
-    storage = OauthStorage::UserTokenStorage.new(user.id, server_url)
+    storage = user.mcp_token_storage(server_url)
 
     RubyLLM::MCP.client(
       name: "user-#{user.id}-#{server_url.hash}",
@@ -392,12 +476,22 @@ class McpClientFactory
     )
   end
 
-  def self.for_user_with_fallback(user, server_url: nil)
-    for_user(user, server_url: server_url)
+  def self.for_with_fallback(user, server_url: nil)
+    self.for(user, server_url: server_url)
   rescue NotAuthenticatedError
     nil
   end
 end
+```
+
+You can also access the client directly via the user model:
+
+```ruby
+# Using McpClient class directly
+client = McpClient.for(user)
+
+# Or via the user model (same result)
+client = user.mcp_client
 ```
 
 ## User Flow Examples
@@ -523,12 +617,11 @@ class McpConnectionsController < ApplicationController
     raise "Unknown server" unless server_config
 
     # Create OAuth provider with server-specific scopes
-    storage = OauthStorage::UserTokenStorage.new(current_user.id, server_config[:url])
     oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
       server_url: server_config[:url],
       redirect_uri: mcp_connections_callback_url,
       scope: server_config[:scopes],
-      storage: storage
+      storage: current_user.mcp_token_storage(server_config[:url])
     )
 
     session[:mcp_oauth_context] = {
@@ -557,7 +650,7 @@ class MultiServerJob < ApplicationJob
 
   def create_client(user, server_key)
     config = McpServer.for(server_key)
-    McpClientFactory.for_user(user, server_url: config[:url])
+    McpClient.for(user, server_url: config[:url])
   end
 end
 ```
@@ -567,18 +660,16 @@ end
 ### Scoped Access by User Role
 
 ```ruby
-# app/services/mcp_client_factory.rb
+# app/lib/mcp_client.rb
 ROLE_SCOPES = {
   viewer: "mcp:read",
   editor: "mcp:read mcp:write",
   admin: "mcp:read mcp:write mcp:admin"
 }.freeze
 
-def self.for_user(user, server_url: nil)
+def self.for(user, server_url: nil)
   server_url ||= ENV["DEFAULT_MCP_SERVER_URL"]
   scope = ROLE_SCOPES[user.role.to_sym] || ROLE_SCOPES[:viewer]
-
-  storage = OauthStorage::UserTokenStorage.new(user.id, server_url)
 
   RubyLLM::MCP.client(
     name: "user-#{user.id}-mcp",
@@ -586,7 +677,7 @@ def self.for_user(user, server_url: nil)
     config: {
       url: server_url,
       oauth: {
-        storage: storage,
+        storage: user.mcp_token_storage(server_url),
         scope: scope
       }
     }
@@ -615,14 +706,11 @@ class RefreshMcpTokensJob < ApplicationJob
   private
 
   def refresh_user_token(credential)
-    storage = OauthStorage::UserTokenStorage.new(
-      credential.user_id,
-      credential.server_url
-    )
+    user = User.find(credential.user_id)
 
     oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
       server_url: credential.server_url,
-      storage: storage
+      storage: user.mcp_token_storage(credential.server_url)
     )
 
     refreshed = oauth_provider.access_token
@@ -818,25 +906,50 @@ Rails CSRF protection works automatically since OAuth state parameter is stored 
 
 ### 4. Rate Limiting
 
+Rails 8+ includes built-in rate limiting in ActionController. The generator automatically adds protection against OAuth abuse:
+
 ```ruby
 # app/controllers/mcp_connections_controller.rb
 class McpConnectionsController < ApplicationController
   before_action :authenticate_user!
-  before_action :check_rate_limit, only: [:connect]
 
-  private
+  # Prevent burst requests - max 5 connection attempts per minute
+  rate_limit to: 5, within: 1.minute, only: [:connect, :callback],
+             by: -> { current_user.id },
+             name: "mcp_oauth_burst",
+             with: -> {
+               redirect_to mcp_connections_path,
+                           alert: "Too many connection attempts. Please wait a moment and try again."
+             }
 
-  def check_rate_limit
-    key = "mcp_oauth:#{current_user.id}"
-    count = Rails.cache.read(key) || 0
+  # Prevent abuse - max 20 connection attempts per day
+  rate_limit to: 20, within: 1.day, only: [:connect, :callback],
+             by: -> { current_user.id },
+             name: "mcp_oauth_daily",
+             with: -> {
+               redirect_to mcp_connections_path,
+                           alert: "Daily connection limit reached. Please try again tomorrow."
+             }
 
-    if count >= 5
-      redirect_to mcp_connections_path,
-                  alert: "Too many connection attempts. Please try again later."
-      return
+  # ... rest of controller ...
+end
+```
+
+This provides two-tier protection:
+- **Short-term**: Prevents rapid-fire attempts (5 per minute)
+- **Long-term**: Prevents daily abuse (20 per day)
+
+Both limits are per-user (by `current_user.id`) and include custom redirect messages when exceeded.
+
+**For Rails 7 and earlier**, use Rack::Attack or a custom implementation:
+
+```ruby
+# config/initializers/rack_attack.rb (Rails 7 and earlier)
+class Rack::Attack
+  throttle("mcp_oauth/ip", limit: 5, period: 1.hour) do |req|
+    if req.path.start_with?("/mcp_connections/connect")
+      req.ip
     end
-
-    Rails.cache.write(key, count + 1, expires_in: 1.hour)
   end
 end
 ```
@@ -851,9 +964,9 @@ def perform(user_id, task)
   user = User.find(user_id)
 
   begin
-    client = McpClientFactory.for_user(user)
+    client = McpClient.for(user)
     # ... execute task ...
-  rescue McpClientFactory::NotAuthenticatedError
+  rescue McpClient::NotAuthenticatedError
     # User not connected - notify them
     notify_auth_required(user)
   rescue RubyLLM::MCP::Errors::TransportError => e
@@ -887,7 +1000,7 @@ end
 
 ```ruby
 class AiTaskJob < ApplicationJob
-  retry_on McpClientFactory::NotAuthenticatedError,
+  retry_on McpClient::NotAuthenticatedError,
            wait: :polynomially_longer,
            attempts: 3 do |job, exception|
     # After retries, notify user
@@ -997,7 +1110,7 @@ RSpec.describe AiAnalysisJob do
     it "raises NotAuthenticatedError" do
       expect {
         described_class.perform_now(user.id, { query: "Test" })
-      }.to raise_error(McpClientFactory::NotAuthenticatedError)
+      }.to raise_error(McpClient::NotAuthenticatedError)
     end
   end
 end
@@ -1167,7 +1280,7 @@ mcp_servers:
 class AiJob < ApplicationJob
   def perform(user_id, task)
     user = User.find(user_id)
-    client = McpClientFactory.for_user(user)  # User's token!
+    client = McpClient.for(user)  # User's token!
     # ... task executes with user's permissions ...
   end
 end
