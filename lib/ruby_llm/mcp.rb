@@ -92,5 +92,6 @@ loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 loader.inflector.inflect("http_client" => "HTTPClient")
+loader.inflector.inflect("oauth_provider" => "OAuthProvider")
 
 loader.setup

@@ -156,6 +156,7 @@ RSpec.describe RubyLLM::MCP::Transport do
         expect(protocol).to eq(mock_sse)
         expect(RubyLLM::MCP::Transports::SSE).to have_received(:new).with(
           coordinator: coordinator,
+          options: {},
           **config
         )
       end
@@ -170,6 +171,7 @@ RSpec.describe RubyLLM::MCP::Transport do
         expect(protocol).to eq(mock_streamable)
         expect(RubyLLM::MCP::Transports::StreamableHTTP).to have_received(:new).with(
           coordinator: coordinator,
+          options: {},
           **config
         )
       end
@@ -184,6 +186,7 @@ RSpec.describe RubyLLM::MCP::Transport do
         expect(protocol).to eq(mock_streamable)
         expect(RubyLLM::MCP::Transports::StreamableHTTP).to have_received(:new).with(
           coordinator: coordinator,
+          options: {},
           **config
         )
       end

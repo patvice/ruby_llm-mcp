@@ -313,18 +313,95 @@ class StreamingAnalysisController < ApplicationController
 end
 ```
 
+## OAuth Authentication for Multi-User Applications
+
+For Rails applications with multiple users where each user needs their own MCP connection:
+
+### Quick Start
+
+```bash
+# Install OAuth support
+rails generate ruby_llm:mcp:oauth:install
+
+# Run migrations
+rails db:migrate
+
+# Configure
+# .env
+DEFAULT_MCP_SERVER_URL=https://mcp.example.com/api
+MCP_OAUTH_SCOPES=mcp:read mcp:write
+```
+
+### Usage Pattern
+
+```ruby
+# User model
+class User < ApplicationRecord
+  include UserMcpOauth  # Adds mcp_connected?, mcp_client, etc.
+end
+
+# Background job with per-user permissions
+class AiResearchJob < ApplicationJob
+  def perform(user_id, query)
+    user = User.find(user_id)
+    client = user.mcp_client  # Uses user's OAuth token!
+
+    tools = client.tools
+    chat = RubyLLM.chat(provider: "anthropic/claude-sonnet-4")
+      .with_tools(*tools)
+
+    response = chat.ask(query)
+    # ... save results ...
+  end
+end
+
+# Controller
+class ResearchController < ApplicationController
+  def create
+    if current_user.mcp_connected?
+      AiResearchJob.perform_later(current_user.id, params[:query])
+      redirect_to research_path, notice: "Research started!"
+    else
+      redirect_to connect_mcp_connections_path,
+                  alert: "Please connect MCP server first"
+    end
+  end
+end
+```
+
+### Key Features
+
+- **Per-user OAuth tokens** - Each user has their own credentials
+- **Secure storage** - Encrypted tokens in database
+- **Background jobs** - No browser needed after initial auth
+- **Automatic refresh** - Tokens refresh transparently
+- **Multi-server support** - Users can connect to multiple MCP servers
+
+### Complete Guide
+
+For detailed implementation including:
+- Multi-tenant architecture
+- Token lifecycle management
+- Security best practices
+- Production deployment
+- Monitoring and alerts
+
+See the **[Rails OAuth Integration Guide]({% link guides/rails-oauth.md %})**
+
 ## Next Steps
 
 Now that you have comprehensive Rails integration set up:
 
 1. **Configure your MCP servers** in `config/mcps.yml`
 2. **Choose your client management strategy** (manual vs automatic)
-3. **Implement MCP services** for your specific use cases
-4. **Add proper error handling and monitoring**
-5. **Set up tests** for your MCP integrations
+3. **For multi-user OAuth**, see [Rails OAuth Integration]({% link guides/rails-oauth.md %})
+4. **Implement MCP services** for your specific use cases
+5. **Add proper error handling and monitoring**
+6. **Set up tests** for your MCP integrations
 
 For more detailed information on specific topics:
 
+- **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** - Multi-user OAuth setup
 - **[Configuration]({% link configuration.md %})** - Advanced client configuration
 - **[Tools]({% link server/tools.md %})** - Working with MCP tools
 - **[Resources]({% link server/resources.md %})** - Managing resources and templates

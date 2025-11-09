@@ -13,13 +13,14 @@ module RubyLLM
 
         attr_reader :command, :stdin, :stdout, :stderr, :id, :coordinator
 
-        def initialize(command:, coordinator:, request_timeout:, args: [], env: {})
+        def initialize(command:, coordinator:, request_timeout:, options: {})
           @request_timeout = request_timeout
           @command = command
           @coordinator = coordinator
-          @args = args
-          @env = env || {}
+          @args = options[:args] || options["args"] || []
+          @env = options[:env] || options["env"] || {}
           @client_id = SecureRandom.uuid
+          # NOTE: Stdio transport doesn't use OAuth (local process communication)
 
           @id_counter = 0
           @id_mutex = Mutex.new

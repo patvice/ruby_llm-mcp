@@ -12,26 +12,28 @@ module RubyLLM
       class SSE
         include Support::Timeout
 
-        attr_reader :headers, :id, :coordinator
+        attr_reader :headers, :id, :coordinator, :oauth_provider
 
-        def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {})
+        def initialize(url:, coordinator:, request_timeout:, options: {})
           @event_url = url
           @messages_url = nil
           @coordinator = coordinator
           @request_timeout = request_timeout
-          @version = version
+          @version = options[:version] || options["version"] || :http2
+          @oauth_provider = options[:oauth_provider] || options["oauth_provider"]
 
           uri = URI.parse(url)
           @root_url = "#{uri.scheme}://#{uri.host}"
           @root_url += ":#{uri.port}" if uri.port != uri.default_port
 
           @client_id = SecureRandom.uuid
-          @headers = headers.merge({
-                                     "Accept" => "text/event-stream",
-                                     "Content-Type" => "application/json",
-                                     "Cache-Control" => "no-cache",
-                                     "X-CLIENT-ID" => @client_id
-                                   })
+          custom_headers = options[:headers] || options["headers"] || {}
+          @headers = custom_headers.merge({
+                                            "Accept" => "text/event-stream",
+                                            "Content-Type" => "application/json",
+                                            "Cache-Control" => "no-cache",
+                                            "X-CLIENT-ID" => @client_id
+                                          })
 
           @id_counter = 0
           @id_mutex = Mutex.new
@@ -42,6 +44,7 @@ module RubyLLM
           @sse_thread = nil
 
           RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
+          RubyLLM::MCP.logger.debug "OAuth provider: #{@oauth_provider ? 'present' : 'none'}" if @oauth_provider
         end
 
         def request(body, add_id: true, wait_for_response: true)
@@ -104,8 +107,11 @@ module RubyLLM
         private
 
         def send_request(body, request_id)
-          http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
-                                                            headers: @headers)
+          request_headers = build_request_headers
+          http_client = Support::HTTPClient.connection.with(
+            timeout: { request_timeout: @request_timeout / 1000 },
+            headers: request_headers
+          )
           response = http_client.post(@messages_url, body: JSON.generate(body))
           handle_httpx_error_response!(response,
                                        context: { location: "message endpoint request", request_id: request_id })
@@ -173,10 +179,28 @@ module RubyLLM
         end
 
         def create_sse_client
-          sse_client = HTTPX.plugin(:stream).with(headers: @headers)
+          stream_headers = build_request_headers
+          sse_client = HTTPX.plugin(:stream).with(headers: stream_headers)
           return sse_client unless @version == :http1
 
           sse_client.with(ssl: { alpn_protocols: ["http/1.1"] })
+        end
+
+        # Build request headers with OAuth authorization if available
+        def build_request_headers
+          headers = @headers.dup
+
+          if @oauth_provider
+            token = @oauth_provider.access_token
+            if token
+              headers["Authorization"] = token.to_header
+              RubyLLM::MCP.logger.debug "Applied OAuth authorization header"
+            else
+              RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available"
+            end
+          end
+
+          headers
         end
 
         def validate_sse_response!(response)
