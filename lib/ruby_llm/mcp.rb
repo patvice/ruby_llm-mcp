@@ -100,5 +100,9 @@ loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 loader.inflector.inflect("http_client" => "HTTPClient")
 loader.inflector.inflect("oauth_provider" => "OAuthProvider")
 loader.inflector.inflect("browser_oauth" => "BrowserOAuth")
+loader.inflector.inflect("browser_oauth_provider" => "BrowserOAuthProvider")
+loader.inflector.inflect("http_server" => "HttpServer")
+loader.inflector.inflect("callback_handler" => "CallbackHandler")
+loader.inflector.inflect("callback_server" => "CallbackServer")
 
 loader.setup

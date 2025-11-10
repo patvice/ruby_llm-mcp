@@ -100,6 +100,22 @@ module RubyLLM
           refresh_token(token) if token.refresh_token
         end
 
+        # Authenticate and return current access token
+        # This is a convenience method for consistency with BrowserOAuthProvider
+        # For standard OAuth flow, external authorization is required before calling this
+        # @return [Token] current valid access token
+        # @raise [Errors::TransportError] if not authenticated or token unavailable
+        def authenticate
+          token = access_token
+          unless token
+            raise Errors::TransportError.new(
+              message: "Not authenticated. Please complete OAuth authorization flow first. " \
+                       "For standard OAuth, you must authorize externally and exchange the code."
+            )
+          end
+          token
+        end
+
         # Start OAuth authorization flow (authorization code grant)
         # @return [String] authorization URL for user to visit
         def start_authorization_flow

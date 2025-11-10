@@ -164,13 +164,12 @@ client = RubyLLM::MCP.client(
   }
 )
 
-# Authenticate via browser
-transport = client.instance_variable_get(:@coordinator).send(:transport)
-oauth_provider = transport.oauth_provider
-
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
-  callback_port: 8080
+# Authenticate via browser using factory method
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://api.example.com/mcp/sse",
+  type: :browser,
+  callback_port: 8080,
+  scope: "mcp:sse"
 )
 
 token = browser_oauth.authenticate(timeout: 300)
@@ -199,11 +198,12 @@ client = RubyLLM::MCP.client(
   }
 )
 
-# Authenticate
-transport = client.instance_variable_get(:@coordinator).send(:transport)
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  transport.oauth_provider,
-  callback_port: 9000
+# Authenticate using factory method
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://api.example.com/mcp",
+  type: :browser,
+  callback_port: 9000,
+  scope: "mcp:full"
 )
 browser_oauth.authenticate
 
@@ -248,7 +248,7 @@ client.start
 
 ## Browser-Based Authentication
 
-The `BrowserOAuth` class provides complete browser-based OAuth:
+The `BrowserOAuthProvider` class provides complete browser-based OAuth:
 
 ### Features
 
@@ -265,16 +265,11 @@ The `BrowserOAuth` class provides complete browser-based OAuth:
 ```ruby
 require "ruby_llm/mcp/auth/browser_oauth"
 
-oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
-  server_url: "https://mcp.example.com",
-  redirect_uri: "http://localhost:8080/callback",
-  scope: "mcp:read mcp:write"
-)
-
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://mcp.example.com",
+  type: :browser,
   callback_port: 8080,
-  callback_path: "/callback"
+  scope: "mcp:read mcp:write"
 )
 
 begin
@@ -297,8 +292,11 @@ end
 You can customize the HTML pages shown to users after OAuth authentication:
 
 ```ruby
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://api.example.com",
+  type: :browser,
+  callback_port: 8080,
+  scope: "mcp:read mcp:write",
   pages: {
     # Static HTML or a Proc that generates HTML
     success_page: "<html><body><h1>Welcome!</h1></body></html>",
@@ -424,9 +422,11 @@ http://example.com:80             → http://example.com
 ### Port Already in Use
 
 ```ruby
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
-  callback_port: 8081  # Try different port
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://mcp.example.com",
+  type: :browser,
+  callback_port: 8081,  # Try different port
+  scope: "mcp:read mcp:write"
 )
 ```
 
@@ -482,13 +482,13 @@ begin
 rescue RubyLLM::MCP::Errors::AuthenticationRequiredError => e
   puts "Authentication required: #{e.message}"
 
-  # Get OAuth provider from transport
-  transport_wrapper = client.instance_variable_get(:@coordinator).send(:transport)
-  actual_transport = transport_wrapper.transport_protocol
-  oauth_provider = actual_transport.oauth_provider
-
   # Trigger browser OAuth flow
-  browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(oauth_provider)
+  browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+    "https://mcp.example.com",
+    type: :browser,
+    callback_port: 8080,
+    scope: "mcp:read mcp:write"
+  )
   token = browser_oauth.authenticate
 
   puts "Authenticated! Token expires: #{token.expires_at}"
@@ -646,7 +646,7 @@ The generator automatically:
 
 ## Next Steps
 
-1. **Single-user apps**: Use `BrowserOAuth` class directly
+1. **Single-user apps**: Use `BrowserOAuthProvider` class directly or use the factory method `Auth.create_oauth`
 2. **Multi-user apps**: Use Rails OAuth integration
 3. **Production**: Implement custom storage (Redis, Database)
 4. **Security**: Enable debug logging during development

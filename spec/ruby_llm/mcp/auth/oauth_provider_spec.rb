@@ -240,6 +240,56 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
     end
   end
 
+  describe "#authenticate" do
+    let(:provider) do
+      described_class.new(
+        server_url: server_url,
+        storage: storage,
+        logger: logger
+      )
+    end
+
+    context "when token is available" do
+      let(:token) do
+        RubyLLM::MCP::Auth::Token.new(
+          access_token: "valid_token",
+          expires_in: 3600
+        )
+      end
+
+      before do
+        storage.set_token(server_url, token)
+      end
+
+      it "returns the token" do
+        result = provider.authenticate
+
+        expect(result).to eq(token)
+        expect(result.access_token).to eq("valid_token")
+      end
+    end
+
+    context "when no token is available" do
+      it "raises TransportError" do
+        expect do
+          provider.authenticate
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Not authenticated/)
+      end
+
+      it "provides helpful error message" do
+        expect do
+          provider.authenticate
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /complete OAuth authorization flow first/)
+      end
+
+      it "mentions standard OAuth flow in error" do
+        expect do
+          provider.authenticate
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /standard OAuth.*authorize externally/)
+      end
+    end
+  end
+
   describe "MCP OAuth 2.1 Compliance Features" do
     describe "#initialize with grant_type" do
       it "accepts grant_type parameter" do

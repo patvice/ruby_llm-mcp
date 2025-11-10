@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSpec/SpecFilePathFormat
   let(:oauth_provider) { instance_double(RubyLLM::MCP::Auth::OAuthProvider) }
   let(:callback_port) { 8080 }
   let(:callback_path) { "/callback" }
@@ -22,12 +22,14 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
     allow(logger).to receive(:info)
     allow(logger).to receive(:warn)
     allow(logger).to receive(:error)
-    allow(oauth_provider).to receive(:redirect_uri).and_return("http://localhost:8080/callback")
+    allow(oauth_provider).to receive_messages(redirect_uri: "http://localhost:8080/callback",
+                                              server_url: "https://mcp.example.com", scope: "mcp:read mcp:write",
+                                              storage: instance_double(RubyLLM::MCP::Auth::MemoryStorage))
   end
 
   describe "#initialize" do
     it "initializes with oauth_provider and default settings" do
-      browser_oauth = described_class.new(oauth_provider)
+      browser_oauth = described_class.new(oauth_provider: oauth_provider)
 
       expect(browser_oauth.oauth_provider).to eq(oauth_provider)
       expect(browser_oauth.callback_port).to eq(8080)
@@ -39,7 +41,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       custom_logger = instance_double(Logger)
       allow(oauth_provider).to receive(:redirect_uri).and_return("http://localhost:9090/auth/callback")
       browser_oauth = described_class.new(
-        oauth_provider,
+        oauth_provider: oauth_provider,
         callback_port: 9090,
         callback_path: "/auth/callback",
         logger: custom_logger
@@ -54,7 +56,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       allow(oauth_provider).to receive(:redirect_uri).and_return("http://localhost:3000/wrong")
       allow(oauth_provider).to receive(:redirect_uri=)
 
-      described_class.new(oauth_provider, callback_port: 8080, callback_path: "/callback")
+      described_class.new(oauth_provider: oauth_provider, callback_port: 8080, callback_path: "/callback")
 
       expect(oauth_provider).to have_received(:redirect_uri=).with("http://localhost:8080/callback")
       expect(logger).to have_received(:warn).with(/doesn't match callback server/)
@@ -64,7 +66,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       allow(oauth_provider).to receive(:redirect_uri).and_return("http://localhost:8080/callback")
       allow(oauth_provider).to receive(:redirect_uri=)
 
-      described_class.new(oauth_provider, callback_port: 8080, callback_path: "/callback")
+      described_class.new(oauth_provider: oauth_provider, callback_port: 8080, callback_path: "/callback")
 
       expect(oauth_provider).not_to have_received(:redirect_uri=)
       expect(logger).not_to have_received(:warn)
@@ -72,28 +74,28 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
     it "accepts custom success page as string" do
       custom_page = "<html><body>Custom Success</body></html>"
-      browser_oauth = described_class.new(oauth_provider, pages: { success_page: custom_page })
+      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { success_page: custom_page })
 
       expect(browser_oauth.custom_success_page).to eq(custom_page)
     end
 
     it "accepts custom success page as proc" do
       custom_page = -> { "<html><body>Custom Success</body></html>" }
-      browser_oauth = described_class.new(oauth_provider, pages: { success_page: custom_page })
+      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { success_page: custom_page })
 
       expect(browser_oauth.custom_success_page).to eq(custom_page)
     end
 
     it "accepts custom error page as string" do
       custom_page = "<html><body>Custom Error</body></html>"
-      browser_oauth = described_class.new(oauth_provider, pages: { error_page: custom_page })
+      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { error_page: custom_page })
 
       expect(browser_oauth.custom_error_page).to eq(custom_page)
     end
 
     it "accepts custom error page as proc" do
       custom_page = ->(msg) { "<html><body>Error: #{msg}</body></html>" }
-      browser_oauth = described_class.new(oauth_provider, pages: { error_page: custom_page })
+      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { error_page: custom_page })
 
       expect(browser_oauth.custom_error_page).to eq(custom_page)
     end
@@ -102,7 +104,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       custom_success = "<html><body>Success</body></html>"
       custom_error = "<html><body>Error</body></html>"
       browser_oauth = described_class.new(
-        oauth_provider,
+        oauth_provider: oauth_provider,
         pages: {
           success_page: custom_success,
           error_page: custom_error
@@ -116,7 +118,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
   describe "#authenticate" do
     let(:browser_oauth) do
-      described_class.new(oauth_provider, callback_port: callback_port, callback_path: callback_path)
+      described_class.new(oauth_provider: oauth_provider, callback_port: callback_port, callback_path: callback_path)
     end
     let(:tcp_server) { instance_double(TCPServer, wait_readable: false, closed?: false) }
 
@@ -157,20 +159,22 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       end
 
       it "opens browser when auto_open_browser is true" do
+        opener = browser_oauth.instance_variable_get(:@opener)
         allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-        allow(browser_oauth).to receive(:system).and_return(true)
+        allow(opener).to receive(:system).and_return(true)
 
         browser_oauth.authenticate(auto_open_browser: true)
 
-        expect(browser_oauth).to have_received(:system).with("open", auth_url)
+        expect(opener).to have_received(:system).with("open", auth_url)
       end
 
       it "doesn't open browser when auto_open_browser is false" do
-        allow(browser_oauth).to receive(:system)
+        opener = browser_oauth.instance_variable_get(:@opener)
+        allow(opener).to receive(:system)
 
         browser_oauth.authenticate(auto_open_browser: false)
 
-        expect(browser_oauth).not_to have_received(:system)
+        expect(opener).not_to have_received(:system)
       end
 
       it "waits for callback and completes authorization" do
@@ -251,7 +255,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
   describe "#handle_http_request" do
     let(:browser_oauth) do
-      described_class.new(oauth_provider, callback_port: callback_port, callback_path: callback_path)
+      described_class.new(oauth_provider: oauth_provider, callback_port: callback_port, callback_path: callback_path)
     end
     let(:client_socket) { instance_double(TCPSocket) }
     let(:result) { { code: nil, state: nil, error: nil, completed: false } }
@@ -367,44 +371,46 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
   end
 
   describe "#parse_query_params" do
-    let(:browser_oauth) { described_class.new(oauth_provider) }
+    let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
+    let(:http_server) { browser_oauth.instance_variable_get(:@http_server) }
 
     it "decodes URL-encoded strings" do
-      params = browser_oauth.send(:parse_query_params, "key=hello%20world&other=test%2Bvalue")
+      params = http_server.parse_query_params("key=hello%20world&other=test%2Bvalue")
 
       expect(params["key"]).to eq("hello world")
       expect(params["other"]).to eq("test+value")
     end
 
     it "handles empty values" do
-      params = browser_oauth.send(:parse_query_params, "key1=&key2=value")
+      params = http_server.parse_query_params("key1=&key2=value")
 
       expect(params["key1"]).to eq("")
       expect(params["key2"]).to eq("value")
     end
 
     it "handles special characters" do
-      params = browser_oauth.send(:parse_query_params, "email=user%40example.com&path=%2Fapi%2Fv1")
+      params = http_server.parse_query_params("email=user%40example.com&path=%2Fapi%2Fv1")
 
       expect(params["email"]).to eq("user@example.com")
       expect(params["path"]).to eq("/api/v1")
     end
 
     it "handles empty query string" do
-      params = browser_oauth.send(:parse_query_params, "")
+      params = http_server.parse_query_params("")
 
       expect(params).to eq({})
     end
 
     it "handles multiple parameters" do
-      params = browser_oauth.send(:parse_query_params, "a=1&b=2&c=3")
+      params = http_server.parse_query_params("a=1&b=2&c=3")
 
       expect(params).to eq({ "a" => "1", "b" => "2", "c" => "3" })
     end
   end
 
   describe "#send_http_response" do
-    let(:browser_oauth) { described_class.new(oauth_provider) }
+    let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
+    let(:http_server) { browser_oauth.instance_variable_get(:@http_server) }
     let(:client_socket) { instance_double(TCPSocket) }
 
     before do
@@ -414,7 +420,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
     it "sends 200 OK with correct headers" do
       allow(client_socket).to receive(:write)
 
-      browser_oauth.send(:send_http_response, client_socket, 200, "text/plain", "Success")
+      http_server.send_http_response(client_socket, 200, "text/plain", "Success")
 
       expect(client_socket).to have_received(:write) do |response|
         expect(response).to include("HTTP/1.1 200 OK")
@@ -428,7 +434,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
     it "sends 400 Bad Request with correct headers" do
       allow(client_socket).to receive(:write)
 
-      browser_oauth.send(:send_http_response, client_socket, 400, "text/plain", "Error")
+      http_server.send_http_response(client_socket, 400, "text/plain", "Error")
 
       expect(client_socket).to have_received(:write) do |response|
         expect(response).to include("HTTP/1.1 400 Bad Request")
@@ -440,7 +446,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
     it "sends 404 Not Found with correct headers" do
       allow(client_socket).to receive(:write)
 
-      browser_oauth.send(:send_http_response, client_socket, 404, "text/plain", "Not Found")
+      http_server.send_http_response(client_socket, 404, "text/plain", "Not Found")
 
       expect(client_socket).to have_received(:write) do |response|
         expect(response).to include("HTTP/1.1 404 Not Found")
@@ -451,49 +457,50 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       allow(client_socket).to receive(:write).and_raise(IOError)
 
       expect do
-        browser_oauth.send(:send_http_response, client_socket, 200, "text/plain", "Success")
+        http_server.send_http_response(client_socket, 200, "text/plain", "Success")
       end.not_to raise_error
     end
   end
 
   describe "#open_browser" do
-    let(:browser_oauth) { described_class.new(oauth_provider) }
+    let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
+    let(:opener) { browser_oauth.instance_variable_get(:@opener) }
     let(:url) { "https://example.com/auth" }
 
     it "calls correct command for macOS" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-      allow(browser_oauth).to receive(:system).and_return(true)
+      allow(opener).to receive(:system).and_return(true)
 
-      result = browser_oauth.send(:open_browser, url)
+      result = opener.open_browser(url)
 
       expect(result).to be true
-      expect(browser_oauth).to have_received(:system).with("open", url)
+      expect(opener).to have_received(:system).with("open", url)
     end
 
     it "calls correct command for Linux" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("linux")
-      allow(browser_oauth).to receive(:system).and_return(true)
+      allow(opener).to receive(:system).and_return(true)
 
-      result = browser_oauth.send(:open_browser, url)
+      result = opener.open_browser(url)
 
       expect(result).to be true
-      expect(browser_oauth).to have_received(:system).with("xdg-open", url)
+      expect(opener).to have_received(:system).with("xdg-open", url)
     end
 
     it "calls correct command for Windows" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("mswin")
-      allow(browser_oauth).to receive(:system).and_return(true)
+      allow(opener).to receive(:system).and_return(true)
 
-      result = browser_oauth.send(:open_browser, url)
+      result = opener.open_browser(url)
 
       expect(result).to be true
-      expect(browser_oauth).to have_received(:system).with("start", url)
+      expect(opener).to have_received(:system).with("start", url)
     end
 
     it "warns on unknown operating system" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("unknown-os")
 
-      result = browser_oauth.send(:open_browser, url)
+      result = opener.open_browser(url)
 
       expect(result).to be false
       expect(logger).to have_received(:warn).with(/Unknown operating system/)
@@ -501,9 +508,9 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
     it "handles system call failures" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-      allow(browser_oauth).to receive(:system).and_raise(StandardError.new("Command failed"))
+      allow(opener).to receive(:system).and_raise(StandardError.new("Command failed"))
 
-      result = browser_oauth.send(:open_browser, url)
+      result = opener.open_browser(url)
 
       expect(result).to be false
       expect(logger).to have_received(:warn).with(/Failed to open browser/)
@@ -512,25 +519,26 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
   describe "#success_page" do
     context "without custom page" do
-      let(:browser_oauth) { described_class.new(oauth_provider) }
+      let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "includes proper HTML structure" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
-        expect(html).to include("<html>")
+        expect(html).to include("<html")
         expect(html).to include("<head>")
         expect(html).to include("<body>")
         expect(html).to include("</html>")
       end
 
       it "includes success message" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).to include("Authentication Successful")
       end
 
       it "includes logo and favicon" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).to include("rubyllm-mcp-logo.svg")
         expect(html).to include("favicon.svg")
@@ -541,19 +549,20 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       let(:custom_html) { "<html><body>Custom Success!</body></html>" }
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           pages: { success_page: custom_html }
         )
       end
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "returns custom HTML string" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).to eq(custom_html)
       end
 
       it "doesn't include default content" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).not_to include("Authentication Successful")
       end
@@ -563,19 +572,20 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       let(:custom_proc) { -> { "<html><body>Dynamic Success Page</body></html>" } }
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           pages: { success_page: custom_proc }
         )
       end
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "calls proc and returns result" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).to eq("<html><body>Dynamic Success Page</body></html>")
       end
 
       it "doesn't include default content" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).not_to include("Authentication Successful")
       end
@@ -585,13 +595,14 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       let(:custom_lambda) { -> { "<html><body>Lambda Success!</body></html>" } }
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           pages: { success_page: custom_lambda }
         )
       end
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "calls lambda and returns result" do
-        html = browser_oauth.send(:success_page)
+        html = pages.success_page
 
         expect(html).to eq("<html><body>Lambda Success!</body></html>")
       end
@@ -600,33 +611,34 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
   describe "#error_page" do
     context "without custom page" do
-      let(:browser_oauth) { described_class.new(oauth_provider) }
+      let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "includes proper HTML structure" do
-        html = browser_oauth.send(:error_page, "Error message")
+        html = pages.error_page("Error message")
 
-        expect(html).to include("<html>")
+        expect(html).to include("<html")
         expect(html).to include("<head>")
         expect(html).to include("<body>")
         expect(html).to include("</html>")
       end
 
       it "includes error message" do
-        html = browser_oauth.send(:error_page, "Test error message")
+        html = pages.error_page("Test error message")
 
         expect(html).to include("Authentication Failed")
         expect(html).to include("Test error message")
       end
 
       it "escapes HTML in error message" do
-        html = browser_oauth.send(:error_page, "<script>alert('xss')</script>")
+        html = pages.error_page("<script>alert('xss')</script>")
 
         expect(html).to include("&lt;script&gt;")
         expect(html).not_to include("<script>alert('xss')</script>")
       end
 
       it "includes logo and favicon" do
-        html = browser_oauth.send(:error_page, "Error")
+        html = pages.error_page("Error")
 
         expect(html).to include("rubyllm-mcp-logo.svg")
         expect(html).to include("favicon.svg")
@@ -637,25 +649,26 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       let(:custom_html) { "<html><body>Custom Error!</body></html>" }
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           pages: { error_page: custom_html }
         )
       end
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "returns custom HTML string" do
-        html = browser_oauth.send(:error_page, "Some error")
+        html = pages.error_page("Some error")
 
         expect(html).to eq(custom_html)
       end
 
       it "doesn't include default content" do
-        html = browser_oauth.send(:error_page, "Some error")
+        html = pages.error_page("Some error")
 
         expect(html).not_to include("Authentication Failed")
       end
 
       it "ignores error message parameter when using static string" do
-        html = browser_oauth.send(:error_page, "Dynamic error")
+        html = pages.error_page("Dynamic error")
 
         expect(html).to eq(custom_html)
         expect(html).not_to include("Dynamic error")
@@ -668,26 +681,27 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       end
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           pages: { error_page: custom_proc }
         )
       end
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "calls proc with error message and returns result" do
-        html = browser_oauth.send(:error_page, "Access denied")
+        html = pages.error_page("Access denied")
 
         expect(html).to eq("<html><body>Error: Access denied</body></html>")
       end
 
       it "doesn't include default content" do
-        html = browser_oauth.send(:error_page, "Some error")
+        html = pages.error_page("Some error")
 
         expect(html).not_to include("Authentication Failed")
       end
 
       it "passes different error messages to proc" do
-        html1 = browser_oauth.send(:error_page, "Error 1")
-        html2 = browser_oauth.send(:error_page, "Error 2")
+        html1 = pages.error_page("Error 1")
+        html2 = pages.error_page("Error 2")
 
         expect(html1).to include("Error 1")
         expect(html2).to include("Error 2")
@@ -700,24 +714,25 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       end
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           pages: { error_page: custom_lambda }
         )
       end
+      let(:pages) { browser_oauth.instance_variable_get(:@pages) }
 
       it "calls lambda with error message and returns result" do
-        html = browser_oauth.send(:error_page, "Invalid token")
+        html = pages.error_page("Invalid token")
 
         expect(html).to eq("<html><body>Lambda Error: Invalid token</body></html>")
       end
     end
   end
 
-  describe "CallbackServer" do
+  describe "Browser::CallbackServer" do
     let(:tcp_server) { instance_double(TCPServer) }
     let(:thread) { instance_double(Thread) }
     let(:stop_proc) { -> {} }
-    let(:callback_server) { described_class::CallbackServer.new(tcp_server, thread, stop_proc) }
+    let(:callback_server) { RubyLLM::MCP::Auth::Browser::CallbackServer.new(tcp_server, thread, stop_proc) }
 
     describe "#shutdown" do
       it "calls stop proc" do
@@ -781,7 +796,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
   describe "thread coordination" do
     let(:browser_oauth) do
-      described_class.new(oauth_provider, callback_port: callback_port, callback_path: callback_path)
+      described_class.new(oauth_provider: oauth_provider, callback_port: callback_port, callback_path: callback_path)
     end
     let(:tcp_server) { instance_double(TCPServer) }
     let(:client_socket) { instance_double(TCPSocket) }
@@ -842,7 +857,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
 
   describe "integration scenarios" do
     let(:browser_oauth) do
-      described_class.new(oauth_provider, callback_port: callback_port, callback_path: callback_path)
+      described_class.new(oauth_provider: oauth_provider, callback_port: callback_port, callback_path: callback_path)
     end
     let(:tcp_server) { instance_double(TCPServer) }
     let(:client_socket) { instance_double(TCPSocket) }
@@ -954,7 +969,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       let(:custom_success_html) { "<html><body>Custom Success Page</body></html>" }
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           callback_port: callback_port,
           callback_path: callback_path,
           pages: { success_page: custom_success_html }
@@ -987,7 +1002,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       end
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           callback_port: callback_port,
           callback_path: callback_path,
           pages: { error_page: custom_error_proc }
@@ -1021,7 +1036,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       end
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           callback_port: callback_port,
           callback_path: callback_path,
           pages: { success_page: custom_success_proc }
@@ -1051,7 +1066,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       let(:custom_error_html) { "<html><body>My Error Page</body></html>" }
       let(:browser_oauth) do
         described_class.new(
-          oauth_provider,
+          oauth_provider: oauth_provider,
           callback_port: callback_port,
           callback_path: callback_path,
           pages: {

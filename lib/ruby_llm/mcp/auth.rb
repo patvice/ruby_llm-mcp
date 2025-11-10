@@ -338,6 +338,22 @@ module RubyLLM
           Base64.urlsafe_encode64(digest, padding: false)
         end
       end
+
+      # Factory method to create OAuth providers
+      # @param server_url [String] OAuth server URL
+      # @param type [Symbol] OAuth provider type (:standard or :browser)
+      # @param options [Hash] additional options passed to provider
+      # @return [OAuthProvider, BrowserOAuthProvider] OAuth provider instance
+      def self.create_oauth(server_url, type: :standard, **options)
+        case type
+        when :browser
+          BrowserOAuthProvider.new(server_url: server_url, **options)
+        when :standard
+          OAuthProvider.new(server_url: server_url, **options)
+        else
+          raise ArgumentError, "Unknown OAuth type: #{type}. Must be :standard or :browser"
+        end
+      end
     end
   end
 end
