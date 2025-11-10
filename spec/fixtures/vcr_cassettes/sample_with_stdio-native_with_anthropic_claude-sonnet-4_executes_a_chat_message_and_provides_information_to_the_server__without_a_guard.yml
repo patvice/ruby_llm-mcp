@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 21:59:42 GMT
+      - Mon, 10 Nov 2025 20:50:15 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T21:59:42Z'
+      - '2025-11-10T20:50:14Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T21:59:42Z'
+      - '2025-11-10T20:50:15Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T21:59:41Z'
+      - '2025-11-10T20:50:14Z'
       Retry-After:
-      - '19'
+      - '50'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T21:59:42Z'
+      - '2025-11-10T20:50:14Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2114'
+      - '2444'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -78,8 +78,8 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01VHCj4S5acKp2TkwA8RbvEy","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_0161H8UxQSUy3XbAtxbSqBZu","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
         I''m doing well, thank you for asking. I''m here and ready to help with whatever
-        you''d like to discuss or work on. How are you doing today?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":19,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":39,"service_tier":"standard"}}'
-  recorded_at: Thu, 06 Nov 2025 21:59:42 GMT
+        you might need. How are you doing today?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":19,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":34,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 20:50:15 GMT
 recorded_with: VCR 6.3.1

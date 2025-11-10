@@ -52,7 +52,7 @@ VCR.configure do |config|
   FileUtils.mkdir_p(config.cassette_library_dir)
 
   # Allow HTTP connections when necessary - this will fail PRs by design if they don't have cassettes
-  config.allow_http_connections_when_no_cassette = true
+  config.allow_http_connections_when_no_cassette = !ENV["CI"]
 
   # Filter out API keys from the recorded cassettes
   config.filter_sensitive_data("<OPENAI_API_KEY>") { ENV.fetch("OPENAI_API_KEY", nil) }

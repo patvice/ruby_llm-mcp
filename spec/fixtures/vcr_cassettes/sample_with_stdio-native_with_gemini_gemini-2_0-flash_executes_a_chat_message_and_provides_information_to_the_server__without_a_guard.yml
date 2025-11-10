@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 21:59:58 GMT
+      - Mon, 10 Nov 2025 20:50:19 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=578
+      - gfet4t7; dur=772
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -54,19 +54,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I am doing well, thank you for asking! How can I help you today?\n"
+                    "text": "Hello! As a large language model, I don't experience feelings in the same way humans do. However, I'm functioning optimally and ready to assist you. How can I help you today?\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.051865610811445445
+              "avgLogprobs": -0.21212452933901832
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 12,
-            "candidatesTokenCount": 18,
-            "totalTokenCount": 30,
+            "candidatesTokenCount": 42,
+            "totalTokenCount": 54,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -76,12 +76,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 18
+                "tokenCount": 42
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "XhoNafDRGdfO_uMPhOu7gQY"
+          "responseId": "ClASaemXOeTvjrEPlqOI6A0"
         }
-  recorded_at: Thu, 06 Nov 2025 21:59:58 GMT
+  recorded_at: Mon, 10 Nov 2025 20:50:19 GMT
 recorded_with: VCR 6.3.1

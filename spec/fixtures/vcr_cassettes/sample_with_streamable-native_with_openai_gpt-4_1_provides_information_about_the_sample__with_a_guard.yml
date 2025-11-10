@@ -24,7 +24,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 21:53:02 GMT
+      - Mon, 10 Nov 2025 20:50:34 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -36,13 +36,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '805'
+      - '632'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '831'
+      - '652'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -78,16 +78,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ2CbtQDKHtECWJifR3LDNuTZ6ZlV",
+          "id": "chatcmpl-CaT8LpUugVMhZlw20hMuiMFDYhys4",
           "object": "chat.completion",
-          "created": 1762465981,
+          "created": 1762807833,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Hello! I'm just a virtual assistant, so I don't have feelings, but I'm here and ready to help you. How can I assist you today?",
+                "content": "Hello! I'm just a program, so I don't have feelings, but I'm ready to help you. How can I assist you today?",
                 "refusal": null,
                 "annotations": []
               },
@@ -97,8 +97,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 23,
-            "completion_tokens": 30,
-            "total_tokens": 53,
+            "completion_tokens": 27,
+            "total_tokens": 50,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -113,5 +113,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Thu, 06 Nov 2025 21:53:02 GMT
+  recorded_at: Mon, 10 Nov 2025 20:50:34 GMT
 recorded_with: VCR 6.3.1
