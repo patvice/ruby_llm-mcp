@@ -117,7 +117,7 @@ class CustomOAuthStorage
   private
 
   # Simulate persistence to demonstrate storage patterns
-  def simulate_persistence(type, key, data)
+  def simulate_persistence(type, _key, data)
     # In a real app, this might be:
 
     # Database example:
@@ -152,7 +152,7 @@ puts "=" * 60
 # Create custom storage instance
 storage = CustomOAuthStorage.new
 
-puts "\n" + "=" * 60
+puts "\n#{'=' * 60}"
 puts "Using Custom Storage with Browser OAuth"
 puts "-" * 60
 
@@ -161,18 +161,18 @@ SERVER_URL = "https://accounts.google.com"
 SCOPES = "openid profile email"
 
 # Create BrowserOAuthProvider with custom storage
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuthProvider.new(
+RubyLLM::MCP::Auth::BrowserOAuthProvider.new(
   server_url: SERVER_URL,
   callback_port: 8080,
   scope: SCOPES,
-  storage: storage  # Pass custom storage
+  storage: storage # Pass custom storage
 )
 
 puts "\nBrowser OAuth created with custom storage"
 puts "All token operations will use CustomOAuthStorage"
 
 # Simulate token storage (in a real app, this comes from OAuth flow)
-puts "\n" + "-" * 60
+puts "\n#{'-' * 60}"
 puts "Simulating Token Storage Operations"
 puts "-" * 60
 
@@ -198,7 +198,7 @@ puts "✓ Token retrieved successfully" if retrieved_token
 puts "\nStored tokens:"
 storage.list_tokens.each { |url| puts "  - #{url}" }
 
-puts "\n" + "=" * 60
+puts "\n#{'=' * 60}"
 puts "Using Custom Storage with Standard OAuth"
 puts "-" * 60
 
@@ -207,7 +207,7 @@ standard_oauth = RubyLLM::MCP::Auth::OAuthProvider.new(
   server_url: SERVER_URL,
   redirect_uri: "http://localhost:8080/callback",
   scope: SCOPES,
-  storage: storage  # Same storage instance can be shared
+  storage: storage # Same storage instance can be shared
 )
 
 puts "Standard OAuth created with same custom storage"
@@ -217,7 +217,7 @@ puts "Tokens are shared across different OAuth provider instances"
 token_from_standard = standard_oauth.access_token
 puts "\n✓ Token accessible from standard provider: #{token_from_standard ? 'Yes' : 'No'}"
 
-puts "\n" + "=" * 60
+puts "\n#{'=' * 60}"
 puts "Custom Storage Benefits:"
 puts "-" * 60
 puts "✓ Persist tokens across application restarts"
@@ -228,7 +228,7 @@ puts "✓ Add logging and monitoring"
 puts "✓ Support multi-user systems"
 puts "✓ Integrate with existing authentication systems"
 
-puts "\n" + "=" * 60
+puts "\n#{'=' * 60}"
 puts "Real-World Storage Examples:"
 puts "-" * 60
 puts <<~EXAMPLES

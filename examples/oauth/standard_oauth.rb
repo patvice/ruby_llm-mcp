@@ -50,7 +50,7 @@ puts "  2. User authorizes your application"
 puts "  3. OAuth provider redirects back to your redirect_uri with 'code' and 'state'"
 
 # Step 2: Complete the flow (after receiving callback)
-puts "\n" + "-" * 60
+puts "\n#{'-' * 60}"
 puts "Step 2: Complete Authorization (after callback)"
 puts "-" * 60
 puts "After the user authorizes, you'll receive:"
@@ -96,7 +96,7 @@ puts "  #{REDIRECT_URI}?code=AUTHORIZATION_CODE&state=STATE_VALUE"
 #   puts "\n✗ Error: #{e.message}"
 # end
 
-puts "\n" + "=" * 60
+puts "\n#{'=' * 60}"
 puts "Integration with Web Applications:"
 puts "-" * 60
 puts "In a Rails/Sinatra app, you would:"

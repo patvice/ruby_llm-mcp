@@ -72,7 +72,7 @@ puts "=" * 60
 #   puts e.backtrace.first(5).join("\n")
 # end
 
-puts "\n" + "=" * 60
+puts "\n#{'=' * 60}"
 puts "To test this example:"
 puts "1. Set up OAuth credentials with your provider"
 puts "2. Export environment variables:"
