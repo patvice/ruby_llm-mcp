@@ -52,6 +52,13 @@ module RubyLLM
 
           RubyLLM::MCP.logger.info("Sampling request: #{result.inspect}")
           Sample.new(result, coordinator).execute
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Error in sampling request: #{e.message}\n#{e.backtrace.join("\n")}")
+          coordinator.error_response(
+            id: result.id,
+            message: "Error processing sampling request: #{e.message}",
+            code: -32_000
+          )
         end
 
         def handle_elicitation_response(result)
