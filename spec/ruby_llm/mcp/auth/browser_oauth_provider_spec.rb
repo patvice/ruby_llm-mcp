@@ -72,47 +72,78 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
       expect(logger).not_to have_received(:warn)
     end
 
-    it "accepts custom success page as string" do
+    it "uses custom success page from config as string" do
       custom_page = "<html><body>Custom Success</body></html>"
-      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { success_page: custom_page })
+      RubyLLM::MCP.configure do |config|
+        config.oauth.browser_success_page = custom_page
+      end
+
+      browser_oauth = described_class.new(oauth_provider: oauth_provider)
 
       expect(browser_oauth.custom_success_page).to eq(custom_page)
+
+      # Reset config
+      RubyLLM::MCP.config.oauth.browser_success_page = nil
     end
 
-    it "accepts custom success page as proc" do
+    it "uses custom success page from config as proc" do
       custom_page = -> { "<html><body>Custom Success</body></html>" }
-      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { success_page: custom_page })
+      RubyLLM::MCP.configure do |config|
+        config.oauth.browser_success_page = custom_page
+      end
+
+      browser_oauth = described_class.new(oauth_provider: oauth_provider)
 
       expect(browser_oauth.custom_success_page).to eq(custom_page)
+
+      # Reset config
+      RubyLLM::MCP.config.oauth.browser_success_page = nil
     end
 
-    it "accepts custom error page as string" do
+    it "uses custom error page from config as string" do
       custom_page = "<html><body>Custom Error</body></html>"
-      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { error_page: custom_page })
+      RubyLLM::MCP.configure do |config|
+        config.oauth.browser_error_page = custom_page
+      end
+
+      browser_oauth = described_class.new(oauth_provider: oauth_provider)
 
       expect(browser_oauth.custom_error_page).to eq(custom_page)
+
+      # Reset config
+      RubyLLM::MCP.config.oauth.browser_error_page = nil
     end
 
-    it "accepts custom error page as proc" do
+    it "uses custom error page from config as proc" do
       custom_page = ->(msg) { "<html><body>Error: #{msg}</body></html>" }
-      browser_oauth = described_class.new(oauth_provider: oauth_provider, pages: { error_page: custom_page })
+      RubyLLM::MCP.configure do |config|
+        config.oauth.browser_error_page = custom_page
+      end
+
+      browser_oauth = described_class.new(oauth_provider: oauth_provider)
 
       expect(browser_oauth.custom_error_page).to eq(custom_page)
+
+      # Reset config
+      RubyLLM::MCP.config.oauth.browser_error_page = nil
     end
 
-    it "accepts both custom pages simultaneously" do
+    it "uses both custom pages from config simultaneously" do
       custom_success = "<html><body>Success</body></html>"
       custom_error = "<html><body>Error</body></html>"
-      browser_oauth = described_class.new(
-        oauth_provider: oauth_provider,
-        pages: {
-          success_page: custom_success,
-          error_page: custom_error
-        }
-      )
+      RubyLLM::MCP.configure do |config|
+        config.oauth.browser_success_page = custom_success
+        config.oauth.browser_error_page = custom_error
+      end
+
+      browser_oauth = described_class.new(oauth_provider: oauth_provider)
 
       expect(browser_oauth.custom_success_page).to eq(custom_success)
       expect(browser_oauth.custom_error_page).to eq(custom_error)
+
+      # Reset config
+      RubyLLM::MCP.config.oauth.browser_success_page = nil
+      RubyLLM::MCP.config.oauth.browser_error_page = nil
     end
   end
 
@@ -548,12 +579,16 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     context "with custom string page" do
       let(:custom_html) { "<html><body>Custom Success!</body></html>" }
       let(:browser_oauth) do
-        described_class.new(
-          oauth_provider: oauth_provider,
-          pages: { success_page: custom_html }
-        )
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_html
+        end
+        described_class.new(oauth_provider: oauth_provider)
       end
       let(:pages) { browser_oauth.instance_variable_get(:@pages) }
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
+      end
 
       it "returns custom HTML string" do
         html = pages.success_page
@@ -571,12 +606,16 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     context "with custom proc page" do
       let(:custom_proc) { -> { "<html><body>Dynamic Success Page</body></html>" } }
       let(:browser_oauth) do
-        described_class.new(
-          oauth_provider: oauth_provider,
-          pages: { success_page: custom_proc }
-        )
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_proc
+        end
+        described_class.new(oauth_provider: oauth_provider)
       end
       let(:pages) { browser_oauth.instance_variable_get(:@pages) }
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
+      end
 
       it "calls proc and returns result" do
         html = pages.success_page
@@ -594,12 +633,16 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     context "with custom lambda page" do
       let(:custom_lambda) { -> { "<html><body>Lambda Success!</body></html>" } }
       let(:browser_oauth) do
-        described_class.new(
-          oauth_provider: oauth_provider,
-          pages: { success_page: custom_lambda }
-        )
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_lambda
+        end
+        described_class.new(oauth_provider: oauth_provider)
       end
       let(:pages) { browser_oauth.instance_variable_get(:@pages) }
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
+      end
 
       it "calls lambda and returns result" do
         html = pages.success_page
@@ -648,12 +691,16 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     context "with custom string page" do
       let(:custom_html) { "<html><body>Custom Error!</body></html>" }
       let(:browser_oauth) do
-        described_class.new(
-          oauth_provider: oauth_provider,
-          pages: { error_page: custom_html }
-        )
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_error_page = custom_html
+        end
+        described_class.new(oauth_provider: oauth_provider)
       end
       let(:pages) { browser_oauth.instance_variable_get(:@pages) }
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_error_page = nil
+      end
 
       it "returns custom HTML string" do
         html = pages.error_page("Some error")
@@ -680,12 +727,16 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         ->(error_msg) { "<html><body>Error: #{error_msg}</body></html>" }
       end
       let(:browser_oauth) do
-        described_class.new(
-          oauth_provider: oauth_provider,
-          pages: { error_page: custom_proc }
-        )
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_error_page = custom_proc
+        end
+        described_class.new(oauth_provider: oauth_provider)
       end
       let(:pages) { browser_oauth.instance_variable_get(:@pages) }
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_error_page = nil
+      end
 
       it "calls proc with error message and returns result" do
         html = pages.error_page("Access denied")
@@ -713,12 +764,16 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         ->(error_msg) { "<html><body>Lambda Error: #{error_msg}</body></html>" }
       end
       let(:browser_oauth) do
-        described_class.new(
-          oauth_provider: oauth_provider,
-          pages: { error_page: custom_lambda }
-        )
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_error_page = custom_lambda
+        end
+        described_class.new(oauth_provider: oauth_provider)
       end
       let(:pages) { browser_oauth.instance_variable_get(:@pages) }
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_error_page = nil
+      end
 
       it "calls lambda with error message and returns result" do
         html = pages.error_page("Invalid token")
@@ -968,12 +1023,18 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     context "with custom success page" do
       let(:custom_success_html) { "<html><body>Custom Success Page</body></html>" }
       let(:browser_oauth) do
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_success_html
+        end
         described_class.new(
           oauth_provider: oauth_provider,
           callback_port: callback_port,
-          callback_path: callback_path,
-          pages: { success_page: custom_success_html }
+          callback_path: callback_path
         )
+      end
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
       end
 
       it "sends custom success page on successful authentication" do
@@ -1001,12 +1062,18 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         ->(error_msg) { "<html><body>Custom Error: #{error_msg}</body></html>" }
       end
       let(:browser_oauth) do
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_error_page = custom_error_proc
+        end
         described_class.new(
           oauth_provider: oauth_provider,
           callback_port: callback_port,
-          callback_path: callback_path,
-          pages: { error_page: custom_error_proc }
+          callback_path: callback_path
         )
+      end
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_error_page = nil
       end
 
       it "sends custom error page with error message on OAuth error" do
@@ -1035,12 +1102,18 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         -> { "<html><body>Dynamic Success - #{Time.now.to_i}</body></html>" }
       end
       let(:browser_oauth) do
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_success_proc
+        end
         described_class.new(
           oauth_provider: oauth_provider,
           callback_port: callback_port,
-          callback_path: callback_path,
-          pages: { success_page: custom_success_proc }
+          callback_path: callback_path
         )
+      end
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
       end
 
       it "calls proc to generate success page dynamically" do
@@ -1065,15 +1138,20 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
       let(:custom_success_html) { "<html><body>My Success Page</body></html>" }
       let(:custom_error_html) { "<html><body>My Error Page</body></html>" }
       let(:browser_oauth) do
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_success_html
+          config.oauth.browser_error_page = custom_error_html
+        end
         described_class.new(
           oauth_provider: oauth_provider,
           callback_port: callback_port,
-          callback_path: callback_path,
-          pages: {
-            success_page: custom_success_html,
-            error_page: custom_error_html
-          }
+          callback_path: callback_path
         )
+      end
+
+      after do
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
+        RubyLLM::MCP.config.oauth.browser_error_page = nil
       end
 
       it "uses custom success page for successful auth" do

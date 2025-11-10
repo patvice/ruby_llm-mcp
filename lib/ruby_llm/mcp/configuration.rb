@@ -52,7 +52,9 @@ module RubyLLM
                       :tos_uri,
                       :policy_uri,
                       :jwks_uri,
-                      :jwks
+                      :jwks,
+                      :browser_success_page,
+                      :browser_error_page
 
         def initialize
           @client_name = "RubyLLM MCP Client"
@@ -65,6 +67,8 @@ module RubyLLM
           @policy_uri = nil
           @jwks_uri = nil
           @jwks = nil
+          @browser_success_page = nil
+          @browser_error_page = nil
         end
       end
 

@@ -48,17 +48,23 @@ RSpec.describe RubyLLM::MCP::Auth do
 
       it "passes additional options to BrowserOAuthProvider" do
         custom_page = "<html><body>Custom</body></html>"
+        RubyLLM::MCP.configure do |config|
+          config.oauth.browser_success_page = custom_page
+        end
+
         provider = described_class.create_oauth(
           server_url,
           type: :browser,
           callback_port: 9090,
-          scope: scope,
-          pages: { success_page: custom_page }
+          scope: scope
         )
 
         expect(provider).to be_a(RubyLLM::MCP::Auth::BrowserOAuthProvider)
         expect(provider.callback_port).to eq(9090)
         expect(provider.custom_success_page).to eq(custom_page)
+
+        # Reset config
+        RubyLLM::MCP.config.oauth.browser_success_page = nil
       end
     end
 

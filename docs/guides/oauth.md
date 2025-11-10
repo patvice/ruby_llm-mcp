@@ -289,23 +289,25 @@ end
 
 ### Custom Success/Error Pages
 
-You can customize the HTML pages shown to users after OAuth authentication:
+You can customize the HTML pages shown to users after OAuth authentication via the global configuration:
 
 ```ruby
+RubyLLM::MCP.configure do |config|
+  # Static HTML or a Proc that generates HTML
+  config.oauth.browser_success_page = "<html><body><h1>Welcome!</h1></body></html>"
+
+  # Error page receives the error message
+  config.oauth.browser_error_page = ->(error_msg) {
+    "<html><body><h1>Error:</h1><p>#{CGI.escapeHTML(error_msg)}</p></body></html>"
+  }
+end
+
+# All browser OAuth providers will use these custom pages
 browser_oauth = RubyLLM::MCP::Auth.create_oauth(
   "https://api.example.com",
   type: :browser,
   callback_port: 8080,
-  scope: "mcp:read mcp:write",
-  pages: {
-    # Static HTML or a Proc that generates HTML
-    success_page: "<html><body><h1>Welcome!</h1></body></html>",
-
-    # Error page receives the error message
-    error_page: ->(error_msg) {
-      "<html><body><h1>Error:</h1><p>#{CGI.escapeHTML(error_msg)}</p></body></html>"
-    }
-  }
+  scope: "mcp:read mcp:write"
 )
 ```
 

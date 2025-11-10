@@ -33,11 +33,8 @@ module RubyLLM
         # @param storage [Object] token storage instance
         # @param redirect_uri [String] OAuth redirect URI
         # @param scope [String] OAuth scopes
-        # @param pages [Hash] optional custom pages
-        # @option pages [String, Proc] :success_page custom HTML for success page
-        # @option pages [String, Proc] :error_page custom HTML for error page (accepts error_message)
         def initialize(server_url: nil, oauth_provider: nil, callback_port: 8080, callback_path: "/callback", # rubocop:disable Metrics/ParameterLists
-                       logger: nil, storage: nil, redirect_uri: nil, scope: nil, pages: {})
+                       logger: nil, storage: nil, redirect_uri: nil, scope: nil)
           @logger = logger || MCP.logger
           @callback_port = callback_port
           @callback_path = callback_path
@@ -77,8 +74,8 @@ module RubyLLM
           @http_server = Browser::HttpServer.new(port: @callback_port, logger: @logger)
           @callback_handler = Browser::CallbackHandler.new(callback_path: @callback_path, logger: @logger)
           @pages = Browser::Pages.new(
-            custom_success_page: pages[:success_page],
-            custom_error_page: pages[:error_page]
+            custom_success_page: MCP.config.oauth.browser_success_page,
+            custom_error_page: MCP.config.oauth.browser_error_page
           )
           @opener = Browser::Opener.new(logger: @logger)
         end
