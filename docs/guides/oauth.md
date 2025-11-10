@@ -9,6 +9,9 @@ description: "Complete OAuth 2.1 implementation with PKCE, dynamic registration,
 # OAuth 2.1 Authentication
 {: .no_toc }
 
+{: .label .label-green }
+0.8+
+
 Comprehensive OAuth 2.1 support for MCP servers with automatic token management, browser-based authentication, and pluggable storage.
 
 ## Table of contents
@@ -20,6 +23,8 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 ---
 
 ## Features
+{: .label .label-green }
+0.8+
 
 ### OAuth 2.1 Compliance
 
@@ -41,6 +46,8 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 | **Stdio** | N/A | Local process communication (no auth needed) |
 
 ## Architecture
+{: .label .label-green }
+0.8+
 
 ### Core Components
 
@@ -73,6 +80,8 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 ```
 
 ## Quick Start
+{: .label .label-green }
+0.8+
 
 ### Browser-Based OAuth (Simplest)
 
@@ -188,6 +197,8 @@ RubyLLM::MCP.establish_connection
 ```
 
 ## Configuration Options
+{: .label .label-green }
+0.8+
 
 ### OAuth Configuration
 
@@ -212,6 +223,8 @@ mcp_servers:
 ```
 
 ## Usage Examples
+{: .label .label-green }
+0.8+
 
 ### Basic OAuth Client
 
@@ -277,6 +290,8 @@ tools = client.tools
 ```
 
 ## Browser-Based Authentication
+{: .label .label-green }
+0.8+
 
 The `BrowserOAuthProvider` class provides complete browser-based OAuth:
 
@@ -342,6 +357,8 @@ browser_oauth = RubyLLM::MCP::Auth.create_oauth(
 ```
 
 ## Custom Storage
+{: .label .label-green }
+0.8+
 
 The default in-memory storage works for single-user applications, but production applications typically need persistent storage. Custom storage is especially important when:
 
@@ -480,6 +497,8 @@ client.start
 See [Rails OAuth Integration Guide]({% link guides/rails-oauth.md %}) for a complete multi-user database storage implementation with migrations, models, and controllers.
 
 ## Security Considerations
+{: .label .label-green }
+0.8+
 
 ### PKCE (Proof Key for Code Exchange)
 
@@ -514,6 +533,8 @@ http://example.com:80             → http://example.com
 ```
 
 ## Troubleshooting
+{: .label .label-green }
+0.8+
 
 ### Port Already in Use
 
@@ -591,6 +612,8 @@ puts "Available tools: #{tools.map(&:name).join(', ')}"
 ```
 
 ## Advanced Topics
+{: .label .label-green }
+0.8+
 
 ### Custom OAuth Provider
 
@@ -699,39 +722,6 @@ config: {
   }
 }
 ```
-
-## Multi-User Applications
-
-For Rails applications with multiple users, see:
-- **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** - Complete multi-tenant setup with customizable generator
-
-### Rails Generator Features
-
-The OAuth generator supports full customization for different Rails architectures:
-
-```bash
-# Basic installation
-rails generate ruby_llm:mcp:oauth:install
-
-# Custom user model (Account, Member, etc.)
-rails generate ruby_llm:mcp:oauth:install Account
-
-# Namespaced (Admin panel, multi-tenant)
-rails generate ruby_llm:mcp:oauth:install User --namespace=Admin
-
-# With options
-rails generate ruby_llm:mcp:oauth:install User \
-  --namespace=Admin \
-  --controller-name=OAuthConnectionsController \
-  --skip-routes
-```
-
-The generator automatically:
-- Creates migrations with proper foreign keys for your user model
-- Generates models with correct associations
-- Updates controllers with your authentication methods
-- Injects routes (unless `--skip-routes`)
-- Customizes all service objects and jobs
 
 ## Next Steps
 
