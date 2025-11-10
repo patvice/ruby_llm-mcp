@@ -3,12 +3,6 @@
 require "spec_helper"
 
 RSpec.describe RubyLLM::MCP::Sample do
-  before do
-    MCPTestConfiguration.reset_config!
-    MCPTestConfiguration.configure_ruby_llm!
-  end
-
-  # Integration tests - only run on adapters that support sampling
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
     ClientRunner.build_client_runners(CLIENT_OPTIONS)
   end
@@ -33,7 +27,12 @@ RSpec.describe RubyLLM::MCP::Sample do
                            .gsub(" ", "_")
                            .gsub("/", "_")
 
-    VCR.use_cassette(cassette_name) do
+    VCR.use_cassette(cassette_name, allow_playback_repeats: true) do
+      # Reset and configure RubyLLM INSIDE the cassette block
+      # so Faraday connections are created AFTER VCR hooks are in place
+      MCPTestConfiguration.reset_config!
+      MCPTestConfiguration.configure_ruby_llm!
+
       example.run
     end
   end

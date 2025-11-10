@@ -41,6 +41,13 @@ module RubyLLM
           else
             coordinator.error_response(id: result.id, message: "Roots are not enabled", code: -32_000)
           end
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Error in roots request: #{e.message}\n#{e.backtrace.join("\n")}")
+          coordinator.error_response(
+            id: result.id,
+            message: "Error processing roots request: #{e.message}",
+            code: -32_000
+          )
         end
 
         def handle_sampling_response(result)
