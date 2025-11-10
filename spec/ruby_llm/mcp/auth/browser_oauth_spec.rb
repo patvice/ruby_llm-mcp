@@ -69,6 +69,49 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       expect(oauth_provider).not_to have_received(:redirect_uri=)
       expect(logger).not_to have_received(:warn)
     end
+
+    it "accepts custom success page as string" do
+      custom_page = "<html><body>Custom Success</body></html>"
+      browser_oauth = described_class.new(oauth_provider, pages: { success_page: custom_page })
+
+      expect(browser_oauth.custom_success_page).to eq(custom_page)
+    end
+
+    it "accepts custom success page as proc" do
+      custom_page = -> { "<html><body>Custom Success</body></html>" }
+      browser_oauth = described_class.new(oauth_provider, pages: { success_page: custom_page })
+
+      expect(browser_oauth.custom_success_page).to eq(custom_page)
+    end
+
+    it "accepts custom error page as string" do
+      custom_page = "<html><body>Custom Error</body></html>"
+      browser_oauth = described_class.new(oauth_provider, pages: { error_page: custom_page })
+
+      expect(browser_oauth.custom_error_page).to eq(custom_page)
+    end
+
+    it "accepts custom error page as proc" do
+      custom_page = ->(msg) { "<html><body>Error: #{msg}</body></html>" }
+      browser_oauth = described_class.new(oauth_provider, pages: { error_page: custom_page })
+
+      expect(browser_oauth.custom_error_page).to eq(custom_page)
+    end
+
+    it "accepts both custom pages simultaneously" do
+      custom_success = "<html><body>Success</body></html>"
+      custom_error = "<html><body>Error</body></html>"
+      browser_oauth = described_class.new(
+        oauth_provider,
+        pages: {
+          success_page: custom_success,
+          error_page: custom_error
+        }
+      )
+
+      expect(browser_oauth.custom_success_page).to eq(custom_success)
+      expect(browser_oauth.custom_error_page).to eq(custom_error)
+    end
   end
 
   describe "#authenticate" do
@@ -468,28 +511,205 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
   end
 
   describe "#success_page" do
-    let(:browser_oauth) { described_class.new(oauth_provider) }
+    context "without custom page" do
+      let(:browser_oauth) { described_class.new(oauth_provider) }
 
-    it "includes proper HTML structure" do
-      html = browser_oauth.send(:success_page)
+      it "includes proper HTML structure" do
+        html = browser_oauth.send(:success_page)
 
-      expect(html).to include("<html>")
-      expect(html).to include("<head>")
-      expect(html).to include("<body>")
-      expect(html).to include("</html>")
+        expect(html).to include("<html>")
+        expect(html).to include("<head>")
+        expect(html).to include("<body>")
+        expect(html).to include("</html>")
+      end
+
+      it "includes success message" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).to include("Authentication Successful")
+      end
+
+      it "includes logo and favicon" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).to include("rubyllm-mcp-logo.svg")
+        expect(html).to include("favicon.svg")
+      end
+    end
+
+    context "with custom string page" do
+      let(:custom_html) { "<html><body>Custom Success!</body></html>" }
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          pages: { success_page: custom_html }
+        )
+      end
+
+      it "returns custom HTML string" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).to eq(custom_html)
+      end
+
+      it "doesn't include default content" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).not_to include("Authentication Successful")
+      end
+    end
+
+    context "with custom proc page" do
+      let(:custom_proc) { -> { "<html><body>Dynamic Success Page</body></html>" } }
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          pages: { success_page: custom_proc }
+        )
+      end
+
+      it "calls proc and returns result" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).to eq("<html><body>Dynamic Success Page</body></html>")
+      end
+
+      it "doesn't include default content" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).not_to include("Authentication Successful")
+      end
+    end
+
+    context "with custom lambda page" do
+      let(:custom_lambda) { -> { "<html><body>Lambda Success!</body></html>" } }
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          pages: { success_page: custom_lambda }
+        )
+      end
+
+      it "calls lambda and returns result" do
+        html = browser_oauth.send(:success_page)
+
+        expect(html).to eq("<html><body>Lambda Success!</body></html>")
+      end
     end
   end
 
   describe "#error_page" do
-    let(:browser_oauth) { described_class.new(oauth_provider) }
+    context "without custom page" do
+      let(:browser_oauth) { described_class.new(oauth_provider) }
 
-    it "includes proper HTML structure" do
-      html = browser_oauth.send(:error_page, "Error message")
+      it "includes proper HTML structure" do
+        html = browser_oauth.send(:error_page, "Error message")
 
-      expect(html).to include("<html>")
-      expect(html).to include("<head>")
-      expect(html).to include("<body>")
-      expect(html).to include("</html>")
+        expect(html).to include("<html>")
+        expect(html).to include("<head>")
+        expect(html).to include("<body>")
+        expect(html).to include("</html>")
+      end
+
+      it "includes error message" do
+        html = browser_oauth.send(:error_page, "Test error message")
+
+        expect(html).to include("Authentication Failed")
+        expect(html).to include("Test error message")
+      end
+
+      it "escapes HTML in error message" do
+        html = browser_oauth.send(:error_page, "<script>alert('xss')</script>")
+
+        expect(html).to include("&lt;script&gt;")
+        expect(html).not_to include("<script>alert('xss')</script>")
+      end
+
+      it "includes logo and favicon" do
+        html = browser_oauth.send(:error_page, "Error")
+
+        expect(html).to include("rubyllm-mcp-logo.svg")
+        expect(html).to include("favicon.svg")
+      end
+    end
+
+    context "with custom string page" do
+      let(:custom_html) { "<html><body>Custom Error!</body></html>" }
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          pages: { error_page: custom_html }
+        )
+      end
+
+      it "returns custom HTML string" do
+        html = browser_oauth.send(:error_page, "Some error")
+
+        expect(html).to eq(custom_html)
+      end
+
+      it "doesn't include default content" do
+        html = browser_oauth.send(:error_page, "Some error")
+
+        expect(html).not_to include("Authentication Failed")
+      end
+
+      it "ignores error message parameter when using static string" do
+        html = browser_oauth.send(:error_page, "Dynamic error")
+
+        expect(html).to eq(custom_html)
+        expect(html).not_to include("Dynamic error")
+      end
+    end
+
+    context "with custom proc page" do
+      let(:custom_proc) do
+        ->(error_msg) { "<html><body>Error: #{error_msg}</body></html>" }
+      end
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          pages: { error_page: custom_proc }
+        )
+      end
+
+      it "calls proc with error message and returns result" do
+        html = browser_oauth.send(:error_page, "Access denied")
+
+        expect(html).to eq("<html><body>Error: Access denied</body></html>")
+      end
+
+      it "doesn't include default content" do
+        html = browser_oauth.send(:error_page, "Some error")
+
+        expect(html).not_to include("Authentication Failed")
+      end
+
+      it "passes different error messages to proc" do
+        html1 = browser_oauth.send(:error_page, "Error 1")
+        html2 = browser_oauth.send(:error_page, "Error 2")
+
+        expect(html1).to include("Error 1")
+        expect(html2).to include("Error 2")
+      end
+    end
+
+    context "with custom lambda page" do
+      let(:custom_lambda) do
+        ->(error_msg) { "<html><body>Lambda Error: #{error_msg}</body></html>" }
+      end
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          pages: { error_page: custom_lambda }
+        )
+      end
+
+      it "calls lambda with error message and returns result" do
+        html = browser_oauth.send(:error_page, "Invalid token")
+
+        expect(html).to eq("<html><body>Lambda Error: Invalid token</body></html>")
+      end
     end
   end
 
@@ -714,6 +934,167 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuth do # rubocop:disable RSpec/SpecF
       end.to raise_error(RubyLLM::MCP::Errors::TransportError)
 
       expect(tcp_server).to have_received(:close)
+    end
+  end
+
+  describe "custom pages integration" do
+    let(:tcp_server) { instance_double(TCPServer) }
+    let(:client_socket) { instance_double(TCPSocket) }
+
+    before do
+      allow(oauth_provider).to receive(:start_authorization_flow).and_return(auth_url)
+      allow(TCPServer).to receive(:new).and_return(tcp_server)
+      allow(tcp_server).to receive(:close)
+      allow(tcp_server).to receive(:closed?).and_return(false)
+      allow(client_socket).to receive(:setsockopt)
+      allow(client_socket).to receive(:close)
+    end
+
+    context "with custom success page" do
+      let(:custom_success_html) { "<html><body>Custom Success Page</body></html>" }
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          callback_port: callback_port,
+          callback_path: callback_path,
+          pages: { success_page: custom_success_html }
+        )
+      end
+
+      it "sends custom success page on successful authentication" do
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive(:accept).and_return(client_socket)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?code=test_code&state=test_state HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+        allow(oauth_provider).to receive(:complete_authorization_flow).and_return(token)
+
+        browser_oauth.authenticate(auto_open_browser: false)
+
+        expect(client_socket).to have_received(:write) do |response|
+          expect(response).to include("HTTP/1.1 200 OK")
+          expect(response).to include("Custom Success Page")
+          expect(response).not_to include("Authentication Successful")
+        end
+      end
+    end
+
+    context "with custom error page" do
+      let(:custom_error_proc) do
+        ->(error_msg) { "<html><body>Custom Error: #{error_msg}</body></html>" }
+      end
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          callback_port: callback_port,
+          callback_path: callback_path,
+          pages: { error_page: custom_error_proc }
+        )
+      end
+
+      it "sends custom error page with error message on OAuth error" do
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive(:accept).and_return(client_socket)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?error=access_denied&error_description=User%20cancelled HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+
+        expect do
+          browser_oauth.authenticate(auto_open_browser: false)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError)
+
+        expect(client_socket).to have_received(:write) do |response|
+          expect(response).to include("HTTP/1.1 400 Bad Request")
+          expect(response).to include("Custom Error: User cancelled")
+          expect(response).not_to include("Authentication Failed")
+        end
+      end
+    end
+
+    context "with custom proc-based success page" do
+      let(:custom_success_proc) do
+        -> { "<html><body>Dynamic Success - #{Time.now.to_i}</body></html>" }
+      end
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          callback_port: callback_port,
+          callback_path: callback_path,
+          pages: { success_page: custom_success_proc }
+        )
+      end
+
+      it "calls proc to generate success page dynamically" do
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive(:accept).and_return(client_socket)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?code=test_code&state=test_state HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+        allow(oauth_provider).to receive(:complete_authorization_flow).and_return(token)
+
+        browser_oauth.authenticate(auto_open_browser: false)
+
+        expect(client_socket).to have_received(:write) do |response|
+          expect(response).to include("Dynamic Success")
+        end
+      end
+    end
+
+    context "with both custom pages" do
+      let(:custom_success_html) { "<html><body>My Success Page</body></html>" }
+      let(:custom_error_html) { "<html><body>My Error Page</body></html>" }
+      let(:browser_oauth) do
+        described_class.new(
+          oauth_provider,
+          callback_port: callback_port,
+          callback_path: callback_path,
+          pages: {
+            success_page: custom_success_html,
+            error_page: custom_error_html
+          }
+        )
+      end
+
+      it "uses custom success page for successful auth" do
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive(:accept).and_return(client_socket)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?code=test&state=test HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+        allow(oauth_provider).to receive(:complete_authorization_flow).and_return(token)
+
+        browser_oauth.authenticate(auto_open_browser: false)
+
+        expect(client_socket).to have_received(:write) do |response|
+          expect(response).to include("My Success Page")
+        end
+      end
+
+      it "uses custom error page for OAuth errors" do
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive(:accept).and_return(client_socket)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?error=invalid_request HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+
+        expect do
+          browser_oauth.authenticate(auto_open_browser: false)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError)
+
+        expect(client_socket).to have_received(:write) do |response|
+          expect(response).to include("My Error Page")
+        end
+      end
     end
   end
 end

@@ -112,8 +112,6 @@ module RubyLLM
         redirect_uri = oauth_config[:redirect_uri] || oauth_config["redirect_uri"] || "http://localhost:8080/callback"
         scope = oauth_config[:scope] || oauth_config["scope"]
         storage = oauth_config[:storage] || oauth_config["storage"]
-        client_name = oauth_config[:client_name] || oauth_config["client_name"]
-        client_uri = oauth_config[:client_uri] || oauth_config["client_uri"]
         grant_type = oauth_config[:grant_type] || oauth_config["grant_type"] || :authorization_code
 
         RubyLLM::MCP::Auth::OAuthProvider.new(
@@ -122,8 +120,6 @@ module RubyLLM
           scope: scope,
           logger: MCP.logger,
           storage: storage,
-          client_name: client_name,
-          client_uri: client_uri,
           grant_type: grant_type
         )
       end

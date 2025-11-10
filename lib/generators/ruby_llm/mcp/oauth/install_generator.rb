@@ -41,10 +41,14 @@ module RubyLLM
           end
 
           def create_migrations
-            migration_template "migrations/create_mcp_oauth_credentials.rb.tt",
-                               "db/migrate/create_mcp_oauth_credentials.rb"
-            migration_template "migrations/create_mcp_oauth_states.rb.tt",
-                               "db/migrate/create_mcp_oauth_states.rb"
+            create_migration_if_needed(
+              "create_mcp_oauth_credentials",
+              "migrations/create_mcp_oauth_credentials.rb.tt"
+            )
+            create_migration_if_needed(
+              "create_mcp_oauth_states",
+              "migrations/create_mcp_oauth_states.rb.tt"
+            )
           end
 
           def create_models
@@ -75,26 +79,18 @@ module RubyLLM
             routes_content = if namespace_name
                                <<~ROUTES.strip
                                  namespace :#{namespace_name.underscore} do
-                                   resources :mcp_connections, only: [ :index, :create ] do
+                                   resources :mcp_connections, only: [ :index, :show, :create, :update, :destroy ] do
                                      collection do
                                        get :callback
-                                     end
-                                     member do
-                                       delete :disconnect
-                                       get :refresh
                                      end
                                    end
                                  end
                                ROUTES
                              else
                                <<~ROUTES.strip
-                                 resources :mcp_connections, only: [ :index, :create ] do
+                                 resources :mcp_connections, only: [ :index, :show, :create, :update, :destroy ] do
                                    collection do
                                      get :callback
-                                   end
-                                   member do
-                                     delete :disconnect
-                                     get :refresh
                                    end
                                  end
                                ROUTES
@@ -108,6 +104,7 @@ module RubyLLM
 
             view_path = namespace_name ? "#{namespace_name.underscore}/mcp_connections" : "mcp_connections"
             copy_file "views/index.html.erb", "app/views/#{view_path}/index.html.erb"
+            copy_file "views/show.html.erb", "app/views/#{view_path}/show.html.erb"
           end
 
           def add_user_concern
@@ -153,6 +150,19 @@ module RubyLLM
           end
 
           private
+
+          # Migration helper method
+          def create_migration_if_needed(migration_name, template_path)
+            if migration_exists?(migration_name)
+              say "  ⏭️  Migration #{migration_name} already exists, skipping", :yellow
+            else
+              migration_template template_path, "db/migrate/#{migration_name}.rb"
+            end
+          end
+
+          def migration_exists?(migration_name)
+            Dir.glob("db/migrate/*_#{migration_name}.rb").any?
+          end
 
           # Validation methods
           def check_user_model_exists
@@ -296,6 +306,7 @@ module RubyLLM
             say "  • app/controllers/#{controller_file_path}_controller.rb"
             unless options[:skip_views]
               say "  • app/views/#{"#{namespace_name.underscore}/" if namespace_name}mcp_connections/index.html.erb"
+              say "  • app/views/#{"#{namespace_name.underscore}/" if namespace_name}mcp_connections/show.html.erb"
             end
             say "  • app/jobs/ai_research_job.rb (example)"
             say "  • app/jobs/cleanup_expired_oauth_states_job.rb"

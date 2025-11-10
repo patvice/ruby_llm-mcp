@@ -52,7 +52,7 @@
               </td>
               <td>
                 <% if credential.token_expires_at %>
-                  <%= time_tag credential.token_expires_at, credential.token_expires_at.to_s(:short) %>
+                  <%= time_tag credential.token_expires_at, credential.token_expires_at.to_fs(:short) %>
                   <br>
                   <small class="mcp-text-muted">
                     (<%= time_ago_in_words(credential.token_expires_at) %>
@@ -71,13 +71,15 @@
               </td>
               <td>
                 <div class="mcp-btn-group">
-                  <% if credential.expired? || credential.expires_soon? %>
-                    <%= link_to "Refresh",
-                        refresh_mcp_connection_path(credential),
-                        class: "mcp-btn mcp-btn-warning" %>
-                  <% end %>
+                  <%= link_to "View Tools",
+                      mcp_connection_path(credential),
+                      class: "mcp-btn mcp-btn-primary" %>
+                  <%= button_to "Refresh",
+                      mcp_connection_path(credential),
+                      method: :patch,
+                      class: "mcp-btn #{credential.expired? || credential.expires_soon? ? 'mcp-btn-warning' : 'mcp-btn-secondary'}" %>
                   <%= button_to "Disconnect",
-                      disconnect_mcp_connection_path(credential),
+                      mcp_connection_path(credential),
                       method: :delete,
                       form: { data: { turbo_confirm: "Are you sure you want to disconnect this MCP server?" } },
                       class: "mcp-btn mcp-btn-danger" %>
@@ -100,7 +102,7 @@
       <h3>Add New Server</h3>
       <p>Connect to an MCP server to access tools, resources, and AI capabilities.</p>
 
-      <%= form_with url: mcp_connections_path, method: :post, class: "mcp-form" do |f| %>
+      <%= form_with url: mcp_connections_path, method: :post, class: "mcp-form", data: { turbo: false } do |f| %>
         <div class="mcp-form-group">
           <%= label_tag :name, "Server Name", class: "mcp-form-label" %>
           <%= text_field_tag :name, nil,
@@ -287,6 +289,17 @@
   border-color: #0056b3;
 }
 
+.mcp-btn-secondary {
+  color: white;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.mcp-btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
 .mcp-btn-warning {
   color: #212529;
   background-color: #ffc107;
@@ -463,6 +476,171 @@
 
   .mcp-btn {
     width: 100%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+  }
+
+  .mcp-connections-container {
+    color: #e0e0e0;
+    background-color: #1a1a1a;
+  }
+
+  .mcp-connections-container h1,
+  .mcp-connections-container h2,
+  .mcp-connections-container h3,
+  .mcp-connections-container h4 {
+    color: #f0f0f0;
+  }
+
+  /* Table dark mode */
+  .mcp-table {
+    background: #2a2a2a;
+    color: #e0e0e0;
+  }
+
+  .mcp-table thead {
+    background-color: #1a1a1a;
+    border-bottom-color: #3a3a3a;
+  }
+
+  .mcp-table th {
+    color: #b0b0b0;
+  }
+
+  .mcp-table td {
+    border-top-color: #3a3a3a;
+  }
+
+  .mcp-table tbody tr:hover {
+    background-color: #333333;
+  }
+
+  /* Badge dark mode */
+  .mcp-badge-success {
+    background-color: #1e4620;
+    color: #8fd98f;
+  }
+
+  .mcp-badge-warning {
+    background-color: #4a3a00;
+    color: #ffd966;
+  }
+
+  .mcp-badge-danger {
+    background-color: #4a1a1f;
+    color: #ff8a95;
+  }
+
+  /* Button dark mode */
+  .mcp-btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+
+  .mcp-btn-primary:hover {
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+  }
+
+  .mcp-btn-secondary {
+    background-color: #5a6268;
+    border-color: #5a6268;
+  }
+
+  .mcp-btn-secondary:hover {
+    background-color: #4e555b;
+    border-color: #4e555b;
+  }
+
+  .mcp-btn-warning {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #000;
+  }
+
+  .mcp-btn-warning:hover {
+    background-color: #c79100;
+    border-color: #c79100;
+  }
+
+  .mcp-btn-danger {
+    background-color: #bb2d3b;
+    border-color: #bb2d3b;
+  }
+
+  .mcp-btn-danger:hover {
+    background-color: #a02633;
+    border-color: #a02633;
+  }
+
+  /* Code dark mode */
+  .mcp-code {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+
+  .mcp-code-muted {
+    color: #8a8a8a;
+  }
+
+  /* Text utilities dark mode */
+  .mcp-text-muted {
+    color: #8a8a8a;
+  }
+
+  /* Card dark mode */
+  .mcp-card {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+  }
+
+  /* Alert dark mode */
+  .mcp-alert-info {
+    background-color: #0c3d47;
+    border-color: #0f5460;
+    color: #9fe5f0;
+  }
+
+  .mcp-alert-warning {
+    background-color: #4a3a00;
+    border-color: #665000;
+    color: #ffd966;
+  }
+
+  .mcp-alert-success {
+    background-color: #1e4620;
+    border-color: #2a5e2c;
+    color: #8fd98f;
+  }
+
+  /* Form dark mode */
+  .mcp-form-input {
+    background-color: #1a1a1a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  .mcp-form-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+  }
+
+  .mcp-form-label {
+    color: #d0d0d0;
+  }
+
+  .mcp-form-help {
+    color: #8a8a8a;
+  }
+
+  /* Info section dark mode */
+  .mcp-info {
+    background-color: #1a1a1a;
   }
 }
 </style>

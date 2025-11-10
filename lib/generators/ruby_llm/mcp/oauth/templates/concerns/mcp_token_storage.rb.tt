@@ -11,18 +11,20 @@ module McpTokenStorage
   # Create token storage instance for a specific server URL
   # @param server_url [String] MCP server URL
   # @param name [String] Optional friendly name for the server
+  # @param scope [String] Optional OAuth scope for the connection
   # @return [TokenStorageAdapter] storage adapter instance
-  def mcp_token_storage(server_url, name = nil)
-    TokenStorageAdapter.new(self.id, server_url, self.class.name.underscore, name)
+  def mcp_token_storage(server_url, name = nil, scope = nil)
+    TokenStorageAdapter.new(self.id, server_url, self.class.name.underscore, name, scope)
   end
 
   # Internal adapter class that implements the OAuth storage interface
   class TokenStorageAdapter
-    def initialize(<%= user_variable_name %>_id, server_url, user_type = "<%= user_variable_name %>", name = nil)
+    def initialize(<%= user_variable_name %>_id, server_url, user_type = "<%= user_variable_name %>", name = nil, scope = nil)
       @<%= user_variable_name %>_id = <%= user_variable_name %>_id
       @server_url = server_url
       @user_type = user_type
       @name = name
+      @scope = scope
     end
 
     # Token storage
@@ -81,7 +83,9 @@ module McpTokenStorage
       state = <%= state_model_name %>.find_or_initialize_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
       state.pkce = pkce
       state.state_param ||= SecureRandom.hex(32)
-      state.expires_at ||= 10.minutes.from_now
+      state.name = @name if @name.present?
+      state.scope = @scope if @scope.present?
+      state.expires_at = 10.minutes.from_now
       state.save!
     end
 
@@ -97,7 +101,9 @@ module McpTokenStorage
     def set_state(_server_url, state_param)
       state = <%= state_model_name %>.find_or_initialize_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
       state.state_param = state_param
-      state.expires_at ||= 10.minutes.from_now
+      state.name = @name if @name.present?
+      state.scope = @scope if @scope.present?
+      state.expires_at = 10.minutes.from_now
       state.save!
     end
 

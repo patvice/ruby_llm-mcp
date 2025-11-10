@@ -254,7 +254,8 @@ The `BrowserOAuth` class provides complete browser-based OAuth:
 
 - **Automatic Browser Opening**: Opens default browser to authorization URL
 - **Local Callback Server**: Pure Ruby TCP server (no external dependencies)
-- **Beautiful UI**: Styled HTML success/error pages
+- **Beautiful UI**: Styled HTML success/error pages with RubyLLM MCP branding
+- **Custom Pages**: Optional custom success/error pages for your branding
 - **Cross-Platform**: Supports macOS, Linux, Windows
 - **Timeout Support**: Configurable timeout for user authorization
 - **Thread-Safe**: Safe for concurrent use
@@ -289,6 +290,25 @@ rescue RubyLLM::MCP::Errors::TimeoutError
 rescue RubyLLM::MCP::Errors::TransportError => e
   puts "Authorization failed: #{e.message}"
 end
+```
+
+### Custom Success/Error Pages
+
+You can customize the HTML pages shown to users after OAuth authentication:
+
+```ruby
+browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
+  oauth_provider,
+  pages: {
+    # Static HTML or a Proc that generates HTML
+    success_page: "<html><body><h1>Welcome!</h1></body></html>",
+
+    # Error page receives the error message
+    error_page: ->(error_msg) {
+      "<html><body><h1>Error:</h1><p>#{CGI.escapeHTML(error_msg)}</p></body></html>"
+    }
+  }
+)
 ```
 
 ## Custom Storage

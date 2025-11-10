@@ -8,6 +8,8 @@ class CreateMcpOauthStates < ActiveRecord::Migration[<%= ActiveRecord::Migration
       t.string :state_param, null: false
       t.text :pkce_data, null: false
       t.datetime :expires_at, null: false
+      t.string :name
+      t.string :scope
 
       t.timestamps
 
