@@ -39,5 +39,6 @@ jobs:
       - name: Run specs
         run: bundle exec rake
         env:
+          CI: "true"
           GITHUB_ACTIONS: "true"
           RUBY_LLM_DEBUG: "true"
