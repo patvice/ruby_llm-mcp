@@ -6,6 +6,12 @@ require "simplecov"
 require "vcr"
 require "webmock/rspec"
 
+# Ensure WebMock can stub Faraday requests
+require "faraday" if defined?(Faraday)
+
+# Disable real HTTP connections globally
+WebMock.disable_net_connect!(allow_localhost: true)
+
 Dotenv.load
 
 SimpleCov.start do
