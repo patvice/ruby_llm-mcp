@@ -7,7 +7,7 @@ module RubyLLM
     class Client
       extend Forwardable
 
-      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on, :roots
+      attr_reader :name, :config, :transport_type, :request_timeout, :log_level, :on, :roots, :coordinator
       attr_accessor :linked_resources
 
       def initialize(name:, transport_type:, start: true, request_timeout: MCP.config.request_timeout, config: {})

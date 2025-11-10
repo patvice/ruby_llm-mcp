@@ -165,7 +165,7 @@ client = RubyLLM::MCP.client(
 )
 
 # Authenticate via browser
-transport = client.instance_variable_get(:@coordinator).send(:transport)
+transport = client.coordinator.transport
 oauth_provider = transport.oauth_provider
 
 browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
@@ -200,7 +200,7 @@ client = RubyLLM::MCP.client(
 )
 
 # Authenticate
-transport = client.instance_variable_get(:@coordinator).send(:transport)
+transport = client.coordinator.transport
 browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
   transport.oauth_provider,
   callback_port: 9000
@@ -227,7 +227,7 @@ client = RubyLLM::MCP.client(
   }
 )
 
-transport = client.instance_variable_get(:@coordinator).send(:transport)
+transport = client.coordinator.transport
 oauth_provider = transport.oauth_provider
 
 # Get authorization URL

@@ -47,8 +47,8 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
     it "can access protocol version through private coordinator for verification" do
       client.start
 
-      # Access coordinator through private instance variable for testing purposes
-      coordinator = client.instance_variable_get(:@coordinator)
+      # Access coordinator through public accessor
+      coordinator = client.coordinator
       expect(coordinator.protocol_version).to be_a(String)
       expect(coordinator.protocol_version).to match(/\d{4}-\d{2}-\d{2}/)
       expect(coordinator.protocol_version).to eq("2025-03-26")
@@ -112,7 +112,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       client.start
 
       # Verify the transport has the set_protocol_version method
-      coordinator = client.instance_variable_get(:@coordinator)
+      coordinator = client.coordinator
       transport = coordinator.transport
       expect(transport).to respond_to(:set_protocol_version)
 
@@ -123,7 +123,7 @@ RSpec.describe RubyLLM::MCP::Transports::StreamableHTTP do
       client.start
 
       # Access transport through coordinator for verification
-      coordinator = client.instance_variable_get(:@coordinator)
+      coordinator = client.coordinator
       transport = coordinator.transport
 
       # The transport should have a protocol version set

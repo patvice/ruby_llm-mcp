@@ -42,9 +42,9 @@ RSpec.describe RubyLLM::MCP::Client do
 
       tool = client.tool("timeout_tool")
 
-      allow(client.instance_variable_get(:@coordinator)).to receive(:cancelled_notification).and_call_original
+      allow(client.coordinator).to receive(:cancelled_notification).and_call_original
       expect { tool.execute(seconds: 2) }.to raise_error(RubyLLM::MCP::Errors::TimeoutError)
-      expect(client.instance_variable_get(:@coordinator)).to have_received(:cancelled_notification)
+      expect(client.coordinator).to have_received(:cancelled_notification)
 
       client.stop
     end
@@ -273,12 +273,12 @@ RSpec.describe RubyLLM::MCP::Client do
           cache_before_reset = client.instance_variable_get(:@resource_templates)
           expect(cache_before_reset).not_to be_empty
 
-          allow(client.instance_variable_get(:@coordinator)).to receive(:resource_template_list).and_call_original
+          allow(client.coordinator).to receive(:resource_template_list).and_call_original
           client.reset_resource_templates!
           expect(client.instance_variable_get(:@resource_templates)).to eq({})
 
           client.resource_templates
-          expect(client.instance_variable_get(:@coordinator)).to have_received(:resource_template_list)
+          expect(client.coordinator).to have_received(:resource_template_list)
         end
       end
 
