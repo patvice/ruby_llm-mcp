@@ -11,7 +11,7 @@ http_interactions:
         the weather from a list of locations","input_schema":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":["latitude","longitude"],"additionalProperties":false}},"required":["geocode"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:40:20 GMT
+      - Mon, 10 Nov 2025 23:30:25 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,27 +40,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '26000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:40:26Z'
+      - '2025-11-10T23:30:32Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:40:20Z'
+      - '2025-11-10T23:30:26Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:40:18Z'
+      - '2025-11-10T23:30:24Z'
       Retry-After:
-      - '44'
+      - '36'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '34000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:40:20Z'
+      - '2025-11-10T23:30:26Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -68,7 +68,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2258'
+      - '2678'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -79,10 +79,10 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01P8MiWyTyypyUg4diJE7Aex","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01GECNMGkarPUKsG4f2otJKZ","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_011VRTYMEEpw5J2SXS9ubG86","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01HmdWuUCcK575m8xh2a8ebK","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
         Francisco"]}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":558,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":78,"service_tier":"standard"}}'
-  recorded_at: Thu, 06 Nov 2025 20:40:20 GMT
+  recorded_at: Mon, 10 Nov 2025 23:30:26 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -90,14 +90,14 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you tell me the weather for Ottawa and San Francisco?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
-        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01GECNMGkarPUKsG4f2otJKZ","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
-        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01GECNMGkarPUKsG4f2otJKZ","content":[{"type":"text","text":"Weather
+        get the weather information for Ottawa and San Francisco for you."},{"type":"tool_use","id":"toolu_01HmdWuUCcK575m8xh2a8ebK","name":"get_weather_from_locations","input":{"locations":["Ottawa","San
+        Francisco"]}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01HmdWuUCcK575m8xh2a8ebK","content":[{"type":"text","text":"Weather
         for Ottawa, San Francisco is great!"}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"get_weather_from_locations","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"locations":{"type":"array","items":{"type":"string"}}},"required":["locations"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}},{"name":"get_weather_from_geocode","description":"Get
         the weather from a list of locations","input_schema":{"type":"object","properties":{"geocode":{"type":"object","properties":{"latitude":{"type":"number"},"longitude":{"type":"number"}},"required":["latitude","longitude"],"additionalProperties":false}},"required":["geocode"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -114,7 +114,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:40:24 GMT
+      - Mon, 10 Nov 2025 23:30:28 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -126,27 +126,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '27000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:40:28Z'
+      - '2025-11-10T23:30:33Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:40:24Z'
+      - '2025-11-10T23:30:29Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:40:21Z'
+      - '2025-11-10T23:30:27Z'
       Retry-After:
-      - '37'
+      - '35'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '35000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:40:24Z'
+      - '2025-11-10T23:30:29Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -154,7 +154,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '4142'
+      - '2667'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -165,8 +165,9 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_012pEqhqjXkkxFgFuVYJFAHe","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        weather for both Ottawa and San Francisco is great! Both locations are experiencing
-        favorable weather conditions."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":656,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":22,"service_tier":"standard"}}'
-  recorded_at: Thu, 06 Nov 2025 20:40:24 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_0112qtmvzRMiCqMWmian3EEx","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        weather for both Ottawa and San Francisco is currently great! \n\nWould you
+        like more specific details about temperature, precipitation, or other weather
+        conditions for either city?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":656,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":36,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:30:28 GMT
 recorded_with: VCR 6.3.1

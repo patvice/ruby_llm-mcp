@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Fri, 07 Nov 2025 00:36:50 GMT
+      - Mon, 10 Nov 2025 23:33:06 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=3404
+      - gfet4t7; dur=3043
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have access to a vast amount of information. Here's a breakdown of what I can do and the resources I utilize:\n\n*   **Vast Knowledge Base:** I've been trained on a massive dataset of text and code, which includes:\n    *   Books\n    *   Articles\n    *   Websites\n    *   Code repositories\n    *   and more\n\n*   **Natural Language Processing (NLP):** I'm equipped with NLP capabilities, allowing me to:\n    *   Understand and interpret human language (like the prompt you provided).\n    *   Generate human-like text.\n    *   Translate languages.\n    *   Summarize text.\n    *   Answer questions.\n\n*   **Image Understanding:** As seen in my response, I can:\n    *   Analyze images you provide.\n    *   Identify objects within images.\n    *   Understand the context of an image.\n    *   Generate descriptions of images.\n\n*   **Code Generation:** I can:\n    *   Write code in various programming languages.\n    *   Explain code.\n    *   Debug code.\n\n*   **Real-time Information (Limited):** While I primarily rely on my pre-existing knowledge, I can sometimes access and process some real-time information, but my ability to do so is limited and may not always be accurate. I don't have continuous, live access to the internet like a search engine.\n\n**Important Considerations:**\n\n*   **No Personal Opinions or Beliefs:** I don't have personal opinions, emotions, or beliefs. My responses are based on the information I've been trained on.\n*   **Potential for Errors:** While I strive for accuracy, I am still under development, and my responses may sometimes contain errors or inaccuracies. It's important to verify information from reliable sources.\n*   **Context is Key:** The quality of my responses depends on the clarity and context of your prompts. The more information you provide, the better I can understand your needs."
+                    "text": "I have access to a vast amount of information. Here's a breakdown of what I can do:\n\n*   **Vast Knowledge Base:** I've been trained on a massive dataset of text and code, which allows me to answer questions, generate different creative text formats (like poems, code, scripts, musical pieces, email, letters, etc.), translate languages, write different kinds of creative content, and answer your questions in an informative way.\n*   **Image Understanding:** As demonstrated by my response to the image you provided, I can analyze and understand the content of images.\n*   **Real-time Information (with limitations):** I can access real-time information, such as current events or stock prices, but my knowledge of events after my last training cut-off is limited. I also don't have perfect access to all information available on the internet.\n*   **Code Execution:** I can execute code in various programming languages, which is useful for performing calculations, data analysis, and more.\n*   **No Personal Experiences:** I don't have personal experiences, emotions, or opinions. My responses are based on the data I've been trained on.\n*   **No Memory:** I don't remember previous conversations unless they are explicitly stored or referenced within the current interaction.\n\nIn essence, I am a powerful tool for accessing and processing information, generating content, and assisting with a wide range of tasks. However, it's important to remember that I am an AI and my abilities are limited by my training data and programming."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.33768931669347424
+              "avgLogprobs": -0.33153586224232134
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 275,
-            "candidatesTokenCount": 425,
-            "totalTokenCount": 700,
+            "candidatesTokenCount": 321,
+            "totalTokenCount": 596,
             "promptTokensDetails": [
               {
                 "modality": "IMAGE",
@@ -81,12 +81,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 425
+                "tokenCount": 321
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "Hz8NafnqH6vVjMcPtKy7iA0"
+          "responseId": "L3YSad32MIST_uMP-oqamAY"
         }
-  recorded_at: Fri, 07 Nov 2025 00:36:50 GMT
+  recorded_at: Mon, 10 Nov 2025 23:33:06 GMT
 recorded_with: VCR 6.3.1

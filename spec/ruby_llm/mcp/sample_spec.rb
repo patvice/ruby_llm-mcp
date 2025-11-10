@@ -7,6 +7,11 @@ RSpec.describe RubyLLM::MCP::Sample do
     ClientRunner.build_client_runners(CLIENT_OPTIONS)
   end
 
+  before do
+    MCPTestConfiguration.reset_config!
+    MCPTestConfiguration.configure_ruby_llm!
+  end
+
   let(:client) { instance_double(RubyLLM::MCP::Client) }
   let(:result) do
     RubyLLM::MCP::Result.new(
@@ -24,15 +29,11 @@ RSpec.describe RubyLLM::MCP::Sample do
     cassette_name = example.full_description
                            .delete_prefix("RubyLLM::MCP::")
                            .downcase
+                           .gsub(", ", "")
                            .gsub(" ", "_")
                            .gsub("/", "_")
 
     VCR.use_cassette(cassette_name, allow_playback_repeats: true) do
-      # Reset and configure RubyLLM INSIDE the cassette block
-      # so Faraday connections are created AFTER VCR hooks are in place
-      MCPTestConfiguration.reset_config!
-      MCPTestConfiguration.configure_ruby_llm!
-
       example.run
     end
   end
@@ -159,7 +160,7 @@ RSpec.describe RubyLLM::MCP::Sample do
       expect(sample.model_preferences.intelligence_priority).to eq(1)
     end
 
-    it "client can call a block to determine the preferred model, accessing the model preferences" do
+    it "client can call a block to determine the preferred model accessing the model preferences" do
       model_preferences = nil
       RubyLLM::MCP.configure do |config|
         config.sampling.enabled = true
@@ -179,7 +180,7 @@ RSpec.describe RubyLLM::MCP::Sample do
       expect(model_preferences).to be_a(RubyLLM::MCP::Sample::Hint)
     end
 
-    it "client calls a block to determine the preferred model, and raises an error it will send an error back" do
+    it "client calls a block to determine the preferred model and raises an error it will send an error back" do
       RubyLLM::MCP.configure do |config|
         config.sampling.enabled = true
 
@@ -199,7 +200,7 @@ RSpec.describe RubyLLM::MCP::Sample do
 
     COMPLEX_FUNCTION_MODELS.each do |model|
       context "with #{model[:provider]} #{model[:model]}" do
-        it "executes a chat message and provides information to the server, without a guard" do
+        it "executes a chat message and provides information to the server without a guard" do
           RubyLLM::MCP.configure do |config|
             config.sampling.enabled = true
             config.sampling.preferred_model = model[:model]
@@ -212,7 +213,7 @@ RSpec.describe RubyLLM::MCP::Sample do
           expect(result.to_s).to include("Sampling test completed")
         end
 
-        it "provides information about the sample, with a guard" do
+        it "provides information about the sample with a guard" do
           RubyLLM::MCP.configure do |config|
             config.sampling.enabled = true
             config.sampling.preferred_model = model[:model]

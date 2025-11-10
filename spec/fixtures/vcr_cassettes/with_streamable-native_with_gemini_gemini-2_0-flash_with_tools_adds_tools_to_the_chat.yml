@@ -47,7 +47,7 @@ http_interactions:
         message for elicitation\"}},\"required\":[\"message\"]}}]}]}"
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -68,7 +68,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:45:06 GMT
+      - Mon, 10 Nov 2025 23:32:56 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -78,7 +78,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=546
+      - gfet4t7; dur=681
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -104,7 +104,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.024125371873378754
+              "avgLogprobs": -0.39269127845764162
             }
           ],
           "usageMetadata": {
@@ -125,9 +125,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "0QgNaeHBMOuZ_uMPysDIuQ0"
+          "responseId": "J3YSaYSqGrmM_PUP_bXhkAc"
         }
-  recorded_at: Thu, 06 Nov 2025 20:45:06 GMT
+  recorded_at: Mon, 10 Nov 2025 23:32:56 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -175,7 +175,7 @@ http_interactions:
         message for elicitation\"}},\"required\":[\"message\"]}}]}]}"
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -196,7 +196,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:45:06 GMT
+      - Mon, 10 Nov 2025 23:32:56 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -206,7 +206,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=619
+      - gfet4t7; dur=586
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -220,19 +220,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "1 + 2 = 3\n"
+                    "text": "Okay, I've added 1 and 2, and the result is 3.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.13339008390903473
+              "avgLogprobs": -0.053273499011993408
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 589,
-            "candidatesTokenCount": 8,
-            "totalTokenCount": 597,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 609,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -242,12 +242,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 8
+                "tokenCount": 20
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "0ggNaaLJGfOo_uMPiM2dKQ"
+          "responseId": "KHYSaaeoDPe__uMP_8mNqQU"
         }
-  recorded_at: Thu, 06 Nov 2025 20:45:07 GMT
+  recorded_at: Mon, 10 Nov 2025 23:32:56 GMT
 recorded_with: VCR 6.3.1

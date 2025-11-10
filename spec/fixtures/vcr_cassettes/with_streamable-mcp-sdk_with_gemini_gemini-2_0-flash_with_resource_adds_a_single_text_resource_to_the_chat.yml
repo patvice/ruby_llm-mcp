@@ -11,7 +11,7 @@ http_interactions:
         does the test file contain?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Fri, 07 Nov 2025 01:23:34 GMT
+      - Mon, 10 Nov 2025 23:36:33 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=847
+      - gfet4t7; dur=728
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -56,19 +56,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The file \"test.txt\" contains the following text:\n\n\"Hello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\"\n"
+                    "text": "The test file, named \"test.txt\", contains the following content:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.079281840324401859
+              "avgLogprobs": -0.049586551530020576
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 51,
-            "candidatesTokenCount": 50,
-            "totalTokenCount": 101,
+            "candidatesTokenCount": 56,
+            "totalTokenCount": 107,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -78,12 +78,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 50
+                "tokenCount": 56
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "FUoNaYy-JOeVjMcPz_GtoA8"
+          "responseId": "AHcSadj1F_6C-8YPxuCwmQU"
         }
-  recorded_at: Fri, 07 Nov 2025 01:23:34 GMT
+  recorded_at: Mon, 10 Nov 2025 23:36:33 GMT
 recorded_with: VCR 6.3.1

@@ -10,7 +10,7 @@ http_interactions:
         the greeting template to say hello to Bob"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 00:27:44 GMT
+      - Mon, 10 Nov 2025 23:37:19 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-07T00:27:44Z'
+      - '2025-11-10T23:37:19Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-07T00:27:45Z'
+      - '2025-11-10T23:37:20Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-07T00:27:41Z'
+      - '2025-11-10T23:37:17Z'
       Retry-After:
-      - '17'
+      - '42'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-07T00:27:44Z'
+      - '2025-11-10T23:37:19Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '4432'
+      - '3478'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -78,8 +78,8 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01D7k5KqfNquALfBNVePvThW","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        use the greeting template to say hello to Bob.\n\n<use_template name=\"greeting\">\n<parameter
-        name=\"name\">Bob</parameter>\n</use_template>"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":31,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":41,"service_tier":"standard"}}'
-  recorded_at: Fri, 07 Nov 2025 00:27:44 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_013ZsEFyCQKgbXyoNgCrD5Xb","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        use the greeting template to say hello to Bob.\n\n<greeting>\ngreeting://Bob\n</greeting>\n\nHello,
+        Bob!"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":31,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":32,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:37:19 GMT
 recorded_with: VCR 6.3.1

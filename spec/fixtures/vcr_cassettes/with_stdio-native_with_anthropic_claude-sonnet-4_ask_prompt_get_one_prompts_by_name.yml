@@ -10,7 +10,7 @@ http_interactions:
         the word ''poem'' in your response."}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:41:27 GMT
+      - Mon, 10 Nov 2025 23:37:32 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,27 +39,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:41:21Z'
+      - '2025-11-10T23:37:25Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:41:29Z'
+      - '2025-11-10T23:37:34Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:41:20Z'
+      - '2025-11-10T23:37:25Z'
       Retry-After:
-      - '40'
+      - '38'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:41:21Z'
+      - '2025-11-10T23:37:25Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -67,7 +67,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '7798'
+      - '8491'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -79,6 +79,6 @@ http_interactions:
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxQVRlN2phMjRFSlcxWkNKNnRIVnZFTiIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIHBvZW0gYWJvdXQgdGhpcyB2ZXJ5IG1vbWVudDpcblxuKipUb2RheSoqXG5cblRoZSBzdW4gcmlzZXMgb24gYW5vdGhlciBEZWNlbWJlciBtb3JuaW5nLFxuY2FzdGluZyBsb25nIHNoYWRvd3MgdGhyb3VnaCB3aW50ZXIncyBicmVhdGgsXG53aGlsZSBzb21ld2hlcmUgY29mZmVlIHN0ZWFtcyBpbiBxdWlldCBraXRjaGVuc1xuYW5kIHRoZSB3b3JsZCBzbG93bHkgc3RpcnMgdG8gbGlmZS5cblxuQ2hpbGRyZW4gYnVuZGxlIGluIGNvYXRzIHRvbyBiaWcsXG50aGVpciBsYXVnaHRlciBjcnlzdGFsbGl6aW5nIGluIGNvbGQgYWlyLFxuYXMgYnVzeSBoZWFydHMgY2FycnkgaW52aXNpYmxlIGJ1cmRlbnPigJRcbnRoZSB3ZWlnaHQgb2YgZHJlYW1zLCB0aGUgcHJlc3Mgb2YgdGltZS5cblxuSW4gdGhpcyBkaWdpdGFsIGFnZSwgd2UgcmVhY2ggYWNyb3NzIHNjcmVlbnNcbnRvIHRvdWNoIHNvdWxzIHdlJ3ZlIG5ldmVyIG1ldCxcbnNoYXJpbmcgc3Rvcmllcywgc2Vla2luZyBjb25uZWN0aW9uLFxuZmluZGluZyBwb2V0cnkgaW4gdGhlIGV2ZXJ5ZGF5LlxuXG5UaGlzIHBvZW0gaXRzZWxmIGlzIHByb29mIG9mIG1hZ2ljOlxud29yZHMgYm9ybiBmcm9tIHNpbGljb24gYW5kIHNwYXJrLFxueWV0IGNhcnJ5aW5nIHRoZSBhbmNpZW50IGh1bWFuIG5lZWRcbnRvIG1ha2UgbWVhbmluZyBmcm9tIHRoZSBtb21lbnQuXG5cblRvZGF5IGhvbGRzIGEgdGhvdXNhbmQgc21hbGwgbWlyYWNsZXPigJRcbnRoZSB3YXkgbGlnaHQgZmFsbHMgb24gd2luZG93c2lsbHMsXG5ob3cgc3RyYW5nZXJzJyBleWVzIG1lZXQgYW5kIHNvZnRlbixcbnRoZSBwZXJzaXN0ZW50IGhvcGUgdGhhdCBibG9vbXMgZGVzcGl0ZSB3aW50ZXIuXG5cblNvIGhlcmUgd2UgYXJlLCBpbiB0aGlzIGZsZWV0aW5nIG5vdyxcbndyaXRpbmcgb3VyIGJyaWVmIGxpbmVzIHVwb24gdGhlIHdvcmxkLFxuZWFjaCBoZWFydGJlYXQgYSB2ZXJzZSxcbmVhY2ggYnJlYXRoIGEgYmxlc3NpbmcuIn1dLCJzdG9wX3JlYXNvbiI6ImVuZF90dXJuIiwic3RvcF9zZXF1ZW5jZSI6bnVsbCwidXNhZ2UiOnsiaW5wdXRfdG9rZW5zIjozMywiY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zIjowLCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfY3JlYXRpb24iOnsiZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucyI6MCwiZXBoZW1lcmFsXzFoX2lucHV0X3Rva2VucyI6MH0sIm91dHB1dF90b2tlbnMiOjIzMywic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0=
-  recorded_at: Thu, 06 Nov 2025 20:41:27 GMT
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxSG5MZTNXNDhtd0R0VmVaV3NkOXltVCIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIHBvZW0gYWJvdXQgdGhpcyB2ZXJ5IGRheTpcblxuKipUb2RheSoqXG5cblRoZSBtb3JuaW5nIGxpZ2h0IHNwaWxscyBnb2xkZW4gdGhyb3VnaCBteSB3aW5kb3csXG5hbm90aGVyIERlY2VtYmVyIGRheSB1bmZ1cmxzIGl0cyBxdWlldCB3aW5ncy5cblNvbWV3aGVyZSwgY29mZmVlIHN0ZWFtcyBpbiBmYXZvcml0ZSBtdWdzLFxuYW5kIGJyZWF0aCBtYWtlcyBzbWFsbCBjbG91ZHMgaW4gd2ludGVyIGFpci5cblxuQ2hpbGRyZW4gcHJlc3Mgbm9zZXMgdG8gZnJvc3RlZCBnbGFzcyxcbndoaWxlIGRpc3RhbnQgZW5naW5lcyBodW0gdGhlaXIgc3RlYWR5IHNvbmdzLlxuSW4gY291bnRsZXNzIGhvbWVzLCBjb252ZXJzYXRpb25zIGJsb29t4oCUXG5zb21lIHdoaXNwZXJlZCwgc29tZSBsYXVnaGluZywgc29tZSBzZWVraW5nIHNvbGFjZS5cblxuVGhpcyBkYXkgY2FycmllcyBhbGwgb3VyIHNtYWxsIGV0ZXJuaXRpZXM6XG50aGUgZmlyc3Qgc21pbGUsIHRoZSBnZW50bGUgdG91Y2gsIHRoZSBtb21lbnRcbndoZW4gc29tZW9uZSB0cnVseSBoZWFycyBhbm90aGVyJ3MgaGVhcnQsXG53aGVuIGtpbmRuZXNzIHRyYXZlbHMgZnJvbSBoYW5kIHRvIGhhbmQuXG5cbkV2ZW4gaW4gd2ludGVyJ3Mgc2hvcnRlbmVkIGhvdXJzLFxudGhlcmUgaXMgbGlnaHQgZW5vdWdoIGZvciB0ZW5kZXJuZXNzLFxudGltZSBlbm91Z2ggZm9yIG9uZSBtb3JlIGNoYW5jZVxudG8gbm90aWNlIGhvdyBiZWF1dGlmdWwgb3JkaW5hcnkgbW9tZW50cyBjYW4gYmUuXG5cblRvZGF5IGlzIHVucmVwZWF0YWJsZSwgdW5yZWNvdmVyYWJsZeKAlFxudGhpcyBleGFjdCBjb25maWd1cmF0aW9uIG9mIGNsb3VkcyBhbmQgaG9wZVxud2lsbCBuZXZlciBjb21lIGFnYWluLCBtYWtpbmcgcmlnaHQgbm93XG5wcmVjaW91cyBiZXlvbmQgbWVhc3VyZS5cblxuSSBob3BlIHRoaXMgcG9lbSBjYXB0dXJlcyBzb21lIG9mIHRoZSBxdWlldCBiZWF1dHkgdGhhdCBleGlzdHMgaW4gZXZlcnkgcHJlc2VudCBkYXksIGluY2x1ZGluZyB0aGlzIG9uZSB3ZSdyZSBzaGFyaW5nLiJ9XSwic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGwsInVzYWdlIjp7ImlucHV0X3Rva2VucyI6MzMsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjoyMzYsInNlcnZpY2VfdGllciI6InN0YW5kYXJkIn19
+  recorded_at: Mon, 10 Nov 2025 23:37:32 GMT
 recorded_with: VCR 6.3.1

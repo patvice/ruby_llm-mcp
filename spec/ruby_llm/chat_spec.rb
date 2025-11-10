@@ -17,6 +17,7 @@ RSpec.describe RubyLLM::Chat do
   around do |example|
     cassette_name = example.full_description
                            .delete_prefix("RubyLLM::Chat ")
+                           .gsub(", ", "__")
                            .gsub(" ", "_")
                            .gsub("/", "_")
 

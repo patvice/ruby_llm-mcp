@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 00:37:16 GMT
+      - Mon, 10 Nov 2025 23:35:20 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '7708'
+      - '9275'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '7728'
+      - '9298'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -83,7 +83,42 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        ewogICJpZCI6ICJjaGF0Y21wbC1DWjRsUnd5UU5ZUUZTeE4zeExlVUV6cDZlY014MCIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjQ3NTgyOSwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJJIGhhdmUgYWNjZXNzIHRvIGEgd2lkZSByYW5nZSBvZiByZXNvdXJjZXMgYW5kIGNhcGFiaWxpdGllcywgaW5jbHVkaW5nOlxuXG4xLiAqKkdlbmVyYWwgS25vd2xlZGdlKio6IEkgYW0gdHJhaW5lZCBvbiBhIHZhc3QgZGF0YXNldCB0aGF0IGluY2x1ZGVzIGJvb2tzLCBhcnRpY2xlcywgd2Vic2l0ZXMsIGFuZCBtb3Jl4oCUdXAgdG8gbXkga25vd2xlZGdlIGN1dG9mZnMgKE9jdG9iZXIgMjAyMyBmb3IgZ2VuZXJhbCBpbmZvLCBKdW5lIDIwMjQgZm9yIHNvbWUgdXBkYXRlcykuXG5cbjIuICoqVGV4dCBBbmFseXNpcyoqOiBJIGNhbiByZWFkLCBhbmFseXplLCBzdW1tYXJpemUsIGFuZCBnZW5lcmF0ZSB0ZXh0IG9uIG1hbnkgdG9waWNzLlxuXG4zLiAqKkltYWdlIEFuYWx5c2lzKio6IEkgY2FuIHZpZXcgaW1hZ2VzLCBkZXNjcmliZSB3aGF04oCZcyBpbiB0aGVtLCBhbmQgcGVyZm9ybSBiYXNpYyBpZGVudGlmaWNhdGlvbiBvZiBvYmplY3RzLCBhbmltYWxzLCB0ZXh0IChPQ1IpLCBhbmQgc2NlbmVzLiAoTm90ZTogSSBjYW5ub3QgcmVjb2duaXplIG9yIGlkZW50aWZ5IHJlYWwgcGVvcGxlIG9yIGluZmVyIHByaXZhdGUgZGV0YWlscyBmcm9tIGltYWdlcy4pXG5cbjQuICoqUHJvZ3JhbW1pbmcgSGVscCoqOiBJIGNhbiB3cml0ZSwgZGVidWcsIGFuZCBleHBsYWluIGNvZGUgaW4gbWFueSBwcm9ncmFtbWluZyBsYW5ndWFnZXMuXG5cbjUuICoqQ3JlYXRpdmUgVGFza3MqKjogSSBjYW4gaGVscCBicmFpbnN0b3JtIGlkZWFzLCB3cml0ZSBzdG9yaWVzLCBwb2VtcywgYW5kIGNyZWF0ZSBvdGhlciBmb3JtcyBvZiBjcmVhdGl2ZSBjb250ZW50LlxuXG42LiAqKk1hdGggYW5kIExvZ2ljKio6IEkgY2FuIHNvbHZlIG1hdGggcHJvYmxlbXMsIHBlcmZvcm0gY2FsY3VsYXRpb25zLCBhbmQgZXhwbGFpbiBzdGVwcy5cblxuNy4gKipFZHVjYXRpb24gYW5kIFR1dG9yaW5nKio6IEkgY2FuIGFuc3dlciBxdWVzdGlvbnMgYW5kIGV4cGxhaW4gY29uY2VwdHMgYWNyb3NzIG1hbnkgc3ViamVjdHMuXG5cbkhvd2V2ZXIsICoqSSBkbyBOT1QgaGF2ZSoqOlxuLSAqKkxpdmUgaW50ZXJuZXQgYWNjZXNzOioqIEkgY2Fubm90IGJyb3dzZSB0aGUgd2ViIG9yIHZpZXcgcmVhbC10aW1lIGRhdGEuXG4tICoqQWNjZXNzIHRvIHByaXZhdGUgZGF0YWJhc2VzIG9yIHN1YnNjcmlwdGlvbiBjb250ZW50KiosIGxpa2UgcGFpZCBhY2FkZW1pYyBqb3VybmFscyBiZWhpbmQgcGF5d2FsbHMuXG5cbklmIHlvdSBuZWVkIGluZm8gb3IgaGVscCBpbiBhIHNwZWNpZmljIGFyZWEsIGp1c3QgbGV0IG1lIGtub3chIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMjgyLAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMjgzLAogICAgInRvdGFsX3Rva2VucyI6IDU2NSwKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwX2QzOGM3ZjRmYTciCn0K
-  recorded_at: Fri, 07 Nov 2025 00:37:16 GMT
+      string: |
+        {
+          "id": "chatcmpl-CaVhfHeHtlc7fGRgZpaPpfvy0qbcP",
+          "object": "chat.completion",
+          "created": 1762817711,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "I have access to a wide range of resources and capabilities, including:\n\n### General Knowledge\n- **Comprehensive information** up to my latest update (June 2024).\n- **Encyclopedic facts**, historical events, scientific data, and more.\n- **Textual analysis** and explanations in multiple subjects and fields.\n\n### Language and Writing\n- **Drafting, editing,** and **proofreading** text.\n- **Summarizing** and **rewriting** content.\n- **Translating** languages.\n- **Generating creative content** (stories, poems, etc.).\n\n### Coding and Technical Help\n- **Programming support** in various languages (Python, JavaScript, etc.).\n- **Debugging** and **explaining code**.\n- **Algorithm and data structure help**.\n\n### Image Capabilities\n- **Analyzing and describing images** you upload.\n- **Object recognition** and **basic visual explanations**.\n- **Extracting text from images** (OCR).\n\n### Learning and Study Support\n- **Explaining concepts** at different levels (beginner to advanced).\n- **Creating practice questions**, quizzes, and study guides.\n\n### Practical Assistance\n- **Planning** (schedules, itineraries, study plans).\n- **Providing recipes, instructions, DIY guides**.\n\n### Limitations\n- **No real-time internet access** to fetch up-to-the-minute information.\n- **Cannot access paid or proprietary databases**.\n- **Cannot directly access private information or accounts**.\n\nIf you have any specific task or need to know if I can help with something, just let me know!",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 282,
+            "completion_tokens": 326,
+            "total_tokens": 608,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_d38c7f4fa7"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:35:20 GMT
 recorded_with: VCR 6.3.1

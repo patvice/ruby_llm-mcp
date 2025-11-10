@@ -9,7 +9,7 @@ http_interactions:
         for ruby channel and let me know what they say?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":["channel"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:29 GMT
+      - Mon, 10 Nov 2025 23:34:40 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=492
+      - gfet4t7; dur=507
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -86,9 +86,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "YAkNadPDJuG8_uMPscaCuQ0"
+          "responseId": "j3YSaYj9Op-8_uMP69vkiAs"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:29 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:40 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -100,7 +100,7 @@ http_interactions:
         community."}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":["channel"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -121,7 +121,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:29 GMT
+      - Mon, 10 Nov 2025 23:34:41 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -131,7 +131,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=592
+      - gfet4t7; dur=596
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -151,7 +151,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0033514076663601782
+              "avgLogprobs": -0.00523299555624685
             }
           ],
           "usageMetadata": {
@@ -172,7 +172,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "YQkNaaiFDIS2_uMPn6_2yAM"
+          "responseId": "kHYSabSjJKu__uMP0Kb0qA4"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:29 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:41 GMT
 recorded_with: VCR 6.3.1

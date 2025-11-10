@@ -11,7 +11,7 @@ http_interactions:
         the prompt."}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:43:08 GMT
+      - Mon, 10 Nov 2025 23:38:11 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,13 +38,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '4249'
+      - '4712'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '4283'
+      - '4748'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -79,6 +79,6 @@ http_interactions:
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        ewogICJpZCI6ICJjaGF0Y21wbC1DWjE2dUhqVk1DemViSjI5SmpsU1RvTVA4ZHltbCIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjQ2MTc4NCwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJDZXJ0YWlubHkhIEhlcmUgaXMgYSBiZWF1dGlmdWwgcG9lbSBhYm91dCB0aGUgY3VycmVudCBkYXksIHdpdGggdGhlIHdvcmQgJ3BvZW0nIGluY2x1ZGVkOlxuXG5Ub2RheSB1bnNwb29scyBhIGdvbGRlbiB0aHJlYWTigJQgIFxuTW9ybmluZyBkcmlmdHMgb24gc3VtbWVy4oCZcyBicmVhdGgsICBcbkNsb3VkcyB3aGlzcGVyIHNlY3JldHMgb3ZlcmhlYWQsICBcblN1bmxpZ2h0IGNvbXBvc2VzIHZlcnNlcyBpbiBpdHMgc3RlYWQuXG5cbkVhY2ggaG91ciwgYSBzdGFuemEgYnJpZ2h0IGFuZCBuZXcsICBcbkJpcmRzb25nIHNjcmliYmxlcyBmb3J0dW5l4oCZcyByaHltZSwgIFxuVGhpcyBnZW50bGUgYnJlZXplIHJlY2l0ZXMgaXQsIHRvbzogIFxuQSBsaXZpbmcgcG9lbSBzaGFwZWQgYnkgdGltZS5cblxuSW4gdGhpcyBtb21lbnQsIGxldCB3b3JyaWVzIHN0cmF5LCAgXG5IZWFyIGxhdWdodGVyIGJsb3Nzb20sIGZyZXNoIGFuZCBjbGVhci4gIFxuVGhlIHN0b3J5IG9mIHRoZSB3b3JsZCB0b2RheSAgXG5JcyBhIHBvZW0gd3JpdHRlbiBub3cgYW5kIGhlcmUuIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogNDUsCiAgICAiY29tcGxldGlvbl90b2tlbnMiOiAxMjQsCiAgICAidG90YWxfdG9rZW5zIjogMTY5LAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfZDM4YzdmNGZhNyIKfQo=
-  recorded_at: Thu, 06 Nov 2025 20:43:08 GMT
+        ewogICJpZCI6ICJjaGF0Y21wbC1DYVZrVk5pN1RtSFNLd0NWUkdVa0NONEh5YlRaVCIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjgxNzg4NywKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJDZXJ0YWlubHkhIEhlcmUgaXMgYSBwb2VtIGFib3V0IHRvZGF5LCBpbmNsdWRpbmcgdGhlIHdvcmQgXCJwb2VtXCIgYXMgeW91IHJlcXVlc3RlZDpcblxuQSBwb2VtIGZvciB0aGlzIGdlbnRsZSBkYXkgdW5mdXJsc+KAlCAgXG5Tb2Z0IGRhd24tZmluZ2VycyBzdHJldGNoIGFjcm9zcyB0aGUgc2t5LCAgXG5QZXRhbHMgdHJlbWJsaW5nIHdpdGggZGV34oCZcyBicmlnaHQgcGVhcmxzLCAgXG5TdW5iZWFtcyBjaGFzaW5nIGNsb3VkcyBhcyB0aGV5IGZsb2F0IGJ5LlxuXG5JbiBtb3JuaW5nJ3MgcG9lbSwgZWFjaCBtb21lbnQgcmh5bWVzICBcbldpdGggbGF1Z2h0ZXIsIGZvb3RzdGVwcywgY29mZmVl4oCZcyBzdGVhbeKAlCAgXG5TaW1wbGUgcml0dWFscyBtYXJraW5nIHRpbWUsICBcbkEgZ29sZGVuIHRocmVhZCB0aHJvdWdoIGV2ZXJ5IGRyZWFtLlxuXG5Ob3cgbm9vbiBzcGlsbHMgbGlnaHQgb24gcXVpZXQgc3RyZWV0cywgIFxuUm9iaW5zIGdvc3NpcCBpbiB0aGUgdHJlZXMgYWJvdmUuICBcbkluIHRoaXMgcG9lbSBvZiBsaWZlLCBteSBoZWFydCByZXBlYXRzICBcblRoZSBlYXN5IHJlZnJhaW4gb2YgaG9wZSBhbmQgbG92ZS5cblxuTGV0IGR1c2sgYXJyaXZlLCBlbWJyb2lkZXJlZCBpbiByb3NlLCAgXG5XaXRoIHByb21pc2VzIHRoZSBzdGFycyB3aWxsIGtlZXAuICBcblRvZGF54oCUYSBwb2Vt4oCUZHJhd3MgcXVpZXRseSBjbG9zZSwgIFxuSXRzIHZlcnNlcyBsaW5nZXJpbmcgYXMgSSBkcmlmdCB0byBzbGVlcC4iLAogICAgICAgICJyZWZ1c2FsIjogbnVsbCwKICAgICAgICAiYW5ub3RhdGlvbnMiOiBbXQogICAgICB9LAogICAgICAibG9ncHJvYnMiOiBudWxsLAogICAgICAiZmluaXNoX3JlYXNvbiI6ICJzdG9wIgogICAgfQogIF0sCiAgInVzYWdlIjogewogICAgInByb21wdF90b2tlbnMiOiA0NSwKICAgICJjb21wbGV0aW9uX3Rva2VucyI6IDE2NSwKICAgICJ0b3RhbF90b2tlbnMiOiAyMTAsCiAgICAicHJvbXB0X3Rva2Vuc19kZXRhaWxzIjogewogICAgICAiY2FjaGVkX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwCiAgICB9LAogICAgImNvbXBsZXRpb25fdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJyZWFzb25pbmdfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAsCiAgICAgICJhY2NlcHRlZF9wcmVkaWN0aW9uX3Rva2VucyI6IDAsCiAgICAgICJyZWplY3RlZF9wcmVkaWN0aW9uX3Rva2VucyI6IDAKICAgIH0KICB9LAogICJzZXJ2aWNlX3RpZXIiOiAiZGVmYXVsdCIsCiAgInN5c3RlbV9maW5nZXJwcmludCI6ICJmcF9kMzhjN2Y0ZmE3Igp9Cg==
+  recorded_at: Mon, 10 Nov 2025 23:38:11 GMT
 recorded_with: VCR 6.3.1

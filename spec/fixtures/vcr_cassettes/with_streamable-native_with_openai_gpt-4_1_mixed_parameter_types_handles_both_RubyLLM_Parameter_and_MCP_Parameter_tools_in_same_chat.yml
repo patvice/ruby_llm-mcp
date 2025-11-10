@@ -12,7 +12,7 @@ http_interactions:
         two numbers together","parameters":{"type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:46:23 GMT
+      - Mon, 10 Nov 2025 23:33:38 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,13 +39,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '679'
+      - '483'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '694'
+      - '496'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -81,9 +81,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ1A6p4nINHebwppZ6DnFPW8uptXr",
+          "id": "chatcmpl-CaVg9OeUFuPxmlI6g6sEPRZu7bDPB",
           "object": "chat.completion",
-          "created": 1762461982,
+          "created": 1762817617,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -93,7 +93,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_szBjuqUHQqswv3l12VvF5nHa",
+                    "id": "call_x2z9QFpUEQ1O1jq30kTHPVAc",
                     "type": "function",
                     "function": {
                       "name": "simple_multiply",
@@ -101,7 +101,7 @@ http_interactions:
                     }
                   },
                   {
-                    "id": "call_EkEKGl2UjvI0k2zI3pOZhYHn",
+                    "id": "call_plQYLXI3lBc1atjskfrUoQV3",
                     "type": "function",
                     "function": {
                       "name": "add",
@@ -134,20 +134,20 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Thu, 06 Nov 2025 20:46:23 GMT
+  recorded_at: Mon, 10 Nov 2025 23:33:38 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you multiply
-        3 and 4, then add 5 and 7?"},{"role":"assistant","tool_calls":[{"id":"call_szBjuqUHQqswv3l12VvF5nHa","type":"function","function":{"name":"simple_multiply","arguments":"{\"x\":3,\"y\":4}"}},{"id":"call_EkEKGl2UjvI0k2zI3pOZhYHn","type":"function","function":{"name":"add","arguments":"{\"a\":5,\"b\":7}"}}]},{"role":"tool","content":"12","tool_call_id":"call_szBjuqUHQqswv3l12VvF5nHa"},{"role":"tool","content":"12","tool_call_id":"call_EkEKGl2UjvI0k2zI3pOZhYHn"}],"stream":false,"tools":[{"type":"function","function":{"name":"simple_multiply","description":"Multiply
+        3 and 4, then add 5 and 7?"},{"role":"assistant","tool_calls":[{"id":"call_x2z9QFpUEQ1O1jq30kTHPVAc","type":"function","function":{"name":"simple_multiply","arguments":"{\"x\":3,\"y\":4}"}},{"id":"call_plQYLXI3lBc1atjskfrUoQV3","type":"function","function":{"name":"add","arguments":"{\"a\":5,\"b\":7}"}}]},{"role":"tool","content":"12","tool_call_id":"call_x2z9QFpUEQ1O1jq30kTHPVAc"},{"role":"tool","content":"12","tool_call_id":"call_plQYLXI3lBc1atjskfrUoQV3"}],"stream":false,"tools":[{"type":"function","function":{"name":"simple_multiply","description":"Multiply
         two numbers together","parameters":{"type":"object","properties":{"x":{"type":"number","description":"First
         number"},"y":{"type":"number","description":"Second number"}},"required":["x","y"],"additionalProperties":false,"strict":true}}},{"type":"function","function":{"name":"add","description":"Addes
         two numbers together","parameters":{"type":"object","properties":{"a":{"type":"number"},"b":{"type":"number"}},"required":["a","b"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -162,7 +162,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:46:24 GMT
+      - Mon, 10 Nov 2025 23:33:38 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -174,13 +174,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '698'
+      - '504'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '714'
+      - '528'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -216,16 +216,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ1A7IVxnll2Wr9MLRoFbqRcpaCn7",
+          "id": "chatcmpl-CaVgA6KYmoi3RIVVYz4jHged2BfLG",
           "object": "chat.completion",
-          "created": 1762461983,
+          "created": 1762817618,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Here are the results:\n- 3 multiplied by 4 is 12.\n- 5 added to 7 is 12.",
+                "content": "- 3 multiplied by 4 equals 12.\n- 5 added to 7 also equals 12.",
                 "refusal": null,
                 "annotations": []
               },
@@ -235,8 +235,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 162,
-            "completion_tokens": 28,
-            "total_tokens": 190,
+            "completion_tokens": 24,
+            "total_tokens": 186,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -251,5 +251,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Thu, 06 Nov 2025 20:46:24 GMT
+  recorded_at: Mon, 10 Nov 2025 23:33:38 GMT
 recorded_with: VCR 6.3.1

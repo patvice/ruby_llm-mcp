@@ -9,7 +9,7 @@ http_interactions:
         you create a greeting for John in Spanish?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:44:42 GMT
+      - Mon, 10 Nov 2025 23:38:25 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,27 +38,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:44:42Z'
+      - '2025-11-10T23:38:25Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:44:42Z'
+      - '2025-11-10T23:38:25Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:44:41Z'
+      - '2025-11-10T23:38:24Z'
       Retry-After:
-      - '19'
+      - '35'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:44:42Z'
+      - '2025-11-10T23:38:25Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -66,7 +66,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2669'
+      - '2294'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -78,6 +78,6 @@ http_interactions:
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxRFNqcGUxQ0Q2c0ZBOTdKaXVIckszRSIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IsKhSG9sYSwgSm9obiEgwr9Dw7NtbyBlc3TDoXM/XG5cbihIZWxsbywgSm9obiEgSG93IGFyZSB5b3U/KSJ9XSwic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGwsInVzYWdlIjp7ImlucHV0X3Rva2VucyI6MTcsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjozMiwic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0=
-  recorded_at: Thu, 06 Nov 2025 20:44:42 GMT
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxRDRVM0d5aUtWWkVFRnJMWFF5RGlqRiIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IsKhSG9sYSwgSm9obiEgwr9Dw7NtbyBlc3TDoXM/XG5cbihIZWxsbywgSm9obiEgSG93IGFyZSB5b3U/KSJ9XSwic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGwsInVzYWdlIjp7ImlucHV0X3Rva2VucyI6MTcsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjozMiwic2VydmljZV90aWVyIjoic3RhbmRhcmQifX0=
+  recorded_at: Mon, 10 Nov 2025 23:38:25 GMT
 recorded_with: VCR 6.3.1

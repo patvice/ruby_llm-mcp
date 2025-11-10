@@ -10,7 +10,7 @@ http_interactions:
         image do you have?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:37 GMT
+      - Mon, 10 Nov 2025 23:34:52 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=765
+      - gfet4t7; dur=836
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,38 +55,38 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have a picture of a dog.\n"
+                    "text": "I have an image of a light-colored dog, likely a puppy, with its mouth wide open, possibly yawning. It's standing on a white background.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.46257177988688153
+              "avgLogprobs": -0.27159135481890512
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 273,
-            "candidatesTokenCount": 9,
-            "totalTokenCount": 282,
+            "candidatesTokenCount": 34,
+            "totalTokenCount": 307,
             "promptTokensDetails": [
-              {
-                "modality": "IMAGE",
-                "tokenCount": 258
-              },
               {
                 "modality": "TEXT",
                 "tokenCount": 15
+              },
+              {
+                "modality": "IMAGE",
+                "tokenCount": 258
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 9
+                "tokenCount": 34
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "aAkNaenvEqWM_PUPz-ix2QU"
+          "responseId": "m3YSabnUJcm7_uMPn_fA8Ak"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:36 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:52 GMT
 recorded_with: VCR 6.3.1

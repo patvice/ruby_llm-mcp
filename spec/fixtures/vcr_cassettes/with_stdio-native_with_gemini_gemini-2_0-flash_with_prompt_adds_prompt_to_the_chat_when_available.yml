@@ -10,7 +10,7 @@ http_interactions:
         based on the prompt provided."}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:42:14 GMT
+      - Mon, 10 Nov 2025 23:37:55 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=728
+      - gfet4t7; dur=507
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Hello! I'm doing well, thank you for asking. Hello!\n"
+                    "text": "Hello! I'm doing well, thank you.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.24469223618507385
+              "avgLogprobs": -0.22922990719477335
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 21,
-            "candidatesTokenCount": 16,
-            "totalTokenCount": 37,
+            "candidatesTokenCount": 12,
+            "totalTokenCount": 33,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 16
+                "tokenCount": 12
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "JQgNaZT3MrXO_uMP4LLikQ0"
+          "responseId": "U3cSaaeKHMmG-8YP5q2v6AQ"
         }
-  recorded_at: Thu, 06 Nov 2025 20:42:14 GMT
+  recorded_at: Mon, 10 Nov 2025 23:37:55 GMT
 recorded_with: VCR 6.3.1

@@ -41,4 +41,3 @@ jobs:
         env:
           CI: "true"
           GITHUB_ACTIONS: "true"
-          RUBY_LLM_DEBUG: "true"

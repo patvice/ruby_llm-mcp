@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Fri, 07 Nov 2025 00:36:32 GMT
+      - Mon, 10 Nov 2025 23:31:22 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=4203
+      - gfet4t7; dur=2324
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have access to a vast amount of information and can perform a wide range of tasks. Here's a breakdown of my capabilities:\n\n*   **Vast Knowledge Base:** I've been trained on a massive dataset of text and code, which allows me to understand and generate human-like text on a wide variety of topics.\n\n*   **Natural Language Processing (NLP):**\n    *   **Understanding:** I can understand the nuances of human language, including grammar, sentiment, and context.\n    *   **Generation:** I can generate different kinds of creative text formats, like poems, code, scripts, musical pieces, email, letters, etc. I will try my best to fulfill all your requirements.\n    *   **Translation:** I can translate languages.\n    *   **Summarization:** I can summarize text.\n    *   **Question Answering:** I can answer your questions in an informative way, even if they are open ended, challenging, or strange.\n\n*   **Image Understanding:** As demonstrated, I can process and understand the content of images, including identifying objects and describing scenes.\n\n*   **Code Generation and Understanding:** I can generate and understand code in various programming languages.\n\n*   **Access to Real-time Information (with limitations):** While my core knowledge is based on a massive dataset, I can also access and process information from the real world through Google Search. However, this access has limitations, and I might not always be able to provide the most up-to-date information.\n\n**Important Considerations:**\n\n*   **No Personal Experiences or Opinions:** I don't have personal experiences, emotions, or opinions. My responses are based on the data I was trained on.\n*   **Limitations and Potential Errors:** While I strive to provide accurate and helpful information, I am still under development and can sometimes make mistakes. It's important to critically evaluate my responses.\n*   **Privacy:** I don't retain information about our conversations in a way that's tied to your identity.\n\nIn summary, I am a powerful tool that can assist you with a wide range of tasks involving language, information retrieval, and creative content generation.\n"
+                    "text": "I have access to a vast amount of information through Google's knowledge base, which allows me to process and understand text, images, and other data. I can use this information to:\n\n*   **Answer your questions:** I can provide information on a wide range of topics, from general knowledge to more specific queries.\n*   **Generate text:** I can write different kinds of creative text formats, like poems, code, scripts, musical pieces, email, letters, etc. I will try my best to fulfill all your requirements.\n*   **Translate languages:** I can translate text from one language to another.\n*   **Summarize text:** I can provide summaries of articles or documents.\n*   **Analyze images:** As demonstrated in the previous turn, I can describe and understand the content of images.\n\nHowever, I don't have real-time access to the internet for browsing, so my knowledge is limited to the information I was trained on. I also can't access personal information from your computer or any other devices."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.182193087897121
+              "avgLogprobs": -0.23301197658075351
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 275,
-            "candidatesTokenCount": 451,
-            "totalTokenCount": 726,
+            "candidatesTokenCount": 214,
+            "totalTokenCount": 489,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -81,12 +81,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 451
+                "tokenCount": 214
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "DD8NabyyH-eVjMcPvvGtoA8"
+          "responseId": "yHUSaYWIDtn3jrEPtfLAgAU"
         }
-  recorded_at: Fri, 07 Nov 2025 00:36:32 GMT
+  recorded_at: Mon, 10 Nov 2025 23:31:22 GMT
 recorded_with: VCR 6.3.1

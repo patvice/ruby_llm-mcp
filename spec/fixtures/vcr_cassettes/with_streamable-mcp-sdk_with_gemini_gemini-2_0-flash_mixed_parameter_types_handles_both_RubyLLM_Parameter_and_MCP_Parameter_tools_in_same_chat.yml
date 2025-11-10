@@ -12,7 +12,7 @@ http_interactions:
         two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":["a","b"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -33,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Fri, 07 Nov 2025 01:23:37 GMT
+      - Mon, 10 Nov 2025 23:36:35 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -43,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=744
+      - gfet4t7; dur=689
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -60,8 +60,8 @@ http_interactions:
                     "functionCall": {
                       "name": "simple_multiply",
                       "args": {
-                        "y": 4,
-                        "x": 3
+                        "x": 3,
+                        "y": 4
                       }
                     }
                   },
@@ -69,8 +69,8 @@ http_interactions:
                     "functionCall": {
                       "name": "add",
                       "args": {
-                        "b": 7,
-                        "a": 5
+                        "a": 5,
+                        "b": 7
                       }
                     }
                   }
@@ -99,22 +99,22 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "GEoNafqzLYiUjMcP8rmc8A4"
+          "responseId": "A3cSae3vD-TvjrEPlqOI6A0"
         }
-  recorded_at: Fri, 07 Nov 2025 01:23:37 GMT
+  recorded_at: Mon, 10 Nov 2025 23:36:35 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you multiply 3 and
-        4, then add 5 and 7?"}]},{"role":"model","parts":[{"functionCall":{"name":"simple_multiply","args":{"y":4,"x":3}}},{"functionCall":{"name":"add","args":{"b":7,"a":5}}}]},{"role":"function","parts":[{"functionResponse":{"name":"simple_multiply","response":{"name":"simple_multiply","content":[{"text":"12"}]}}},{"functionResponse":{"name":"add","response":{"name":"add","content":[{"text":"12"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"simple_multiply","description":"Multiply
+        4, then add 5 and 7?"}]},{"role":"model","parts":[{"functionCall":{"name":"simple_multiply","args":{"x":3,"y":4}}},{"functionCall":{"name":"add","args":{"a":5,"b":7}}}]},{"role":"function","parts":[{"functionResponse":{"name":"simple_multiply","response":{"name":"simple_multiply","content":[{"text":"12"}]}}},{"functionResponse":{"name":"add","response":{"name":"add","content":[{"text":"12"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"simple_multiply","description":"Multiply
         two numbers together","parameters":{"type":"OBJECT","properties":{"x":{"type":"NUMBER","description":"First
         number"},"y":{"type":"NUMBER","description":"Second number"}},"required":["x","y"]}},{"name":"add","description":"Addes
         two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":["a","b"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -135,7 +135,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Fri, 07 Nov 2025 01:23:38 GMT
+      - Mon, 10 Nov 2025 23:36:36 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -145,7 +145,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=651
+      - gfet4t7; dur=497
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -186,7 +186,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "GUoNabCmLPXPjMcPwLXcwQk"
+          "responseId": "BHcSabvbBq3J-8YPnpXJ-Ao"
         }
-  recorded_at: Fri, 07 Nov 2025 01:23:38 GMT
+  recorded_at: Mon, 10 Nov 2025 23:36:36 GMT
 recorded_with: VCR 6.3.1

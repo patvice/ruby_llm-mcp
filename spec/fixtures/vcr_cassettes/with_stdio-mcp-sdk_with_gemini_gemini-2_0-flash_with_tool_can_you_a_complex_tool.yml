@@ -10,7 +10,7 @@ http_interactions:
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"type":"STRING"}},"required":["website"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:30 GMT
+      - Mon, 10 Nov 2025 23:34:41 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=552
+      - gfet4t7; dur=564
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -87,9 +87,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "YQkNaa27NK7g_uMPqez24Qs"
+          "responseId": "kXYSaZyME4ST_uMP-oqamAY"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:30 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:41 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -103,7 +103,7 @@ http_interactions:
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"type":"STRING"}},"required":["website"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -124,7 +124,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:31 GMT
+      - Mon, 10 Nov 2025 23:34:42 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -134,7 +134,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=637
+      - gfet4t7; dur=720
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -148,19 +148,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The website example.com is a domain for use in documentation examples. They do not specify what they do other than that.\n"
+                    "text": "The website example.com is a domain used for documentation examples. It does not describe what \"they\" do, as it's not a company or organization with a specific purpose. It's simply a placeholder domain.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.05092569956412682
+              "avgLogprobs": -0.12830099852188773
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 95,
-            "candidatesTokenCount": 26,
-            "totalTokenCount": 121,
+            "candidatesTokenCount": 46,
+            "totalTokenCount": 141,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -170,12 +170,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 26
+                "tokenCount": 46
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "YgkNacyuHYCm_uMP1fqeuA0"
+          "responseId": "kXYSadPrOau__uMP0Kb0qA4"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:31 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:42 GMT
 recorded_with: VCR 6.3.1

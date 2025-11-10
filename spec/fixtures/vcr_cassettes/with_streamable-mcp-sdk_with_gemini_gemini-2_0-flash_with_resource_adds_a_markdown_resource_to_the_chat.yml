@@ -12,7 +12,7 @@ http_interactions:
         does the markdown file say?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -33,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Fri, 07 Nov 2025 01:23:35 GMT
+      - Mon, 10 Nov 2025 23:36:34 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -43,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1050
+      - gfet4t7; dur=1078
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -57,13 +57,13 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The markdown file `my.md` contains the following content:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nIn summary, the file is a simple markdown document with a title \"My Markdown File\" and two sections, \"Section 1\" and \"Section 2\", each containing a brief descriptive sentence.\n"
+                    "text": "The markdown file, `my.md`, contains the following:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nIn essence, it's a simple markdown document with a main title \"My Markdown File\" and two sections, \"Section 1\" and \"Section 2\", each with a short description.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.13914931037209249
+              "avgLogprobs": -0.085302179509943177
             }
           ],
           "usageMetadata": {
@@ -84,7 +84,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "FkoNaaDDIISAjMcP0sHGqQ0"
+          "responseId": "AXcSaeG4DI2HjrEPuObrmQs"
         }
-  recorded_at: Fri, 07 Nov 2025 01:23:35 GMT
+  recorded_at: Mon, 10 Nov 2025 23:36:34 GMT
 recorded_with: VCR 6.3.1

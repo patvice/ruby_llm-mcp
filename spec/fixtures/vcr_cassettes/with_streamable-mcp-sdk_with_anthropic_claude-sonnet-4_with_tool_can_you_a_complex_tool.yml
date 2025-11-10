@@ -11,7 +11,7 @@ http_interactions:
         website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}},"required":["name","value"],"additionalProperties":false}}},"required":["url","headers"],"additionalProperties":false}]}},"required":["website"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 01:22:47 GMT
+      - Mon, 10 Nov 2025 23:35:45 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -38,29 +38,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Limit:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Remaining:
-      - '30000'
+      - '29000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-07T01:22:46Z'
+      - '2025-11-10T23:35:46Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-07T01:22:47Z'
+      - '2025-11-10T23:35:46Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-07T01:22:46Z'
+      - '2025-11-10T23:35:44Z'
       Retry-After:
-      - '14'
+      - '16'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
-      - '38000'
+      - '37000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-07T01:22:46Z'
+      - '2025-11-10T23:35:46Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -68,7 +68,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2275'
+      - '2407'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -79,9 +79,10 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01UUSsSKiwhcoR2h5498FHJE","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        fetch the website https://www.example.com/ for you and check what they do."},{"type":"tool_use","id":"toolu_019znjWRGh3hinQsvWaAVUEX","name":"fetch_site","input":{"website":"https://www.example.com/"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":529,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":82,"service_tier":"standard"}}'
-  recorded_at: Fri, 07 Nov 2025 01:22:46 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01FUYg2XFoFJBefWUVoHKx46","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        fetch the website https://www.example.com/ for you and check what they say
+        about what they do."},{"type":"tool_use","id":"toolu_01SPtRPwsvcJ4H7buXYTLmAu","name":"fetch_site","input":{"website":"https://www.example.com/"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":529,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":86,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:35:45 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -90,14 +91,15 @@ http_interactions:
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you fetch the website https://www.example.com/ and see if the site say what
         they do?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll fetch
-        the website https://www.example.com/ for you and check what they do."},{"type":"tool_use","id":"toolu_019znjWRGh3hinQsvWaAVUEX","name":"fetch_site","input":{"website":"https://www.example.com/"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_019znjWRGh3hinQsvWaAVUEX","content":[{"type":"text","text":"Website
+        the website https://www.example.com/ for you and check what they say about
+        what they do."},{"type":"tool_use","id":"toolu_01SPtRPwsvcJ4H7buXYTLmAu","name":"fetch_site","input":{"website":"https://www.example.com/"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01SPtRPwsvcJ4H7buXYTLmAu","content":[{"type":"text","text":"Website
         content from https://www.example.com/:\n\nExample Domain Example Domain This
         domain is for use in documentation examples without needing permission. Avoid
         use in operations. Learn more"}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"fetch_site","description":"Fetches
         website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}},"required":["name","value"],"additionalProperties":false}}},"required":["url","headers"],"additionalProperties":false}]}},"required":["website"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -114,7 +116,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 01:22:51 GMT
+      - Mon, 10 Nov 2025 23:35:51 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -126,27 +128,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-07T01:22:49Z'
+      - '2025-11-10T23:35:48Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-07T01:22:52Z'
+      - '2025-11-10T23:35:53Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-07T01:22:48Z'
+      - '2025-11-10T23:35:47Z'
       Retry-After:
-      - '12'
+      - '14'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-07T01:22:49Z'
+      - '2025-11-10T23:35:48Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -154,7 +156,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '4423'
+      - '6195'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -165,14 +167,17 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_015bZP9qtUyztLtmgz98EZom","type":"message","role":"assistant","content":[{"type":"text","text":"Based
-        on the content I fetched from https://www.example.com/, this is actually just
-        an example domain used for documentation purposes. The site states:\n\n\"This
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01TZgPkEqEShAES5p1ReiK1M","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the content I fetched from https://www.example.com/, this is actually a
+        special domain used for documentation purposes. The site states:\n\n\"This
         domain is for use in documentation examples without needing permission. Avoid
-        use in operations.\"\n\nSo Example.com doesn''t represent a real business
-        or organization - it''s specifically maintained as a placeholder domain that
-        can be used in documentation, tutorials, and examples without requiring special
-        permission. It''s essentially a reserved domain for educational and demonstration
-        purposes rather than a commercial website with specific services or products."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":660,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":116,"service_tier":"standard"}}'
-  recorded_at: Fri, 07 Nov 2025 01:22:51 GMT
+        use in operations.\"\n\nSo rather than being a business or service that \"does\"
+        something specific, example.com is maintained as a placeholder domain that
+        developers and writers can use in examples, tutorials, and documentation without
+        needing to get permission from a real website owner. It''s specifically designed
+        to avoid being used in actual operations or live systems.\n\nThe site includes
+        a \"Learn more\" link which presumably provides additional information about
+        this purpose, but the main message is clear - it''s a reserved domain for
+        educational and documentation examples."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":664,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":157,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:35:51 GMT
 recorded_with: VCR 6.3.1

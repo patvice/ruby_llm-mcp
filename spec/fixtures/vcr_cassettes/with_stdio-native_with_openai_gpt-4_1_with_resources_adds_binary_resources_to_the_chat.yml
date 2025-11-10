@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 00:36:40 GMT
+      - Mon, 10 Nov 2025 23:31:50 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '8119'
+      - '9308'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '8151'
+      - '9330'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -85,16 +85,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ4krEtAKOK9AQlAq0wJxdXUWgp5u",
+          "id": "chatcmpl-CaVeHLmhu3ScbhIKgkVCfZ5hE1XEK",
           "object": "chat.completion",
-          "created": 1762475793,
+          "created": 1762817501,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "I have access to a wide range of resources and information, including:\n\n1. **General Knowledge**: I have been trained on a vast dataset that includes information up to June 2024. This covers topics such as science, technology, history, literature, art, sports, and more.\n\n2. **Images**: I can analyze and describe images you upload, including identifying objects, providing summaries, and extracting text (OCR). However, there are some restrictions, such as not identifying real people in photographs.\n\n3. **Text Interpretation**: I can interpret and analyze the text you provide, including code, essays, articles, and more.\n\n4. **Problem Solving**: I can help with solving math problems, programming questions, logical puzzles, and more.\n\n5. **Writing Assistance**: I can assist with essays, stories, reports, emails, and other writing tasks.\n\n6. **Updated Information**: My knowledge base includes events, facts, and advancements up to June 2024. I do not have real-time web browsing capabilities, so I can't access live or up-to-the-minute updates.\n\n7. **Language Translation**: I can translate text between numerous languages.\n\n**Limitations:**\n- I **cannot** access or search the internet in real time.\n- I **cannot** provide or guess the identity of people in images.\n- I **cannot** interact with external software or devices directly (apart from plugins/integrations set up in certain environments).\n- My responses are based on the data up until my last update (June 2024).\n\nIf you have any specific needs or questions, please let me know!",
+                "content": "I have access to multiple resources and capabilities to help answer your questions and assist you, including:\n\n### 1. **Extensive Knowledge Base**\n- My knowledge is based on a wide range of sources up to June 2024. This includes textbooks, articles, websites, research papers, and more.\n\n### 2. **Image Analysis**\n- I can analyze and describe images, objects, and simple scenes.\n- I can extract text from images (OCR).\n- I can identify some basic elements, but I **cannot recognize or identify real people**.\n\n### 3. **Text Generation & Summarization**\n- I can summarize articles, books, and essays.\n- I can generate creative content like stories, poems, scripts, and more.\n\n### 4. **Math & Science**\n- I can solve mathematical problems, explain scientific concepts, and help with data analysis.\n\n### 5. **Programming Help**\n- I can write, debug, and explain code in multiple languages such as Python, JavaScript, Java, C++, etc.\n- I can explain algorithms, data structures, and programming concepts.\n\n### 6. **Language Translation**\n- I am capable of translating text between many languages.\n\n### 7. **Research Assistance**\n- I can help you brainstorm, organize research, find trustworthy sources, and generate citations (but I cannot access real-time web data or paywalled content).\n\n### 8. **Learning Support**\n- I can help with understanding concepts, creating study plans, and providing practice quizzes.\n\n### 9. **Conversational Abilities**\n- I can engage in general conversation, answer trivia, and provide advice (within my safety and ethical boundaries).\n\n---\n\n**Limitations:**\n- I cannot browse the internet in real time or access live data.\n- I do not have access to your personal files or any external databases.\n- I do not have sensory perception (hearing, touch, etc.) beyond image/text input.\n\n---\n\nIf you have a specific task or question, let me know how I can help!",
                 "refusal": null,
                 "annotations": []
               },
@@ -104,8 +104,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 282,
-            "completion_tokens": 332,
-            "total_tokens": 614,
+            "completion_tokens": 413,
+            "total_tokens": 695,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -120,5 +120,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Fri, 07 Nov 2025 00:36:40 GMT
+  recorded_at: Mon, 10 Nov 2025 23:31:50 GMT
 recorded_with: VCR 6.3.1

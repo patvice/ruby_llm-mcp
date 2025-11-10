@@ -10,7 +10,7 @@ http_interactions:
         response."}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:45:23 GMT
+      - Mon, 10 Nov 2025 23:38:44 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=3058
+      - gfet4t7; dur=2937
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Sunrise spills, a honeyed, amber hue,\nAcross the fields, still beaded with the dew.\nThe robin sings a trill, a vibrant call,\nAnd shadows shrink, embracing one and all.\n\nA gentle breeze, a whispered, leafy sigh,\nKisses the cheeks of clouds that drift on high.\nThe world awakens, stretches, yawning wide,\nPrepared to meet the day, with naught to hide.\n\nA farmer sows his seeds, with hopeful hand,\nWhile bees hum softly, in this fertile land.\nA river flows, a silver, winding thread,\nBearing secrets whispered, overheard.\n\nThe children laugh, their voices bright and clear,\nDispelling doubts, and banishing all fear.\nThey chase the butterflies, with wings so frail,\nAnd paint their dreams upon the morning gale.\n\nThe simple joy, a comfort, sweet and deep,\nTo linger here, the promises to keep.\nAnd in this moment, born of light and grace,\nI find the seeds of beauty, in this place.\n\nSo let me write this **poem**, for today,\nBefore its golden moments fade away.\nA testament to beauty, found anew,\nIn every sunrise, fresh and pure and true.\n"
+                    "text": "The sun, a painter, strokes the eastern sky,\nWith hues of rose and gold, where dreams still lie.\nThe birds awake, a chorus takes its flight,\nA symphony of dawn, banishing the night.\n\nA gentle breeze, a whisper through the trees,\nCarries the scent of earth and morning ease.\nThe dew-kissed petals, shimmer, cool and bright,\nReflecting back the nascent, pearly light.\n\nThe city stirs, a rumble in the core,\nA thousand tasks awaiting, to explore.\nThe farmer toils, beneath the sun's warm gaze,\nPreparing fields for future, fruitful days.\n\nA cup of warmth, a thought both clear and keen,\nA moment's pause, to let the beauty seen\nResonate within, a quiet, grateful hum,\nBefore the day's demands begin to come.\n\nAnd in this tapestry of sights and sound,\nA fleeting chance, upon this fertile ground,\nTo breathe it in, this perfect, present hour,\nAnd find the magic, blooming like a flower.\n\nThis is the day, a canvas fresh and new,\nA chance to paint a life both strong and true.\nAnd in this moment, filled with grace and gleam,\nA tiny, hopeful, **poem** takes its dream.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.72860504860101749
+              "avgLogprobs": -0.59476766099024858
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 25,
-            "candidatesTokenCount": 258,
-            "totalTokenCount": 283,
+            "candidatesTokenCount": 274,
+            "totalTokenCount": 299,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 258
+                "tokenCount": 274
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "4AgNaeOqD4Ke_uMPpqS7uQw"
+          "responseId": "gXcSaaPvK7yN_PUPksiq-QM"
         }
-  recorded_at: Thu, 06 Nov 2025 20:45:23 GMT
+  recorded_at: Mon, 10 Nov 2025 23:38:44 GMT
 recorded_with: VCR 6.3.1

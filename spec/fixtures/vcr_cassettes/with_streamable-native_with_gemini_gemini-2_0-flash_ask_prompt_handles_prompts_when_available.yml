@@ -9,7 +9,7 @@ http_interactions:
         you also say Hello back?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:45:20 GMT
+      - Mon, 10 Nov 2025 23:38:41 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=483
+      - gfet4t7; dur=457
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -60,7 +60,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0966713097360399
+              "avgLogprobs": -0.020141805211702984
             }
           ],
           "usageMetadata": {
@@ -81,7 +81,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "3wgNaezlKPOo_uMPiM2dKQ"
+          "responseId": "gXcSadHmCtfO_uMPhOu7gQY"
         }
-  recorded_at: Thu, 06 Nov 2025 20:45:20 GMT
+  recorded_at: Mon, 10 Nov 2025 23:38:41 GMT
 recorded_with: VCR 6.3.1

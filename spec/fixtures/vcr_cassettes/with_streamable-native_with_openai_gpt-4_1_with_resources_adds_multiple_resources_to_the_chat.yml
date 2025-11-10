@@ -17,7 +17,7 @@ http_interactions:
         information do you have from the provided resources?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -32,7 +32,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:45:49 GMT
+      - Mon, 10 Nov 2025 23:33:23 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -44,13 +44,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2827'
+      - '2872'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '4088'
+      - '2887'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -86,16 +86,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ19XksjVucYrSnnfJONpRyW4HXbe",
+          "id": "chatcmpl-CaVfs9JLM7VDVbFDAHy9RJiQjzV00",
           "object": "chat.completion",
-          "created": 1762461947,
+          "created": 1762817600,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Based on the resources you have provided, I have access to the following files and their contents:\n\n---\n\n### 1. **plain_text.txt**\n**Content:**\n> Plan text information\n\n---\n\n### 2. **test.txt**\n**Content:**\n> Hello, this is a test file!  \n> This content will be served by the MCP resource.  \n> You can modify this file and it will be cached for 5 minutes.\n\n---\n\n### 3. **second_file.txt**\n**Content:**\n> This is the second file that I want to be able to use as a resource\n\n---\n\n### 4. **my.md**\n**Content:**\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n---\n\nIf you need specific details from any of these resources or want to reference or manipulate the content, let me know!",
+                "content": "Here is the information I have from the provided resources:\n\n---\n\n### plain_text.txt\n- **Description:** A plain text file.\n- **Content:** \"Plan text information\"\n\n---\n\n### test.txt\n- **Description:** A text file.\n- **Content:**\n  ```\n  Hello, this is a test file!\n  This content will be served by the MCP resource.\n  You can modify this file and it will be cached for 5 minutes.\n  ```\n\n---\n\n### second_file.txt\n- **Description:** A second text file.\n- **Content:**\n  ```\n  This is the second file that I want to be able to use as a resource\n  ```\n\n---\n\n### my.md\n- **Description:** A markdown file.\n- **Content:**  \n  ```\n  # My Markdown File\n\n  This is a markdown file that I want to be able to use as a resource\n\n  ## Section 1\n\n  This is a section in my markdown file\n\n  ## Section 2\n\n  This is another section in my markdown file\n  ```\n\n---\n\nIf you need information or details from any specific file or want to use them in a particular way, let me know!",
                 "refusal": null,
                 "annotations": []
               },
@@ -105,8 +105,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 168,
-            "completion_tokens": 213,
-            "total_tokens": 381,
+            "completion_tokens": 241,
+            "total_tokens": 409,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -121,5 +121,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Thu, 06 Nov 2025 20:45:49 GMT
+  recorded_at: Mon, 10 Nov 2025 23:33:23 GMT
 recorded_with: VCR 6.3.1

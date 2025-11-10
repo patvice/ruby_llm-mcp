@@ -9,7 +9,7 @@ http_interactions:
         messages for ruby channel and let me know what they say?"}],"stream":false,"tools":[{"type":"function","function":{"name":"list_messages","description":"","parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -24,7 +24,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 01:23:44 GMT
+      - Mon, 10 Nov 2025 23:36:40 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -36,13 +36,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '575'
+      - '482'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '786'
+      - '502'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -50,11 +50,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29935'
+      - '29098'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 129ms
+      - 1.802s
       X-Request-Id:
       - "<X_REQUEST_ID>"
       X-Openai-Proxy-Wasm:
@@ -78,9 +78,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ5UVTNBwYz7segAerbWml1GN7w7K",
+          "id": "chatcmpl-CaVj6cyYOAlsCgLf5LoT5rBjhIe67",
           "object": "chat.completion",
-          "created": 1762478623,
+          "created": 1762817800,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -90,7 +90,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_aRJSHcr2hoqmCalL5KmZvMBV",
+                    "id": "call_uxagruYp9qvL2oI0MqAwbZzj",
                     "type": "function",
                     "function": {
                       "name": "list_messages",
@@ -123,19 +123,19 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Fri, 07 Nov 2025 01:23:43 GMT
+  recorded_at: Mon, 10 Nov 2025 23:36:40 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you pull
-        messages for ruby channel and let me know what they say?"},{"role":"assistant","tool_calls":[{"id":"call_aRJSHcr2hoqmCalL5KmZvMBV","type":"function","function":{"name":"list_messages","arguments":"{\"channel\":\"ruby\"}"}}]},{"role":"tool","content":"Ruby
+        messages for ruby channel and let me know what they say?"},{"role":"assistant","tool_calls":[{"id":"call_uxagruYp9qvL2oI0MqAwbZzj","type":"function","function":{"name":"list_messages","arguments":"{\"channel\":\"ruby\"}"}}]},{"role":"tool","content":"Ruby
         is a great language for web development. It''s easy to learn and has a large
-        community.","tool_call_id":"call_aRJSHcr2hoqmCalL5KmZvMBV"}],"stream":false,"tools":[{"type":"function","function":{"name":"list_messages","description":"","parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
+        community.","tool_call_id":"call_uxagruYp9qvL2oI0MqAwbZzj"}],"stream":false,"tools":[{"type":"function","function":{"name":"list_messages","description":"","parameters":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -150,7 +150,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 01:23:45 GMT
+      - Mon, 10 Nov 2025 23:36:42 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -162,13 +162,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1153'
+      - '1029'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '1175'
+      - '1045'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -176,11 +176,11 @@ http_interactions:
       X-Ratelimit-Remaining-Requests:
       - '499'
       X-Ratelimit-Remaining-Tokens:
-      - '29956'
+      - '29233'
       X-Ratelimit-Reset-Requests:
       - 120ms
       X-Ratelimit-Reset-Tokens:
-      - 88ms
+      - 1.533s
       X-Request-Id:
       - "<X_REQUEST_ID>"
       X-Openai-Proxy-Wasm:
@@ -204,16 +204,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ5UWvoICnYYTysy5jKFYMXyzMFxS",
+          "id": "chatcmpl-CaVj7obBWebj0JkLa7DWuO30G0tY2",
           "object": "chat.completion",
-          "created": 1762478624,
+          "created": 1762817801,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Here is the most recent message from the ruby channel:\n\n\"Ruby is a great language for web development. It's easy to learn and has a large community.\"\n\nLet me know if you want a summary, more details, or messages from another channel!",
+                "content": "The latest message in the \"ruby\" channel says:\n\n\"Ruby is a great language for web development. It's easy to learn and has a large community.\"\n\nLet me know if you need more information or messages!",
                 "refusal": null,
                 "annotations": []
               },
@@ -223,8 +223,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 93,
-            "completion_tokens": 50,
-            "total_tokens": 143,
+            "completion_tokens": 43,
+            "total_tokens": 136,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -239,5 +239,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Fri, 07 Nov 2025 01:23:45 GMT
+  recorded_at: Mon, 10 Nov 2025 23:36:42 GMT
 recorded_with: VCR 6.3.1

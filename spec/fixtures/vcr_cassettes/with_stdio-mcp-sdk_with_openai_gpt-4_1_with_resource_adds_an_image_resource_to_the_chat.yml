@@ -10,7 +10,7 @@ http_interactions:
         image do you have?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:48:17 GMT
+      - Mon, 10 Nov 2025 23:35:25 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1937'
+      - '2385'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '1979'
+      - '2475'
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -85,16 +85,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ1Bvrk48q08YUWMX2AvMVLWOpBXC",
+          "id": "chatcmpl-CaVhr5mam49vy5gjTsvCSMpiMiHB0",
           "object": "chat.completion",
-          "created": 1762462095,
+          "created": 1762817723,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "You uploaded an image of a dog. The dog appears to be a light-colored puppy, possibly a Golden Retriever, with its mouth open in what looks like a big yawn or a happy expression. The background is plain white.",
+                "content": "The image you provided is of a light-colored puppy, possibly a Golden Retriever, standing on a white background with its mouth open, appearing to be yawning or perhaps barking. It looks happy and playful!",
                 "refusal": null,
                 "annotations": []
               },
@@ -104,8 +104,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 280,
-            "completion_tokens": 46,
-            "total_tokens": 326,
+            "completion_tokens": 41,
+            "total_tokens": 321,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -120,5 +120,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Thu, 06 Nov 2025 20:48:17 GMT
+  recorded_at: Mon, 10 Nov 2025 23:35:25 GMT
 recorded_with: VCR 6.3.1

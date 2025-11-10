@@ -9,7 +9,7 @@ http_interactions:
         you pull messages for ruby channel and let me know what they say?"}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -26,7 +26,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:43:26 GMT
+      - Mon, 10 Nov 2025 23:32:09 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -36,29 +36,29 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Limit:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Remaining:
-      - '28000'
+      - '27000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:43:29Z'
+      - '2025-11-10T23:32:14Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:43:26Z'
+      - '2025-11-10T23:32:09Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:43:24Z'
+      - '2025-11-10T23:32:08Z'
       Retry-After:
-      - '36'
+      - '56'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
-      - '36000'
+      - '35000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:43:26Z'
+      - '2025-11-10T23:32:09Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -66,7 +66,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '2462'
+      - '2411'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -77,9 +77,9 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_015xRpYuGrQeEDE1idpeqVN9","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
-        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01TBnY1djS2UzZssEe1eZBuN","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":405,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":66,"service_tier":"standard"}}'
-  recorded_at: Thu, 06 Nov 2025 20:43:26 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01GLtKmUCdBATotLEqtMRwUb","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01TcJ82AeaCg4nsq2G5vXxBv","name":"list_messages","input":{"channel":"ruby"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":405,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":66,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:32:09 GMT
 - request:
     method: post
     uri: https://api.anthropic.com/v1/messages
@@ -87,12 +87,12 @@ http_interactions:
       encoding: UTF-8
       string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
         you pull messages for ruby channel and let me know what they say?"}]},{"role":"assistant","content":[{"type":"text","text":"I''ll
-        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01TBnY1djS2UzZssEe1eZBuN","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01TBnY1djS2UzZssEe1eZBuN","content":[{"type":"text","text":"Ruby
+        pull the messages from the ruby channel for you."},{"type":"tool_use","id":"toolu_01TcJ82AeaCg4nsq2G5vXxBv","name":"list_messages","input":{"channel":"ruby"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01TcJ82AeaCg4nsq2G5vXxBv","content":[{"type":"text","text":"Ruby
         is a great language for web development. It''s easy to learn and has a large
         community."}]}]}],"stream":false,"max_tokens":64000,"tools":[{"name":"list_messages","description":"","input_schema":{"type":"object","properties":{"channel":{"type":"string"}},"required":["channel"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}]}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -109,7 +109,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:43:29 GMT
+      - Mon, 10 Nov 2025 23:32:12 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -121,27 +121,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '28000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:43:30Z'
+      - '2025-11-10T23:32:15Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:43:29Z'
+      - '2025-11-10T23:32:12Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:43:27Z'
+      - '2025-11-10T23:32:10Z'
       Retry-After:
-      - '36'
+      - '52'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '36000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:43:29Z'
+      - '2025-11-10T23:32:12Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -149,7 +149,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '3000'
+      - '2615'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -160,11 +160,11 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01FANTGuSJbNDu88Qptbj3Ka","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        messages from the ruby channel say: \"Ruby is a great language for web development.
-        It''s easy to learn and has a large community.\"\n\nThis appears to be a positive
-        comment about the Ruby programming language, highlighting its strengths for
-        web development and its accessibility for newcomers, as well as mentioning
-        the supportive community around it."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":502,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":72,"service_tier":"standard"}}'
-  recorded_at: Thu, 06 Nov 2025 20:43:29 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01VurwH482WJEhzqQkjmJrci","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        messages from the ruby channel contain: \"Ruby is a great language for web
+        development. It''s easy to learn and has a large community.\"\n\nThis appears
+        to be discussing the Ruby programming language, highlighting its benefits
+        for web development and mentioning its accessibility for learners and strong
+        community support."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":502,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":62,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:32:12 GMT
 recorded_with: VCR 6.3.1

@@ -10,7 +10,7 @@ http_interactions:
         template to say hello to Bob"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:46:11 GMT
+      - Mon, 10 Nov 2025 23:37:21 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '299'
+      - '193'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
       X-Envoy-Upstream-Service-Time:
-      - '312'
+      - '205'
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -79,9 +79,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CZ19vkWyHDHdKbGcy5KHMrMDT07sk",
+          "id": "chatcmpl-CaVjlNcMLtHSnZjYIUQnwWBtueoCb",
           "object": "chat.completion",
-          "created": 1762461971,
+          "created": 1762817841,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -114,5 +114,5 @@ http_interactions:
           "service_tier": "default",
           "system_fingerprint": "fp_d38c7f4fa7"
         }
-  recorded_at: Thu, 06 Nov 2025 20:46:11 GMT
+  recorded_at: Mon, 10 Nov 2025 23:37:21 GMT
 recorded_with: VCR 6.3.1

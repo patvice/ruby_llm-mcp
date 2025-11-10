@@ -12,7 +12,7 @@ http_interactions:
         does the markdown file say?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -29,7 +29,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 06 Nov 2025 20:43:59 GMT
+      - Mon, 10 Nov 2025 23:32:43 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -41,27 +41,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-06T20:43:57Z'
+      - '2025-11-10T23:32:41Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-06T20:44:00Z'
+      - '2025-11-10T23:32:44Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-06T20:43:56Z'
+      - '2025-11-10T23:32:38Z'
       Retry-After:
-      - '3'
+      - '20'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-06T20:43:57Z'
+      - '2025-11-10T23:32:41Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -69,7 +69,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '3703'
+      - '6337'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -80,13 +80,13 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01PMNLbfC8DAoUzc7otXcLcG","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        markdown file contains the following content:\n\n# My Markdown File\n\nThis
-        is a markdown file that I want to be able to use as a resource\n\n## Section
-        1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another
-        section in my markdown file\n\nThe file has:\n- A main heading \"My Markdown
-        File\"\n- An introductory sentence explaining it''s meant to be used as a
-        resource\n- Two subsections (Section 1 and Section 2) with brief descriptive
-        text for each"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":117,"service_tier":"standard"}}'
-  recorded_at: Thu, 06 Nov 2025 20:43:59 GMT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01XLrhLSftJhJzUU7x31tEmw","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        markdown file \"my.md\" contains the following content:\n\n**Title:** My Markdown
+        File\n\n**Main content:** It describes itself as \"a markdown file that I
+        want to be able to use as a resource\"\n\n**Structure:** The file has two
+        sections:\n- **Section 1:** Contains the text \"This is a section in my markdown
+        file\"\n- **Section 2:** Contains the text \"This is another section in my
+        markdown file\"\n\nIt''s a simple markdown document with a main heading, introductory
+        text, and two subsections with basic descriptive content."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":126,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:32:43 GMT
 recorded_with: VCR 6.3.1

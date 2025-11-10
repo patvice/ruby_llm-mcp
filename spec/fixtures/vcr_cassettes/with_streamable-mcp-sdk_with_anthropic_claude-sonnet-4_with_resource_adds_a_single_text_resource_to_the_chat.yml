@@ -11,7 +11,7 @@ http_interactions:
         does the test file contain?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 07 Nov 2025 01:23:08 GMT
+      - Mon, 10 Nov 2025 23:36:08 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,27 +40,27 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-07T01:23:07Z'
+      - '2025-11-10T23:36:07Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-07T01:23:09Z'
+      - '2025-11-10T23:36:09Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-07T01:23:06Z'
+      - '2025-11-10T23:36:06Z'
       Retry-After:
-      - '54'
+      - '55'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-07T01:23:07Z'
+      - '2025-11-10T23:36:07Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
@@ -68,7 +68,7 @@ http_interactions:
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
       X-Envoy-Upstream-Service-Time:
-      - '3809'
+      - '3020'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
@@ -79,12 +79,11 @@ http_interactions:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01GzxtJYme9JoAyUhuzimhjC","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        test file contains the following text:\n\n```\nHello, this is a test file!\nThis
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01YNFpQUht11FBeUdzQmBcPh","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        test file contains the following content:\n\n```\nHello, this is a test file!\nThis
         content will be served by the MCP resource.\nYou can modify this file and
-        it will be cached for 5 minutes.\n```\n\nThis appears to be a simple test
-        file that demonstrates how MCP (Model Context Protocol) resources work, specifically
-        mentioning that the content is served by the MCP resource system and has a
-        5-minute cache duration."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":60,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":99,"service_tier":"standard"}}'
-  recorded_at: Fri, 07 Nov 2025 01:23:08 GMT
+        it will be cached for 5 minutes.\n```\n\nThis appears to be a simple text
+        file that serves as an example for demonstrating MCP (Model Context Protocol)
+        resource functionality, with a note about 5-minute caching behavior."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":60,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":92,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:36:08 GMT
 recorded_with: VCR 6.3.1

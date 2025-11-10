@@ -17,7 +17,7 @@ http_interactions:
         information do you have from the provided resources?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -38,7 +38,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:32 GMT
+      - Mon, 10 Nov 2025 23:34:44 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -48,7 +48,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1295
+      - gfet4t7; dur=2010
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,19 +62,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, I have information from the following files:\n\n*   **plain_text.txt:** Contains the text \"A plain text file\" followed by \"Plan text information\".\n\n*   **test.txt:** Contains the text \"Hello, this is a test file! This content will be served by the MCP resource. You can modify this file and it will be cached for 5 minutes.\"\n\n*   **second_file.txt:** Contains the text \"This is the second file that I want to be able to use as a resource\"\n\n*   **my.md:** Contains a markdown file with a title \"My Markdown File\", two sections titled \"Section 1\" and \"Section 2\", and associated descriptive text for each section.\n"
+                    "text": "I have information about four files:\n\n*   **plain_text.txt:** Contains the text \"A plain text file\\n\\nPlan text information\".\n*   **test.txt:** Contains the text \"Hello, this is a test file!\\nThis content will be served by the MCP resource.\\nYou can modify this file and it will be cached for 5 minutes.\"\n*   **second_file.txt:** Contains the text \"This is the second file that I want to be able to use as a resource\".\n*   **my.md:** A Markdown file containing headings, sections and text. The content indicates it's intended for use as a resource.  Specifically, it contains a main heading \"My Markdown File\", two level 2 headings \"Section 1\" and \"Section 2\" and accompanying text under each heading.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.16965143757481729
+              "avgLogprobs": -0.24168020919714561
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 154,
-            "candidatesTokenCount": 155,
-            "totalTokenCount": 309,
+            "candidatesTokenCount": 179,
+            "totalTokenCount": 333,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -84,12 +84,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 155
+                "tokenCount": 179
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "YwkNaaehC67g_uMPqez24Qs"
+          "responseId": "knYSaYS3L7yN_PUPksiq-QM"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:32 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:44 GMT
 recorded_with: VCR 6.3.1

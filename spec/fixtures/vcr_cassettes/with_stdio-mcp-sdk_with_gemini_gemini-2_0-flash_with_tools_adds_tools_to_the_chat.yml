@@ -47,7 +47,7 @@ http_interactions:
         message for elicitation\"}},\"required\":[\"message\"]}}]}]}"
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -68,7 +68,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:26 GMT
+      - Mon, 10 Nov 2025 23:34:37 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -78,7 +78,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=632
+      - gfet4t7; dur=613
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -95,8 +95,8 @@ http_interactions:
                     "functionCall": {
                       "name": "add",
                       "args": {
-                        "b": 2,
-                        "a": 1
+                        "a": 1,
+                        "b": 2
                       }
                     }
                   }
@@ -125,16 +125,16 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "XQkNacvuJLe9_uMPz6W9wQ0"
+          "responseId": "jXYSaZrQCaCP_PUP5uSsgQc"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:26 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:37 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Can you add
-        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"b\":2,\"a\":1}}}]},{\"role\":\"function\",\"parts\":[{\"functionResponse\":{\"name\":\"add\",\"response\":{\"name\":\"add\",\"content\":[{\"text\":\"3\"}]}}}]}],\"generationConfig\":{},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
+        1 and 2?\"}]},{\"role\":\"model\",\"parts\":[{\"functionCall\":{\"name\":\"add\",\"args\":{\"a\":1,\"b\":2}}}]},{\"role\":\"function\",\"parts\":[{\"functionResponse\":{\"name\":\"add\",\"response\":{\"name\":\"add\",\"content\":[{\"text\":\"3\"}]}}}]}],\"generationConfig\":{},\"tools\":[{\"functionDeclarations\":[{\"name\":\"add\",\"description\":\"Addes
         two numbers together\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{\"a\":{\"type\":\"NUMBER\"},\"b\":{\"type\":\"NUMBER\"}},\"required\":[\"a\",\"b\"]}},{\"name\":\"return_set_evn\",\"description\":\"Returns
         the set environment variable\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{},\"required\":[]}},{\"name\":\"malformed_tool\",\"description\":\"A
         malformed tool\",\"parameters\":{\"type\":\"OBJECT\",\"properties\":{},\"required\":[]}},{\"name\":\"tool_error\",\"description\":\"Returns
@@ -175,7 +175,7 @@ http_interactions:
         message for elicitation\"}},\"required\":[\"message\"]}}]}]}"
     headers:
       User-Agent:
-      - Faraday v2.13.1
+      - Faraday v2.14.0
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -196,7 +196,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Thu, 06 Nov 2025 20:47:27 GMT
+      - Mon, 10 Nov 2025 23:34:38 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -206,7 +206,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=668
+      - gfet4t7; dur=695
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -226,7 +226,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.14668121337890624
+              "avgLogprobs": -0.053273499011993408
             }
           ],
           "usageMetadata": {
@@ -247,7 +247,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "XgkNab2GIfqp_uMPk4zp0Qk"
+          "responseId": "jXYSabnAOY6N_uMP6_StwAc"
         }
-  recorded_at: Thu, 06 Nov 2025 20:47:27 GMT
+  recorded_at: Mon, 10 Nov 2025 23:34:38 GMT
 recorded_with: VCR 6.3.1
