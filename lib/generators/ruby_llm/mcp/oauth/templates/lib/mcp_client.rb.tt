@@ -1,0 +1,68 @@
+# frozen_string_literal: true
+
+# Creates per-<%= user_variable_name %> MCP clients with OAuth authentication
+class McpClient
+  class NotAuthenticatedError < StandardError; end
+
+  # Create MCP client for a specific <%= user_variable_name %>
+  # @param <%= user_variable_name %> [<%= user_model_name %>] the <%= user_variable_name %> to create client for
+  # @param server_url [String] MCP server URL (required)
+  # @param scope [String] OAuth scopes to request
+  # @return [RubyLLM::MCP::Client] configured MCP client
+  # @raise [NotAuthenticatedError] if <%= user_variable_name %> hasn't connected to MCP server
+  # @raise [ArgumentError] if server_url not provided
+  def self.for(<%= user_variable_name %>, server_url:, scope: nil)
+    raise ArgumentError, "server_url is required" unless server_url.present?
+    scope ||= "mcp:read mcp:write"
+
+    unless <%= user_variable_name %>.mcp_connected?(server_url)
+      raise NotAuthenticatedError,
+            "<%= user_model_name %> #{<%= user_variable_name %>.id} has not connected to MCP server: #{server_url}. " \
+            "Please complete OAuth flow first."
+    end
+
+    storage = <%= user_variable_name %>.mcp_token_storage(server_url)
+
+    RubyLLM::MCP.client(
+      name: "<%= user_variable_name %>-#{<%= user_variable_name %>.id}-#{server_url.hash.abs}",
+      transport_type: determine_transport_type(server_url),
+      config: {
+        url: server_url,
+        oauth: {
+          storage: storage,
+          scope: scope
+        }
+      }
+    )
+  end
+
+  # Create MCP client for <%= user_variable_name %>, returning nil if not authenticated
+  # @param <%= user_variable_name %> [<%= user_model_name %>] the <%= user_variable_name %>
+  # @param server_url [String] MCP server URL (required)
+  # @return [RubyLLM::MCP::Client, nil] client or nil
+  def self.for_with_fallback(<%= user_variable_name %>, server_url:)
+    self.for(<%= user_variable_name %>, server_url: server_url)
+  rescue NotAuthenticatedError, ArgumentError
+    nil
+  end
+
+  # Check if <%= user_variable_name %> has valid MCP connection
+  # @param <%= user_variable_name %> [<%= user_model_name %>] the <%= user_variable_name %>
+  # @param server_url [String] MCP server URL (required)
+  # @return [Boolean] true if <%= user_variable_name %> has valid token
+  def self.connected?(<%= user_variable_name %>, server_url:)
+    return false unless server_url.present?
+
+    credential = <%= user_variable_name %>.mcp_oauth_credentials.find_by(server_url: server_url)
+    credential&.valid_token? || false
+  end
+
+  # Determine transport type from URL
+  # @param url [String] server URL
+  # @return [Symbol] :sse or :streamable
+  def self.determine_transport_type(url)
+    url.include?("/sse") ? :sse : :streamable
+  end
+
+  private_class_method :determine_transport_type
+end

@@ -9,6 +9,9 @@ description: "Complete OAuth 2.1 implementation with PKCE, dynamic registration,
 # OAuth 2.1 Authentication
 {: .no_toc }
 
+{: .label .label-green }
+0.8+
+
 Comprehensive OAuth 2.1 support for MCP servers with automatic token management, browser-based authentication, and pluggable storage.
 
 ## Table of contents
@@ -20,6 +23,8 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 ---
 
 ## Features
+{: .label .label-green }
+0.8+
 
 ### OAuth 2.1 Compliance
 
@@ -41,6 +46,8 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 | **Stdio** | N/A | Local process communication (no auth needed) |
 
 ## Architecture
+{: .label .label-green }
+0.8+
 
 ### Core Components
 
@@ -56,7 +63,7 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 │  (Tokens, Client Info, Metadata)    │
 ├─────────────────────────────────────┤
 │         Transport Layer             │
-│  (SSE, StreamableHTTP)             │
+│  (SSE, StreamableHTTP)              │
 └─────────────────────────────────────┘
 ```
 
@@ -73,25 +80,96 @@ Comprehensive OAuth 2.1 support for MCP servers with automatic token management,
 ```
 
 ## Quick Start
+{: .label .label-green }
+0.8+
 
-### Basic Configuration
+### Browser-Based OAuth (Simplest)
 
-Add OAuth configuration to your MCP client:
+The easiest way to use OAuth with MCP - storage automatically shared:
 
 ```ruby
 require "ruby_llm/mcp"
 
+# Create client with OAuth config
 client = RubyLLM::MCP.client(
-  name: "oauth-mcp-server",
-  transport_type: :sse,  # or :streamable
+  name: "oauth-server",
+  transport_type: :sse,
+  start: false,
   config: {
     url: "https://mcp.example.com/api",
-    oauth: {
-      redirect_uri: "http://localhost:8080/callback",
-      scope: "mcp:read mcp:write"
-    }
+    oauth: { scope: "mcp:read mcp:write" }
   }
 )
+
+# Authenticate via browser - storage automatically shared
+client.oauth(type: :browser).authenticate
+
+# Use client normally
+client.start
+tools = client.tools
+puts "Available tools: #{tools.map(&:name).join(', ')}"
+```
+
+### Manual Authorization Flow (No Browser)
+
+For headless environments:
+
+```ruby
+require "ruby_llm/mcp"
+
+# Create client with OAuth config
+client = RubyLLM::MCP.client(
+  name: "oauth-server",
+  transport_type: :sse,
+  start: false,
+  config: {
+    url: "https://mcp.example.com/api",
+    oauth: { scope: "mcp:read mcp:write" }
+  }
+)
+
+# Get authorization URL
+auth_url = client.oauth(type: :standard).start_authorization_flow
+puts "Visit: #{auth_url}"
+
+# After user authorizes, complete the flow
+code = "authorization_code_from_callback"
+state = "state_from_callback"
+client.oauth.complete_authorization_flow(code, state)
+
+# Use client normally
+client.start
+tools = client.tools
+```
+
+### Passing OAuth Provider Instance
+
+You can also create the OAuth provider separately and pass it to the client:
+
+```ruby
+require "ruby_llm/mcp"
+
+# Create and authenticate OAuth provider
+oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://mcp.example.com/api",
+  type: :browser,
+  scope: "mcp:read mcp:write"
+)
+oauth.authenticate
+
+# Pass provider to client - storage automatically shared
+client = RubyLLM::MCP.client(
+  name: "oauth-server",
+  transport_type: :sse,
+  config: {
+    url: "https://mcp.example.com/api",
+    oauth: oauth
+  }
+)
+
+# Use normally
+tools = client.tools
+puts "Available tools: #{tools.map(&:name).join(', ')}"
 ```
 
 ### File-Based Configuration
@@ -119,6 +197,8 @@ RubyLLM::MCP.establish_connection
 ```
 
 ## Configuration Options
+{: .label .label-green }
+0.8+
 
 ### OAuth Configuration
 
@@ -143,80 +223,43 @@ mcp_servers:
 ```
 
 ## Usage Examples
+{: .label .label-green }
+0.8+
 
-### SSE Client with OAuth
+### Basic OAuth Client
+
+The OAuth flow is the same regardless of transport type (SSE or StreamableHTTP):
 
 ```ruby
 require "ruby_llm/mcp"
-require "ruby_llm/mcp/auth/browser_oauth"
 
-# Create client with OAuth
+# Create client with OAuth config
 client = RubyLLM::MCP.client(
-  name: "secure-server",
-  transport_type: :sse,
+  name: "oauth-server",
+  transport_type: :sse,  # or :streamable
   start: false,
   config: {
-    url: "https://mcp.example.com/sse",
-    oauth: {
-      redirect_uri: "http://localhost:8080/callback",
-      scope: "mcp:read mcp:write"
-    }
+    url: "https://mcp.example.com/api",
+    oauth: { scope: "mcp:read mcp:write" }
   }
 )
 
 # Authenticate via browser
-transport = client.instance_variable_get(:@coordinator).send(:transport)
-oauth_provider = transport.oauth_provider
+client.oauth(type: :browser).authenticate
 
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
-  callback_port: 8080
-)
-
-token = browser_oauth.authenticate(timeout: 300)
-
-puts "Successfully authenticated!"
+# Use client normally
 client.start
-
-# Use normally - OAuth automatic
 tools = client.tools
 puts "Available tools: #{tools.map(&:name).join(', ')}"
 ```
 
-### StreamableHTTP with OAuth
-
-```ruby
-client = RubyLLM::MCP.client(
-  name: "streamable-server",
-  transport_type: :streamable,
-  start: false,
-  config: {
-    url: "https://api.example.com/mcp",
-    oauth: {
-      redirect_uri: "http://localhost:9000/callback",
-      scope: "mcp:full"
-    }
-  }
-)
-
-# Authenticate
-transport = client.instance_variable_get(:@coordinator).send(:transport)
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  transport.oauth_provider,
-  callback_port: 9000
-)
-browser_oauth.authenticate
-
-# Use client
-client.start
-result = client.tool("search").execute(params: { query: "Ruby MCP" })
-```
-
 ### Manual Authorization Flow
 
-For scenarios without browser access:
+For headless environments or when you need manual control:
 
 ```ruby
+require "ruby_llm/mcp"
+
 client = RubyLLM::MCP.client(
   name: "manual-auth",
   transport_type: :sse,
@@ -227,34 +270,37 @@ client = RubyLLM::MCP.client(
   }
 )
 
-transport = client.instance_variable_get(:@coordinator).send(:transport)
-oauth_provider = transport.oauth_provider
-
 # Get authorization URL
-auth_url = oauth_provider.start_authorization_flow
+oauth = client.oauth(type: :standard)
+auth_url = oauth.start_authorization_flow
 
-puts "\nPlease visit this URL to authorize:"
-puts auth_url
-puts "\nEnter the 'code' parameter from callback:"
+puts "Visit: #{auth_url}"
+puts "Enter authorization code:"
 code = gets.chomp
 
-puts "Enter the 'state' parameter:"
+puts "Enter state parameter:"
 state = gets.chomp
 
 # Complete authorization
-token = oauth_provider.complete_authorization_flow(code, state)
+oauth.complete_authorization_flow(code, state)
+
+# Use client
 client.start
+tools = client.tools
 ```
 
 ## Browser-Based Authentication
+{: .label .label-green }
+0.8+
 
-The `BrowserOAuth` class provides complete browser-based OAuth:
+The `BrowserOAuthProvider` class provides complete browser-based OAuth:
 
 ### Features
 
 - **Automatic Browser Opening**: Opens default browser to authorization URL
 - **Local Callback Server**: Pure Ruby TCP server (no external dependencies)
-- **Beautiful UI**: Styled HTML success/error pages
+- **Beautiful UI**: Styled HTML success/error pages with RubyLLM MCP branding
+- **Custom Pages**: Optional custom success/error pages for your branding
 - **Cross-Platform**: Supports macOS, Linux, Windows
 - **Timeout Support**: Configurable timeout for user authorization
 - **Thread-Safe**: Safe for concurrent use
@@ -264,16 +310,11 @@ The `BrowserOAuth` class provides complete browser-based OAuth:
 ```ruby
 require "ruby_llm/mcp/auth/browser_oauth"
 
-oauth_provider = RubyLLM::MCP::Auth::OAuthProvider.new(
-  server_url: "https://mcp.example.com",
-  redirect_uri: "http://localhost:8080/callback",
-  scope: "mcp:read mcp:write"
-)
-
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://mcp.example.com",
+  type: :browser,
   callback_port: 8080,
-  callback_path: "/callback"
+  scope: "mcp:read mcp:write"
 )
 
 begin
@@ -291,7 +332,40 @@ rescue RubyLLM::MCP::Errors::TransportError => e
 end
 ```
 
+### Custom Success/Error Pages
+
+You can customize the HTML pages shown to users after OAuth authentication via the global configuration:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Static HTML or a Proc that generates HTML
+  config.oauth.browser_success_page = "<html><body><h1>Welcome!</h1></body></html>"
+
+  # Error page receives the error message
+  config.oauth.browser_error_page = ->(error_msg) {
+    "<html><body><h1>Error:</h1><p>#{CGI.escapeHTML(error_msg)}</p></body></html>"
+  }
+end
+
+# All browser OAuth providers will use these custom pages
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://api.example.com",
+  type: :browser,
+  callback_port: 8080,
+  scope: "mcp:read mcp:write"
+)
+```
+
 ## Custom Storage
+{: .label .label-green }
+0.8+
+
+The default in-memory storage works for single-user applications, but production applications typically need persistent storage. Custom storage is especially important when:
+
+- **Multi-user applications**: Each user needs their own OAuth tokens
+- **Distributed systems**: Tokens must be shared across multiple processes/servers
+- **Token persistence**: Tokens should survive application restarts
+- **User-specific configuration**: Each user may have different MCP server configurations
 
 ### Storage Interface
 
@@ -299,31 +373,84 @@ Implement these methods for custom storage:
 
 ```ruby
 class CustomStorage
-  # Token storage
+  # Token storage - stores access/refresh tokens
   def get_token(server_url); end
   def set_token(server_url, token); end
 
-  # Client registration storage
+  # Client registration storage - stores client_id and client_secret
   def get_client_info(server_url); end
   def set_client_info(server_url, client_info); end
 
-  # Server metadata caching
+  # Server metadata caching - stores OAuth server discovery metadata
   def get_server_metadata(server_url); end
   def set_server_metadata(server_url, metadata); end
 
-  # PKCE state management (temporary)
+  # PKCE state management (temporary) - only needed during auth flow
   def get_pkce(server_url); end
   def set_pkce(server_url, pkce); end
   def delete_pkce(server_url); end
 
-  # State parameter management (temporary)
+  # State parameter management (temporary) - only needed during auth flow
   def get_state(server_url); end
   def set_state(server_url, state); end
   def delete_state(server_url); end
 end
 ```
 
-### Redis Storage Example
+### Using Storage with Clients
+
+When you pass a storage instance to a client, the OAuth provider automatically uses it for all token operations:
+
+```ruby
+# User-specific storage example
+class UserOAuthStorage
+  def initialize(user_id)
+    @user_id = user_id
+    @redis = Redis.new
+  end
+
+  def get_token(server_url)
+    key = "user:#{@user_id}:oauth:#{server_url}:token"
+    data = @redis.get(key)
+    data ? RubyLLM::MCP::Auth::Token.from_h(JSON.parse(data, symbolize_names: true)) : nil
+  end
+
+  def set_token(server_url, token)
+    key = "user:#{@user_id}:oauth:#{server_url}:token"
+    @redis.set(key, token.to_h.to_json)
+    @redis.expire(key, 86400) # 24 hours
+  end
+
+  # Implement remaining methods...
+end
+
+# Create client with user-specific storage
+user = User.find(params[:user_id])
+storage = UserOAuthStorage.new(user.id)
+
+client = RubyLLM::MCP.client(
+  name: "user-server",
+  transport_type: :sse,
+  start: false,
+  config: {
+    url: user.mcp_server_url,  # From user's database
+    oauth: {
+      storage: storage,          # User-specific storage
+      scope: user.oauth_scope    # From user's preferences
+    }
+  }
+)
+
+# Authenticate (only needed once per user)
+client.oauth(type: :browser).authenticate
+
+# Future requests automatically use stored tokens
+client.start
+tools = client.tools
+```
+### Simple Redis Storage Example
+
+An example of a simple Redis storage implementation that doesn't need per-user storage:
 
 ```ruby
 require "redis"
@@ -344,28 +471,34 @@ class RedisOAuthStorage
     @redis.expire("oauth:token:#{server_url}", 86400)
   end
 
-  # Implement remaining methods...
+  # Implement remaining methods (get_client_info, set_client_info, etc.)...
 end
 
-# Use custom storage
+# Use shared Redis storage
 client = RubyLLM::MCP.client(
   name: "redis-backed",
   transport_type: :sse,
+  start: false,
   config: {
     url: "https://mcp.example.com",
     oauth: {
       storage: RedisOAuthStorage.new,
-      scope: "mcp:read"
+      scope: "mcp:read mcp:write"
     }
   }
 )
+
+client.oauth(type: :browser).authenticate
+client.start
 ```
 
-### Database Storage Example
+### Complete Database Implementation
 
-See [Rails OAuth Integration Guide]({% link guides/rails-oauth.md %}) for complete database storage implementation.
+See [Rails OAuth Integration Guide]({% link guides/rails-oauth.md %}) for a complete multi-user database storage implementation with migrations, models, and controllers.
 
 ## Security Considerations
+{: .label .label-green }
+0.8+
 
 ### PKCE (Proof Key for Code Exchange)
 
@@ -400,13 +533,17 @@ http://example.com:80             → http://example.com
 ```
 
 ## Troubleshooting
+{: .label .label-green }
+0.8+
 
 ### Port Already in Use
 
 ```ruby
-browser_oauth = RubyLLM::MCP::Auth::BrowserOAuth.new(
-  oauth_provider,
-  callback_port: 8081  # Try different port
+browser_oauth = RubyLLM::MCP::Auth.create_oauth(
+  "https://mcp.example.com",
+  type: :browser,
+  callback_port: 8081,  # Try different port
+  scope: "mcp:read mcp:write"
 )
 ```
 
@@ -449,7 +586,34 @@ Ensure exact match (no trailing slash, correct protocol):
 "http://127.0.0.1:8080/callback"   # Different host
 ```
 
+### Handling Authentication Required Errors
+
+When a server requires OAuth authentication, it returns HTTP 401. Handle this to trigger OAuth flow:
+
+```ruby
+require "ruby_llm/mcp"
+
+begin
+  tools = client.tools
+rescue RubyLLM::MCP::Errors::AuthenticationRequiredError => e
+  puts "Authentication required: #{e.message}"
+
+  # Trigger browser OAuth flow using client.oauth
+  token = client.oauth(type: :browser).authenticate
+
+  puts "Authenticated! Token expires: #{token.expires_at}"
+
+  # Retry the operation
+  client.restart!
+  tools = client.tools
+end
+
+puts "Available tools: #{tools.map(&:name).join(', ')}"
+```
+
 ## Advanced Topics
+{: .label .label-green }
+0.8+
 
 ### Custom OAuth Provider
 
@@ -494,15 +658,74 @@ end
 ENV["RUBYLLM_MCP_DEBUG"] = "1"
 ```
 
-## Multi-User Applications
+### Client Credentials Flow
 
-For Rails applications with multiple users, see:
-- **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** - Complete multi-tenant setup
-- Generator: `rails generate ruby_llm:mcp:oauth:install`
+For application-to-application authentication without user interaction:
+
+```ruby
+require "ruby_llm/mcp"
+require "ruby_llm/mcp/auth/oauth_provider"
+
+# Create OAuth provider with client credentials grant
+provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+  server_url: "https://api.example.com/mcp",
+  scope: "mcp:read mcp:write",
+  grant_type: :client_credentials
+)
+
+# Authenticate with client credentials (no browser needed)
+token = provider.client_credentials_flow
+puts "Authenticated! Token expires: #{token.expires_at}"
+
+# Use with MCP client
+client = RubyLLM::MCP.client(
+  name: "app-client",
+  transport_type: :streamable,
+  config: {
+    url: "https://api.example.com/mcp",
+    oauth: {
+      grant_type: :client_credentials,
+      scope: "mcp:read mcp:write"
+    }
+  }
+)
+
+# Manually authenticate before using client
+transport_wrapper = client.instance_variable_get(:@coordinator).send(:transport)
+actual_transport = transport_wrapper.transport_protocol
+oauth_provider = actual_transport.oauth_provider
+
+# Perform client credentials authentication
+token = oauth_provider.client_credentials_flow
+puts "Token obtained: #{token.access_token[0..10]}..."
+
+# Start the client (now authenticated)
+client.start
+
+# Use the client
+puts "Available tools: #{client.tools.map(&:name).join(', ')}"
+```
+
+**Note**: Client credentials flow requires:
+- Server support for `client_credentials` grant type
+- A `client_secret` from dynamic registration (confidential client)
+- Application-level authorization (no user context)
+
+**Configuration Options**:
+
+```ruby
+# In client config
+config: {
+  oauth: {
+    grant_type: :client_credentials,  # Default: :authorization_code
+    scope: "api:read api:write"
+  }
+}
+```
 
 ## Next Steps
 
-1. **Single-user apps**: Use `BrowserOAuth` class directly
+1. **Single-user apps**: Use `BrowserOAuthProvider` class directly or use the factory method `Auth.create_oauth`
 2. **Multi-user apps**: Use Rails OAuth integration
 3. **Production**: Implement custom storage (Redis, Database)
 4. **Security**: Enable debug logging during development

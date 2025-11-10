@@ -17,6 +17,11 @@ module RubyLLM
         @transport_type = transport_type.to_sym
         @request_timeout = request_timeout
 
+        # Store OAuth config before coordinator setup
+        @oauth_config = config[:oauth] || config["oauth"]
+        @oauth_provider = nil
+        @oauth_storage = nil
+
         @coordinator = setup_coordinator
 
         @on = {}
@@ -47,6 +52,40 @@ module RubyLLM
 
       def restart!
         @coordinator.restart_transport
+      end
+
+      # Get or create OAuth provider for this client
+      # @param type [Symbol] OAuth provider type (:standard or :browser, defaults to :standard)
+      # @param options [Hash] additional options passed to provider
+      # @return [OAuthProvider, BrowserOAuthProvider] OAuth provider instance
+      def oauth(type: :standard, **options)
+        # Return existing provider if already created
+        return @oauth_provider if @oauth_provider
+
+        # Get provider from transport if it already exists
+        transport_oauth = @coordinator.transport_oauth_provider
+        return transport_oauth if transport_oauth
+
+        # Create new provider lazily
+        server_url = @config[:url] || @config["url"]
+        unless server_url
+          raise Errors::ConfigurationError.new(
+            message: "Cannot create OAuth provider without server URL in config"
+          )
+        end
+
+        oauth_options = {
+          server_url: server_url,
+          scope: @oauth_config&.dig(:scope) || @oauth_config&.dig("scope"),
+          storage: oauth_storage,
+          **options
+        }
+
+        @oauth_provider = Auth.create_oauth(
+          server_url,
+          type: type,
+          **oauth_options
+        )
       end
 
       def tools(refresh: false)
@@ -259,6 +298,16 @@ module RubyLLM
         @on[:logging] = MCP.config.on_logging
         @on_logging_level = MCP.config.on_logging_level
         @on[:elicitation] = MCP.config.on_elicitation
+      end
+
+      # Get or create OAuth storage shared with transport
+      def oauth_storage
+        # Try to get storage from transport's OAuth provider
+        transport_oauth = @coordinator.transport_oauth_provider
+        return transport_oauth.storage if transport_oauth
+
+        # Create new storage shared with client
+        @oauth_storage ||= Auth::MemoryStorage.new
       end
     end
   end

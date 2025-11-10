@@ -371,4 +371,104 @@ RSpec.describe RubyLLM::MCP::Client do
       end
     end
   end
+
+  describe "#oauth" do
+    let(:client) do
+      RubyLLM::MCP::Client.new(
+        name: "oauth-test-client",
+        transport_type: :sse,
+        start: false,
+        config: {
+          url: "https://mcp.example.com/api",
+          oauth: { scope: "mcp:read mcp:write" }
+        }
+      )
+    end
+
+    after do
+      client.stop if client.alive?
+    end
+
+    describe "with type: :standard" do
+      it "returns OAuthProvider instance" do
+        oauth = client.oauth(type: :standard)
+        expect(oauth).to be_a(RubyLLM::MCP::Auth::OAuthProvider)
+      end
+
+      it "returns same instance on multiple calls (memoization)" do
+        oauth1 = client.oauth(type: :standard)
+        oauth2 = client.oauth
+        expect(oauth1.object_id).to eq(oauth2.object_id)
+      end
+
+      it "uses server URL from config" do
+        oauth = client.oauth(type: :standard)
+        expect(oauth.server_url).to eq("https://mcp.example.com/api")
+      end
+
+      it "uses scope from config" do
+        oauth = client.oauth(type: :standard)
+        expect(oauth.scope).to eq("mcp:read mcp:write")
+      end
+    end
+
+    describe "with type: :browser" do
+      it "returns BrowserOAuthProvider instance" do
+        oauth = client.oauth(type: :browser)
+        expect(oauth).to be_a(RubyLLM::MCP::Auth::BrowserOAuthProvider)
+      end
+
+      it "accepts callback_port option" do
+        oauth = client.oauth(type: :browser, callback_port: 9000)
+        expect(oauth.callback_port).to eq(9000)
+      end
+    end
+
+    describe "storage sharing" do
+      it "shares storage with transport's OAuth provider" do
+        # Start client to initialize transport with OAuth
+        client = RubyLLM::MCP::Client.new(
+          name: "oauth-storage-test",
+          transport_type: :sse,
+          start: false,
+          config: {
+            url: "https://mcp.example.com/api",
+            oauth: { scope: "mcp:read" }
+          }
+        )
+
+        # Get OAuth from client (creates new one)
+        client_oauth = client.oauth(type: :standard)
+
+        # Both should share the same storage
+        expect(client_oauth.storage).to be_a(RubyLLM::MCP::Auth::MemoryStorage)
+      end
+    end
+
+    describe "error handling" do
+      it "raises ConfigurationError when no server URL is configured" do
+        client_without_url = RubyLLM::MCP::Client.new(
+          name: "no-url-client",
+          transport_type: :stdio,
+          start: false,
+          config: {
+            command: "echo",
+            oauth: { scope: "mcp:read" }
+          }
+        )
+
+        expect { client_without_url.oauth }.to raise_error(
+          RubyLLM::MCP::Errors::ConfigurationError,
+          /Cannot create OAuth provider without server URL/
+        )
+      end
+    end
+
+    describe "passing custom options" do
+      it "forwards custom options to Auth.create_oauth" do
+        oauth = client.oauth(type: :standard, redirect_uri: "http://localhost:9999/callback")
+        expect(oauth.redirect_uri).to eq("http://localhost:9999/callback")
+      end
+    end
+  end
 end

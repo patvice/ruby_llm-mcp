@@ -44,6 +44,9 @@ RubyLLM::MCP.configure do |config|
   config.log_level = Rails.env.production? ? Logger::WARN : Logger::INFO
   config.logger = Rails.logger
 
+  # Path to your MCP servers configuration
+  config.config_path = Rails.root.join("config", "mcps.yml")
+
   # Configure roots for filesystem access
   config.roots = [Rails.root] if Rails.env.development?
 
@@ -55,13 +58,6 @@ RubyLLM::MCP.configure do |config|
     true
   end
 end
-
-# Choose your client management strategy
-RubyLLM::MCP.launch_control = :manual # or :automatic
-
-# For automatic client management, uncomment:
-# RubyLLM::MCP.launch_control = :automatic
-# RubyLLM::MCP.start_all_clients
 ```
 
 #### `config/mcps.yml`
@@ -92,40 +88,36 @@ mcp_servers:
   #     Authorization: "Bearer <%= ENV['API_TOKEN'] %>"
 ```
 
-## Client Management Strategies
+## Client Management
 
-### Automatic Client Management
+{: .label .label-yellow }
+Changed in 0.9
 
-For more basic use cases, you can run MCP clients and sub-processes directly along side your Rails application. Automatically starting clients is a good choice for most basic use cases, development, testing and getting started.
+RubyLLM MCP uses an explicit connection management pattern. All MCP operations must be wrapped in `establish_connection` blocks, which ensures proper resource management and cleanup.
 
-```ruby
-# config/initializers/ruby_llm_mcp.rb
-RubyLLM::MCP.launch_control = :automatic
-RubyLLM::MCP.start_all_clients
-
-# Clients are automatically available throughout the application
-clients = RubyLLM::MCP.clients
-chat = RubyLLM.chat(model: "gpt-4")
-chat.with_tools(*clients.tools)
-```
-
-### Manual Client Management
-
-Due to the performace of LLMs, it's likely that for production workloads you would want to that you will want to use LLM requests inside background job or streamable endpoints. Manual controller will give you more control over client connections and where they run.
+### Connection Block Pattern
 
 ```ruby
-# config/initializers/ruby_llm_mcp.rb
-RubyLLM::MCP.launch_control = :manual
-
-# In your application code
+# All MCP operations use establish_connection blocks
 RubyLLM::MCP.establish_connection do |clients|
   chat = RubyLLM.chat(model: "gpt-4")
   chat.with_tools(*clients.tools)
 
   response = chat.ask("Analyze the project structure")
   puts response
-end
+end # Clients are automatically stopped and cleaned up here
 ```
+
+### Benefits
+
+- **Explicit lifecycle**: Clear start and end of client connections
+- **Automatic cleanup**: Clients are properly stopped when the block ends
+- **Thread-safe**: Each block gets isolated client instances
+- **No memory leaks**: Works correctly with Rails code reloading
+- **Production-ready**: Perfect for background jobs and API endpoints
+
+{: .note }
+**Version 0.7 and Earlier**: Used `launch_control` setting for automatic/manual modes. This has been removed in 0.8 in favor of explicit connection blocks. See [Upgrading from 0.7 to 0.8]({% link guides/upgrading-0.7-to-0.8.md %}) for migration details.
 
 ## Examples
 

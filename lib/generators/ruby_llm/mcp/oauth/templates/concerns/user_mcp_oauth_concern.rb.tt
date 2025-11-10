@@ -6,27 +6,27 @@
 module UserMcpOauth
   extend ActiveSupport::Concern
 
+  include McpTokenStorage
+
   included do
     has_many :mcp_oauth_credentials, dependent: :destroy
     has_many :mcp_oauth_states, dependent: :destroy
   end
 
   # Check if user has connected to a specific MCP server
-  # @param server_url [String] MCP server URL (defaults to ENV var)
+  # @param server_url [String] MCP server URL (required)
   # @return [Boolean] true if user has an OAuth credential for this server
-  def mcp_connected?(server_url = nil)
-    server_url ||= ENV.fetch("DEFAULT_MCP_SERVER_URL", nil)
-    return false unless server_url
+  def mcp_connected?(server_url)
+    return false unless server_url.present?
 
     mcp_oauth_credentials.exists?(server_url: server_url)
   end
 
   # Get valid token for a server
-  # @param server_url [String] MCP server URL
+  # @param server_url [String] MCP server URL (required)
   # @return [RubyLLM::MCP::Auth::Token, nil] token if valid, nil otherwise
-  def mcp_token_for(server_url = nil)
-    server_url ||= ENV.fetch("DEFAULT_MCP_SERVER_URL", nil)
-    return nil unless server_url
+  def mcp_token_for(server_url)
+    return nil unless server_url.present?
 
     credential = mcp_oauth_credentials.find_by(server_url: server_url)
     return nil unless credential
@@ -38,18 +38,18 @@ module UserMcpOauth
   end
 
   # Get MCP client for this user
-  # @param server_url [String] MCP server URL
+  # @param server_url [String] MCP server URL (required)
   # @return [RubyLLM::MCP::Client] configured client
-  # @raise [McpClientFactory::NotAuthenticatedError] if not connected
-  def mcp_client(server_url: nil)
-    McpClientFactory.for_user(self, server_url: server_url)
+  # @raise [McpClient::NotAuthenticatedError] if not connected
+  def mcp_client(server_url:)
+    McpClient.for(self, server_url: server_url)
   end
 
   # Get MCP client with fallback to nil if not authenticated
-  # @param server_url [String] MCP server URL
+  # @param server_url [String] MCP server URL (required)
   # @return [RubyLLM::MCP::Client, nil] client or nil
-  def mcp_client_safe(server_url: nil)
-    McpClientFactory.for_user_with_fallback(self, server_url: server_url)
+  def mcp_client_safe(server_url:)
+    McpClient.for_with_fallback(self, server_url: server_url)
   end
 
   # Get all connected MCP servers for this user
@@ -66,10 +66,11 @@ module UserMcpOauth
   end
 
   # Get OAuth connection status for a server
-  # @param server_url [String] MCP server URL
+  # @param server_url [String] MCP server URL (required)
   # @return [Hash] status information
-  def mcp_connection_status(server_url = nil)
-    server_url ||= ENV.fetch("DEFAULT_MCP_SERVER_URL", nil)
+  def mcp_connection_status(server_url)
+    return { connected: false } unless server_url.present?
+
     credential = mcp_oauth_credentials.find_by(server_url: server_url)
 
     return { connected: false } unless credential

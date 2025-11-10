@@ -1,0 +1,114 @@
+# frozen_string_literal: true
+
+# Per-<%= user_variable_name %> OAuth token storage for RubyLLM MCP
+# Implements the storage interface required by RubyLLM::MCP::Auth::OAuthProvider
+#
+# Include this in your <%= user_model_name %> model (or any model that needs MCP OAuth):
+#   include McpTokenStorage
+module McpTokenStorage
+  extend ActiveSupport::Concern
+
+  # Create token storage instance for a specific server URL
+  # @param server_url [String] MCP server URL
+  # @param name [String] Optional friendly name for the server
+  # @param scope [String] Optional OAuth scope for the connection
+  # @return [TokenStorageAdapter] storage adapter instance
+  def mcp_token_storage(server_url, name = nil, scope = nil)
+    TokenStorageAdapter.new(self.id, server_url, self.class.name.underscore, name, scope)
+  end
+
+  # Internal adapter class that implements the OAuth storage interface
+  class TokenStorageAdapter
+    def initialize(<%= user_variable_name %>_id, server_url, user_type = "<%= user_variable_name %>", name = nil, scope = nil)
+      @<%= user_variable_name %>_id = <%= user_variable_name %>_id
+      @server_url = server_url
+      @user_type = user_type
+      @name = name
+      @scope = scope
+    end
+
+    # Token storage
+    def get_token(_server_url)
+      credential = <%= credential_model_name %>.find_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
+      credential&.token
+    end
+
+    def set_token(_server_url, token)
+      credential = <%= credential_model_name %>.find_or_initialize_by(
+        <%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id,
+        server_url: @server_url
+      )
+      credential.name = @name if @name.present?
+      credential.token = token
+      credential.last_refreshed_at = Time.current
+      credential.save!
+    end
+
+    # Client registration storage
+    def get_client_info(_server_url)
+      credential = <%= credential_model_name %>.find_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
+      credential&.client_info
+    end
+
+    def set_client_info(_server_url, client_info)
+      credential = <%= credential_model_name %>.find_or_initialize_by(
+        <%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id,
+        server_url: @server_url
+      )
+      credential.name = @name if @name.present?
+      credential.client_info = client_info
+      credential.save!
+    end
+
+    # Server metadata caching (shared across users)
+    def get_server_metadata(server_url)
+      Rails.cache.fetch("mcp:server_metadata:#{server_url}", expires_in: 24.hours) do
+        nil
+      end
+    end
+
+    def set_server_metadata(server_url, metadata)
+      Rails.cache.write("mcp:server_metadata:#{server_url}", metadata, expires_in: 24.hours)
+    end
+
+    # PKCE state management (temporary - per <%= user_variable_name %>)
+    def get_pkce(_server_url)
+      state = <%= state_model_name %>.find_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
+      return nil unless state
+
+      state.pkce
+    end
+
+    def set_pkce(_server_url, pkce)
+      state = <%= state_model_name %>.find_or_initialize_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
+      state.pkce = pkce
+      state.state_param ||= SecureRandom.hex(32)
+      state.name = @name if @name.present?
+      state.scope = @scope if @scope.present?
+      state.expires_at = 10.minutes.from_now
+      state.save!
+    end
+
+    def delete_pkce(_server_url)
+      <%= state_model_name %>.where(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url).delete_all
+    end
+
+    # State parameter management
+    def get_state(_server_url)
+      <%= state_model_name %>.find_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)&.state_param
+    end
+
+    def set_state(_server_url, state_param)
+      state = <%= state_model_name %>.find_or_initialize_by(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url)
+      state.state_param = state_param
+      state.name = @name if @name.present?
+      state.scope = @scope if @scope.present?
+      state.expires_at = 10.minutes.from_now
+      state.save!
+    end
+
+    def delete_state(_server_url)
+      <%= state_model_name %>.where(<%= user_table_name.singularize %>_id: @<%= user_variable_name %>_id, server_url: @server_url).delete_all
+    end
+  end
+end

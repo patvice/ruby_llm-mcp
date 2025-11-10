@@ -14,6 +14,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
       expect(config.has_support_complex_parameters).to be(false)
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol.latest_version)
     end
 
     it "sets debug log level when RUBYLLM_MCP_DEBUG environment variable is set" do
@@ -23,6 +24,13 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.log_level).to eq(Logger::DEBUG)
 
       ENV.delete("RUBYLLM_MCP_DEBUG")
+    end
+
+    it "sets default protocol_version to latest version" do
+      config = RubyLLM::MCP::Configuration.new
+
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol::LATEST_PROTOCOL_VERSION)
+      expect(config.protocol_version).to eq("2025-06-18")
     end
   end
 
@@ -50,6 +58,11 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.has_support_complex_parameters).to be(true)
     end
 
+    it "allows reading and writing protocol_version" do
+      config.protocol_version = "2024-11-05"
+      expect(config.protocol_version).to eq("2024-11-05")
+    end
+
     it "allows writing logger" do
       custom_logger = Logger.new($stdout)
       config.logger = custom_logger
@@ -65,6 +78,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
       config.request_timeout = 5000
       config.log_level = Logger::ERROR
       config.has_support_complex_parameters = true
+      config.protocol_version = "2024-11-05"
 
       # Reset
       config.reset!
@@ -74,6 +88,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
       expect(config.has_support_complex_parameters).to be(false)
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol.latest_version)
     end
 
     it "resets logger to nil so it gets recreated" do
@@ -239,5 +254,85 @@ RSpec.describe RubyLLM::MCP::Configuration do
     RubyLLM::MCP.configuration.reset!
     expect(RubyLLM::MCP.configuration.log_level).to eq(Logger::DEBUG)
     ENV.delete("RUBYLLM_MCP_DEBUG")
+  end
+
+  describe "OAuth configuration" do
+    it "has an oauth accessor" do
+      config = RubyLLM::MCP::Configuration.new
+
+      expect(config.oauth).to be_a(RubyLLM::MCP::Configuration::OAuth)
+    end
+
+    it "allows configuring OAuth settings" do
+      RubyLLM::MCP.configure do |config|
+        config.oauth.client_name = "My Custom App"
+        config.oauth.client_uri = "https://example.com"
+      end
+
+      expect(RubyLLM::MCP.config.oauth.client_name).to eq("My Custom App")
+      expect(RubyLLM::MCP.config.oauth.client_uri).to eq("https://example.com")
+    end
+  end
+
+  describe "protocol_version usage in OAuth" do
+    it "uses config protocol_version in OAuth provider metadata discovery" do
+      RubyLLM::MCP.configure do |config|
+        config.protocol_version = "2025-03-26"
+      end
+
+      # Verify the header is sent during OAuth discovery
+      discovery_stub = stub_request(:get, "https://example.com/.well-known/oauth-authorization-server")
+                       .with(headers: { "MCP-Protocol-Version" => "2025-03-26" })
+                       .to_return(
+                         status: 200,
+                         body: {
+                           issuer: "https://example.com",
+                           authorization_endpoint: "https://example.com/authorize",
+                           token_endpoint: "https://example.com/token"
+                         }.to_json
+                       )
+
+      # Use a fresh storage instance to avoid caching issues
+      storage = RubyLLM::MCP::Auth::MemoryStorage.new
+      provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: "https://example.com",
+        redirect_uri: "http://localhost:8080/callback",
+        storage: storage
+      )
+
+      # Access the discoverer and trigger discovery
+      discoverer = provider.instance_variable_get(:@discoverer)
+      discoverer.discover("https://example.com")
+      expect(discovery_stub).to have_been_requested
+    end
+
+    it "uses latest version by default in OAuth provider metadata discovery" do
+      RubyLLM::MCP.config.reset!
+
+      # Verify the default header is sent during OAuth discovery
+      discovery_stub = stub_request(:get, "https://example.com/.well-known/oauth-authorization-server")
+                       .with(headers: { "MCP-Protocol-Version" => RubyLLM::MCP::Protocol.latest_version })
+                       .to_return(
+                         status: 200,
+                         body: {
+                           issuer: "https://example.com",
+                           authorization_endpoint: "https://example.com/authorize",
+                           token_endpoint: "https://example.com/token"
+                         }.to_json
+                       )
+
+      # Use a fresh storage instance to avoid caching issues
+      storage = RubyLLM::MCP::Auth::MemoryStorage.new
+      provider = RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: "https://example.com",
+        redirect_uri: "http://localhost:8080/callback",
+        storage: storage
+      )
+
+      # Access the discoverer and trigger discovery
+      discoverer = provider.instance_variable_get(:@discoverer)
+      discoverer.discover("https://example.com")
+      expect(discovery_stub).to have_been_requested
+    end
   end
 end

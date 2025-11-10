@@ -6,6 +6,7 @@ gemspec
 
 group :development do
   # Development dependencies
+  gem "activesupport"
   gem "bundler", ">= 2.0"
   gem "debug"
   gem "dotenv", ">= 3.0"

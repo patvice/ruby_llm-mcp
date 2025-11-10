@@ -1,0 +1,539 @@
+# frozen_string_literal: true
+
+require "cgi"
+
+module RubyLLM
+  module MCP
+    module Auth
+      module Browser
+        # HTML page generation for OAuth callback responses
+        # Provides default success and error pages with customization support
+        class Pages
+          attr_reader :custom_success_page, :custom_error_page
+
+          # @param custom_success_page [String, Proc] custom HTML for success page
+          # @param custom_error_page [String, Proc] custom HTML for error page (accepts error_message)
+          def initialize(custom_success_page: nil, custom_error_page: nil)
+            @custom_success_page = custom_success_page
+            @custom_error_page = custom_error_page
+          end
+
+          # Generate success page HTML
+          # @return [String] HTML content
+          def success_page
+            return @custom_success_page.call if @custom_success_page.respond_to?(:call)
+            return @custom_success_page if @custom_success_page.is_a?(String)
+
+            default_success_page
+          end
+
+          # Generate error page HTML
+          # @param error_message [String] error message to display
+          # @return [String] HTML content
+          def error_page(error_message)
+            if @custom_error_page.respond_to?(:call)
+              return @custom_error_page.call(error_message)
+            elsif @custom_error_page.is_a?(String)
+              return @custom_error_page
+            end
+
+            default_error_page(error_message)
+          end
+
+          private
+
+          # Default HTML success page
+          # @return [String] HTML content
+          def default_success_page
+            <<~HTML
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <title>RubyLLM MCP — Success</title>
+                <link rel="icon" type="image/svg+xml" href="https://www.rubyllm-mcp.com/assets/images/favicon/favicon.svg">
+                <link rel="alternate icon" type="image/x-icon" href="https://www.rubyllm-mcp.com/assets/images/favicon/favicon.ico">
+                <style>
+                  :root {
+                    --ruby-500: #CC342D;
+                    --ruby-600: #B82E28;
+                    --green-500: #22C55E;
+                    --green-600: #16A34A;
+
+                    --text-900: #111827;
+                    --text-600: #4B5563;
+                    --card-bg: #f4f3f2;
+                    --logo-border: rgba(0, 0, 0, 0.5);
+                    --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.35);
+                    --radius-3xl: 1.5rem;
+                    color-scheme: light dark;
+                  }
+
+                  /* Page background with layered radial gradients (from your React inline style) */
+                  html, body { height: 100%; }
+                  body {
+                    margin: 0;
+                    display: grid;
+                    place-items: center;
+                    padding: 1rem;
+                    background:
+                      radial-gradient(at 20% 30%, #8B0000 0%, transparent 50%),
+                      radial-gradient(at 80% 70%, #FFFFFF 0%, transparent 40%),
+                      radial-gradient(at 40% 80%, #B22222 0%, transparent 50%),
+                      radial-gradient(at 60% 20%, #FFE4E4 0%, transparent 45%),
+                      radial-gradient(at 10% 70%, #1a1a1a 0%, transparent 50%),
+                      radial-gradient(at 90% 30%, #4a4a4a 0%, transparent 45%),
+                      linear-gradient(135deg, #CC342D 0%, #E94B3C 50%, #FF6B6B 100%);
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+                  }
+
+                  /* Card */
+                  .card {
+                    width: 100%;
+                    max-width: 32rem;
+                    background: var(--card-bg);
+                    color: var(--text-900);
+                    border-radius: var(--radius-3xl);
+                    box-shadow: var(--shadow-xl);
+                    text-align: center;
+                    padding: 3rem;
+                    opacity: 0;
+                    transform: scale(0.8);
+                    animation: pop-in 500ms ease-out forwards;
+                  }
+
+                  /* MCP logo + border */
+                  .logo {
+                    width: 120px;
+                    height: 120px;
+                    display: block;
+                    margin: 0 auto 1.5rem;
+                    border-radius: 1rem;
+                    border: 2px solid var(--logo-border);
+                    background: transparent;
+                  }
+
+                  /* SVG check animation */
+                  .checkwrap {
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 2rem;
+                  }
+                  .checkmark { width: 120px; height: 120px; overflow: visible; }
+                  .circle {
+                    fill: none;
+                    stroke: var(--green-600);
+                    stroke-width: 4;
+                    opacity: 0;
+                    stroke-dasharray: 339.292; /* ~2πr for r=54 */
+                    stroke-dashoffset: 339.292;
+                    animation: draw-circle 800ms ease-in-out forwards;
+                  }
+                  .tick {
+                    fill: none;
+                    stroke: var(--green-600);
+                    stroke-width: 6;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                    opacity: 0;
+                    stroke-dasharray: 120;
+                    stroke-dashoffset: 120;
+                    animation: draw-tick 600ms ease-in-out 500ms forwards;
+                  }
+                  @media (prefers-color-scheme: dark) {
+                    .tick, .circle {
+                      stroke: var(--green-600);
+                      stroke-width: 6;
+                      paint-order: stroke fill;
+                      stroke-linecap: round;
+                      stroke-linejoin: round;
+                      filter: drop-shadow(0 0 2px rgba(255,255,255,0.2));
+                    }
+                  }
+                  /* Content entrance */
+                  .content {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    animation: rise-in 500ms ease-out 800ms forwards;
+                  }
+                  h1 {
+                    margin: 0 0 1rem 0;
+                    font-size: 2rem;
+                    line-height: 1.2;
+                  }
+                  p { margin: 0 0 2rem 0; color: var(--text-600); }
+
+                  /* Button */
+                  .btn {
+                    display: inline-block;
+                    padding: 0.75rem 2rem;
+                    border-radius: 9999px;
+                    background: var(--ruby-500);
+                    color: #fff;
+                    border: none;
+                    cursor: pointer;
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+                    transition: transform 120ms ease, box-shadow 180ms ease, background-color 180ms ease;
+                    will-change: transform;
+                    font-weight: 600;
+                  }
+                  .btn:hover {
+                    background: var(--ruby-600);
+                    transform: scale(1.05);
+                    box-shadow: 0 14px 28px rgba(0,0,0,0.2);
+                  }
+                  .btn:active { transform: scale(0.95); }
+                  .btn:focus-visible {
+                    outline: 3px solid rgba(204,52,45,0.35);
+                    outline-offset: 2px;
+                  }
+
+                  /* Animations */
+                  @keyframes pop-in { to { opacity: 1; transform: scale(1); } }
+                  @keyframes draw-circle {
+                    0% { opacity: 0; stroke-dashoffset: 339.292; }
+                    20% { opacity: 1; }
+                    100% { opacity: 1; stroke-dashoffset: 0; }
+                  }
+                  @keyframes draw-tick {
+                    0% { opacity: 0; stroke-dashoffset: 120; }
+                    30% { opacity: 1; }
+                    100% { opacity: 1; stroke-dashoffset: 0; }
+                  }
+                  @keyframes rise-in { to { opacity: 1; transform: translateY(0); } }
+
+                  /* Motion-reduction respect */
+                  @media (prefers-reduced-motion: reduce) {
+                    .card, .circle, .tick, .content { animation: none !important; }
+                    .card { opacity: 1; transform: none; }
+                    .content { opacity: 1; transform: none; }
+                  }
+
+                  /* =========================
+                     Dark Mode (automatic)
+                     ========================= */
+                  @media (prefers-color-scheme: dark) {
+                    :root {
+                      --text-900: #F3F4F6;     /* near-white */
+                      --text-600: #D1D5DB;     /* soft gray */
+                      --card-bg: #151417;      /* deep neutral to flatter the logo */
+                      --logo-border: rgba(255, 255, 255, 0.35);
+                      --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.7);
+                      /* brighten the success strokes a touch on dark */
+                      --green-600: #22C55E;    /* use brighter green on dark */
+                    }
+
+                    body {
+                      /* Darker background variant keeping brand feel */
+                      background:
+                        radial-gradient(at 20% 30%, #560606 0%, transparent 50%),
+                        radial-gradient(at 80% 70%, #2a2a2a 0%, transparent 40%),
+                        radial-gradient(at 40% 80%, #6d1414 0%, transparent 50%),
+                        radial-gradient(at 60% 20%, #3a2a2a 0%, transparent 45%),
+                        radial-gradient(at 10% 70%, #0e0e0e 0%, transparent 50%),
+                        radial-gradient(at 90% 30%, #1a1a1a 0%, transparent 45%),
+                        linear-gradient(135deg, #7e1f1b 0%, #a62b26 50%, #b43b3b 100%);
+                    }
+
+                    .btn {
+                      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+                    }
+                    .btn:hover {
+                      box-shadow: 0 14px 28px rgba(0,0,0,0.6);
+                    }
+                  }
+                </style>
+
+                <meta name="theme-color" media="(prefers-color-scheme: light)" content="#CC342D">
+                <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151417" />
+              </head>
+              <body>
+                <main class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
+                  <img
+                    class="logo"
+                    src="https://www.rubyllm-mcp.com/assets/images/rubyllm-mcp-logo.svg"
+                    alt="RubyLLM MCP Logo"
+                    decoding="async"
+                    fetchpriority="high"
+                  />
+
+                  <div class="checkwrap">
+                    <svg class="checkmark" viewBox="0 0 120 120" aria-hidden="true">
+                      <circle class="circle" cx="60" cy="60" r="54"></circle>
+                      <path class="tick" d="M 35 60 L 52 77 L 85 44"></path>
+                    </svg>
+                  </div>
+
+                  <div class="content">
+                    <h1 id="title">Authentication Successful!</h1>
+                    <p id="desc">You can close this window and return to your application.</p>
+                  </div>
+                </main>
+              </body>
+              </html>
+            HTML
+          end
+
+          # Default HTML error page
+          # @param error_message [String] error message
+          # @return [String] HTML content
+          def default_error_page(error_message)
+            <<~HTML
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <title>RubyLLM MCP — Authentication Failed</title>
+                <link rel="icon" type="image/svg+xml" href="https://www.rubyllm-mcp.com/assets/images/favicon/favicon.svg">
+                <link rel="alternate icon" type="image/x-icon" href="https://www.rubyllm-mcp.com/assets/images/favicon/favicon.ico">
+                <style>
+                  :root {
+                    color-scheme: light dark; /* Hint to the browser UI */
+                    --ruby-500: #CC342D;
+                    --ruby-600: #B82E28;
+
+                    --text-900: #111827;
+                    --text-600: #4B5563;
+                    --card-bg: #ffffff;
+                    --logo-border: rgba(0, 0, 0, 0.5);
+
+                    --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.35);
+                    --radius-3xl: 1.5rem;
+
+                    --error-bg: #ffebee;   /* light mode error panel */
+                    --error-border: #f44336;
+                  }
+
+                  /* Page background (matches Success page) */
+                  html, body { height: 100%; }
+                  body {
+                    margin: 0;
+                    display: grid;
+                    place-items: center;
+                    padding: 1rem;
+                    background:
+                      radial-gradient(at 20% 30%, #8B0000 0%, transparent 50%),
+                      radial-gradient(at 80% 70%, #FFFFFF 0%, transparent 40%),
+                      radial-gradient(at 40% 80%, #B22222 0%, transparent 50%),
+                      radial-gradient(at 60% 20%, #FFE4E4 0%, transparent 45%),
+                      radial-gradient(at 10% 70%, #1a1a1a 0%, transparent 50%),
+                      radial-gradient(at 90% 30%, #4a4a4a 0%, transparent 45%),
+                      linear-gradient(135deg, #CC342D 0%, #E94B3C 50%, #FF6B6B 100%);
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+                  }
+
+                  /* Card */
+                  .card {
+                    width: 100%;
+                    max-width: 32rem;
+                    background: var(--card-bg);
+                    color: var(--text-900);
+                    border-radius: var(--radius-3xl);
+                    box-shadow: var(--shadow-xl);
+                    text-align: center;
+                    padding: 3rem;
+                    opacity: 0;
+                    transform: scale(0.8);
+                    animation: pop-in 500ms ease-out forwards;
+                  }
+
+                  /* MCP logo */
+                  .logo {
+                    width: 120px;
+                    height: 120px;
+                    display: block;
+                    margin: 0 auto 1.5rem;
+                    border-radius: 1rem;
+                    border: 2px solid var(--logo-border);
+                  }
+
+                  /* Animated error icon (circle + X) */
+                  .iconwrap {
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 2rem;
+                  }
+                  .erroricon {
+                    width: 120px;
+                    height: 120px;
+                    overflow: visible;
+                  }
+                  .circle {
+                    fill: none;
+                    stroke: var(--ruby-500);
+                    stroke-width: 4;
+                    opacity: 0;
+                    stroke-dasharray: 339.292; /* 2πr for r=54 */
+                    stroke-dashoffset: 339.292;
+                    animation: draw-circle 800ms ease-in-out forwards;
+                  }
+                  .x1, .x2 {
+                    fill: none;
+                    stroke: var(--ruby-500);
+                    stroke-width: 6;
+                    stroke-linecap: round;
+                    opacity: 0;
+                    stroke-dasharray: 120;
+                    stroke-dashoffset: 120;
+                  }
+                  .x1 { animation: draw-x 500ms ease-in-out 500ms forwards; }
+                  .x2 { animation: draw-x 500ms ease-in-out 650ms forwards; }
+
+                  /* Content entrance */
+                  .content {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    animation: rise-in 500ms ease-out 800ms forwards;
+                  }
+                  h1 {
+                    margin: 0 0 1rem 0;
+                    font-size: 2rem;
+                    line-height: 1.2;
+                  }
+                  p { margin: 0 0 1rem 0; color: var(--text-600); }
+
+                  /* Error message box */
+                  .error-box {
+                    color: var(--text-900);
+                    line-height: 1.6;
+                    background: var(--error-bg);
+                    padding: 1rem;
+                    border-radius: 0.5rem;
+                    border-left: 4px solid var(--error-border);
+                    text-align: left;
+                    word-wrap: break-word;
+                    margin: 1rem 0 2rem 0;
+                    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+                    white-space: pre-wrap;
+                  }
+
+                  /* Buttons */
+                  .actions {
+                    display: flex;
+                    justify-content: center;
+                    gap: 0.75rem;
+                    flex-wrap: wrap;
+                  }
+                  .btn {
+                    display: inline-block;
+                    padding: 0.75rem 1.25rem;
+                    border-radius: 9999px;
+                    background: var(--ruby-500);
+                    color: #fff;
+                    border: none;
+                    cursor: pointer;
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+                    transition: transform 120ms ease, box-shadow 180ms ease, background-color 180ms ease;
+                    font-weight: 600;
+                  }
+                  .btn:hover {
+                    background: var(--ruby-600);
+                    transform: scale(1.05);
+                    box-shadow: 0 14px 28px rgba(0,0,0,0.2);
+                  }
+                  .btn:active { transform: scale(0.95); }
+                  .btn.secondary {
+                    background: #374151; /* neutral */
+                  }
+                  .btn.secondary:hover { background: #1f2937; }
+                  .btn:focus-visible {
+                    outline: 3px solid rgba(204,52,45,0.35);
+                    outline-offset: 2px;
+                  }
+
+                  /* Animations */
+                  @keyframes pop-in { to { opacity: 1; transform: scale(1); } }
+                  @keyframes draw-circle {
+                    0% { opacity: 0; stroke-dashoffset: 339.292; }
+                    20% { opacity: 1; }
+                    100% { opacity: 1; stroke-dashoffset: 0; }
+                  }
+                  @keyframes draw-x {
+                    0% { opacity: 0; stroke-dashoffset: 120; }
+                    30% { opacity: 1; }
+                    100% { opacity: 1; stroke-dashoffset: 0; }
+                  }
+                  @keyframes rise-in { to { opacity: 1; transform: translateY(0); } }
+
+                  @media (prefers-reduced-motion: reduce) {
+                    .card, .circle, .x1, .x2, .content { animation: none !important; }
+                    .card { opacity: 1; transform: none; }
+                    .content { opacity: 1; transform: none; }
+                  }
+
+                  /* =========================
+                     Dark Mode (automatic)
+                     ========================= */
+                  @media (prefers-color-scheme: dark) {
+                    :root {
+                      --text-900: #F3F4F6;       /* near-white */
+                      --text-600: #D1D5DB;       /* soft gray */
+                      --card-bg: #151417;        /* deep neutral */
+                      --logo-border: rgba(255, 255, 255, 0.35);
+                      --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.7);
+
+                      /* Tweak error panel for dark mode */
+                      --error-bg: #2a0c0c;       /* subtle deep red panel */
+                      --error-border: #EF4444;   /* brighter red left bar */
+                    }
+
+                    body {
+                      /* Brand-respecting darker background */
+                      background:
+                        radial-gradient(at 20% 30%, #560606 0%, transparent 50%),
+                        radial-gradient(at 80% 70%, #2a2a2a 0%, transparent 40%),
+                        radial-gradient(at 40% 80%, #6d1414 0%, transparent 50%),
+                        radial-gradient(at 60% 20%, #3a2a2a 0%, transparent 45%),
+                        radial-gradient(at 10% 70%, #0e0e0e 0%, transparent 50%),
+                        radial-gradient(at 90% 30%, #1a1a1a 0%, transparent 45%),
+                        linear-gradient(135deg, #7e1f1b 0%, #a62b26 50%, #b43b3b 100%);
+                    }
+
+                    .btn {
+                      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+                    }
+                    .btn:hover {
+                      box-shadow: 0 14px 28px rgba(0,0,0,0.6);
+                    }
+                  }
+                </style>
+              </head>
+              <body>
+                <main class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
+                  <!-- MCP Logo -->
+                  <img
+                    class="logo"
+                    src="https://www.rubyllm-mcp.com/assets/images/rubyllm-mcp-logo.svg"
+                    alt="RubyLLM MCP Logo"
+                    decoding="async"
+                    fetchpriority="high"
+                  />
+
+                  <!-- Animated Error Icon -->
+                  <div class="iconwrap" aria-hidden="true">
+                    <svg class="erroricon" viewBox="0 0 120 120">
+                      <circle class="circle" cx="60" cy="60" r="54"></circle>
+                      <path class="x1" d="M 42 42 L 78 78"></path>
+                      <path class="x2" d="M 78 42 L 42 78"></path>
+                    </svg>
+                  </div>
+
+                  <!-- Message + details -->
+                  <div class="content">
+                    <h1 id="title">Authentication Failed</h1>
+                    <p id="desc">Something went wrong while authenticating. See the details below:</p>
+
+                    <div class="error-box">#{CGI.escapeHTML(error_message)}</div>
+                  </div>
+                </main>
+              </body>
+              </html>
+            HTML
+          end
+        end
+      end
+    end
+  end
+end
