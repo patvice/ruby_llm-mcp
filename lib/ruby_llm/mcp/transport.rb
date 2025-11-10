@@ -97,14 +97,32 @@ module RubyLLM
       # Check if OAuth configuration is present
       def oauth_config_present?(config)
         oauth_config = config[:oauth] || config["oauth"]
-        !oauth_config.nil? && !oauth_config.empty?
+        return false if oauth_config.nil?
+
+        # If it's an OAuth provider instance, it's present
+        return true if oauth_config.respond_to?(:access_token)
+
+        # If it's a hash, check if it's not empty
+        !oauth_config.empty?
       end
 
       # Create OAuth provider from configuration
+      # Accepts either a provider instance or a configuration hash
       def create_oauth_provider(config)
         oauth_config = config.delete(:oauth) || config.delete("oauth")
         return nil unless oauth_config
 
+        # If provider key exists with an instance, use it
+        if oauth_config.is_a?(Hash) && (oauth_config[:provider] || oauth_config["provider"])
+          return oauth_config[:provider] || oauth_config["provider"]
+        end
+
+        # If oauth_config itself is a provider instance, use it directly
+        if oauth_config.respond_to?(:access_token) && oauth_config.respond_to?(:start_authorization_flow)
+          return oauth_config
+        end
+
+        # Otherwise create new provider from config hash
         # Determine server URL based on transport type
         server_url = determine_server_url(config)
         return nil unless server_url

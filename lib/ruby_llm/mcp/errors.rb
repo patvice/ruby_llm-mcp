@@ -45,6 +45,8 @@ module RubyLLM
         end
       end
 
+      class ConfigurationError < BaseError; end
+
       class SessionExpiredError < BaseError; end
 
       class TimeoutError < BaseError

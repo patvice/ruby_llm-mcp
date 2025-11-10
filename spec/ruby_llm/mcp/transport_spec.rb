@@ -230,4 +230,124 @@ RSpec.describe RubyLLM::MCP::Transport do
       expect(described_class.transports[:streamable_http]).to eq(RubyLLM::MCP::Transports::StreamableHTTP)
     end
   end
+
+  describe "OAuth provider handling" do
+    let(:mock_oauth_provider) do
+      instance_double(
+        RubyLLM::MCP::Auth::OAuthProvider,
+        access_token: nil,
+        start_authorization_flow: "https://auth.example.com/authorize"
+      )
+    end
+
+    describe "#create_oauth_provider" do
+      context "when oauth config is an OAuth provider instance" do
+        it "returns the provider instance directly" do
+          config_with_provider = {
+            url: "https://mcp.example.com",
+            oauth: mock_oauth_provider
+          }
+          transport = described_class.new(:sse, coordinator, config: config_with_provider)
+
+          oauth_provider = transport.send(:create_oauth_provider, config_with_provider)
+
+          expect(oauth_provider).to eq(mock_oauth_provider)
+        end
+      end
+
+      context "when oauth config has provider key" do
+        it "returns the provider from the hash" do
+          config_with_provider_key = {
+            url: "https://mcp.example.com",
+            oauth: { provider: mock_oauth_provider }
+          }
+          transport = described_class.new(:sse, coordinator, config: config_with_provider_key)
+
+          oauth_provider = transport.send(:create_oauth_provider, config_with_provider_key)
+
+          expect(oauth_provider).to eq(mock_oauth_provider)
+        end
+      end
+
+      context "when oauth config is a hash without provider" do
+        it "creates new OAuthProvider from config" do
+          config_with_oauth_hash = {
+            url: "https://mcp.example.com",
+            oauth: {
+              scope: "mcp:read mcp:write",
+              redirect_uri: "http://localhost:8080/callback"
+            }
+          }
+          transport = described_class.new(:sse, coordinator, config: config_with_oauth_hash)
+
+          allow(RubyLLM::MCP::Auth::OAuthProvider).to receive(:new).and_return(mock_oauth_provider)
+
+          oauth_provider = transport.send(:create_oauth_provider, config_with_oauth_hash)
+
+          expect(oauth_provider).to eq(mock_oauth_provider)
+          expect(RubyLLM::MCP::Auth::OAuthProvider).to have_received(:new).with(
+            server_url: "https://mcp.example.com",
+            redirect_uri: "http://localhost:8080/callback",
+            scope: "mcp:read mcp:write",
+            logger: RubyLLM::MCP.logger,
+            storage: nil,
+            grant_type: :authorization_code
+          )
+        end
+
+        it "uses default redirect_uri when not provided" do
+          config_with_minimal_oauth = {
+            url: "https://mcp.example.com",
+            oauth: { scope: "mcp:read" }
+          }
+          transport = described_class.new(:sse, coordinator, config: config_with_minimal_oauth)
+
+          allow(RubyLLM::MCP::Auth::OAuthProvider).to receive(:new).and_return(mock_oauth_provider)
+
+          transport.send(:create_oauth_provider, config_with_minimal_oauth)
+
+          expect(RubyLLM::MCP::Auth::OAuthProvider).to have_received(:new).with(
+            server_url: "https://mcp.example.com",
+            redirect_uri: "http://localhost:8080/callback",
+            scope: "mcp:read",
+            logger: RubyLLM::MCP.logger,
+            storage: nil,
+            grant_type: :authorization_code
+          )
+        end
+      end
+
+      context "when no oauth config is present" do
+        it "returns nil" do
+          config_without_oauth = { url: "https://mcp.example.com" }
+          transport = described_class.new(:sse, coordinator, config: config_without_oauth)
+
+          oauth_provider = transport.send(:create_oauth_provider, config_without_oauth)
+
+          expect(oauth_provider).to be_nil
+        end
+      end
+    end
+
+    describe "integration with build_transport" do
+      it "passes OAuth provider instance to transport" do
+        config_with_provider = {
+          url: "https://mcp.example.com",
+          oauth: mock_oauth_provider
+        }
+        transport = described_class.new(:sse, coordinator, config: config_with_provider)
+
+        mock_sse = instance_double(RubyLLM::MCP::Transports::SSE)
+        allow(RubyLLM::MCP::Transports::SSE).to receive(:new).and_return(mock_sse)
+
+        transport.send(:build_transport)
+
+        expect(RubyLLM::MCP::Transports::SSE).to have_received(:new).with(
+          coordinator: coordinator,
+          url: "https://mcp.example.com",
+          options: hash_including(oauth_provider: mock_oauth_provider)
+        )
+      end
+    end
+  end
 end

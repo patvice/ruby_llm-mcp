@@ -283,6 +283,17 @@ module RubyLLM
         @transport ||= RubyLLM::MCP::Transport.new(@transport_type, self, config: @config)
       end
 
+      # Get OAuth provider from transport if available
+      # @return [OAuthProvider, BrowserOAuthProvider, nil] OAuth provider or nil
+      def transport_oauth_provider
+        return nil unless @transport
+
+        transport_protocol = @transport.transport_protocol
+        return nil unless transport_protocol.respond_to?(:oauth_provider)
+
+        transport_protocol.oauth_provider
+      end
+
       private
 
       def sampling_enabled?
