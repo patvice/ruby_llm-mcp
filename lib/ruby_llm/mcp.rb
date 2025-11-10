@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 # Standard Libraries
+require "cgi"
 require "erb"
 require "json"
 require "logger"
 require "open3"
+require "rbconfig"
 require "securerandom"
+require "socket"
 require "timeout"
 require "uri"
 require "yaml"
@@ -80,6 +83,12 @@ module RubyLLM
       # No-op: Complex parameters are now supported by default
     end
 
+    def mcp_configurations
+      config.mcp_configuration.each_with_object({}) do |config, acc|
+        acc[config[:name]] = config
+      end
+    end
+
     def configure
       yield config
     end
@@ -105,8 +114,13 @@ loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 loader.inflector.inflect("http_client" => "HTTPClient")
+loader.inflector.inflect("http_server" => "HttpServer")
+
 loader.inflector.inflect("ruby_llm_adapter" => "RubyLLMAdapter")
 loader.inflector.inflect("mcp_sdk_adapter" => "MCPSDKAdapter")
 loader.inflector.inflect("mcp_transports" => "MCPTransports")
+
+loader.inflector.inflect("oauth_provider" => "OAuthProvider")
+loader.inflector.inflect("browser_oauth_provider" => "BrowserOAuthProvider")
 
 loader.setup

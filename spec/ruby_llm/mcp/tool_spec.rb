@@ -150,7 +150,7 @@ RSpec.describe RubyLLM::MCP::Tool do
   end
 
   # Human in the loop tests - only run on adapters that support this feature
-  each_client_supporting(:human_in_the_loop) do |config|
+  each_client_supporting(:human_in_the_loop) do |_config|
     describe "on_human_in_the_loop" do
       it "calls a human in the loop and cancels the tool call if returns false" do
         called = false
@@ -185,7 +185,7 @@ RSpec.describe RubyLLM::MCP::Tool do
   end
 
   describe "Structured Tool Output (2025-06-18)" do
-    each_client do |config|
+    each_client do |_config|
       it "validates structured output against output schema" do
         tool = client.tool("structured_data_analyzer")
         expect(tool).to be_a(RubyLLM::MCP::Tool)
@@ -227,7 +227,7 @@ RSpec.describe RubyLLM::MCP::Tool do
   end
 
   describe "Human-Friendly Display Names (2025-06-18)" do
-    each_client do |config|
+    each_client do |_config|
       it "provides human-friendly titles for tools" do
         tool = client.tool("complex_calculation")
         expect(tool).to be_a(RubyLLM::MCP::Tool)
@@ -659,7 +659,7 @@ RSpec.describe RubyLLM::MCP::Tool do
     end
 
     describe "integration with real client" do
-      each_client do |config|
+      each_client do |_config|
         it "normalizes malformed_tool schema correctly" do
           tool = client.tool("malformed_tool")
 

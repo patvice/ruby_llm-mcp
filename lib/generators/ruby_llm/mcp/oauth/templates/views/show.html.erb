@@ -1,0 +1,560 @@
+<div class="mcp-connections-container">
+
+  <%= link_to "← Back to Connections", mcp_connections_path, class: "mcp-btn mcp-btn-secondary" %>
+  <div class="mcp-header">
+    <h1><%= @credential.name %></h1>
+    <div class="mcp-header-meta">
+      <code class="mcp-code"><%= @credential.server_url %></code>
+      <% if @credential.expired? %>
+        <span class="mcp-badge mcp-badge-danger">Expired</span>
+      <% elsif @credential.expires_soon? %>
+        <span class="mcp-badge mcp-badge-warning">Expiring Soon</span>
+      <% else %>
+        <span class="mcp-badge mcp-badge-success">Active</span>
+      <% end %>
+    </div>
+  </div>
+
+  <% if flash[:notice] %>
+    <div class="mcp-alert mcp-alert-success">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% if flash[:alert] %>
+    <div class="mcp-alert mcp-alert-warning">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <div class="mcp-tools-section">
+    <h2>Available Tools (<%= @tools.count %>)</h2>
+    <% if @tools.any? %>
+      <div class="mcp-tools-list">
+        <% @tools.each do |tool| %>
+          <div class="mcp-tool-card">
+            <div class="mcp-tool-header">
+              <h3 class="mcp-tool-name"><%= tool.name %></h3>
+              <div class="mcp-tool-badges">
+                <% if tool.annotations&.read_only_hint %>
+                  <span class="mcp-badge mcp-badge-info">Read Only</span>
+                <% end %>
+                <% if tool.annotations&.destructive_hint %>
+                  <span class="mcp-badge mcp-badge-warning">Destructive</span>
+                <% end %>
+                <% if tool.annotations&.idempotent_hint %>
+                  <span class="mcp-badge mcp-badge-success">Idempotent</span>
+                <% end %>
+              </div>
+            </div>
+
+            <% if tool.description.present? %>
+              <p class="mcp-tool-description"><%= tool.description %></p>
+            <% else %>
+              <p class="mcp-tool-description mcp-text-muted">No description available</p>
+            <% end %>
+
+            <% if tool.params_schema.present? && tool.params_schema["properties"]&.any? %>
+              <div class="mcp-tool-schema">
+                <h4>Input Parameters</h4>
+                <div class="mcp-parameters">
+                  <% tool.params_schema["properties"].each do |param_name, param_info| %>
+                    <div class="mcp-parameter">
+                      <div class="mcp-parameter-header">
+                        <code class="mcp-param-name"><%= param_name %></code>
+                        <span class="mcp-param-type"><%= param_info["type"] %></span>
+                        <% if tool.params_schema["required"]&.include?(param_name) %>
+                          <span class="mcp-badge mcp-badge-required">Required</span>
+                        <% end %>
+                      </div>
+                      <% if param_info["description"].present? %>
+                        <p class="mcp-parameter-description"><%= param_info["description"] %></p>
+                      <% end %>
+                      <% if param_info["items"].present? %>
+                        <div class="mcp-parameter-items">
+                          <small class="mcp-text-muted">Items: <%= param_info["items"]["type"] %></small>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+
+                <details class="mcp-schema-details">
+                  <summary>View Full Schema</summary>
+                  <pre class="mcp-schema-code"><%= JSON.pretty_generate(tool.params_schema) %></pre>
+                </details>
+              </div>
+            <% elsif tool.params_schema.present? %>
+              <div class="mcp-tool-schema">
+                <p class="mcp-text-muted"><em>No input parameters required</em></p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="mcp-alert mcp-alert-info">
+        <p>No tools available from this MCP server.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+/* MCP Tools Show Page - Self-contained styles */
+.mcp-connections-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.mcp-header {
+  margin: 2rem 0;
+}
+
+.mcp-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.mcp-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.mcp-tools-section {
+  margin-top: 2rem;
+}
+
+.mcp-tools-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #2a2a2a;
+}
+
+.mcp-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.mcp-tool-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.mcp-tool-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mcp-tool-header {
+  margin-bottom: 1rem;
+}
+
+.mcp-tool-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #007bff;
+  margin: 0 0 0.5rem 0;
+  word-break: break-word;
+}
+
+.mcp-tool-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.mcp-tool-description {
+  font-size: 0.95rem;
+  color: #495057;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.mcp-tool-schema {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.mcp-tool-schema h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.mcp-schema-details {
+  margin-top: 0.5rem;
+}
+
+.mcp-schema-details summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #007bff;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.mcp-schema-details summary:hover {
+  background-color: #e9ecef;
+}
+
+.mcp-schema-code {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #212529;
+}
+
+.mcp-parameters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mcp-parameter {
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #007bff;
+}
+
+.mcp-parameter-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mcp-param-name {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #007bff;
+  background-color: #e7f3ff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+}
+
+.mcp-param-type {
+  font-size: 0.75rem;
+  color: #6c757d;
+  background-color: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.mcp-parameter-description {
+  font-size: 0.875rem;
+  color: #495057;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.mcp-parameter-items {
+  margin-top: 0.25rem;
+}
+
+/* Badge styles */
+.mcp-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.mcp-badge-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.mcp-badge-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.mcp-badge-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.mcp-badge-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.mcp-badge-required {
+  background-color: #f8d7da;
+  color: #721c24;
+  font-size: 0.7rem;
+}
+
+/* Button styles */
+.mcp-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.mcp-btn:hover {
+  opacity: 0.9;
+}
+
+.mcp-btn-secondary {
+  color: white;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.mcp-btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+/* Code styles */
+.mcp-code {
+  background-color: #f5f5f5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.875em;
+  color: #212529;
+}
+
+/* Text utilities */
+.mcp-text-muted {
+  color: #6c757d;
+}
+
+/* Alert styles */
+.mcp-alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.mcp-alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.mcp-alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.mcp-alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mcp-connections-container {
+    padding: 0 0.5rem;
+  }
+
+  .mcp-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .mcp-tool-card {
+    padding: 1rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+  }
+
+  .mcp-connections-container {
+    color: #e0e0e0;
+    background-color: #1a1a1a;
+  }
+
+  .mcp-header h1 {
+    color: #f0f0f0;
+  }
+
+  .mcp-tools-section h2 {
+    color: #f0f0f0;
+  }
+
+  /* Tool card dark mode */
+  .mcp-tool-card {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .mcp-tool-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  }
+
+  .mcp-tool-name {
+    color: #4dabf7;
+  }
+
+  .mcp-tool-description {
+    color: #b0b0b0;
+  }
+
+  /* Tool schema dark mode */
+  .mcp-tool-schema {
+    border-top-color: #3a3a3a;
+  }
+
+  .mcp-tool-schema h4 {
+    color: #8a8a8a;
+  }
+
+  .mcp-schema-details summary {
+    background-color: #1a1a1a;
+    color: #4dabf7;
+  }
+
+  .mcp-schema-details summary:hover {
+    background-color: #333333;
+  }
+
+  .mcp-schema-code {
+    background-color: #1a1a1a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  /* Parameter dark mode */
+  .mcp-parameter {
+    background-color: #1a1a1a;
+    border-left-color: #4dabf7;
+  }
+
+  .mcp-param-name {
+    color: #4dabf7;
+    background-color: #0d3a5c;
+  }
+
+  .mcp-param-type {
+    color: #8a8a8a;
+    background-color: #2a2a2a;
+  }
+
+  .mcp-parameter-description {
+    color: #b0b0b0;
+  }
+
+  /* Badge dark mode */
+  .mcp-badge-success {
+    background-color: #1e4620;
+    color: #8fd98f;
+  }
+
+  .mcp-badge-warning {
+    background-color: #4a3a00;
+    color: #ffd966;
+  }
+
+  .mcp-badge-danger {
+    background-color: #4a1a1f;
+    color: #ff8a95;
+  }
+
+  .mcp-badge-info {
+    background-color: #0c3d47;
+    color: #9fe5f0;
+  }
+
+  .mcp-badge-required {
+    background-color: #4a1a1f;
+    color: #ff8a95;
+  }
+
+  /* Button dark mode */
+  .mcp-btn-secondary {
+    background-color: #5a6268;
+    border-color: #5a6268;
+  }
+
+  .mcp-btn-secondary:hover {
+    background-color: #4e555b;
+    border-color: #4e555b;
+  }
+
+  /* Code dark mode */
+  .mcp-code {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+
+  /* Text utilities dark mode */
+  .mcp-text-muted {
+    color: #8a8a8a;
+  }
+
+  /* Alert dark mode */
+  .mcp-alert-info {
+    background-color: #0c3d47;
+    border-color: #0f5460;
+    color: #9fe5f0;
+  }
+
+  .mcp-alert-warning {
+    background-color: #4a3a00;
+    border-color: #665000;
+    color: #ffd966;
+  }
+
+  .mcp-alert-success {
+    background-color: #1e4620;
+    border-color: #2a5e2c;
+    color: #8fd98f;
+  }
+}
+</style>

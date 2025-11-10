@@ -88,7 +88,8 @@ module RubyLLM
           result = @mcp_client.call_tool(tool: tool, arguments: parameters)
           transform_tool_result(result)
         rescue RubyLLM::MCP::Errors::TimeoutError => e
-          if @mcp_client&.transport&.native_transport&.alive? && !e.request_id.nil?
+          native_transport = @mcp_client&.transport&.native_transport
+          if native_transport&.alive? && !e.request_id.nil?
             cancelled_notification(reason: "Request timed out", request_id: e.request_id)
           end
           raise e
@@ -197,13 +198,17 @@ module RubyLLM
               request_timeout: @config[:request_timeout] || 10_000
             )
           when :streamable, :streamable_http
+            # Prepare OAuth provider if OAuth config is present
+            config_copy = @config.dup
+            oauth_provider = Auth::TransportOauthHelper.create_oauth_provider(config_copy) if Auth::TransportOauthHelper.oauth_config_present?(config_copy)
+
             MCPTransports::StreamableHTTP.new(
               url: @config[:url],
               headers: @config[:headers] || {},
               version: @config[:version] || :http2,
               request_timeout: @config[:request_timeout] || 10_000,
               reconnection: @config[:reconnection] || {},
-              oauth: @config[:oauth],
+              oauth_provider: oauth_provider,
               rate_limit: @config[:rate_limit],
               session_id: @config[:session_id]
             )

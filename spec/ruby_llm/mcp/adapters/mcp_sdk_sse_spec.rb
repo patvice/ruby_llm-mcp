@@ -28,7 +28,7 @@ class MCPSDKSSERunner
   end
 end
 
-RSpec.describe RubyLLM::MCP::Adapters::MCPSDKAdapter, "SSE Transport" do
+RSpec.describe RubyLLM::MCP::Adapters::MCPSDKAdapter do # rubocop:disable RSpec/SpecFilePathFormat
   let(:client) { MCPSDKSSERunner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll

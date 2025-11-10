@@ -51,8 +51,22 @@ module RubyLLM
             raise Errors::InvalidTransportType.new(message: message)
           end
 
+          # Extract and merge options if present (from OAuth helper preparation)
+          transport_config = config.dup
+          if transport_config[:options]
+            options = transport_config.delete(:options)
+            transport_config.merge!(options)
+          end
+
+          # Remove OAuth-specific params from transports that don't support them
+          # This allows other arbitrary params (like timeout) to pass through for testing
+          unless %i[streamable streamable_http].include?(transport_type)
+            transport_config.delete(:oauth_provider)
+            transport_config.delete(:oauth)
+          end
+
           transport_klass = RubyLLM::MCP::Native::Transport.transports[transport_type]
-          transport_klass.new(coordinator: coordinator, **config)
+          transport_klass.new(coordinator: coordinator, **transport_config)
         end
       end
     end

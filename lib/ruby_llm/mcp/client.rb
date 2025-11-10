@@ -27,6 +27,11 @@ module RubyLLM
         @config = config.merge(request_timeout: request_timeout)
         @request_timeout = request_timeout
 
+        # Store OAuth config for later use
+        @oauth_config = config[:oauth] || config["oauth"]
+        @oauth_provider = nil
+        @oauth_storage = nil
+
         @on = {}
         @tools = {}
         @resources = {}
@@ -59,6 +64,40 @@ module RubyLLM
 
       def restart!
         @adapter.restart!
+      end
+
+      # Get or create OAuth provider for this client
+      # @param type [Symbol] OAuth provider type (:standard or :browser, defaults to :standard)
+      # @param options [Hash] additional options passed to provider
+      # @return [OAuthProvider, BrowserOAuthProvider] OAuth provider instance
+      def oauth(type: :standard, **options)
+        # Return existing provider if already created
+        return @oauth_provider if @oauth_provider
+
+        # Get provider from transport if it already exists
+        transport_oauth = transport_oauth_provider
+        return transport_oauth if transport_oauth
+
+        # Create new provider lazily
+        server_url = @config[:url] || @config["url"]
+        unless server_url
+          raise Errors::ConfigurationError.new(
+            message: "Cannot create OAuth provider without server URL in config"
+          )
+        end
+
+        oauth_options = {
+          server_url: server_url,
+          scope: @oauth_config&.dig(:scope) || @oauth_config&.dig("scope"),
+          storage: oauth_storage,
+          **options
+        }
+
+        @oauth_provider = Auth.create_oauth(
+          server_url,
+          type: type,
+          **oauth_options
+        )
       end
 
       def tools(refresh: false)
@@ -237,6 +276,29 @@ module RubyLLM
 
       private
 
+      # Get OAuth provider from adapter's transport if available
+      # @return [OAuthProvider, BrowserOAuthProvider, nil] OAuth provider or nil
+      def transport_oauth_provider
+        return nil unless @adapter
+
+        # For RubyLLMAdapter
+        if @adapter.respond_to?(:native_client)
+          transport = @adapter.native_client.transport
+          transport_protocol = transport.transport_protocol
+          return transport_protocol.oauth_provider if transport_protocol.respond_to?(:oauth_provider)
+        end
+
+        # For MCPSDKAdapter with wrapped transports
+        if @adapter.respond_to?(:mcp_client) && @adapter.instance_variable_get(:@mcp_client)
+          mcp_client = @adapter.instance_variable_get(:@mcp_client)
+          if mcp_client&.transport.respond_to?(:native_transport)
+            return mcp_client.transport.native_transport.oauth_provider
+          end
+        end
+
+        nil
+      end
+
       def build_adapter
         case @adapter_type
         when :ruby_llm
@@ -321,6 +383,16 @@ module RubyLLM
         if @adapter.supports?(:elicitation)
           @on[:elicitation] = MCP.config.on_elicitation
         end
+      end
+
+      # Get or create OAuth storage shared with transport
+      def oauth_storage
+        # Try to get storage from transport's OAuth provider
+        transport_oauth = transport_oauth_provider
+        return transport_oauth.storage if transport_oauth
+
+        # Create new storage shared with client
+        @oauth_storage ||= Auth::MemoryStorage.new
       end
     end
   end

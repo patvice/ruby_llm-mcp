@@ -44,6 +44,9 @@ RubyLLM::MCP.configure do |config|
   config.log_level = Rails.env.production? ? Logger::WARN : Logger::INFO
   config.logger = Rails.logger
 
+  # Path to your MCP servers configuration
+  config.config_path = Rails.root.join("config", "mcps.yml")
+
   # Configure roots for filesystem access
   config.roots = [Rails.root] if Rails.env.development?
 
@@ -55,13 +58,6 @@ RubyLLM::MCP.configure do |config|
     true
   end
 end
-
-# Choose your client management strategy
-RubyLLM::MCP.launch_control = :manual # or :automatic
-
-# For automatic client management, uncomment:
-# RubyLLM::MCP.launch_control = :automatic
-# RubyLLM::MCP.start_all_clients
 ```
 
 #### `config/mcps.yml`
@@ -92,40 +88,36 @@ mcp_servers:
   #     Authorization: "Bearer <%= ENV['API_TOKEN'] %>"
 ```
 
-## Client Management Strategies
+## Client Management
 
-### Automatic Client Management
+{: .label .label-yellow }
+Changed in 0.9
 
-For more basic use cases, you can run MCP clients and sub-processes directly along side your Rails application. Automatically starting clients is a good choice for most basic use cases, development, testing and getting started.
+RubyLLM MCP uses an explicit connection management pattern. All MCP operations must be wrapped in `establish_connection` blocks, which ensures proper resource management and cleanup.
 
-```ruby
-# config/initializers/ruby_llm_mcp.rb
-RubyLLM::MCP.launch_control = :automatic
-RubyLLM::MCP.start_all_clients
-
-# Clients are automatically available throughout the application
-clients = RubyLLM::MCP.clients
-chat = RubyLLM.chat(model: "gpt-4")
-chat.with_tools(*clients.tools)
-```
-
-### Manual Client Management
-
-Due to the performace of LLMs, it's likely that for production workloads you would want to that you will want to use LLM requests inside background job or streamable endpoints. Manual controller will give you more control over client connections and where they run.
+### Connection Block Pattern
 
 ```ruby
-# config/initializers/ruby_llm_mcp.rb
-RubyLLM::MCP.launch_control = :manual
-
-# In your application code
+# All MCP operations use establish_connection blocks
 RubyLLM::MCP.establish_connection do |clients|
   chat = RubyLLM.chat(model: "gpt-4")
   chat.with_tools(*clients.tools)
 
   response = chat.ask("Analyze the project structure")
   puts response
-end
+end # Clients are automatically stopped and cleaned up here
 ```
+
+### Benefits
+
+- **Explicit lifecycle**: Clear start and end of client connections
+- **Automatic cleanup**: Clients are properly stopped when the block ends
+- **Thread-safe**: Each block gets isolated client instances
+- **No memory leaks**: Works correctly with Rails code reloading
+- **Production-ready**: Perfect for background jobs and API endpoints
+
+{: .note }
+**Version 0.7 and Earlier**: Used `launch_control` setting for automatic/manual modes. This has been removed in 0.8 in favor of explicit connection blocks. See [Upgrading from 0.7 to 0.8]({% link guides/upgrading-0.7-to-0.8.md %}) for migration details.
 
 ## Examples
 
@@ -313,18 +305,95 @@ class StreamingAnalysisController < ApplicationController
 end
 ```
 
+## OAuth Authentication for Multi-User Applications
+
+For Rails applications with multiple users where each user needs their own MCP connection:
+
+### Quick Start
+
+```bash
+# Install OAuth support
+rails generate ruby_llm:mcp:oauth:install
+
+# Run migrations
+rails db:migrate
+
+# Configure
+# .env
+DEFAULT_MCP_SERVER_URL=https://mcp.example.com/api
+MCP_OAUTH_SCOPES=mcp:read mcp:write
+```
+
+### Usage Pattern
+
+```ruby
+# User model
+class User < ApplicationRecord
+  include UserMcpOauth  # Adds mcp_connected?, mcp_client, etc.
+end
+
+# Background job with per-user permissions
+class AiResearchJob < ApplicationJob
+  def perform(user_id, query)
+    user = User.find(user_id)
+    client = user.mcp_client  # Uses user's OAuth token!
+
+    tools = client.tools
+    chat = RubyLLM.chat(provider: "anthropic/claude-sonnet-4")
+      .with_tools(*tools)
+
+    response = chat.ask(query)
+    # ... save results ...
+  end
+end
+
+# Controller
+class ResearchController < ApplicationController
+  def create
+    if current_user.mcp_connected?
+      AiResearchJob.perform_later(current_user.id, params[:query])
+      redirect_to research_path, notice: "Research started!"
+    else
+      redirect_to connect_mcp_connections_path,
+                  alert: "Please connect MCP server first"
+    end
+  end
+end
+```
+
+### Key Features
+
+- **Per-user OAuth tokens** - Each user has their own credentials
+- **Secure storage** - Encrypted tokens in database
+- **Background jobs** - No browser needed after initial auth
+- **Automatic refresh** - Tokens refresh transparently
+- **Multi-server support** - Users can connect to multiple MCP servers
+
+### Complete Guide
+
+For detailed implementation including:
+- Multi-tenant architecture
+- Token lifecycle management
+- Security best practices
+- Production deployment
+- Monitoring and alerts
+
+See the **[Rails OAuth Integration Guide]({% link guides/rails-oauth.md %})**
+
 ## Next Steps
 
 Now that you have comprehensive Rails integration set up:
 
 1. **Configure your MCP servers** in `config/mcps.yml`
 2. **Choose your client management strategy** (manual vs automatic)
-3. **Implement MCP services** for your specific use cases
-4. **Add proper error handling and monitoring**
-5. **Set up tests** for your MCP integrations
+3. **For multi-user OAuth**, see [Rails OAuth Integration]({% link guides/rails-oauth.md %})
+4. **Implement MCP services** for your specific use cases
+5. **Add proper error handling and monitoring**
+6. **Set up tests** for your MCP integrations
 
 For more detailed information on specific topics:
 
+- **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** - Multi-user OAuth setup
 - **[Configuration]({% link configuration.md %})** - Advanced client configuration
 - **[Tools]({% link server/tools.md %})** - Working with MCP tools
 - **[Resources]({% link server/resources.md %})** - Managing resources and templates

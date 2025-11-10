@@ -29,10 +29,13 @@ module RubyLLM
           # This ensures the client's request_timeout is used instead of the global default
           request_timeout = config.delete(:request_timeout)
 
+          # Prepare OAuth provider if OAuth config is present
+          transport_config = prepare_transport_config(config, transport_type)
+
           @native_client = Native::Client.new(
             name: client.name,
             transport_type: transport_type,
-            transport_config: config,
+            transport_config: transport_config,
             request_timeout: request_timeout,
             human_in_the_loop_callback: build_human_in_the_loop_callback(client),
             roots_callback: -> { client.roots.paths },
@@ -69,6 +72,24 @@ module RubyLLM
         end
 
         private
+
+        # Prepare transport configuration with OAuth provider if needed
+        def prepare_transport_config(config, transport_type)
+          transport_config = config.dup
+
+          # Only prepare OAuth for HTTP-based transports
+          if %i[sse streamable streamable_http].include?(transport_type)
+            # Create OAuth provider if OAuth config is present
+            oauth_provider = Auth::TransportOauthHelper.create_oauth_provider(transport_config) if Auth::TransportOauthHelper.oauth_config_present?(transport_config)
+
+            # Prepare options for HTTP transports
+            Auth::TransportOauthHelper.prepare_http_transport_config(transport_config, oauth_provider)
+          elsif transport_type == :stdio
+            Auth::TransportOauthHelper.prepare_stdio_transport_config(transport_config)
+          else
+            transport_config
+          end
+        end
 
         def build_human_in_the_loop_callback(client)
           lambda do |name, params|

@@ -22,21 +22,6 @@ module RubyLLM
           end
         end
 
-        class OAuthOptions
-          attr_reader :issuer, :client_id, :client_secret, :scope
-
-          def initialize(issuer:, client_id:, client_secret:, scopes:)
-            @issuer = issuer
-            @client_id = client_id
-            @client_secret = client_secret
-            @scope = scopes
-          end
-
-          def enabled?
-            @issuer && @client_id && @client_secret && @scope
-          end
-        end
-
         # Options for starting SSE connections
         class StartSSEOptions
           attr_reader :resumption_token, :on_resumption_token, :replay_message_id
@@ -52,7 +37,7 @@ module RubyLLM
         class StreamableHTTP
           include Support::Timeout
 
-          attr_reader :session_id, :protocol_version, :coordinator
+          attr_reader :session_id, :protocol_version, :coordinator, :oauth_provider
 
           def initialize( # rubocop:disable Metrics/ParameterLists
             url:,
@@ -61,11 +46,22 @@ module RubyLLM
             headers: {},
             reconnection: {},
             version: :http2,
-            oauth: nil,
+            oauth_provider: nil,
             rate_limit: nil,
             reconnection_options: nil,
-            session_id: nil
+            session_id: nil,
+            options: {}
           )
+            # Extract options if provided (for backward compatibility)
+            extracted_options = options.dup
+            headers = extracted_options.delete(:headers) || headers
+            version = extracted_options.delete(:version) || version
+            oauth_provider = extracted_options.delete(:oauth_provider) || oauth_provider
+            reconnection = extracted_options.delete(:reconnection) || reconnection
+            reconnection_options = extracted_options.delete(:reconnection_options) || reconnection_options
+            rate_limit = extracted_options.delete(:rate_limit) || rate_limit
+            session_id = extracted_options.delete(:session_id) || session_id
+
             @url = URI(url)
             @coordinator = coordinator
             @request_timeout = request_timeout
@@ -81,7 +77,7 @@ module RubyLLM
             @client_id = SecureRandom.uuid
 
             @reconnection_options = ReconnectionOptions.new(**reconnection)
-            @oauth_options = OAuthOptions.new(**oauth) unless oauth.nil?
+            @oauth_provider = oauth_provider
             @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
             @id_counter = 0
@@ -239,17 +235,6 @@ module RubyLLM
               }
             )
 
-            if @oauth_options&.enabled?
-              client = client.plugin(:oauth).oauth_auth(
-                issuer: @oauth_options.issuer,
-                client_id: @oauth_options.client_id,
-                client_secret: @oauth_options.client_secret,
-                scope: @oauth_options.scope
-              )
-
-              client.with_access_token
-            end
-
             register_client(client)
           end
 
@@ -259,7 +244,25 @@ module RubyLLM
             headers["mcp-session-id"] = @session_id if @session_id
             headers["mcp-protocol-version"] = @protocol_version if @protocol_version
             headers["X-CLIENT-ID"] = @client_id
-            headers["Origin"] = @uri.to_s
+            headers["Origin"] = @url.to_s
+
+            # Apply OAuth authorization if available
+            if @oauth_provider
+              RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
+              RubyLLM::MCP.logger.debug "  Server URL: #{@oauth_provider.server_url}"
+
+              token = @oauth_provider.access_token
+              if token
+                headers["Authorization"] = token.to_header
+                RubyLLM::MCP.logger.debug "Applied OAuth authorization header: #{token.to_header}"
+              else
+                RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available!"
+                RubyLLM::MCP.logger.warn "  This means the token is not in storage or has expired"
+                RubyLLM::MCP.logger.warn "  Check that authentication completed successfully"
+              end
+            else
+              RubyLLM::MCP.logger.debug "No OAuth provider configured for this transport"
+            end
 
             headers
           end
@@ -320,16 +323,6 @@ module RubyLLM
               }
             )
 
-            if @oauth_options&.enabled?
-              client = client.plugin(:oauth).oauth_auth(
-                issuer: @oauth_options.issuer,
-                client_id: @oauth_options.client_id,
-                client_secret: @oauth_options.client_secret,
-                scope: @oauth_options.scope
-              )
-
-              client.with_access_token
-            end
             register_client(client)
           end
 
@@ -348,8 +341,12 @@ module RubyLLM
               handle_accepted_response(original_message)
             when 404
               handle_session_expired
-            when 405, 401
-              # TODO: Implement 401 handling this once we are adding authorization
+            when 401
+              # OAuth authentication required
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication required (401 Unauthorized)"
+              )
+            when 405
               # Method not allowed - acceptable for some endpoints
               nil
             when 400...500
@@ -405,38 +402,70 @@ module RubyLLM
           end
 
           def handle_client_error(response)
-            begin
-              # Safely access response body
-              response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
-              error_body = JSON.parse(response_body)
-
-              if error_body.is_a?(Hash) && error_body["error"]
-                error_message = error_body["error"]["message"] || error_body["error"]["code"]
-
-                if error_message.to_s.downcase.include?("session")
-                  raise Errors::TransportError.new(
-                    code: response.status,
-                    message: "Server error: #{error_message} (Current session ID: #{@session_id || 'none'})"
-                  )
-                end
-
-                raise Errors::TransportError.new(
-                  code: response.status,
-                  message: "Server error: #{error_message}"
-                )
-              end
-            rescue JSON::ParserError
-              # Fall through to generic error
-            end
-
-            # Safely access response attributes
-            response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
             status_code = response.respond_to?(:status) ? response.status : "Unknown"
 
+            # Special handling for 403 with OAuth provider
+            handle_oauth_authorization_error(response, status_code) if status_code == 403 && @oauth_provider
+
+            # Try to parse and handle structured JSON error
+            handle_json_error_response(response, status_code)
+
+            # Fallback: generic error
+            response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
             raise Errors::TransportError.new(
               code: status_code,
               message: "HTTP client error: #{status_code} - #{response_body}"
             )
+          end
+
+          def handle_oauth_authorization_error(response, status_code)
+            response_body = response.respond_to?(:body) ? response.body.to_s : ""
+            error_body = JSON.parse(response_body)
+            error_message = error_body.dig("error", "message") || "Authorization failed"
+
+            raise Errors::TransportError.new(
+              code: status_code,
+              message: "Authorization failed (403 Forbidden). #{error_message}. Check token scope and permissions."
+            )
+          rescue JSON::ParserError
+            raise Errors::TransportError.new(
+              code: status_code,
+              message: "Authorization failed (403 Forbidden). Check token scope and permissions."
+            )
+          end
+
+          def handle_json_error_response(response, status_code)
+            response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
+            error_body = JSON.parse(response_body)
+
+            return unless error_body.is_a?(Hash) && error_body["error"]
+
+            error_message = error_body["error"]["message"] || error_body["error"]["code"]
+
+            # Handle empty error messages
+            if error_message.to_s.empty?
+              raise Errors::TransportError.new(
+                code: status_code,
+                message: "Empty error (full response: #{response_body})"
+              )
+            end
+
+            # Handle session-related errors
+            if error_message.to_s.downcase.include?("session")
+              raise Errors::TransportError.new(
+                code: response.status,
+                message: "Server error: #{error_message} (Current session ID: #{@session_id || 'none'})"
+              )
+            end
+
+            # Generic JSON error
+            raise Errors::TransportError.new(
+              code: response.status,
+              message: "Server error: #{error_message}"
+            )
+          rescue JSON::ParserError
+            # Fall through to generic error in caller
+            nil
           end
 
           def handle_session_expired

@@ -108,9 +108,7 @@ RSpec.describe RubyLLM::MCP::Completion do
         client.capabilities.capabilities["completions"] = {}
       end
     end
-  end
 
-  each_client_supporting(:completions) do
     describe "Context in Completion Requests (2025-06-18)" do
       it "supports context-aware completions" do
         prompt = client.prompt("context_aware_search")

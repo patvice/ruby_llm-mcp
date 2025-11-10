@@ -408,19 +408,19 @@ The RubyLLM MCP client supports multiple protocol versions. You can access these
 
 ```ruby
 # Latest supported protocol version
-puts RubyLLM::MCP::Protocol.latest_version
+puts RubyLLM::MCP::Native::Protocol.latest_version
 # => "2025-06-18"
 
 # Default version used for negotiation
-puts RubyLLM::MCP::Protocol.default_negotiated_version
+puts RubyLLM::MCP::Native::Protocol.default_negotiated_version
 # => "2025-03-26"
 
 # All supported versions
-puts RubyLLM::MCP::Protocol.supported_versions
+puts RubyLLM::MCP::Native::Protocol.supported_versions
 # => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
 
 # Check if a version is supported
-RubyLLM::MCP::Protocol.supported_version?("2025-06-18")
+RubyLLM::MCP::Native::Protocol.supported_version?("2025-06-18")
 # => true
 ```
 

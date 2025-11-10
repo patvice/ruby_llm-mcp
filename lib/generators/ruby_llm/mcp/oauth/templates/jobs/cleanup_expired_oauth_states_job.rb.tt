@@ -1,0 +1,27 @@
+# frozen_string_literal: true
+
+# Background job to cleanup expired OAuth states
+# Schedule this to run hourly or daily to prevent state table bloat
+#
+# Example with sidekiq-scheduler:
+#   cleanup_expired_states:
+#     cron: '0 * * * *'  # Every hour
+#     class: CleanupExpiredOauthStatesJob
+#
+# Example with whenever gem:
+#   every 1.hour do
+#     runner "CleanupExpiredOauthStatesJob.perform_later"
+#   end
+class CleanupExpiredOauthStatesJob < ApplicationJob
+  queue_as :default
+
+  # Cleanup expired OAuth flow states
+  # States are temporary and only needed during the OAuth flow (typically < 10 minutes)
+  def perform
+    deleted_count = <%= state_model_name %>.cleanup_expired
+
+    Rails.logger.info "Cleaned up #{deleted_count} expired MCP OAuth states"
+
+    deleted_count
+  end
+end

@@ -4,9 +4,14 @@ require "spec_helper"
 
 RSpec.describe RubyLLM::MCP::Roots do
   let(:adapter) do
-    adapter = instance_double("Adapter")
+    adapter = instance_double(RubyLLM::MCP::Adapters::BaseAdapter)
     allow(adapter).to receive(:roots_list_change_notification).and_return(true)
     adapter
+  end
+
+  # Integration tests - only run on adapters that support roots
+  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    ClientRunner.build_client_runners(CLIENT_OPTIONS)
   end
 
   it "can be initialized with an array of paths" do
@@ -60,11 +65,6 @@ RSpec.describe RubyLLM::MCP::Roots do
 
     roots.remove("path/to/file2")
     expect(adapter).to have_received(:roots_list_change_notification).exactly(2).times
-  end
-
-  # Integration tests - only run on adapters that support roots
-  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    ClientRunner.build_client_runners(CLIENT_OPTIONS)
   end
 
   each_client_supporting(:roots) do |config|

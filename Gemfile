@@ -8,11 +8,12 @@ group :development do
   gem "mcp", "~> 0.4"
 
   # Development dependencies
+  gem "activesupport"
   gem "bundler", ">= 2.0"
   gem "debug"
   gem "dotenv", ">= 3.0"
   gem "rake", ">= 13.0"
-  gem "rdoc"
+  gem "rdoc", "~> 6.15"
   gem "reline"
   gem "rspec", "~> 3.12"
   gem "rubocop", ">= 1.76"

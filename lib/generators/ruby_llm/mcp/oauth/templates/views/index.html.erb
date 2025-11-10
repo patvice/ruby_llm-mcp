@@ -1,0 +1,646 @@
+<div class="mcp-connections-container">
+  <h1>MCP Server Connections</h1>
+
+  <% if flash[:notice] %>
+    <div class="mcp-alert mcp-alert-success">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% if flash[:alert] %>
+    <div class="mcp-alert mcp-alert-warning">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <% if @credentials.any? %>
+    <h2>Connected Servers</h2>
+    <div class="mcp-table-wrapper">
+      <table class="mcp-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Scopes</th>
+            <th>Expires</th>
+            <th>Last Refreshed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @credentials.each do |credential| %>
+            <tr>
+              <td>
+                <strong><%= credential.name %></strong><br>
+                <small class="mcp-text-muted"><code class="mcp-code"><%= credential.server_url %></code></small>
+              </td>
+              <td>
+                <% if credential.expired? %>
+                  <span class="mcp-badge mcp-badge-danger">Expired</span>
+                <% elsif credential.expires_soon? %>
+                  <span class="mcp-badge mcp-badge-warning">Expiring Soon</span>
+                <% else %>
+                  <span class="mcp-badge mcp-badge-success">Active</span>
+                <% end %>
+              </td>
+              <td>
+                <% if credential.token&.scope %>
+                  <code class="mcp-code mcp-code-muted"><%= credential.token.scope %></code>
+                <% else %>
+                  <span class="mcp-text-muted">N/A</span>
+                <% end %>
+              </td>
+              <td>
+                <% if credential.token_expires_at %>
+                  <%= time_tag credential.token_expires_at, credential.token_expires_at.to_fs(:short) %>
+                  <br>
+                  <small class="mcp-text-muted">
+                    (<%= time_ago_in_words(credential.token_expires_at) %>
+                    <%= credential.token_expires_at > Time.current ? "from now" : "ago" %>)
+                  </small>
+                <% else %>
+                  <span class="mcp-text-muted">Never</span>
+                <% end %>
+              </td>
+              <td>
+                <% if credential.last_refreshed_at %>
+                  <%= time_ago_in_words(credential.last_refreshed_at) %> ago
+                <% else %>
+                  <span class="mcp-text-muted">Never</span>
+                <% end %>
+              </td>
+              <td>
+                <div class="mcp-btn-group">
+                  <%= link_to "View Tools",
+                      mcp_connection_path(credential),
+                      class: "mcp-btn mcp-btn-primary" %>
+                  <%= button_to "Refresh",
+                      mcp_connection_path(credential),
+                      method: :patch,
+                      class: "mcp-btn #{credential.expired? || credential.expires_soon? ? 'mcp-btn-warning' : 'mcp-btn-secondary'}" %>
+                  <%= button_to "Disconnect",
+                      mcp_connection_path(credential),
+                      method: :delete,
+                      form: { data: { turbo_confirm: "Are you sure you want to disconnect this MCP server?" } },
+                      class: "mcp-btn mcp-btn-danger" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="mcp-alert mcp-alert-info">
+      <h4>No MCP Servers Connected</h4>
+      <p>Connect to an MCP server to enable AI-powered features in your account.</p>
+    </div>
+  <% end %>
+
+  <div class="mcp-card">
+    <div class="mcp-card-body">
+      <h3>Add New Server</h3>
+      <p>Connect to an MCP server to access tools, resources, and AI capabilities.</p>
+
+      <%= form_with url: mcp_connections_path, method: :post, class: "mcp-form", data: { turbo: false } do |f| %>
+        <div class="mcp-form-group">
+          <%= label_tag :name, "Server Name", class: "mcp-form-label" %>
+          <%= text_field_tag :name, nil,
+              placeholder: "My MCP Server",
+              required: true,
+              class: "mcp-form-input" %>
+          <small class="mcp-form-help">A friendly name to identify this server</small>
+        </div>
+
+        <div class="mcp-form-group">
+          <%= label_tag :server_url, "MCP Server URL", class: "mcp-form-label" %>
+          <%= text_field_tag :server_url, nil,
+              placeholder: "https://mcp.example.com/api",
+              required: true,
+              class: "mcp-form-input" %>
+          <small class="mcp-form-help">Enter the full URL of your MCP server</small>
+        </div>
+
+        <div class="mcp-form-group">
+          <%= label_tag :scope, "OAuth Scopes (optional)", class: "mcp-form-label" %>
+          <%= text_field_tag :scope, "mcp:read mcp:write",
+              placeholder: "mcp:read mcp:write",
+              class: "mcp-form-input" %>
+          <small class="mcp-form-help">Space-separated list of permissions to request</small>
+        </div>
+
+        <%= submit_tag "Connect Server", class: "mcp-btn mcp-btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mcp-info">
+    <h3>What is MCP?</h3>
+    <p>
+      Model Context Protocol (MCP) allows AI models to securely access external
+      data and tools. By connecting your account, you grant AI features permission
+      to access specific resources on your behalf.
+    </p>
+
+    <h4>Security & Privacy</h4>
+    <ul>
+      <li>Tokens are encrypted and stored securely</li>
+      <li>Each connection is specific to your account</li>
+      <li>You can disconnect at any time</li>
+      <li>Tokens automatically refresh when possible</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+/* MCP Connections - Self-contained styles */
+.mcp-connections-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.mcp-connections-container h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #1a1a1a;
+}
+
+.mcp-connections-container h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #2a2a2a;
+}
+
+.mcp-connections-container h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #2a2a2a;
+}
+
+.mcp-connections-container h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #2a2a2a;
+}
+
+/* Table styles */
+.mcp-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mcp-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.mcp-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.mcp-table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mcp-table td {
+  padding: 0.75rem;
+  border-top: 1px solid #dee2e6;
+  vertical-align: top;
+}
+
+.mcp-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Badge styles */
+.mcp-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.mcp-badge-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.mcp-badge-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.mcp-badge-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Button styles */
+.mcp-btn {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.mcp-btn:hover {
+  opacity: 0.9;
+}
+
+.mcp-btn-primary {
+  color: white;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.mcp-btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.mcp-btn-secondary {
+  color: white;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.mcp-btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+.mcp-btn-warning {
+  color: #212529;
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.mcp-btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #e0a800;
+}
+
+.mcp-btn-danger {
+  color: white;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.mcp-btn-danger:hover {
+  background-color: #c82333;
+  border-color: #c82333;
+}
+
+.mcp-btn-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Code styles */
+.mcp-code {
+  background-color: #f5f5f5;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.875em;
+  color: #212529;
+}
+
+.mcp-code-muted {
+  color: #6c757d;
+}
+
+/* Text utilities */
+.mcp-text-muted {
+  color: #6c757d;
+}
+
+/* Card styles */
+.mcp-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mcp-card-body {
+  padding: 1.5rem;
+}
+
+/* Alert styles */
+.mcp-alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.mcp-alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.mcp-alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.mcp-alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.mcp-alert h4 {
+  margin-top: 0;
+  color: inherit;
+}
+
+/* Form styles */
+.mcp-form {
+  margin-top: 1rem;
+}
+
+.mcp-form-group {
+  margin-bottom: 1rem;
+}
+
+.mcp-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #2a2a2a;
+}
+
+.mcp-form-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #212529;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.mcp-form-input:focus {
+  outline: 0;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.mcp-form-help {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.mcp-form .mcp-btn {
+  margin-top: 0.5rem;
+}
+
+/* Info section */
+.mcp-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.mcp-info ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.mcp-info li {
+  margin-bottom: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mcp-connections-container {
+    padding: 0 0.5rem;
+  }
+
+  .mcp-table {
+    font-size: 0.875rem;
+  }
+
+  .mcp-table th,
+  .mcp-table td {
+    padding: 0.5rem;
+  }
+
+  .mcp-btn-group {
+    flex-direction: column;
+  }
+
+  .mcp-btn {
+    width: 100%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+  }
+
+  .mcp-connections-container {
+    color: #e0e0e0;
+    background-color: #1a1a1a;
+  }
+
+  .mcp-connections-container h1,
+  .mcp-connections-container h2,
+  .mcp-connections-container h3,
+  .mcp-connections-container h4 {
+    color: #f0f0f0;
+  }
+
+  /* Table dark mode */
+  .mcp-table {
+    background: #2a2a2a;
+    color: #e0e0e0;
+  }
+
+  .mcp-table thead {
+    background-color: #1a1a1a;
+    border-bottom-color: #3a3a3a;
+  }
+
+  .mcp-table th {
+    color: #b0b0b0;
+  }
+
+  .mcp-table td {
+    border-top-color: #3a3a3a;
+  }
+
+  .mcp-table tbody tr:hover {
+    background-color: #333333;
+  }
+
+  /* Badge dark mode */
+  .mcp-badge-success {
+    background-color: #1e4620;
+    color: #8fd98f;
+  }
+
+  .mcp-badge-warning {
+    background-color: #4a3a00;
+    color: #ffd966;
+  }
+
+  .mcp-badge-danger {
+    background-color: #4a1a1f;
+    color: #ff8a95;
+  }
+
+  /* Button dark mode */
+  .mcp-btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+
+  .mcp-btn-primary:hover {
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+  }
+
+  .mcp-btn-secondary {
+    background-color: #5a6268;
+    border-color: #5a6268;
+  }
+
+  .mcp-btn-secondary:hover {
+    background-color: #4e555b;
+    border-color: #4e555b;
+  }
+
+  .mcp-btn-warning {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #000;
+  }
+
+  .mcp-btn-warning:hover {
+    background-color: #c79100;
+    border-color: #c79100;
+  }
+
+  .mcp-btn-danger {
+    background-color: #bb2d3b;
+    border-color: #bb2d3b;
+  }
+
+  .mcp-btn-danger:hover {
+    background-color: #a02633;
+    border-color: #a02633;
+  }
+
+  /* Code dark mode */
+  .mcp-code {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+
+  .mcp-code-muted {
+    color: #8a8a8a;
+  }
+
+  /* Text utilities dark mode */
+  .mcp-text-muted {
+    color: #8a8a8a;
+  }
+
+  /* Card dark mode */
+  .mcp-card {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+  }
+
+  /* Alert dark mode */
+  .mcp-alert-info {
+    background-color: #0c3d47;
+    border-color: #0f5460;
+    color: #9fe5f0;
+  }
+
+  .mcp-alert-warning {
+    background-color: #4a3a00;
+    border-color: #665000;
+    color: #ffd966;
+  }
+
+  .mcp-alert-success {
+    background-color: #1e4620;
+    border-color: #2a5e2c;
+    color: #8fd98f;
+  }
+
+  /* Form dark mode */
+  .mcp-form-input {
+    background-color: #1a1a1a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  .mcp-form-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+  }
+
+  .mcp-form-label {
+    color: #d0d0d0;
+  }
+
+  .mcp-form-help {
+    color: #8a8a8a;
+  }
+
+  /* Info section dark mode */
+  .mcp-info {
+    background-color: #1a1a1a;
+  }
+}
+</style>

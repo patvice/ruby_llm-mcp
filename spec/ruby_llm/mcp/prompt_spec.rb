@@ -30,7 +30,7 @@ RSpec.describe RubyLLM::MCP::Prompt do
   end
 
   # Prompt tests - only run on adapters that support prompts
-  each_client_supporting(:prompts) do |config|
+  each_client_supporting(:prompts) do |_config|
     describe "prompts_list" do
       it "returns array of prompts" do
         prompts = client.prompts
@@ -69,7 +69,7 @@ RSpec.describe RubyLLM::MCP::Prompt do
   end
 
   # Refresh via notifications - only supported by adapters with notification support
-  each_client_supporting(:notifications) do |config|
+  each_client_supporting(:notifications) do |_config|
     describe "prompts_list" do
       it "refreshes prompts when requested" do
         tool = client.tool("send_list_changed")
