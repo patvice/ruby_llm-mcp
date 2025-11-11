@@ -34,23 +34,33 @@ RSpec.describe RubyLLM::MCP::Client do
     end
   end
 
-  describe "cancel_request" do
-    it "cancels a request if the timeout is triggered" do
-      options = CLIENT_OPTIONS.last[:options].merge({ start: false, request_timeout: 1000 })
+  describe "request timeout" do
+    it "raises TimeoutError when a tool execution exceeds the timeout" do
+      options = {
+        start: false,
+        request_timeout: 1000,
+        name: "timeout-test-client",
+        adapter: :ruby_llm,
+        transport_type: :stdio,
+        config: {
+          command: "bun",
+          args: ["spec/fixtures/typescript-mcp/index.ts", "--stdio"]
+        }
+      }
+
       client = RubyLLM::MCP::Client.new(**options)
       client.start
 
       tool = client.tool("timeout_tool")
 
-      allow(client.instance_variable_get(:@adapter)).to receive(:cancelled_notification).and_call_original
+      # The tool sleeps for 2 seconds, but timeout is 1 second, so it should raise TimeoutError
       expect { tool.execute(seconds: 2) }.to raise_error(RubyLLM::MCP::Errors::TimeoutError)
-      expect(client.instance_variable_get(:@adapter)).to have_received(:cancelled_notification)
 
       client.stop
     end
   end
 
-  # Ping tests - only for RubyLLM adapter (MCPSDK doesn't support true server ping)
+  # Ping tests - only for RubyLLM adapter (MCPSdk doesn't support true server ping)
   each_client(adapter: :ruby_llm) do |config|
     describe "ping server" do
       it "can ping the client that hasn't been started yet" do

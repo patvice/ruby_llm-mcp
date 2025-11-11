@@ -111,7 +111,7 @@ loader.inflector.inflect("http_client" => "HTTPClient")
 loader.inflector.inflect("http_server" => "HttpServer")
 
 loader.inflector.inflect("ruby_llm_adapter" => "RubyLLMAdapter")
-loader.inflector.inflect("mcp_sdk_adapter" => "MCPSDKAdapter")
+loader.inflector.inflect("mcp_sdk_adapter" => "MCPSdkAdapter")
 loader.inflector.inflect("mcp_transports" => "MCPTransports")
 
 loader.inflector.inflect("oauth_provider" => "OAuthProvider")

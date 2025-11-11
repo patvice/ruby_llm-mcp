@@ -5,7 +5,9 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
-  gem "mcp", "~> 0.4"
+  if RUBY_VERSION >= "3.2.0"
+    gem "mcp", "~> 0.4"
+  end
 
   # Development dependencies
   gem "activesupport"

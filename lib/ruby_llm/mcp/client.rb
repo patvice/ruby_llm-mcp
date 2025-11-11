@@ -288,7 +288,7 @@ module RubyLLM
           return transport_protocol.oauth_provider if transport_protocol.respond_to?(:oauth_provider)
         end
 
-        # For MCPSDKAdapter with wrapped transports
+        # For MCPSdkAdapter with wrapped transports
         if @adapter.respond_to?(:mcp_client) && @adapter.instance_variable_get(:@mcp_client)
           mcp_client = @adapter.instance_variable_get(:@mcp_client)
           if mcp_client&.transport.respond_to?(:native_transport)
@@ -300,13 +300,14 @@ module RubyLLM
       end
 
       def build_adapter
+        puts "Building adapter: #{@adapter_type}"
         case @adapter_type
         when :ruby_llm
           RubyLLM::MCP::Adapters::RubyLLMAdapter.new(self,
                                                      transport_type: @transport_type,
                                                      config: @config)
         when :mcp_sdk
-          RubyLLM::MCP::Adapters::MCPSDKAdapter.new(self,
+          RubyLLM::MCP::Adapters::MCPSdkAdapter.new(self,
                                                     transport_type: @transport_type,
                                                     config: @config)
         else

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class MCPSDKStdioRunner
+class MCPSdkStdioRunner
   class << self
     def instance
-      @instance ||= MCPSDKStdioRunner.new
+      @instance ||= MCPSdkStdioRunner.new
     end
   end
 
@@ -28,15 +28,19 @@ class MCPSDKStdioRunner
   end
 end
 
-RSpec.describe RubyLLM::MCP::Adapters::MCPSDKAdapter do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:client) { MCPSDKStdioRunner.instance.client }
+RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/SpecFilePathFormat
+  let(:client) { MCPSdkStdioRunner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    MCPSDKStdioRunner.instance.start
+    if RUBY_VERSION < "3.2.0"
+      skip "Specs require Ruby 3.2+"
+    else
+      MCPSdkStdioRunner.instance.start
+    end
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    MCPSDKStdioRunner.instance.stop
+    MCPSdkStdioRunner.instance.stop
   end
 
   describe "connection" do

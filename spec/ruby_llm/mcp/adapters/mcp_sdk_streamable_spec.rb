@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class MCPSDKStreamableRunner
+class MCPSdkStreamableRunner
   class << self
     def instance
-      @instance ||= MCPSDKStreamableRunner.new
+      @instance ||= MCPSdkStreamableRunner.new
     end
   end
 
@@ -27,15 +27,19 @@ class MCPSDKStreamableRunner
   end
 end
 
-RSpec.describe RubyLLM::MCP::Adapters::MCPSDKAdapter do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:client) { MCPSDKStreamableRunner.instance.client }
+RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/SpecFilePathFormat
+  let(:client) { MCPSdkStreamableRunner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    MCPSDKStreamableRunner.instance.start
+    if RUBY_VERSION < "3.2.0"
+      skip "Specs require Ruby 3.2+"
+    else
+      MCPSdkStreamableRunner.instance.start
+    end
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    MCPSDKStreamableRunner.instance.stop
+    MCPSdkStreamableRunner.instance.stop
   end
 
   describe "connection" do

@@ -23,11 +23,11 @@ module RubyLLM::MCP::Adapters::MCPTransports
       {} # MCP SDK doesn't provide client capabilities
     end
 
-    def request(body, **)
+    def request(body, **options)
       # For notifications (cancelled, etc), we need to send them through the transport
       return nil unless @transport
 
-      @transport.request(body, **)
+      @transport.request(body, **options)
     end
   end
 end

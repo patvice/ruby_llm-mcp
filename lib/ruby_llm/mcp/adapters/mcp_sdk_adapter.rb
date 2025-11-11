@@ -8,7 +8,7 @@ require_relative "mcp_transports/streamable_http"
 module RubyLLM
   module MCP
     module Adapters
-      class MCPSDKAdapter < BaseAdapter
+      class MCPSdkAdapter < BaseAdapter
         # Only declare features the official MCP SDK supports
         # Note: The MCP gem (as of v0.4) does NOT support prompts or resource templates
         supports :tools, :resources

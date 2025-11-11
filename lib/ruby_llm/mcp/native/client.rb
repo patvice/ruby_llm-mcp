@@ -46,8 +46,8 @@ module RubyLLM
           @capabilities = nil
         end
 
-        def request(body, **)
-          transport.request(body, **)
+        def request(body, **options)
+          transport.request(body, **options)
         rescue RubyLLM::MCP::Errors::TimeoutError => e
           if transport&.alive? && !e.request_id.nil?
             cancelled_notification(reason: "Request timed out", request_id: e.request_id)
@@ -268,9 +268,9 @@ module RubyLLM
           Native::Responses::RootsList.new(self, id: id).call
         end
 
-        def sampling_create_message_response(id:, model:, message:, **)
+        def sampling_create_message_response(id:, model:, message:, **options)
           Native::Responses::SamplingCreateMessage.new(self, id: id, model: model, message: message,
-                                                             **).call
+                                                             **options).call
         end
 
         def error_response(id:, message:, code: -32_000)

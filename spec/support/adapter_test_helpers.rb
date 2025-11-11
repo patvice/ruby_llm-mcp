@@ -132,7 +132,7 @@ module AdapterTestHelpers
     when :ruby_llm
       RubyLLM::MCP::Adapters::RubyLLMAdapter
     when :mcp_sdk
-      RubyLLM::MCP::Adapters::MCPSDKAdapter
+      RubyLLM::MCP::Adapters::MCPSdkAdapter
     else
       raise ArgumentError, "Unknown adapter type: #{adapter}"
     end
