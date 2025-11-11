@@ -157,7 +157,6 @@ module RubyLLM
       attr_accessor :request_timeout,
                     :log_file,
                     :log_level,
-                    :has_support_complex_parameters,
                     :roots,
                     :sampling,
                     :max_connections,
@@ -182,14 +181,6 @@ module RubyLLM
 
       def reset!
         set_defaults
-      end
-
-      def support_complex_parameters!
-        warn "[DEPRECATION] config.support_complex_parameters! is no longer needed and will be removed in version 0.8.0"
-        return if @has_support_complex_parameters
-
-        @has_support_complex_parameters = true
-        RubyLLM::MCP.support_complex_parameters!
       end
 
       def logger
@@ -287,9 +278,6 @@ module RubyLLM
         @log_file = $stdout
         @log_level = ENV["RUBYLLM_MCP_DEBUG"] ? Logger::DEBUG : Logger::INFO
         @logger = nil
-
-        # Complex parameters support
-        @has_support_complex_parameters = false
 
         # MCPs configuration
         @mcps_config_path = nil

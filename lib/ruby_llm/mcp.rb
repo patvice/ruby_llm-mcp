@@ -77,12 +77,6 @@ module RubyLLM
       tools.uniq(&:name)
     end
 
-    def support_complex_parameters!
-      warn "[DEPRECATION] RubyLLM::MCP.support_complex_parameters! is no longer needed " \
-           "and will be removed in version 0.8.0"
-      # No-op: Complex parameters are now supported by default
-    end
-
     def mcp_configurations
       config.mcp_configuration.each_with_object({}) do |config, acc|
         acc[config[:name]] = config

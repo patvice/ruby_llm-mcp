@@ -27,5 +27,9 @@ This section contains guides for using RubyLLM MCP.
 
 ## Upgrading
 
+<<<<<<< HEAD
 - **[Upgrading from 0.7 to 0.8]({% link guides/upgrading-0.7-to-0.8.md %})** - Migration guide for version 0.8
+=======
+- **[Upgrading from 0.7 to 0.8]({% link guides/upgrading-0.7-to-0.8.md %})** - Breaking changes and migration guide for version 0.9
+>>>>>>> origin/main
 - **[Upgrading from 0.6 to 0.7]({% link guides/upgrading-0.6-to-0.7.md %})** - Migration guide for version 0.7
