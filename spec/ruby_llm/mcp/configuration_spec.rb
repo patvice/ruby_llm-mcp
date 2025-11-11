@@ -13,7 +13,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.request_timeout).to eq(8000)
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
-      expect(config.has_support_complex_parameters).to be(false)
       expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol.latest_version)
     end
 
@@ -53,11 +52,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.log_level).to eq(Logger::ERROR)
     end
 
-    it "allows reading and writing has_support_complex_parameters" do
-      config.has_support_complex_parameters = true
-      expect(config.has_support_complex_parameters).to be(true)
-    end
-
     it "allows reading and writing protocol_version" do
       config.protocol_version = "2024-11-05"
       expect(config.protocol_version).to eq("2024-11-05")
@@ -77,7 +71,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
       # Change some values
       config.request_timeout = 5000
       config.log_level = Logger::ERROR
-      config.has_support_complex_parameters = true
       config.protocol_version = "2024-11-05"
 
       # Reset
@@ -87,7 +80,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.request_timeout).to eq(8000)
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
-      expect(config.has_support_complex_parameters).to be(false)
       expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol.latest_version)
     end
 
@@ -143,42 +135,6 @@ RSpec.describe RubyLLM::MCP::Configuration do
 
       expect(logger1).not_to eq(logger2)
     end
-  end
-
-  describe "support_complex_parameters!" do
-    it "sets has_support_complex_parameters to true" do
-      config = RubyLLM::MCP::Configuration.new
-      expect(config.has_support_complex_parameters).to be(false)
-
-      config.support_complex_parameters!
-      expect(config.has_support_complex_parameters).to be(true)
-    end
-
-    it "calls RubyLLM::MCP.support_complex_parameters!" do
-      config = RubyLLM::MCP::Configuration.new
-      allow(RubyLLM::MCP).to receive(:support_complex_parameters!)
-
-      config.support_complex_parameters!
-
-      expect(RubyLLM::MCP).to have_received(:support_complex_parameters!)
-    end
-
-    it "does not call RubyLLM::MCP.support_complex_parameters! if already enabled" do
-      config = RubyLLM::MCP::Configuration.new
-      config.support_complex_parameters!
-
-      allow(RubyLLM::MCP).to receive(:support_complex_parameters!)
-
-      config.support_complex_parameters!
-
-      expect(RubyLLM::MCP).not_to have_received(:support_complex_parameters!)
-    end
-  end
-
-  it "can be configured with support_complex_parameters!" do
-    RubyLLM::MCP.configure(&:support_complex_parameters!)
-
-    expect(RubyLLM::MCP.configuration.has_support_complex_parameters).to be(true)
   end
 
   it "can be configured with a custom logger" do
