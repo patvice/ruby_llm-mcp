@@ -413,7 +413,7 @@ end
 
 ## Related Documentation
 
-- [OAuth 2.1 Implementation]({% link oauth.md %}) - Low-level OAuth details
+- [OAuth 2.1 Implementation]({% link guides/oauth.md %}) - Low-level OAuth details
 - [Rails Integration]({% link guides/rails-integration.md %}) - Basic Rails setup
 
 ---
