@@ -40,7 +40,9 @@ RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    MCPSdkStdioRunner.instance.stop
+    if RUBY_VERSION >= "3.2.0"
+      MCPSdkStdioRunner.instance.stop
+    end
   end
 
   describe "connection" do
