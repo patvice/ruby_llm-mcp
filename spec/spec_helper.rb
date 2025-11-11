@@ -166,6 +166,19 @@ native_clients = [
 
 mcp_sdk_clients = [
   {
+    name: "streamable-mcp-sdk",
+    adapter: :mcp_sdk,
+    options: {
+      name: "streamable-mcp-server",
+      adapter: :mcp_sdk,
+      transport_type: :streamable,
+      config: {
+        url: TestServerManager::HTTP_SERVER_URL
+      },
+      request_timeout: 10_000
+    }
+  },
+  {
     name: "stdio-mcp-sdk",
     adapter: :mcp_sdk,
     options: {
@@ -178,7 +191,10 @@ mcp_sdk_clients = [
         args: [
           "spec/fixtures/typescript-mcp/index.ts",
           "--stdio"
-        ]
+        ],
+        env: {
+          "TEST_ENV" => "this_is_a_test"
+        }
       }
     }
   }

@@ -300,7 +300,6 @@ module RubyLLM
       end
 
       def build_adapter
-        puts "Building adapter: #{@adapter_type}"
         case @adapter_type
         when :ruby_llm
           RubyLLM::MCP::Adapters::RubyLLMAdapter.new(self,
