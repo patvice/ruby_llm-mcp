@@ -45,8 +45,10 @@ VCR.configure do |config|
 
   # Don't record new HTTP interactions when running in CI
   config.default_cassette_options = {
-    record: record_mode
+    record: record_mode,
+    allow_playback_repeats: true
   }
+  config.debug_logger = File.open("vcr_debug.log", "w") if ENV["VCR_DEBUG"] == "true"
 
   # Create new cassette directory if it doesn't exist
   FileUtils.mkdir_p(config.cassette_library_dir)

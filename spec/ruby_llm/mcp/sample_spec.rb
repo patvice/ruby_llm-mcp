@@ -51,7 +51,6 @@ RSpec.describe RubyLLM::MCP::Sample do
 
     after do
       client.stop
-      MCPTestConfiguration.reset_config!
     end
 
     it "client is setup to have sampling capabilities" do

@@ -18,3 +18,4 @@
 Gemfile.lock
 
 node_modules/
+.vcr_debug.log

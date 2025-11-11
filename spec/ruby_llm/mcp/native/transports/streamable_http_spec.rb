@@ -165,8 +165,9 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     end
 
     after do
-      WebMock.disable!
       WebMock.reset!
+      # Re-enable WebMock to ensure it's active for subsequent tests
+      WebMock.enable!
     end
 
     describe "connection errors" do
