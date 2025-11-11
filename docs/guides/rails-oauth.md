@@ -2,7 +2,7 @@
 layout: default
 title: Rails OAuth Integration
 parent: Guides
-nav_order: 10
+nav_order: 7
 description: "Multi-user OAuth authentication for Rails apps with background jobs and per-user MCP permissions"
 ---
 

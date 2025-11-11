@@ -2,7 +2,7 @@
 layout: default
 title: Transports
 parent: Guides
-nav_order: 10
+nav_order: 4
 description: "Understanding MCP transports and building custom transport implementations"
 ---
 
