@@ -76,9 +76,13 @@ module RubyLLM
       private
 
       def callback_guard_success?
-        return true unless @coordinator.client.sampling_callback_enabled?
+        return true unless @coordinator.sampling_callback_enabled?
 
-        unless @coordinator.client.on[:sampling].call(self)
+        callback_result = @coordinator.sampling_callback&.call(self)
+        # If callback returns nil, it means no guard was configured - allow it
+        return true if callback_result.nil?
+
+        unless callback_result
           @coordinator.error_response(id: @id, message: REJECTED_MESSAGE)
           return false
         end

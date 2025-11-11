@@ -2,7 +2,7 @@
 layout: default
 title: Rails Integration
 parent: Guides
-nav_order: 9
+nav_order: 6
 description: "Complete Rails integration with generators, configuration, and automatic client management"
 ---
 

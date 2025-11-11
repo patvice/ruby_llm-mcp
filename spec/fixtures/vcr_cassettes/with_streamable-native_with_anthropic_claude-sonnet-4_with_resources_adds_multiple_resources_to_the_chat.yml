@@ -1,0 +1,104 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"plain_text.txt:
+        A plain text file\n\nPlan text information"}]},{"role":"user","content":[{"type":"text","text":"test.txt:
+        A text file\n\nHello, this is a test file!\nThis content will be served by
+        the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n"}]},{"role":"user","content":[{"type":"text","text":"second_file.txt:
+        A second text file\n\nThis is the second file that I want to be able to use
+        as a resource\n"}]},{"role":"user","content":[{"type":"text","text":"my.md:
+        A markdown file\n\n# My Markdown File\n\nThis is a markdown file that I want
+        to be able to use as a resource\n\n## Section 1\n\nThis is a section in my
+        markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n"}]},{"role":"user","content":[{"type":"text","text":"What
+        information do you have from the provided resources?"}]}],"stream":false,"max_tokens":64000}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 10 Nov 2025 23:32:27 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-10T23:32:22Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-10T23:32:29Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-10T23:32:21Z'
+      Retry-After:
+      - '40'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-10T23:32:22Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '6940'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01CyW5SuLYp6HUGtA9xjkUtS","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the provided resources, I have access to the following information:\n\n##
+        Files Available:\n\n1. **plain_text.txt** - Contains simple text: \"Plan text
+        information\"\n\n2. **test.txt** - Contains:\n   - A greeting message explaining
+        it''s a test file\n   - Information that the content is served by an MCP resource\n   -
+        Note that the file can be modified and will be cached for 5 minutes\n\n3.
+        **second_file.txt** - Contains a brief description stating it''s the second
+        file intended to be used as a resource\n\n4. **my.md** - A markdown file with:\n   -
+        A main heading \"My Markdown File\"\n   - An introduction explaining it''s
+        meant to be used as a resource\n   - Two sections (Section 1 and Section 2)
+        with brief descriptions\n\n## Summary:\nI have access to 4 files total - 3
+        text files and 1 markdown file. These appear to be test/example files set
+        up to demonstrate resource accessibility through what seems to be an MCP (Model
+        Context Protocol) system, with caching functionality mentioned for at least
+        one of the files."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":165,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":254,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:32:27 GMT
+recorded_with: VCR 6.3.1

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "cgi"
-require "socket"
-
 module RubyLLM
   module MCP
     module Auth

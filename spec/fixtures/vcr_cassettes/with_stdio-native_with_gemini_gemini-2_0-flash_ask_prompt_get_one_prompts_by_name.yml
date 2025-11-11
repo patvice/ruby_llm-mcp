@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 10 Nov 2025 23:37:52 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2843
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The dawn unfurls, a silken, pearly grace,\nAnd paints the sky with hues of apricot and rose.\nThe world awakens at a gentler pace,\nAs slumbering shadows slowly decompose.\n\nA gentle breeze, a whispered, leafy sigh,\nDisturbs the stillness of the dew-kissed morn.\nThe birds begin their melodies on high,\nA joyful chorus, freshly newly born.\n\nThe sun ascends, a beacon in the blue,\nDispelling mists that cling to field and stream.\nEach tiny droplet, shimmering and new,\nReflects the light, a vibrant, liquid dream.\n\nThe scent of earth, of blossoms in the air,\nA tapestry of fragrance, rich and deep.\nThe promise hangs, a beauty to ensnare,\nIn secrets that the waking hours keep.\n\nThis day unfolds, a canvas broad and bright,\nA blank expanse where moments can take hold.\nAnd in this frame, infused with golden light,\nA living, breathing, narrative untold.\n\nSo let us breathe, and let our spirits soar,\nEmbrace the beauty held within each hour.\nAnd find within this day, forevermore,\nThe inspiration for a simple, lovely **poem's** power.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.6364014744758606
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 25,
+            "candidatesTokenCount": 256,
+            "totalTokenCount": 281,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 25
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 256
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "TXcSaYijGJaA-8YPw6OUgAo"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:37:52 GMT
+recorded_with: VCR 6.3.1

@@ -15,12 +15,13 @@ Currently full support for MCP protocol version up to `2025-06-18`.
 
 ## RubyLLM::MCP Features
 
-- 🔌 **Multiple Transport Types**: Streamable HTTP, and STDIO and legacy SSE transports
+- 🎛️ **Dual SDK Support** _(v0.8+)_: Choose between native full-featured implementation or official MCP SDK
+- 🔌 **Multiple Transport Types**: Streamable HTTP, STDIO, and SSE transports
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
-- 🎛️ **Client Features**: Support for sampling, roots, and elicitation
-- 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
+- 🎨 **Client Features**: Support for sampling, roots, progress tracking, human-in-the-loop, and elicitation
+- 🔧 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously for different servers and purposes
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 
@@ -47,6 +48,46 @@ Or install it yourself as:
 ```bash
 gem install ruby_llm-mcp
 ```
+
+## Choosing an Adapter
+
+Starting with version 0.8.0, RubyLLM MCP supports multiple SDK adapters:
+
+### RubyLLM Adapter (Default)
+
+The native implementation with full MCP protocol support:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "server",
+  adapter: :ruby_llm,  # Default, can be omitted
+  transport_type: :stdio,
+  config: { command: "mcp-server" }
+)
+```
+
+**Features**: All MCP features including SSE transport, sampling, roots, progress tracking, etc.
+
+### MCP SDK Adapter
+
+The official Anthropic-maintained SDK:
+
+```ruby
+# Add to Gemfile
+gem 'mcp', '~> 0.4'
+
+# Use in code
+client = RubyLLM::MCP.client(
+  name: "server",
+  adapter: :mcp_sdk,
+  transport_type: :stdio,
+  config: { command: "mcp-server" }
+)
+```
+
+**Features**: Core MCP features (tools, resources, prompts). No SSE, sampling, or advanced features.
+
+See the [Adapters Guide](https://rubyllm-mcp.com/guides/adapters.html) for detailed comparison.
 
 ## Usage
 

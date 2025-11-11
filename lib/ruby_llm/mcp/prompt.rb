@@ -21,10 +21,10 @@ module RubyLLM
         end
       end
 
-      attr_reader :name, :description, :arguments, :coordinator
+      attr_reader :name, :description, :arguments, :adapter
 
-      def initialize(coordinator, prompt)
-        @coordinator = coordinator
+      def initialize(adapter, prompt)
+        @adapter = adapter
         @name = prompt["name"]
         @description = prompt["description"]
         @arguments = parse_arguments(prompt["arguments"])
@@ -51,8 +51,8 @@ module RubyLLM
       alias say ask
 
       def complete(argument, value, context: nil)
-        if @coordinator.capabilities.completion?
-          result = @coordinator.completion_prompt(name: @name, argument: argument, value: value, context: context)
+        if @adapter.capabilities.completion?
+          result = @adapter.completion_prompt(name: @name, argument: argument, value: value, context: context)
           if result.error?
             return result.to_error
           end
@@ -80,7 +80,7 @@ module RubyLLM
       private
 
       def fetch_prompt_messages(arguments)
-        result = @coordinator.execute_prompt(
+        result = @adapter.execute_prompt(
           name: @name,
           arguments: arguments
         )
@@ -113,7 +113,7 @@ module RubyLLM
           attachment = MCP::Attachment.new(content["content"], content["mime_type"])
           MCP::Content.new(text: nil, attachments: [attachment])
         when "resource"
-          resource = Resource.new(coordinator, content["resource"])
+          resource = Resource.new(adapter, content["resource"])
           resource.to_content
         end
       end

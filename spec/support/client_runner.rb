@@ -4,11 +4,25 @@ class ClientRunner
   attr_reader :client, :options, :name
 
   class << self
+    def mcp_sdk_available?
+      @mcp_sdk_available ||= begin
+        require "mcp"
+        true
+      rescue LoadError
+        false
+      end
+    end
+
     def build_client_runners(configs)
       @client_runners ||= {}
 
       configs.each do |config|
-        puts config[:name]
+        # Skip MCP SDK clients if the gem is not installed
+        if config[:adapter] == :mcp_sdk && !mcp_sdk_available?
+          puts "Skipping #{config[:name]} - MCP SDK gem not installed"
+          next
+        end
+
         @client_runners[config[:name]] = ClientRunner.new(config[:name], config[:options])
       end
     end
@@ -40,7 +54,7 @@ class ClientRunner
     return @client unless @client.nil?
 
     @client = RubyLLM::MCP::Client.new(**@options)
-    # @client.start
+    @client.start
 
     @client
   end

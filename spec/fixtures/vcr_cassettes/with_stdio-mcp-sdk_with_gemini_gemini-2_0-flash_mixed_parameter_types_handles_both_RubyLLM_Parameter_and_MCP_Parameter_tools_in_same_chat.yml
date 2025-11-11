@@ -1,0 +1,192 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you multiply 3 and
+        4, then add 5 and 7?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"simple_multiply","description":"Multiply
+        two numbers together","parameters":{"type":"OBJECT","properties":{"x":{"type":"NUMBER","description":"First
+        number"},"y":{"type":"NUMBER","description":"Second number"}},"required":["x","y"]}},{"name":"add","description":"Addes
+        two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":["a","b"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 10 Nov 2025 23:34:53 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=802
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "simple_multiply",
+                      "args": {
+                        "y": 4,
+                        "x": 3
+                      }
+                    }
+                  },
+                  {
+                    "functionCall": {
+                      "name": "add",
+                      "args": {
+                        "b": 7,
+                        "a": 5
+                      }
+                    }
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.0002446057430158059
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 48,
+            "candidatesTokenCount": 12,
+            "totalTokenCount": 60,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 48
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 12
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "nHYSaZX-I-ng_uMP2I_x8AI"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:34:53 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you multiply 3 and
+        4, then add 5 and 7?"}]},{"role":"model","parts":[{"functionCall":{"name":"simple_multiply","args":{"y":4,"x":3}}},{"functionCall":{"name":"add","args":{"b":7,"a":5}}}]},{"role":"function","parts":[{"functionResponse":{"name":"simple_multiply","response":{"name":"simple_multiply","content":[{"text":"12"}]}}},{"functionResponse":{"name":"add","response":{"name":"add","content":[{"text":"12"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"simple_multiply","description":"Multiply
+        two numbers together","parameters":{"type":"OBJECT","properties":{"x":{"type":"NUMBER","description":"First
+        number"},"y":{"type":"NUMBER","description":"Second number"}},"required":["x","y"]}},{"name":"add","description":"Addes
+        two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":["a","b"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 10 Nov 2025 23:34:54 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=593
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The result of multiplying 3 and 4 is 12, and the result of adding 5 and 7 is 12.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.010542078812917074
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 78,
+            "candidatesTokenCount": 30,
+            "totalTokenCount": 108,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 78
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 30
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "nXYSaczDHNfi_uMPoryK-QI"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:34:54 GMT
+recorded_with: VCR 6.3.1

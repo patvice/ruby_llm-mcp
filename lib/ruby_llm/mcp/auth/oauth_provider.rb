@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "httpx"
-require "uri"
-
 module RubyLLM
   module MCP
     module Auth

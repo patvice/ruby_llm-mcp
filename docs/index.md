@@ -26,12 +26,13 @@ Currently full support for MCP protocol version up to `2025-06-18`.
 
 ## Key Features
 
-- 🔌 **Multiple Transport Types**: Streamable HTTP, STDIO, and legacy SSE transports
+- 🎛️ **Dual SDK Support**: Choose between native full-featured implementation or official MCP SDK {: .label .label-green } 1.0
+- 🔌 **Multiple Transport Types**: Streamable HTTP, STDIO, and SSE transports
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
-- 🎛️ **Client Features**: Support for sampling and roots
-- 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
+- 🎨 **Client Features**: Support for sampling, roots, progress tracking, and human-in-the-loop
+- 🔧 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 - 🚀 **Rails Integration**: Built-in Rails support with generators and configuration
@@ -149,8 +150,8 @@ Real-time updates from MCP servers including logging, progress, and resource cha
 
 1. **[Getting Started]({% link guides/getting-started.md %})** - Get up and running quickly
 2. **[Configuration]({% link configuration.md %})** - Configure clients and transports
-3. **[Rails Integration]({% link guides/rails-integration.md %})** - Use with Rails applications
-4. **[Transports]({% link guides/transports.md %})** - Build custom transport implementations
+3. **[Adapters & Transports]({% link guides/adapters.md %})** - Choose adapters and configure transports
+4. **[Rails Integration]({% link guides/rails-integration.md %})** - Use with Rails applications
 
 ## Server Interactions
 

@@ -1,0 +1,240 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: "{\"model\":\"claude-sonnet-4-20250514\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Can
+        you add 1 and 2?\"}]}],\"stream\":false,\"max_tokens\":64000,\"tools\":[{\"name\":\"add\",\"description\":\"Addes
+        two numbers together\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[\"a\",\"b\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"return_set_evn\",\"description\":\"Returns
+        the set environment variable\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"malformed_tool\",\"description\":\"A
+        malformed tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{}}},{\"name\":\"tool_error\",\"description\":\"Returns
+        an error\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"shouldError\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
+        for a given number of seconds\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"seconds\":{\"type\":\"number\"}},\"required\":[\"seconds\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"fetch_site\",\"description\":\"Fetches
+        website content and returns it as text\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\"},\"headers\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"value\":{\"type\":\"string\"}},\"required\":[\"name\",\"value\"],\"additionalProperties\":false}}},\"required\":[\"url\",\"headers\"],\"additionalProperties\":false}]}},\"required\":[\"website\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_file_resource\",\"description\":\"Returns
+        a file resource reference\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"filename\":{\"type\":\"string\",\"default\":\"example.txt\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"list_messages\",\"description\":\"\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"channel\":{\"type\":\"string\"}},\"required\":[\"channel\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
+        authentication permissions\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"permission\":{\"type\":\"string\",\"enum\":[\"read\",\"write\"]}},\"required\":[\"permission\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_weather_from_locations\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"locations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[\"locations\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"geocode\":{\"type\":\"object\",\"properties\":{\"latitude\":{\"type\":\"number\"},\"longitude\":{\"type\":\"number\"}},\"required\":[\"latitude\",\"longitude\"],\"additionalProperties\":false}},\"required\":[\"geocode\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"progress\",\"description\":\"Simulate
+        a multi-step operation with progress notifications\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"operation\":{\"type\":\"string\",\"description\":\"Name
+        of the operation to simulate\"},\"steps\":{\"type\":\"number\",\"description\":\"Number
+        of steps (default: 3)\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"simple_progress\",\"description\":\"Send
+        a single progress notification\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"progress\":{\"type\":\"number\",\"minimum\":0,\"maximum\":100}},\"required\":[\"progress\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"log_message\",\"description\":\"Logs
+        a message\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"level\":{\"type\":\"string\"},\"logger\":{\"type\":\"string\"}},\"required\":[\"message\",\"level\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
+        a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"send_list_changed\",\"description\":\"List
+        changed\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\",\"enum\":[\"tools\",\"resources\",\"prompts\"]}},\"required\":[\"type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"client-capabilities\",\"description\":\"Get
+        the capabilities of the client and return them back\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        data and returns structured results\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"summary\",\"detailed\"]}},\"required\":[\"data\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"invalid_structured_output\",\"description\":\"Tool
+        that returns invalid structured data\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"trigger_error\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"create_report\",\"description\":\"Creates
+        a report and returns it as a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"title\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"text\",\"json\"]}},\"required\":[\"title\",\"content\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"user_preference_collector\",\"description\":\"Collects
+        user preferences through elicitation\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\"}},\"required\":[\"scenario\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"complex_calculation\",\"description\":\"\U0001F9EE
+        Advanced Calculator - Performs complex mathematical calculations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"expression\":{\"type\":\"string\"},\"precision\":{\"type\":\"number\"}},\"required\":[\"expression\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"long_running_task\",\"description\":\"Simulates
+        a long-running task with progress updates\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"duration\":{\"type\":\"number\"},\"steps\":{\"type\":\"number\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"context_aware_suggestion\",\"description\":\"Provides
+        suggestions based on context\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\"},\"context_type\":{\"type\":\"string\",\"enum\":[\"user\",\"project\",\"workflow\"]}},\"required\":[\"query\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"user_preference_elicitation\",\"description\":\"Collects
+        user preferences through MCP elicitation (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\",\"description\":\"The
+        scenario for which to collect preferences\"}},\"required\":[\"scenario\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"complex_elicitation\",\"description\":\"Tests
+        elicitation with complex validation schemas (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data_type\":{\"type\":\"string\",\"enum\":[\"user_profile\",\"settings\",\"feedback\"],\"description\":\"Type
+        of data to collect\"}},\"required\":[\"data_type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"rejectable_elicitation\",\"description\":\"Tests
+        elicitation that can be rejected by the client (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"request_type\":{\"type\":\"string\",\"enum\":[\"sensitive\",\"optional\",\"required\"],\"description\":\"Type
+        of request\"}},\"required\":[\"request_type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"simple_elicitation\",\"description\":\"Simple
+        elicitation test tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\",\"description\":\"Custom
+        message for elicitation\"}},\"required\":[\"message\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}]}"
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 10 Nov 2025 23:35:30 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '27000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-10T23:35:34Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-10T23:35:30Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-10T23:35:28Z'
+      Retry-After:
+      - '31'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '35000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-10T23:35:30Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2304'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01NFPqxdScCcgeTzPqmqGopj","type":"message","role":"assistant","content":[{"type":"text","text":"I''ll
+        add 1 and 2 for you using the add function."},{"type":"tool_use","id":"toolu_01JdAbhw3U3B8CMsCHhLVHeq","name":"add","input":{"a":1,"b":2}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":3346,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":86,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:35:30 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: "{\"model\":\"claude-sonnet-4-20250514\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Can
+        you add 1 and 2?\"}]},{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"I'll
+        add 1 and 2 for you using the add function.\"},{\"type\":\"tool_use\",\"id\":\"toolu_01JdAbhw3U3B8CMsCHhLVHeq\",\"name\":\"add\",\"input\":{\"a\":1,\"b\":2}}]},{\"role\":\"user\",\"content\":[{\"type\":\"tool_result\",\"tool_use_id\":\"toolu_01JdAbhw3U3B8CMsCHhLVHeq\",\"content\":[{\"type\":\"text\",\"text\":\"3\"}]}]}],\"stream\":false,\"max_tokens\":64000,\"tools\":[{\"name\":\"add\",\"description\":\"Addes
+        two numbers together\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[\"a\",\"b\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"return_set_evn\",\"description\":\"Returns
+        the set environment variable\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"malformed_tool\",\"description\":\"A
+        malformed tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{}}},{\"name\":\"tool_error\",\"description\":\"Returns
+        an error\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"shouldError\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"timeout_tool\",\"description\":\"Sleeps
+        for a given number of seconds\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"seconds\":{\"type\":\"number\"}},\"required\":[\"seconds\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"fetch_site\",\"description\":\"Fetches
+        website content and returns it as text\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\"},\"headers\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"value\":{\"type\":\"string\"}},\"required\":[\"name\",\"value\"],\"additionalProperties\":false}}},\"required\":[\"url\",\"headers\"],\"additionalProperties\":false}]}},\"required\":[\"website\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_file_resource\",\"description\":\"Returns
+        a file resource reference\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"filename\":{\"type\":\"string\",\"default\":\"example.txt\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"list_messages\",\"description\":\"\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"channel\":{\"type\":\"string\"}},\"required\":[\"channel\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
+        authentication permissions\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"permission\":{\"type\":\"string\",\"enum\":[\"read\",\"write\"]}},\"required\":[\"permission\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_weather_from_locations\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"locations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[\"locations\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
+        the weather from a list of locations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"geocode\":{\"type\":\"object\",\"properties\":{\"latitude\":{\"type\":\"number\"},\"longitude\":{\"type\":\"number\"}},\"required\":[\"latitude\",\"longitude\"],\"additionalProperties\":false}},\"required\":[\"geocode\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"progress\",\"description\":\"Simulate
+        a multi-step operation with progress notifications\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"operation\":{\"type\":\"string\",\"description\":\"Name
+        of the operation to simulate\"},\"steps\":{\"type\":\"number\",\"description\":\"Number
+        of steps (default: 3)\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"simple_progress\",\"description\":\"Send
+        a single progress notification\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"progress\":{\"type\":\"number\",\"minimum\":0,\"maximum\":100}},\"required\":[\"progress\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"log_message\",\"description\":\"Logs
+        a message\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"level\":{\"type\":\"string\"},\"logger\":{\"type\":\"string\"}},\"required\":[\"message\",\"level\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
+        a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"send_list_changed\",\"description\":\"List
+        changed\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\",\"enum\":[\"tools\",\"resources\",\"prompts\"]}},\"required\":[\"type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"client-capabilities\",\"description\":\"Get
+        the capabilities of the client and return them back\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        data and returns structured results\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"summary\",\"detailed\"]}},\"required\":[\"data\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"invalid_structured_output\",\"description\":\"Tool
+        that returns invalid structured data\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"trigger_error\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"create_report\",\"description\":\"Creates
+        a report and returns it as a resource\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"title\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"text\",\"json\"]}},\"required\":[\"title\",\"content\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"user_preference_collector\",\"description\":\"Collects
+        user preferences through elicitation\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\"}},\"required\":[\"scenario\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"complex_calculation\",\"description\":\"\U0001F9EE
+        Advanced Calculator - Performs complex mathematical calculations\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"expression\":{\"type\":\"string\"},\"precision\":{\"type\":\"number\"}},\"required\":[\"expression\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"long_running_task\",\"description\":\"Simulates
+        a long-running task with progress updates\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"duration\":{\"type\":\"number\"},\"steps\":{\"type\":\"number\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"context_aware_suggestion\",\"description\":\"Provides
+        suggestions based on context\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\"},\"context_type\":{\"type\":\"string\",\"enum\":[\"user\",\"project\",\"workflow\"]}},\"required\":[\"query\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"user_preference_elicitation\",\"description\":\"Collects
+        user preferences through MCP elicitation (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"scenario\":{\"type\":\"string\",\"description\":\"The
+        scenario for which to collect preferences\"}},\"required\":[\"scenario\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"complex_elicitation\",\"description\":\"Tests
+        elicitation with complex validation schemas (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"data_type\":{\"type\":\"string\",\"enum\":[\"user_profile\",\"settings\",\"feedback\"],\"description\":\"Type
+        of data to collect\"}},\"required\":[\"data_type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"rejectable_elicitation\",\"description\":\"Tests
+        elicitation that can be rejected by the client (simulation)\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"request_type\":{\"type\":\"string\",\"enum\":[\"sensitive\",\"optional\",\"required\"],\"description\":\"Type
+        of request\"}},\"required\":[\"request_type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}},{\"name\":\"simple_elicitation\",\"description\":\"Simple
+        elicitation test tool\",\"input_schema\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\",\"description\":\"Custom
+        message for elicitation\"}},\"required\":[\"message\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}]}"
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 10 Nov 2025 23:35:32 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '25000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-11-10T23:35:41Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-11-10T23:35:33Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-11-10T23:35:31Z'
+      Retry-After:
+      - '29'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '33000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-11-10T23:35:33Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      X-Envoy-Upstream-Service-Time:
+      - '2699'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_016nDp9RNTCJ3zVn2J7gbDtR","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        result of adding 1 and 2 is 3."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":3445,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":18,"service_tier":"standard"}}'
+  recorded_at: Mon, 10 Nov 2025 23:35:32 GMT
+recorded_with: VCR 6.3.1

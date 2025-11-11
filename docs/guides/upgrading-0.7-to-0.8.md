@@ -6,7 +6,7 @@ nav_order: 11
 description: "Guide for upgrading from RubyLLM MCP 0.8 to 0.9 with breaking changes and migration steps"
 ---
 
-# Upgrading from 0.8 to 0.9
+# Upgrading from 0.7 to 0.8
 {: .no_toc }
 
 This guide covers the breaking changes and migration steps when upgrading from RubyLLM MCP version 0.8.x to 0.9.x.
@@ -103,7 +103,7 @@ RubyLLM::MCP.launch_control = :automatic
 
 ```ruby
 # Gemfile
-gem 'ruby_llm-mcp', '~> 0.9'
+gem 'ruby_llm-mcp', '~> 0.8'
 ```
 
 Then run:
@@ -133,7 +133,7 @@ The `launch_control` configuration option has been completely removed.
 
 Replace automatic client access with `establish_connection` blocks:
 
-#### Before (Version 0.8.x)
+#### Before (Version 0.7.x)
 
 ```ruby
 # config/initializers/ruby_llm_mcp.rb
@@ -154,7 +154,7 @@ class AnalysisController < ApplicationController
 end
 ```
 
-#### After (Version 0.9.x)
+#### After (Version 0.8.x)
 
 ```ruby
 # config/initializers/ruby_llm_mcp.rb
@@ -179,7 +179,7 @@ end
 
 Background jobs should already be using `establish_connection`, but verify:
 
-#### ✅ Correct Pattern (Works in Both 0.8 and 0.9)
+#### ✅ Correct Pattern (Works in Both 0.7 and 0.8)
 
 ```ruby
 class AnalysisJob < ApplicationJob
@@ -201,325 +201,6 @@ class AnalysisJob < ApplicationJob
 end
 ```
 
-This pattern works correctly in both versions and is the recommended approach.
-
-## Updated Configuration Example
-
-Here's a complete example of the updated initializer for version 0.9:
-
-```ruby
-# config/initializers/ruby_llm_mcp.rb
-
-RubyLLM::MCP.configure do |config|
-  # Global configuration
-  config.log_level = Rails.env.production? ? Logger::WARN : Logger::INFO
-  config.logger = Rails.logger
-
-  # Path to your MCP servers configuration
-  config.config_path = Rails.root.join("config", "mcps.yml")
-
-  # Configure roots for filesystem access (development only)
-  config.roots = [Rails.root] if Rails.env.development?
-
-  # Configure sampling (optional)
-  config.sampling.enabled = false
-  config.sampling.preferred_model = "gpt-4" if config.sampling.enabled
-end
-
-# ❌ DO NOT include launch_control - it has been removed
-# ❌ DO NOT include start_all_clients - it has been removed
-```
-
-## Common Migration Scenarios
-
-### Scenario 1: Simple Controller Action
-
-**Before (0.8.x):**
-
-```ruby
-def analyze
-  clients = RubyLLM::MCP.clients
-  chat = RubyLLM.chat(model: "gpt-4").with_tools(*clients.tools)
-  result = chat.ask(params[:query])
-  render json: result
-end
-```
-
-**After (0.9.x):**
-
-```ruby
-def analyze
-  result = RubyLLM::MCP.establish_connection do |clients|
-    chat = RubyLLM.chat(model: "gpt-4").with_tools(*clients.tools)
-    chat.ask(params[:query])
-  end
-  render json: result
-end
-```
-
-### Scenario 2: Streaming Response
-
-**Before (0.8.x):**
-
-```ruby
-def stream
-  response.headers['Content-Type'] = 'text/event-stream'
-
-  clients = RubyLLM::MCP.clients
-  chat = RubyLLM.chat(model: "gpt-4").with_tools(*clients.tools)
-
-  chat.ask(params[:query]) do |chunk|
-    response.stream.write("data: #{chunk.content}\n\n")
-  end
-ensure
-  response.stream.close
-end
-```
-
-**After (0.9.x):**
-
-```ruby
-def stream
-  response.headers['Content-Type'] = 'text/event-stream'
-
-  RubyLLM::MCP.establish_connection do |clients|
-    chat = RubyLLM.chat(model: "gpt-4").with_tools(*clients.tools)
-
-    chat.ask(params[:query]) do |chunk|
-      response.stream.write("data: #{chunk.content}\n\n")
-    end
-  end
-ensure
-  response.stream.close
-end
-```
-
-### Scenario 3: Service Object Pattern
-
-**Before (0.8.x):**
-
-```ruby
-class McpAnalysisService
-  def initialize(query)
-    @query = query
-    @clients = RubyLLM::MCP.clients
-  end
-
-  def call
-    chat = RubyLLM.chat(model: "gpt-4")
-    chat.with_tools(*@clients.tools)
-    chat.ask(@query)
-  end
-end
-
-# Usage
-McpAnalysisService.new(query).call
-```
-
-**After (0.9.x):**
-
-```ruby
-class McpAnalysisService
-  def initialize(query)
-    @query = query
-  end
-
-  def call
-    RubyLLM::MCP.establish_connection do |clients|
-      chat = RubyLLM.chat(model: "gpt-4")
-      chat.with_tools(*clients.tools)
-      chat.ask(@query)
-    end
-  end
-end
-
-# Usage (unchanged)
-McpAnalysisService.new(query).call
-```
-
-## Benefits of the New Pattern
-
-The removal of automatic launch control and mandatory use of `establish_connection` provides several benefits:
-
-### 1. **Explicit Resource Management**
-
-```ruby
-# Clear start and end of MCP client lifecycle
-RubyLLM::MCP.establish_connection do |clients|
-  # Clients are created here
-  # ... use clients ...
-end # Clients are automatically stopped and cleaned up here
-```
-
-### 2. **Better Error Handling**
-
-```ruby
-begin
-  RubyLLM::MCP.establish_connection do |clients|
-    # MCP operations
-  end
-rescue RubyLLM::MCP::Error => e
-  # Handle MCP-specific errors
-  Rails.logger.error("MCP error: #{e.message}")
-rescue => e
-  # Handle other errors
-  Rails.logger.error("Unexpected error: #{e.message}")
-end
-```
-
-### 3. **No Memory Leaks in Development**
-
-Connection blocks ensure clients are properly stopped, even with Rails code reloading.
-
-### 4. **Thread-Safe**
-
-Each request/job gets its own isolated client instances.
-
-### 5. **Works Perfectly with Background Jobs**
-
-The pattern naturally extends to background job processing:
-
-```ruby
-class ProcessDocumentJob < ApplicationJob
-  def perform(document_id)
-    document = Document.find(document_id)
-
-    RubyLLM::MCP.establish_connection do |clients|
-      # Each job has isolated clients
-      # No interference between concurrent jobs
-      analyze_document(clients, document)
-    end
-  end
-end
-```
-
-## Multi-User OAuth Applications
-
-{: .label .label-green }
-0.8+
-
-For multi-user applications where each user needs their own MCP connection, use the new OAuth integration:
-
-```bash
-# Generate OAuth support
-rails generate ruby_llm:mcp:oauth:install
-```
-
-This provides per-user OAuth tokens and automatic client management:
-
-```ruby
-class AiResearchJob < ApplicationJob
-  def perform(user_id, query)
-    user = User.find(user_id)
-
-    # Each user gets their own OAuth-authenticated client
-    client = user.mcp_client  # Uses user's OAuth token
-
-    tools = client.tools
-    chat = RubyLLM.chat(provider: "anthropic/claude-sonnet-4")
-      .with_tools(*tools)
-
-    response = chat.ask(query)
-  end
-end
-```
-
-See **[Rails OAuth Integration Guide]({% link guides/rails-oauth.md %})** for complete details.
-
-## Testing Your Migration
-
-### 1. Update Tests
-
-Replace any test setup that used automatic clients:
-
-**Before:**
-
-```ruby
-# spec/rails_helper.rb or test/test_helper.rb
-RSpec.configure do |config|
-  config.before(:suite) do
-    RubyLLM::MCP.start_all_clients
-  end
-
-  config.after(:suite) do
-    RubyLLM::MCP.stop_all_clients
-  end
-end
-```
-
-**After:**
-
-```ruby
-# No global setup needed!
-# Tests use establish_connection blocks naturally:
-
-RSpec.describe AnalysisController do
-  it "analyzes with MCP tools" do
-    # Mock or use VCR for actual MCP calls
-    post :create, params: { query: "test" }
-    expect(response).to be_successful
-  end
-end
-```
-
-### 2. Verify Background Jobs
-
-Run your test suite, especially background job tests:
-
-```bash
-bundle exec rspec spec/jobs/
-# or
-bundle exec rails test test/jobs/
-```
-
-### 3. Test in Development
-
-Start your development server and verify MCP operations work:
-
-```bash
-rails server
-```
-
-## Troubleshooting
-
-### Error: `undefined method 'launch_control=' for RubyLLM::MCP:Module`
-
-**Cause:** You're still trying to set `launch_control` in your initializer.
-
-**Solution:** Remove all `launch_control` references from `config/initializers/ruby_llm_mcp.rb`.
-
-### Error: `undefined method 'start_all_clients' for RubyLLM::MCP:Module`
-
-**Cause:** You're still trying to call `start_all_clients`.
-
-**Solution:** Remove `start_all_clients` calls. Use `establish_connection` instead.
-
-### Error: `undefined method 'clients' for RubyLLM::MCP:Module`
-
-**Cause:** You're trying to access `RubyLLM::MCP.clients` directly.
-
-**Solution:** Wrap your code in an `establish_connection` block:
-
-```ruby
-RubyLLM::MCP.establish_connection do |clients|
-  # Use clients here
-end
-```
-
-### MCP Operations Work in Console but Not in Controllers
-
-**Cause:** You might be accessing clients without `establish_connection`.
-
-**Solution:** Ensure all MCP access is within connection blocks:
-
-```ruby
-def action
-  RubyLLM::MCP.establish_connection do |clients|
-    # All MCP operations here
-  end
-end
-```
-
 ## Getting Help
 
 If you encounter issues during the upgrade:
@@ -528,37 +209,6 @@ If you encounter issues during the upgrade:
 2. **Review examples**: See [Rails Integration Guide]({% link guides/rails-integration.md %})
 3. **Check GitHub Issues**: [RubyLLM MCP Issues](https://github.com/patvice/ruby_llm-mcp/issues)
 4. **File a bug**: If you find migration issues, please report them
-
-## What's New in 0.9
-
-While migrating, take advantage of new features in version 0.9:
-
-### OAuth 2.1 Support
-
-{: .label .label-green }
-New in 0.9
-
-Complete OAuth 2.1 implementation with:
-- PKCE (RFC 7636)
-- Dynamic Client Registration (RFC 7591)
-- Browser-based authentication
-- Per-user token storage
-- Automatic token refresh
-
-See **[OAuth Guide]({% link guides/oauth.md %})** and **[Rails OAuth Integration]({% link guides/rails-oauth.md %})**.
-
-### Rails OAuth Generator
-
-{: .label .label-green }
-New in 0.9
-
-Generate complete OAuth setup for Rails:
-
-```bash
-rails generate ruby_llm:mcp:oauth:install
-```
-
-Creates models, migrations, controllers, and views for multi-user OAuth.
 
 ## Next Steps
 

@@ -5,9 +5,9 @@ module RubyLLM
     class Roots
       attr_reader :paths
 
-      def initialize(paths: [], coordinator: nil)
+      def initialize(paths: [], adapter: nil)
         @paths = paths
-        @coordinator = coordinator
+        @adapter = adapter
       end
 
       def active?
@@ -16,12 +16,12 @@ module RubyLLM
 
       def add(path)
         @paths << path
-        @coordinator.roots_list_change_notification
+        @adapter.roots_list_change_notification
       end
 
       def remove(path)
         @paths.delete(path)
-        @coordinator.roots_list_change_notification
+        @adapter.roots_list_change_notification
       end
 
       def to_request

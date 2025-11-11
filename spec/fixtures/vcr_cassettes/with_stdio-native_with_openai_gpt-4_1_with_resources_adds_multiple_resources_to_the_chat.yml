@@ -1,0 +1,125 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"plain_text.txt:
+        A plain text file\n\nPlan text information"},{"role":"user","content":"test.txt:
+        A text file\n\nHello, this is a test file!\nThis content will be served by
+        the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n"},{"role":"user","content":"second_file.txt:
+        A second text file\n\nThis is the second file that I want to be able to use
+        as a resource\n"},{"role":"user","content":"my.md: A markdown file\n\n# My
+        Markdown File\n\nThis is a markdown file that I want to be able to use as
+        a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n##
+        Section 2\n\nThis is another section in my markdown file\n"},{"role":"user","content":"What
+        information do you have from the provided resources?"}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 10 Nov 2025 23:31:41 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '2408'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '2567'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29843'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 314ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "id": "chatcmpl-CaVeELjkbhdKo54f3ZF5r6Wse9Zwr",
+          "object": "chat.completion",
+          "created": 1762817498,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Here is the information I have from your provided resources:\n\n---\n\n### 1. **plain_text.txt**\n**Description:** A plain text file  \n**Content:**  \n```\nPlan text information\n```\n\n---\n\n### 2. **test.txt**\n**Description:** A text file  \n**Content:**  \n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n\n---\n\n### 3. **second_file.txt**\n**Description:** A second text file  \n**Content:**  \n```\nThis is the second file that I want to be able to use as a resource\n```\n\n---\n\n### 4. **my.md**\n**Description:** A markdown file  \n**Content:**  \n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n---\n\nIf you want information from a specific file or section, let me know!",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 168,
+            "completion_tokens": 232,
+            "total_tokens": 400,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_d38c7f4fa7"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:31:41 GMT
+recorded_with: VCR 6.3.1

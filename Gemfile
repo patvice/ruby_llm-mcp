@@ -5,6 +5,10 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
+  if RUBY_VERSION >= "3.2.0"
+    gem "mcp", "~> 0.4"
+  end
+
   # Development dependencies
   gem "activesupport"
   gem "bundler", ">= 2.0"

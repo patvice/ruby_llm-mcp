@@ -1,8 +1,24 @@
 # frozen_string_literal: true
 
-require "ruby_llm"
+# Standard Libraries
+require "cgi"
+require "erb"
+require "json"
+require "logger"
+require "open3"
+require "rbconfig"
+require "securerandom"
+require "socket"
+require "timeout"
+require "uri"
+require "yaml"
+
+# Gems
+require "httpx"
 require "json-schema"
+require "ruby_llm"
 require "zeitwerk"
+
 require_relative "chat"
 
 module RubyLLM
@@ -92,11 +108,13 @@ loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
 loader.inflector.inflect("streamable_http" => "StreamableHTTP")
 loader.inflector.inflect("http_client" => "HTTPClient")
-loader.inflector.inflect("oauth_provider" => "OAuthProvider")
-loader.inflector.inflect("browser_oauth" => "BrowserOAuth")
-loader.inflector.inflect("browser_oauth_provider" => "BrowserOAuthProvider")
 loader.inflector.inflect("http_server" => "HttpServer")
-loader.inflector.inflect("callback_handler" => "CallbackHandler")
-loader.inflector.inflect("callback_server" => "CallbackServer")
+
+loader.inflector.inflect("ruby_llm_adapter" => "RubyLLMAdapter")
+loader.inflector.inflect("mcp_sdk_adapter" => "MCPSdkAdapter")
+loader.inflector.inflect("mcp_transports" => "MCPTransports")
+
+loader.inflector.inflect("oauth_provider" => "OAuthProvider")
+loader.inflector.inflect("browser_oauth_provider" => "BrowserOAuthProvider")
 
 loader.setup

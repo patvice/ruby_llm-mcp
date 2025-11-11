@@ -3,11 +3,10 @@
 module RubyLLM
   module MCP
     class NotificationHandler
-      attr_reader :coordinator, :client
+      attr_reader :client
 
-      def initialize(coordinator)
-        @coordinator = coordinator
-        @client = coordinator.client
+      def initialize(client)
+        @client = client
       end
 
       def execute(notification)

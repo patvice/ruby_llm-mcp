@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "browser/http_server"
-require_relative "browser/callback_handler"
-require_relative "browser/pages"
-require_relative "browser/opener"
-require_relative "browser/callback_server"
-
 module RubyLLM
   module MCP
     module Auth

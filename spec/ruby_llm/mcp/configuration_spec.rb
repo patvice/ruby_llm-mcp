@@ -13,7 +13,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.request_timeout).to eq(8000)
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
-      expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol.latest_version)
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol.latest_version)
     end
 
     it "sets debug log level when RUBYLLM_MCP_DEBUG environment variable is set" do
@@ -28,7 +28,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
     it "sets default protocol_version to latest version" do
       config = RubyLLM::MCP::Configuration.new
 
-      expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol::LATEST_PROTOCOL_VERSION)
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol::LATEST_PROTOCOL_VERSION)
       expect(config.protocol_version).to eq("2025-06-18")
     end
   end
@@ -80,7 +80,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.request_timeout).to eq(8000)
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
-      expect(config.protocol_version).to eq(RubyLLM::MCP::Protocol.latest_version)
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol.latest_version)
     end
 
     it "resets logger to nil so it gets recreated" do
@@ -267,7 +267,7 @@ RSpec.describe RubyLLM::MCP::Configuration do
 
       # Verify the default header is sent during OAuth discovery
       discovery_stub = stub_request(:get, "https://example.com/.well-known/oauth-authorization-server")
-                       .with(headers: { "MCP-Protocol-Version" => RubyLLM::MCP::Protocol.latest_version })
+                       .with(headers: { "MCP-Protocol-Version" => RubyLLM::MCP::Native::Protocol.latest_version })
                        .to_return(
                          status: 200,
                          body: {

@@ -1,0 +1,185 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you tell me the weather
+        for Ottawa and San Francisco?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"get_weather_from_locations","description":"Get
+        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":["locations"]}},{"name":"get_weather_from_geocode","description":"Get
+        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":["latitude","longitude"]}},"required":["geocode"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 10 Nov 2025 23:31:15 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=561
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "get_weather_from_locations",
+                      "args": {
+                        "locations": [
+                          "Ottawa",
+                          "San Francisco"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.00012130688198588111
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 57,
+            "candidatesTokenCount": 11,
+            "totalTokenCount": 68,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 57
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 11
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "wnUSaZWrLaSojrEPieGUqQw"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:31:15 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you tell me the weather
+        for Ottawa and San Francisco?"}]},{"role":"model","parts":[{"functionCall":{"name":"get_weather_from_locations","args":{"locations":["Ottawa","San
+        Francisco"]}}}]},{"role":"function","parts":[{"functionResponse":{"name":"get_weather_from_locations","response":{"name":"get_weather_from_locations","content":[{"text":"Weather
+        for Ottawa, San Francisco is great!"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"get_weather_from_locations","description":"Get
+        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"locations":{"type":"ARRAY","items":{"type":"STRING"}}},"required":["locations"]}},{"name":"get_weather_from_geocode","description":"Get
+        the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":["latitude","longitude"]}},"required":["geocode"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 10 Nov 2025 23:31:15 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=570
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "OK. The weather for Ottawa and San Francisco is great!\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.00099698189072884038
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 94,
+            "candidatesTokenCount": 13,
+            "totalTokenCount": 107,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 94
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 13
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "w3USabeXF43tjrEP2eSV0QY"
+        }
+  recorded_at: Mon, 10 Nov 2025 23:31:15 GMT
+recorded_with: VCR 6.3.1

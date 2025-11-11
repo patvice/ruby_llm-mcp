@@ -1,0 +1,54 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you create a greeting
+        for Alice in French?"}]},{"role":"user","parts":[{"text":"Please use the prompt
+        to create a greeting."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 10 Nov 2025 23:38:51 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1681
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJjYW5kaWRhdGVzIjogWwogICAgewogICAgICAiY29udGVudCI6IHsKICAgICAgICAicGFydHMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJ0ZXh0IjogIk9rYXksIGhlcmUgYXJlIGEgZmV3IG9wdGlvbnMgZm9yIGdyZWV0aW5nIEFsaWNlIGluIEZyZW5jaCwgcmFuZ2luZyBpbiBmb3JtYWxpdHk6XG5cbiogICAqKkZvcm1hbDoqKlxuICAgICogICBcIkJvbmpvdXIsIEFsaWNlLlwiIChHb29kIG1vcm5pbmcvR29vZCBkYXksIEFsaWNlLikgLSBBbHdheXMgYSBzYWZlIGFuZCBwb2xpdGUgY2hvaWNlLlxuICAgICogICBcIkVuY2hhbnTDqShlKSBkZSB2b3VzIHJlbmNvbnRyZXIsIEFsaWNlLlwiIChQbGVhc2VkIHRvIG1lZXQgeW91LCBBbGljZS4pIC0gVXNlIFwiRW5jaGFudMOpXCIgaWYgeW91J3JlIG1hbGUsIFwiRW5jaGFudMOpZVwiIGlmIHlvdSdyZSBmZW1hbGUuXG5cbiogICAqKkluZm9ybWFsOioqXG4gICAgKiAgIFwiU2FsdXQsIEFsaWNlLlwiIChIaSwgQWxpY2UuKSAtIEEgY2FzdWFsIGFuZCBmcmllbmRseSBncmVldGluZy5cbiAgICAqICAgXCJDb3Vjb3UsIEFsaWNlLlwiIChIZXksIEFsaWNlLikgLSBBIHZlcnkgaW5mb3JtYWwgYW5kIHBsYXlmdWwgZ3JlZXRpbmcuXG5cbiogICAqKklmIHlvdSBrbm93IGhlciB3ZWxsL2FyZSBjbG9zZToqKlxuICAgICogICBcIlNhbHV0IEFsaWNlLCDDp2EgdmEgP1wiIChIaSBBbGljZSwgaG93J3MgaXQgZ29pbmc/KVxuXG5UaGUgYmVzdCBjaG9pY2UgZGVwZW5kcyBvbiB5b3VyIHJlbGF0aW9uc2hpcCB3aXRoIEFsaWNlIGFuZCB0aGUgY29udGV4dCBvZiB0aGUgZ3JlZXRpbmcuXG4iCiAgICAgICAgICB9CiAgICAgICAgXSwKICAgICAgICAicm9sZSI6ICJtb2RlbCIKICAgICAgfSwKICAgICAgImZpbmlzaFJlYXNvbiI6ICJTVE9QIiwKICAgICAgImF2Z0xvZ3Byb2JzIjogLTAuMjI0NzEzMjYyNTY3NjY1MzgKICAgIH0KICBdLAogICJ1c2FnZU1ldGFkYXRhIjogewogICAgInByb21wdFRva2VuQ291bnQiOiAxOSwKICAgICJjYW5kaWRhdGVzVG9rZW5Db3VudCI6IDE5NywKICAgICJ0b3RhbFRva2VuQ291bnQiOiAyMTYsCiAgICAicHJvbXB0VG9rZW5zRGV0YWlscyI6IFsKICAgICAgewogICAgICAgICJtb2RhbGl0eSI6ICJURVhUIiwKICAgICAgICAidG9rZW5Db3VudCI6IDE5CiAgICAgIH0KICAgIF0sCiAgICAiY2FuZGlkYXRlc1Rva2Vuc0RldGFpbHMiOiBbCiAgICAgIHsKICAgICAgICAibW9kYWxpdHkiOiAiVEVYVCIsCiAgICAgICAgInRva2VuQ291bnQiOiAxOTcKICAgICAgfQogICAgXQogIH0sCiAgIm1vZGVsVmVyc2lvbiI6ICJnZW1pbmktMi4wLWZsYXNoIiwKICAicmVzcG9uc2VJZCI6ICJpWGNTYWFpX05zamdfdU1QX0t2Wm9RYyIKfQo=
+  recorded_at: Mon, 10 Nov 2025 23:38:51 GMT
+recorded_with: VCR 6.3.1

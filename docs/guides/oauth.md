@@ -2,7 +2,7 @@
 layout: default
 title: OAuth 2.1 Authentication
 parent: Guides
-nav_order: 8
+nav_order: 5
 description: "Complete OAuth 2.1 implementation with PKCE, dynamic registration, and automatic token refresh"
 ---
 

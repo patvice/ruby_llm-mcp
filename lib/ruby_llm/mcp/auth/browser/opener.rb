@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rbconfig"
-
 module RubyLLM
   module MCP
     module Auth

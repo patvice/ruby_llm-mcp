@@ -1,0 +1,83 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you write
+        me a beautiful poem about the current day? Make sure to include the word ''poem''
+        in your response."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 10 Nov 2025 23:38:56 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '3617'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '3645'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29970'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 60ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DYVZsRURkbUtKRzdrblFFaTBoaVY1OERsNlVMNiIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjgxNzkzMiwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJUb2RheSwgYSBwb2VtIHVuZm9sZHMgYmVuZWF0aCB3aWRlIEp1bmUgc2tpZXPigJQgIFxuUGV0YWxzIG9mIHN1biBzcGlsbCBhY3Jvc3MgdGhlIG9yZGluYXJ5LCAgXG5CcmVhdGggb2YgbmV3IGxlYXZlcyB1bnNldHRsZXMgdGhlIGh1c2ggIFxuQW5kIHBhaW50cyBxdWlldCBnb2xkIGFsb25nIHRoZSB3aW5kb3dzaWxsLlxuXG5DbG91ZHMgc2hhcGUgc3RvcmllcyBpbiBzaGlmdGluZyBsaWdodCwgIFxuU29mdC1mb290ZWQgaG91cnMgZHJpZnQgdGhyb3VnaCBnZW50bGUgbW9ybmluZywgIFxuRXZlcnkgbWludXRlIGEgc2VjcmV0LCB1bmZvbGRpbmcgdW5zZWVuLCAgXG5MaWtlIGJpcmRzb25nIHdyaXR0ZW4gY2xvc2UgdXBvbiB0aGUgYnJlZXplLlxuXG5UaGlzIGlzIHRoZSBwb2VtIHRoZSB3b3JsZCBpcyB3aGlzcGVyaW5nIG5vd+KAlCAgXG5PZiBsYXVnaHRlciB0cmFpbGluZyBmcm9tIG9wZW4gZG9vcnMsICBcbk9mIGhvcGUgc3B1biBhbmV3IGluIHRoZSBodXNoIGJldHdlZW4gbmV3cywgIFxuT2Ygc21hbGwgam95c+KAlHlvdXIgdGVhLCBhIGZyaWVuZOKAmXMgc21pbGUsICBcblRoZSBhbGNoZW15IG9mIG5vdyB0dXJuaW5nIGxpZmUgaW50byB2ZXJzZS5cblxuU28gbGV0IGVhY2ggaGVhcnRiZWF0IHJoeW1lIHdpdGggd29uZGVyLCAgXG5MZXQgZ3JhdGl0dWRlIGNyaXNwIGluIHlvdXIgY2hlc3QgbGlrZSBwYWdlIGVkZ2VzOyAgXG5Ub2RheSBpcyBhIGxpdmluZyBwb2Vt4oCUanVzdCB3YWl0aW5nICBcbkZvciB5b3UgdG8gc3RlcCBpbnNpZGUgaXRzIGxpbmVzLiIsCiAgICAgICAgInJlZnVzYWwiOiBudWxsLAogICAgICAgICJhbm5vdGF0aW9ucyI6IFtdCiAgICAgIH0sCiAgICAgICJsb2dwcm9icyI6IG51bGwsCiAgICAgICJmaW5pc2hfcmVhc29uIjogInN0b3AiCiAgICB9CiAgXSwKICAidXNhZ2UiOiB7CiAgICAicHJvbXB0X3Rva2VucyI6IDMzLAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMTY4LAogICAgInRvdGFsX3Rva2VucyI6IDIwMSwKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwX2QzOGM3ZjRmYTciCn0K
+  recorded_at: Mon, 10 Nov 2025 23:38:56 GMT
+recorded_with: VCR 6.3.1
