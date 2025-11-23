@@ -12,6 +12,7 @@ module RubyLLM
           @server_metadata = {}
           @pkce_data = {}
           @state_data = {}
+          @resource_metadata = {}
         end
 
         # Token storage
@@ -21,6 +22,10 @@ module RubyLLM
 
         def set_token(server_url, token)
           @tokens[server_url] = token
+        end
+
+        def delete_token(server_url)
+          @tokens.delete(server_url)
         end
 
         # Client registration storage
@@ -65,6 +70,19 @@ module RubyLLM
 
         def delete_state(server_url)
           @state_data.delete(server_url)
+        end
+
+        # Resource metadata management
+        def get_resource_metadata(server_url)
+          @resource_metadata[server_url]
+        end
+
+        def set_resource_metadata(server_url, metadata)
+          @resource_metadata[server_url] = metadata
+        end
+
+        def delete_resource_metadata(server_url)
+          @resource_metadata.delete(server_url)
         end
       end
     end

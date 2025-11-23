@@ -9,12 +9,16 @@ module RubyLLM
 
           attr_reader :headers, :id, :coordinator
 
-          def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {})
+          def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {}, oauth_provider: nil, options: {})
             @event_url = url
             @messages_url = nil
             @coordinator = coordinator
             @request_timeout = request_timeout
             @version = version
+
+            # Extract oauth_provider from options if present
+            extracted_options = options.dup
+            oauth_provider = extracted_options.delete(:oauth_provider) || oauth_provider
 
             uri = URI.parse(url)
             @root_url = "#{uri.scheme}://#{uri.host}"
@@ -27,6 +31,10 @@ module RubyLLM
                                        "Cache-Control" => "no-cache",
                                        "X-CLIENT-ID" => @client_id
                                      })
+
+            @oauth_provider = oauth_provider
+            @resource_metadata_url = nil
+            @auth_retry_attempted = false
 
             @id_counter = 0
             @id_mutex = Mutex.new
@@ -100,13 +108,20 @@ module RubyLLM
           private
 
           def send_request(body, request_id)
+            headers = build_request_headers
             http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
-                                                              headers: @headers)
+                                                              headers: headers)
             response = http_client.post(@messages_url, body: JSON.generate(body))
             handle_httpx_error_response!(response,
                                          context: { location: "message endpoint request", request_id: request_id })
 
-            unless [200, 202].include?(response.status)
+            case response.status
+            when 200, 202
+              # Success
+              return
+            when 401
+              handle_authentication_challenge(response, body, request_id)
+            else
               message = "Failed to have a successful request to #{@messages_url}: #{response.status} - #{response.body}"
               RubyLLM::MCP.logger.error(message)
               raise Errors::TransportError.new(
@@ -114,6 +129,82 @@ module RubyLLM
                 code: response.status
               )
             end
+          end
+
+          def build_request_headers
+            headers = @headers.dup
+
+            # Apply OAuth authorization if available
+            if @oauth_provider
+              RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
+              token = @oauth_provider.access_token
+              if token
+                headers["Authorization"] = token.to_header
+                RubyLLM::MCP.logger.debug "Applied OAuth authorization header"
+              else
+                RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available!"
+              end
+            end
+
+            headers
+          end
+
+          def handle_authentication_challenge(response, original_body, request_id)
+            # If we've already attempted auth retry, don't try again
+            if @auth_retry_attempted
+              RubyLLM::MCP.logger.warn("Authentication retry already attempted, raising error")
+              @auth_retry_attempted = false
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication required (401 Unauthorized) - retry failed"
+              )
+            end
+
+            unless @oauth_provider
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication required (401 Unauthorized) but no OAuth provider configured"
+              )
+            end
+
+            RubyLLM::MCP.logger.info("Received 401 Unauthorized, attempting automatic authentication")
+
+            www_authenticate = response.headers["www-authenticate"]
+            resource_metadata_url = response.headers["mcp-resource-metadata-url"]
+            @resource_metadata_url = resource_metadata_url if resource_metadata_url
+
+            begin
+              @auth_retry_attempted = true
+
+              success = @oauth_provider.handle_authentication_challenge(
+                www_authenticate: www_authenticate,
+                resource_metadata_url: resource_metadata_url,
+                requested_scope: nil
+              )
+
+              if success
+                RubyLLM::MCP.logger.info("Authentication challenge handled successfully, retrying request")
+
+                # Retry the original request (flag stays true to prevent loop)
+                send_request(original_body, request_id)
+
+                # Only reset flag after successful retry
+                @auth_retry_attempted = false
+                return
+              end
+            rescue Errors::AuthenticationRequiredError => e
+              @auth_retry_attempted = false
+              raise e
+            rescue StandardError => e
+              @auth_retry_attempted = false
+              RubyLLM::MCP.logger.error("Authentication challenge handling failed: #{e.message}")
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication failed: #{e.message}"
+              )
+            end
+
+            @auth_retry_attempted = false
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized)"
+            )
           end
 
           def start_sse_listener
@@ -178,6 +269,12 @@ module RubyLLM
           def validate_sse_response!(response)
             return unless response.status >= 400
 
+            # Handle 401 specially for OAuth
+            if response.status == 401
+              handle_sse_authentication_challenge(response)
+              return
+            end
+
             error_body = read_error_body(response)
             error_message = "HTTP #{response.status} error from SSE endpoint: #{error_body}"
             RubyLLM::MCP.logger.error error_message
@@ -185,6 +282,41 @@ module RubyLLM
             handle_client_error!(error_message, response.status) if response.status < 500
 
             raise StandardError, error_message
+          end
+
+          def handle_sse_authentication_challenge(response)
+            unless @oauth_provider
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication required for SSE stream but no OAuth provider configured"
+              )
+            end
+
+            RubyLLM::MCP.logger.info("SSE stream received 401, attempting authentication")
+
+            www_authenticate = response.headers["www-authenticate"]
+            resource_metadata_url = response.headers["mcp-resource-metadata-url"]
+
+            begin
+              success = @oauth_provider.handle_authentication_challenge(
+                www_authenticate: www_authenticate,
+                resource_metadata_url: resource_metadata_url,
+                requested_scope: nil
+              )
+
+              if success
+                RubyLLM::MCP.logger.info("Authentication successful, SSE stream will reconnect")
+                # The caller will retry the SSE connection
+                return
+              end
+            rescue Errors::AuthenticationRequiredError
+              raise
+            rescue StandardError => e
+              RubyLLM::MCP.logger.error("SSE authentication failed: #{e.message}")
+            end
+
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required for SSE stream"
+            )
           end
 
           def handle_client_error!(error_message, status_code)
