@@ -52,7 +52,9 @@ module RubyLLM
         @adapter.start if start
       end
 
-      def_delegators :@adapter, :alive?, :capabilities, :ping, :client_capabilities
+      def_delegators :@adapter, :alive?, :capabilities, :ping, :client_capabilities,
+                     :register_in_flight_request, :unregister_in_flight_request,
+                     :cancel_in_flight_request
 
       def start
         @adapter.start

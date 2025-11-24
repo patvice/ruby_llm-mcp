@@ -77,6 +77,15 @@ module RubyLLM
       class UnsupportedTransport < BaseError; end
 
       class AdapterConfigurationError < BaseError; end
+
+      class RequestCancelled < BaseError
+        attr_reader :request_id
+
+        def initialize(message:, request_id:)
+          @request_id = request_id
+          super(message: message)
+        end
+      end
     end
   end
 end

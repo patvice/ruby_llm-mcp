@@ -20,6 +20,7 @@ module RubyLLM
 
       def execute
         success = @coordinator.elicitation_callback&.call(self)
+
         if success
           valid = validate_response
           if valid

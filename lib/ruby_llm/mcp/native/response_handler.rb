@@ -10,24 +10,38 @@ module RubyLLM
           @coordinator = coordinator
         end
 
-        def execute(result) # rubocop:disable Naming/PredicateMethod
-          if result.ping?
-            coordinator.ping_response(id: result.id)
+        def execute(result)
+          operation = CancellableOperation.new(result.id)
+          coordinator.register_in_flight_request(result.id, operation)
+
+          begin
+            # Execute in a separate thread that can be terminated on cancellation
+            operation.execute do
+              if result.ping?
+                coordinator.ping_response(id: result.id)
+                true
+              elsif result.roots?
+                handle_roots_response(result)
+                true
+              elsif result.sampling?
+                handle_sampling_response(result)
+                true
+              elsif result.elicitation?
+                handle_elicitation_response(result)
+                true
+              else
+                handle_unknown_request(result)
+                RubyLLM::MCP.logger.error("MCP client was sent unknown method type and \
+                  could not respond: #{result.inspect}.")
+                false
+              end
+            end
+          rescue Errors::RequestCancelled => e
+            RubyLLM::MCP.logger.info("Request #{result.id} was cancelled: #{e.message}")
+            # Don't send response - cancellation means result is unused
             true
-          elsif result.roots?
-            handle_roots_response(result)
-            true
-          elsif result.sampling?
-            handle_sampling_response(result)
-            true
-          elsif result.elicitation?
-            handle_elicitation_response(result)
-            true
-          else
-            handle_unknown_request(result)
-            RubyLLM::MCP.logger.error("MCP client was sent unknown method type and \
-              could not respond: #{result.inspect}.")
-            false
+          ensure
+            coordinator.unregister_in_flight_request(result.id)
           end
         end
 

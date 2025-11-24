@@ -63,7 +63,9 @@ module RubyLLM
                        :roots_list_change_notification,
                        :ping_response, :roots_list_response,
                        :sampling_create_message_response,
-                       :error_response, :elicitation_response
+                       :error_response, :elicitation_response,
+                       :register_in_flight_request, :unregister_in_flight_request,
+                       :cancel_in_flight_request
 
         # Handle resource registration in adapter (public API concern)
         def register_resource(resource)

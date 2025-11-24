@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../../../lib/ruby_llm/mcp/result"
+
 class FakeLogger
   def error(message)
     @error_message = message
@@ -21,12 +23,39 @@ RSpec.describe RubyLLM::MCP::NotificationHandler do
     MCPTestConfiguration.reset_config!
   end
 
-  it "calling cancelled at the moment will do nothing" do
-    notification = RubyLLM::MCP::Notification.new(
-      { "method" => "notifications/cancelled" }
-    )
+  describe "notifications/cancelled" do
+    it "calls cancel_in_flight_request on the client with the request ID" do
+      allow(client).to receive(:cancel_in_flight_request).and_return(true)
 
-    expect { notification_handler.execute(notification) }.not_to raise_error
+      notification = RubyLLM::MCP::Notification.new(
+        { "method" => "notifications/cancelled", "params" => { "requestId" => "req-123", "reason" => "Timeout" } }
+      )
+
+      notification_handler.execute(notification)
+
+      expect(client).to have_received(:cancel_in_flight_request).with("req-123")
+    end
+
+    it "handles cancellation when request is not found" do
+      allow(client).to receive(:cancel_in_flight_request).and_return(false)
+
+      notification = RubyLLM::MCP::Notification.new(
+        { "method" => "notifications/cancelled", "params" => { "requestId" => "req-456" } }
+      )
+
+      expect { notification_handler.execute(notification) }.not_to raise_error
+    end
+
+    it "handles cancellation without a reason" do
+      allow(client).to receive(:cancel_in_flight_request).and_return(true)
+
+      notification = RubyLLM::MCP::Notification.new(
+        { "method" => "notifications/cancelled", "params" => { "requestId" => "req-789" } }
+      )
+
+      expect { notification_handler.execute(notification) }.not_to raise_error
+      expect(client).to have_received(:cancel_in_flight_request).with("req-789")
+    end
   end
 
   it "calling an unknown notification will log an error and do nothing else" do

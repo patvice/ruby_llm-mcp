@@ -24,7 +24,7 @@ module RubyLLM
         when "notifications/progress"
           process_progress_message(notification)
         when "notifications/cancelled"
-          # TODO: - do nothing at the moment until we support client operations
+          process_cancelled_notification(notification)
         else
           process_unknown_notification(notification)
         end
@@ -71,6 +71,23 @@ module RubyLLM
           logger.error(message["message"])
         when "alert", "emergency"
           logger.fatal(message["message"])
+        end
+      end
+
+      def process_cancelled_notification(notification)
+        request_id = notification.params["requestId"]
+        reason = notification.params["reason"] || "No reason provided"
+
+        RubyLLM::MCP.logger.info(
+          "Received cancellation for request #{request_id}: #{reason}"
+        )
+
+        success = client.cancel_in_flight_request(request_id)
+
+        unless success
+          RubyLLM::MCP.logger.debug(
+            "Request #{request_id} was not found or already completed"
+          )
         end
       end
 
