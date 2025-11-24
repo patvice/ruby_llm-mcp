@@ -291,13 +291,13 @@ module RubyLLM
           request(body, wait_for_response: false)
         end
 
-        def sampling_create_message_response(id:, model:, message:, **options)
+        def sampling_create_message_response(id:, model:, message:, **_options)
           body = Native::Messages::Responses.sampling_create_message(id: id, model: model, message: message)
           request(body, wait_for_response: false)
         end
 
-        def error_response(id:, message:, code: -32_000)
-          body = Native::Messages::Responses.error(id: id, message: message, code: code)
+        def error_response(id:, message:, code: Native::JsonRpc::ErrorCodes::SERVER_ERROR, data: nil)
+          body = Native::Messages::Responses.error(id: id, message: message, code: code, data: data)
           request(body, wait_for_response: false)
         end
 

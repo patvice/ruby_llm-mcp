@@ -291,7 +291,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
 
         expect do
           transport.request({ "method" => "test", "id" => 1 })
-        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Invalid JSON response/)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /JSON parse error/)
       end
 
       it "handles unexpected content type" do
@@ -351,12 +351,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
           )
         end
 
-        it "logs warning for unknown requests" do
+        it "logs error for invalid JSON-RPC envelope" do
           raw_event = { data: '{"method": "unknown", "params": {}}' }
 
           transport.send(:process_sse_event, raw_event, nil)
-
-          expect(logger).to have_received(:warn).with(/Unknown request from MCP server/)
+          expect(logger).to have_received(:error).with(/Invalid JSON-RPC envelope/)
         end
       end
 
@@ -667,18 +666,17 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     end
 
     describe "edge cases and boundary conditions" do
-      it "handles bad JSON format request body gracefully" do
+      it "handles response without jsonrpc field" do
         stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json" },
-            body: '{"result": "ok"}'
+            body: '{"result": "ok"}' # Missing jsonrpc field
           )
 
-        # Empty request body should be handled properly
         expect do
-          transport.request({}, wait_for_response: false)
-        end.to raise_error(RubyLLM::MCP::Errors::TransportError)
+          transport.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Invalid JSON-RPC envelope/)
       end
 
       it "handles request without ID gracefully" do
@@ -688,7 +686,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
           .to_return(
             status: 200,
             headers: { "Content-Type" => "application/json", "mcp-session-id" => session_id },
-            body: { "result" => { "content" => [{ "type" => "text", "value" => "ok" }] } }.to_json
+            body: {
+              "jsonrpc" => "2.0",
+              "id" => nil,
+              "result" => { "content" => [{ "type" => "text", "value" => "ok" }] }
+            }.to_json
           )
 
         # Request without ID should be handled properly (notification)
@@ -697,7 +699,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
       end
 
       it "handles very large response gracefully" do
-        large_response = { "result" => { "content" => [{ "type" => "text", "value" => "x" * 10_000 }] } }
+        large_response = {
+          "jsonrpc" => "2.0",
+          "id" => 1,
+          "result" => { "content" => [{ "type" => "text", "value" => "x" * 10_000 }] }
+        }
 
         stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
@@ -735,7 +741,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
                 "Content-Type" => "application/json",
                 "mcp-session-id" => "new-session-123"
               },
-              body: { "result" => { "content" => [{ "type" => "text", "value" => "ok" }] } }.to_json
+              body: {
+                "jsonrpc" => "2.0",
+                "id" => 1,
+                "result" => { "content" => [{ "type" => "text", "value" => "ok" }] }
+              }.to_json
             )
         end
 
@@ -854,7 +864,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end
 
         it "processes notifications correctly" do
-          notification_event = { data: '{"method": "test_notification"}' }
+          notification_event = { data: '{"jsonrpc": "2.0", "method": "test_notification"}' }
           allow(mock_result).to receive_messages(notification?: true, request?: false, response?: false)
 
           transport.send(:process_sse_event, notification_event, nil)
@@ -863,7 +873,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end
 
         it "processes requests correctly" do
-          request_event = { data: '{"method": "test_request", "id": "req-1"}' }
+          request_event = { data: '{"jsonrpc": "2.0", "method": "test_request", "id": "req-1"}' }
           allow(mock_result).to receive_messages(notification?: false, request?: true, response?: false, id: "req-1")
           allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
 
@@ -888,7 +898,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end
 
         it "queues response and removes from pending" do
-          response_event = { data: "{\"id\": \"#{request_id}\", \"result\": \"success\"}" }
+          response_event = { data: "{\"jsonrpc\": \"2.0\", \"id\": \"#{request_id}\", \"result\": \"success\"}" }
 
           # Start a thread to check the queue
           result_thread = Thread.new do
@@ -909,11 +919,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
 
       context "when handling replay message ID in SSE processing" do
         let(:replay_id) { "replay-123" }
-        let(:original_event) { { data: '{"id": "original-456", "method": "test"}' } }
+        let(:original_event) { { data: '{"jsonrpc": "2.0", "id": "original-456", "method": "test"}' } }
 
         before do
-          allow(JSON).to receive(:parse).with('{"id": "original-456", "method": "test"}').and_return(
-            { "id" => "original-456", "method" => "test" }
+          allow(JSON).to receive(:parse).with('{"jsonrpc": "2.0", "id": "original-456", "method": "test"}').and_return(
+            { "jsonrpc" => "2.0", "id" => "original-456", "method" => "test" }
           )
           allow(mock_coordinator).to receive(:process_result)
         end

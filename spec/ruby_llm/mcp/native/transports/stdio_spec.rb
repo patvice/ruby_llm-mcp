@@ -214,11 +214,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
 
       mock_transport.send(:process_response, invalid_response)
 
-      expect(RubyLLM::MCP.logger).to have_received(:error).with(/Error parsing response as JSON/)
+      expect(RubyLLM::MCP.logger).to have_received(:error).with(/JSON parse error/)
     end
 
     it "processes notifications correctly" do
-      notification = '{"method": "notifications/message", "params": {"level": "info", "data": "test"}}'
+      notification = '{"jsonrpc": "2.0", "method": "notifications/message", "params": {"level": "info", "data": "test"}}'
       result = instance_double(RubyLLM::MCP::Result)
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
@@ -231,7 +231,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
 
     it "processes requests correctly" do
-      request = '{"id": "123", "method": "tools/call", "params": {}}'
+      request = '{"jsonrpc": "2.0", "id": "123", "method": "tools/call", "params": {}}'
       result = instance_double(RubyLLM::MCP::Result)
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
@@ -244,7 +244,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
 
     it "handles responses with matching request IDs" do
-      response = '{"id": "1", "result": {"data": "test"}}'
+      response = '{"jsonrpc": "2.0", "id": "1", "result": {"data": "test"}}'
       result = instance_double(RubyLLM::MCP::Result)
       response_queue = Queue.new
 

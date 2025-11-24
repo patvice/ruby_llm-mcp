@@ -367,7 +367,7 @@ module RubyLLM
                 response_body = "{}"
               end
 
-              json_response = JSON.parse(response_body)
+              json_response = parse_and_validate_http_response(response_body)
               result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
               if request_id
@@ -660,7 +660,8 @@ module RubyLLM
             return unless @running && !@abort_controller
 
             begin
-              event_data = JSON.parse(raw_event[:data])
+              event_data = parse_and_validate_sse_event(raw_event[:data])
+              return unless event_data
 
               # Handle replay message ID if specified
               if replay_message_id && event_data.is_a?(Hash) && event_data["id"]
@@ -680,8 +681,6 @@ module RubyLLM
                   response_queue&.push(result)
                 end
               end
-            rescue JSON::ParserError => e
-              RubyLLM::MCP.logger.warn "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
             rescue Errors::UnknownRequest => e
               RubyLLM::MCP.logger.warn "Unknown request from MCP server: #{e.message}"
             rescue StandardError => e
@@ -691,6 +690,47 @@ module RubyLLM
                 error: e
               )
             end
+          end
+
+          def parse_and_validate_sse_event(data)
+            event_data = JSON.parse(data)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(event_data)
+            unless validator.valid?
+              RubyLLM::MCP.logger.error("Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}")
+              return nil
+            end
+
+            event_data
+          rescue JSON::ParserError => e
+            RubyLLM::MCP.logger.warn "Failed to parse SSE event data: #{data} - #{e.message}"
+            nil
+          end
+
+          def parse_and_validate_http_response(response_body)
+            json_response = JSON.parse(response_body)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(json_response)
+            unless validator.valid?
+              error_msg = "Invalid JSON-RPC envelope: #{validator.error_message}"
+              RubyLLM::MCP.logger.error("#{error_msg}\nRaw: #{response_body}")
+              raise Errors::TransportError.new(
+                message: error_msg,
+                code: Native::JsonRpc::ErrorCodes::INVALID_REQUEST
+              )
+            end
+
+            json_response
+          rescue JSON::ParserError => e
+            error_msg = "JSON parse error: #{e.message}"
+            RubyLLM::MCP.logger.error("#{error_msg}\nRaw: #{response_body}")
+            raise Errors::TransportError.new(
+              message: error_msg,
+              code: Native::JsonRpc::ErrorCodes::PARSE_ERROR,
+              error: e
+            )
           end
 
           def wait_for_response_with_timeout(request_id, response_queue)

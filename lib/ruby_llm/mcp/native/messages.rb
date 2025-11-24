@@ -6,7 +6,7 @@ module RubyLLM
       # Centralized message builders for MCP JSON-RPC communication
       # All message construction happens here, returning properly formatted bodies
       module Messages
-        JSONRPC_VERSION = "2.0"
+        JSONRPC_VERSION = JsonRpc::VERSION
 
         # Request methods
         METHOD_INITIALIZE = "initialize"

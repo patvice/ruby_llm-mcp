@@ -279,16 +279,7 @@ module RubyLLM
                 response_queue&.push(event)
               end
             else
-              event = begin
-                JSON.parse(raw_event[:data])
-              rescue JSON::ParserError => e
-                # We can sometimes get partial endpoint events, so we will ignore them
-                unless @endpoint.nil?
-                  RubyLLM::MCP.logger.info "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
-                end
-
-                nil
-              end
+              event = parse_and_validate_event(raw_event[:data])
               return if event.nil?
 
               request_id = event["id"]&.to_s
@@ -305,6 +296,26 @@ module RubyLLM
                 end
               end
             end
+          end
+
+          def parse_and_validate_event(data)
+            event = JSON.parse(data)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(event)
+            unless validator.valid?
+              RubyLLM::MCP.logger.error("Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}")
+              # SSE is unidirectional from server to client, so we can't send error responses back
+              return nil
+            end
+
+            event
+          rescue JSON::ParserError => e
+            # We can sometimes get partial endpoint events, so we will ignore them
+            unless @endpoint.nil?
+              RubyLLM::MCP.logger.info "Failed to parse SSE event data: #{data} - #{e.message}"
+            end
+            nil
           end
 
           def parse_event(raw)

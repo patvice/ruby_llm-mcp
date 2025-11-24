@@ -62,14 +62,17 @@ module RubyLLM
             }
           end
 
-          def error(id:, message:, code: -32_000)
+          def error(id:, message:, code: JsonRpc::ErrorCodes::SERVER_ERROR, data: nil)
+            error_object = {
+              code: code,
+              message: message
+            }
+            error_object[:data] = data if data
+
             {
               jsonrpc: JSONRPC_VERSION,
               id: id,
-              error: {
-                code: code,
-                message: message
-              }
+              error: error_object
             }
           end
 

@@ -14,7 +14,11 @@ RSpec.describe RubyLLM::MCP::Native::ResponseHandler do
     )
 
     request_handler.execute(result)
-    error_message = "Unknown method and could not respond: #{result.method}"
-    expect(client).to have_received(:error_response).with(id: "123", message: error_message, code: -32_000)
+    error_message = "Method not found: #{result.method}"
+    expect(client).to have_received(:error_response).with(
+      id: "123",
+      message: error_message,
+      code: RubyLLM::MCP::Native::JsonRpc::ErrorCodes::METHOD_NOT_FOUND
+    )
   end
 end
