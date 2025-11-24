@@ -204,7 +204,6 @@ module RubyLLM
             @reader_thread = Thread.new do
               read_stdout_loop
             end
-            # Don't use abort_on_exception - handle errors cooperatively
           end
 
           def read_stdout_loop
@@ -240,13 +239,10 @@ module RubyLLM
           end
 
           def handle_stream_error(error, stream_name)
-            # Check @running to distinguish graceful shutdown from unexpected errors.
-            # During shutdown, streams are closed intentionally and shouldn't trigger close.
             if running?
               RubyLLM::MCP.logger.error "#{stream_name} error: #{error.message}. Closing transport."
               safe_close_with_error(error)
             else
-              # Graceful shutdown in progress
               RubyLLM::MCP.logger.debug "#{stream_name} thread exiting during shutdown"
             end
           end
@@ -255,7 +251,6 @@ module RubyLLM
             @stderr_thread = Thread.new do
               read_stderr_loop
             end
-            # Don't use abort_on_exception - handle errors cooperatively
           end
 
           def read_stderr_loop
@@ -292,7 +287,6 @@ module RubyLLM
             result = @coordinator.process_result(result)
             return if result.nil?
 
-            # Handle regular responses (tool calls, etc.)
             @pending_mutex.synchronize do
               if result.matching_id?(request_id) && @pending_requests.key?(request_id)
                 response_queue = @pending_requests.delete(request_id)

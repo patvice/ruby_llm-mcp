@@ -151,7 +151,6 @@ module RubyLLM
             @protocol_version = version
           end
 
-          # Public hooks for SSE events (similar to TS transport)
           def on_message(&block)
             @on_message_callback = block
           end
@@ -166,12 +165,10 @@ module RubyLLM
 
           private
 
-          # Thread-safe check if transport is running and not stopped
           def running?
             @state_mutex.synchronize { @running && !@sse_stopped }
           end
 
-          # Thread-safe stop signal
           def abort!
             @state_mutex.synchronize do
               @running = false
@@ -186,10 +183,8 @@ module RubyLLM
               headers = build_common_headers
               response = @connection.delete(@url, headers: headers)
 
-              # Handle HTTPX error responses first
               handle_httpx_error_response!(response, context: { location: "terminating session" })
 
-              # 405 Method Not Allowed is acceptable per spec
               unless [200, 405].include?(response.status)
                 reason_phrase = response.respond_to?(:reason_phrase) ? response.reason_phrase : nil
                 raise Errors::TransportError.new(
@@ -213,7 +208,6 @@ module RubyLLM
 
             error = response.error
 
-            # Special handling for EOFError in SSE contexts
             if allow_eof_for_sse && error.is_a?(EOFError)
               RubyLLM::MCP.logger.info "SSE stream closed: #{response.error.message}"
               return :eof_handled
@@ -263,7 +257,6 @@ module RubyLLM
           end
 
           def create_connection
-            # Use request_timeout for all timeout values (converted from ms to seconds)
             timeout_seconds = @request_timeout / 1000.0
             client = Support::HTTPClient.connection.with(
               timeout: {
@@ -285,7 +278,6 @@ module RubyLLM
             headers["X-CLIENT-ID"] = @client_id
             headers["Origin"] = @url.to_s
 
-            # Apply OAuth authorization if available
             if @oauth_provider
               RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
               RubyLLM::MCP.logger.debug "  Server URL: #{@oauth_provider.server_url}"
@@ -326,7 +318,6 @@ module RubyLLM
 
             request_client = nil
             begin
-              # Set up connection with streaming callbacks if not initialization
               connection = if is_initialization
                              @connection
                            else
@@ -366,10 +357,8 @@ module RubyLLM
           end
 
           def handle_response(response, request_id, original_message)
-            # Handle HTTPX error responses first
             handle_httpx_error_response!(response, context: { location: "handling response", request_id: request_id })
 
-            # Extract session ID if present (only for successful responses)
             session_id = response.headers["mcp-session-id"]
             @session_id = session_id if session_id
 
@@ -443,13 +432,10 @@ module RubyLLM
           def handle_client_error(response)
             status_code = response.respond_to?(:status) ? response.status : "Unknown"
 
-            # Special handling for 403 with OAuth provider
             handle_oauth_authorization_error(response, status_code) if status_code == 403 && @oauth_provider
 
-            # Try to parse and handle structured JSON error
             handle_json_error_response(response, status_code)
 
-            # Fallback: generic error
             response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
             raise Errors::TransportError.new(
               code: status_code,
@@ -481,7 +467,6 @@ module RubyLLM
 
             error_message = error_body["error"]["message"] || error_body["error"]["code"]
 
-            # Handle empty error messages
             if error_message.to_s.empty?
               raise Errors::TransportError.new(
                 code: status_code,
@@ -489,7 +474,6 @@ module RubyLLM
               )
             end
 
-            # Handle session-related errors
             if error_message.to_s.downcase.include?("session")
               raise Errors::TransportError.new(
                 code: response.status,
@@ -497,7 +481,6 @@ module RubyLLM
               )
             end
 
-            # Generic JSON error
             raise Errors::TransportError.new(
               code: response.status,
               message: "Server error: #{error_message}"
@@ -537,11 +520,9 @@ module RubyLLM
                 headers["Last-Event-ID"] = options.resumption_token
               end
 
-              # Set up SSE streaming connection with callbacks
               connection = create_connection_with_sse_callbacks(options, headers)
               response = connection.get(@url)
 
-              # Handle HTTPX error responses first
               error_result = handle_httpx_error_response!(response, context: { location: "SSE connection" },
                                                                     allow_eof_for_sse: true)
               return if error_result == :eof_handled
@@ -716,12 +697,10 @@ module RubyLLM
             begin
               event_data = JSON.parse(raw_event[:data])
 
-              # Enhanced logging with event details
               event_type = raw_event[:event] || "message"
               event_id = raw_event[:id]
               RubyLLM::MCP.logger.debug "Processing SSE event: type=#{event_type}, id=#{event_id || 'none'}"
 
-              # Handle replay message ID if specified
               if replay_message_id && event_data.is_a?(Hash) && event_data["id"]
                 event_data["id"] = replay_message_id
               end
@@ -729,7 +708,6 @@ module RubyLLM
               result = RubyLLM::MCP::Result.new(event_data, session_id: @session_id)
               RubyLLM::MCP.logger.debug "SSE Result Received: #{result.inspect}"
 
-              # Call on_message hook if registered
               @on_message_callback&.call(result)
 
               result = @coordinator.process_result(result)
@@ -782,7 +760,6 @@ module RubyLLM
           end
 
           def cleanup_sse_resources
-            # Set shutdown flags under mutex
             abort!
 
             # Call on_close hook if registered
@@ -791,12 +768,9 @@ module RubyLLM
             # Close all HTTPX clients to signal SSE thread to exit
             close_all_clients
 
-            # Wait for SSE thread to exit cooperatively
             @sse_mutex.synchronize do
               if @sse_thread&.alive?
-                # Try to join the thread first (cooperative shutdown)
                 unless @sse_thread.join(5)
-                  # Only kill as last resort if join times out
                   RubyLLM::MCP.logger.warn "SSE thread did not exit cleanly, forcing termination"
                   @sse_thread.kill
                   @sse_thread.join(1)
@@ -805,7 +779,6 @@ module RubyLLM
               end
             end
 
-            # Drain pending requests with error instead of closing queues
             drain_pending_requests_with_error
           end
 

@@ -136,7 +136,6 @@ module RubyLLM
             @sse_thread&.join(1)
             @sse_thread = nil
 
-            # Fail all pending requests
             fail_pending_requests!(
               Errors::TransportError.new(
                 message: "SSE transport closed",
@@ -144,7 +143,6 @@ module RubyLLM
               )
             )
 
-            # Reset state
             @messages_url = nil
           end
 
@@ -192,14 +190,12 @@ module RubyLLM
                   set_message_endpoint(endpoint)
                 end
               rescue Errors::TimeoutError => e
-                # Clean up the pending request on timeout
                 @pending_mutex.synchronize do
                   @pending_requests.delete("endpoint")
                 end
                 RubyLLM::MCP.logger.error "Timeout waiting for endpoint event: #{e.message}"
                 raise e
               rescue StandardError => e
-                # Clean up the pending request on any error
                 @pending_mutex.synchronize do
                   @pending_requests.delete("endpoint")
                 end
@@ -209,7 +205,6 @@ module RubyLLM
           end
 
           def set_message_endpoint(endpoint)
-            # Handle both string endpoints and JSON payloads
             endpoint_url = if endpoint.is_a?(String)
                              endpoint
                            elsif endpoint.is_a?(Hash)
@@ -283,8 +278,6 @@ module RubyLLM
               message: error_message,
               code: status_code
             )
-
-            # Close the transport (which will fail pending requests)
             close
 
             raise transport_error
@@ -332,7 +325,6 @@ module RubyLLM
           end
 
           def read_error_body(response)
-            # Try to read the error body from the response
             body = ""
             begin
               response.each do |chunk|
@@ -350,16 +342,12 @@ module RubyLLM
             error_message = "#{message}: #{error.message}"
             RubyLLM::MCP.logger.error "#{error_message}. Closing SSE transport."
 
-            # Create a transport error to fail pending requests
             transport_error = Errors::TransportError.new(
               message: error_message,
               code: nil
             )
-
-            # Close the transport (which will fail pending requests)
             close
 
-            # Notify coordinator if needed
             @coordinator&.handle_error(transport_error)
           end
 
@@ -383,7 +371,6 @@ module RubyLLM
           end
 
           def process_event(raw_event)
-            # Return if we believe that are getting a partial event
             return if raw_event[:data].nil?
 
             if raw_event[:event] == "endpoint"
@@ -398,7 +385,6 @@ module RubyLLM
             event_data = raw_event[:data]
             return if event_data.nil?
 
-            # Try to parse as JSON first, fall back to string
             endpoint = begin
               JSON.parse(event_data)
             rescue JSON::ParserError
@@ -417,7 +403,6 @@ module RubyLLM
             event = begin
               JSON.parse(raw_event[:data])
             rescue JSON::ParserError => e
-              # We can sometimes get partial events, so we will ignore them
               if @messages_url
                 RubyLLM::MCP.logger.debug "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
               end
