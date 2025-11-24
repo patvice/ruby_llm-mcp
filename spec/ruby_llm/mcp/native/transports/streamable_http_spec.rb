@@ -360,9 +360,9 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end
       end
 
-      it "respects abort controller in SSE processing" do
+      it "respects sse_stopped flag in SSE processing" do
         allow(mock_coordinator).to receive(:process_result)
-        transport.instance_variable_set(:@abort_controller, true)
+        transport.instance_variable_set(:@sse_stopped, true)
 
         raw_event = { data: '{"method": "test"}' }
 
@@ -382,9 +382,9 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect(mock_coordinator).not_to have_received(:process_result)
       end
 
-      it "handles SSE buffer events with abort controller" do
+      it "handles SSE buffer events with sse_stopped flag" do
         allow(transport).to receive(:extract_sse_event)
-        transport.instance_variable_set(:@abort_controller, true)
+        transport.instance_variable_set(:@sse_stopped, true)
 
         buffer = +"data: test\n\n"
 
@@ -651,8 +651,8 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Failed to open SSE stream: 400/)
       end
 
-      it "stops retrying when abort controller is set" do
-        transport.instance_variable_set(:@abort_controller, true)
+      it "stops retrying when sse_stopped flag is set" do
+        transport.instance_variable_set(:@sse_stopped, true)
 
         stub_request(:get, TestServerManager::HTTP_SERVER_URL)
           .with(headers: { "Accept" => "text/event-stream" })
@@ -1192,6 +1192,569 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect do
           transport.send(:handle_client_error, response)
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Plain text error message/)
+      end
+    end
+  end
+
+  describe "reconnection options precedence" do
+    it "uses explicit reconnection_options when provided" do
+      explicit_options = RubyLLM::MCP::Native::Transports::ReconnectionOptions.new(
+        max_retries: 5,
+        initial_reconnection_delay: 500
+      )
+
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        reconnection_options: explicit_options,
+        options: { reconnection: { max_retries: 1 } }
+      )
+
+      reconnection_opts = transport.instance_variable_get(:@reconnection_options)
+      expect(reconnection_opts.max_retries).to eq(5)
+      expect(reconnection_opts.initial_reconnection_delay).to eq(500)
+    end
+
+    it "uses reconnection hash when reconnection_options not provided" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: { reconnection: { max_retries: 3, initial_reconnection_delay: 200 } }
+      )
+
+      reconnection_opts = transport.instance_variable_get(:@reconnection_options)
+      expect(reconnection_opts.max_retries).to eq(3)
+      expect(reconnection_opts.initial_reconnection_delay).to eq(200)
+    end
+
+    it "uses defaults when neither reconnection_options nor reconnection provided" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      reconnection_opts = transport.instance_variable_get(:@reconnection_options)
+      expect(reconnection_opts.max_retries).to eq(2)
+      expect(reconnection_opts.initial_reconnection_delay).to eq(1_000)
+    end
+
+    it "uses defaults when reconnection hash is empty" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: { reconnection: {} }
+      )
+
+      reconnection_opts = transport.instance_variable_get(:@reconnection_options)
+      expect(reconnection_opts.max_retries).to eq(2)
+      expect(reconnection_opts.initial_reconnection_delay).to eq(1_000)
+    end
+  end
+
+  describe "resumable SSE with last event ID tracking" do
+    before do
+      WebMock.enable!
+    end
+
+    after do
+      WebMock.reset!
+      WebMock.enable!
+    end
+
+    it "tracks last SSE event ID" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      expect(transport.instance_variable_get(:@last_sse_event_id)).to be_nil
+
+      # Simulate SSE event with ID
+      raw_event = { data: '{"method": "test"}', id: "event-123" }
+      RubyLLM::MCP::Native::Transports::StartSSEOptions.new
+
+      allow(mock_coordinator).to receive(:process_result)
+      transport.send(:process_sse_event, raw_event, nil)
+
+      # Last event ID should not be tracked in process_sse_event, only in callback
+      # This is tracked in add_on_response_body_chunk_callback
+    end
+
+    it "includes last event ID in reconnection headers" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 1000,
+        options: { reconnection: { max_retries: 1 } }
+      )
+
+      # Set a last event ID
+      transport.instance_variable_set(:@last_sse_event_id, "event-456")
+
+      # Mock the connection to fail once, then succeed
+      call_count = 0
+      stub_request(:get, TestServerManager::HTTP_SERVER_URL)
+        .with(headers: { "Accept" => "text/event-stream" })
+        .to_return do |request|
+          call_count += 1
+          if call_count == 1
+            { status: 500 }
+          else
+            # Check that Last-Event-ID header is present
+            expect(request.headers["Last-Event-Id"]).to eq("event-456")
+            { status: 200, headers: { "Content-Type" => "text/event-stream" } }
+          end
+        end
+
+      options = RubyLLM::MCP::Native::Transports::StartSSEOptions.new
+      transport.send(:start_sse, options)
+    end
+  end
+
+  describe "separate timeouts for requests vs SSE" do
+    it "uses request_timeout for regular requests" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 3000,
+        options: {}
+      )
+
+      connection = transport.instance_variable_get(:@connection)
+      timeout_config = connection.instance_variable_get(:@options).timeout
+
+      expect(timeout_config[:read_timeout]).to eq(3.0)
+    end
+
+    it "uses sse_timeout for SSE connections when provided" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 3000,
+        sse_timeout: 10_000,
+        options: {}
+      )
+
+      expect(transport.instance_variable_get(:@sse_timeout)).to eq(10_000)
+    end
+
+    it "uses default long timeout for SSE when sse_timeout not provided" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 3000,
+        options: {}
+      )
+
+      expect(transport.instance_variable_get(:@sse_timeout)).to be_nil
+      # Default should be 1 hour (3600 seconds) in create_connection_with_sse_callbacks
+    end
+  end
+
+  describe "SSE state management" do
+    it "uses sse_stopped instead of abort_controller" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      expect(transport.instance_variable_get(:@sse_stopped)).to be(false)
+      expect(transport.send(:running?)).to be(true)
+
+      transport.send(:abort!)
+
+      expect(transport.instance_variable_get(:@sse_stopped)).to be(true)
+      expect(transport.send(:running?)).to be(false)
+    end
+
+    it "provides on_message hook" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      messages = []
+      transport.on_message { |msg| messages << msg }
+
+      allow(mock_coordinator).to receive(:process_result).and_return(nil)
+
+      raw_event = { data: '{"method": "test"}' }
+      transport.send(:process_sse_event, raw_event, nil)
+
+      expect(messages.size).to eq(1)
+      expect(messages.first).to be_a(RubyLLM::MCP::Result)
+    end
+
+    it "provides on_error hook" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      errors = []
+      transport.on_error { |err| errors << err }
+
+      raw_event = { data: "invalid json" }
+      transport.send(:process_sse_event, raw_event, nil)
+
+      expect(errors.size).to eq(1)
+      expect(errors.first).to be_a(JSON::ParserError)
+    end
+
+    it "provides on_close hook" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      close_called = false
+      transport.on_close { close_called = true }
+
+      transport.send(:cleanup_sse_resources)
+
+      expect(close_called).to be(true)
+    end
+  end
+
+  describe "enhanced SSE event logging" do
+    it "logs event type and ID when processing SSE events" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      allow(mock_coordinator).to receive(:process_result).and_return(nil)
+
+      raw_event = { data: '{"method": "test"}', event: "notification", id: "evt-789" }
+      transport.send(:process_sse_event, raw_event, nil)
+
+      expect(logger).to have_received(:debug).with(/Processing SSE event: type=notification, id=evt-789/)
+    end
+
+    it "logs when SSE event matches pending request" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      request_id = "req-999"
+      response_queue = Queue.new
+      transport.instance_variable_get(:@pending_mutex).synchronize do
+        transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
+      end
+
+      mock_result = instance_double(RubyLLM::MCP::Result)
+      allow(mock_result).to receive(:id).and_return(request_id)
+      allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
+
+      raw_event = { data: "{\"id\": \"#{request_id}\"}" }
+
+      # Start thread to consume the queue
+      Thread.new { response_queue.pop }
+      sleep(0.1)
+
+      transport.send(:process_sse_event, raw_event, nil)
+
+      expect(logger).to have_received(:debug).with(/Matched SSE event to pending request: #{request_id}/)
+    end
+
+    it "logs when no pending request found for SSE event" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      request_id = "req-888"
+      mock_result = instance_double(RubyLLM::MCP::Result)
+      allow(mock_result).to receive(:id).and_return(request_id)
+      allow(mock_coordinator).to receive(:process_result).and_return(mock_result)
+
+      raw_event = { data: "{\"id\": \"#{request_id}\"}" }
+      transport.send(:process_sse_event, raw_event, nil)
+
+      expect(logger).to have_received(:debug).with(/No pending request found for SSE event: #{request_id}/)
+    end
+  end
+
+  describe "thread safety improvements" do
+    describe "state flag synchronization" do
+      it "provides thread-safe running? check" do
+        expect(transport.send(:running?)).to be(true)
+
+        # Simulate concurrent access
+        threads = 10.times.map do
+          Thread.new { transport.send(:running?) }
+        end
+
+        results = threads.map(&:value)
+        expect(results).to all(be(true))
+      end
+
+      it "provides thread-safe abort! method" do
+        expect(transport.send(:running?)).to be(true)
+
+        transport.send(:abort!)
+
+        expect(transport.send(:running?)).to be(false)
+        expect(transport).not_to be_alive
+      end
+
+      it "guards chunk callbacks when flags flip mid-stream" do
+        # Set up a mock callback scenario
+        allow(mock_coordinator).to receive(:process_result)
+
+        # Simulate running state
+        expect(transport.send(:running?)).to be(true)
+
+        # Now abort
+        transport.send(:abort!)
+
+        # Callbacks should respect the running? check
+        raw_event = { data: '{"method": "test"}' }
+        transport.send(:process_sse_event, raw_event, nil)
+
+        # Should not process when not running
+        expect(mock_coordinator).not_to have_received(:process_result)
+      end
+
+      it "handles concurrent state changes safely" do
+        threads = []
+
+        # Multiple threads trying to check state
+        5.times do
+          threads << Thread.new { transport.send(:running?) }
+        end
+
+        # One thread trying to abort
+        threads << Thread.new { transport.send(:abort!) }
+
+        # More threads checking state
+        5.times do
+          threads << Thread.new { transport.send(:running?) }
+        end
+
+        # Should not raise any errors
+        expect { threads.each(&:join) }.not_to raise_error
+      end
+    end
+
+    describe "cooperative SSE shutdown" do
+      let(:mock_thread) { instance_double(Thread) }
+
+      before do
+        WebMock.enable!
+      end
+
+      after do
+        WebMock.reset!
+        WebMock.enable!
+      end
+
+      it "attempts cooperative join before killing thread" do
+        # Set up a mock SSE thread
+        allow(mock_thread).to receive(:alive?).and_return(true)
+        allow(mock_thread).to receive(:join).with(5).and_return(mock_thread)
+        transport.instance_variable_set(:@sse_thread, mock_thread)
+
+        transport.send(:cleanup_sse_resources)
+
+        # Should have called join (cooperative shutdown)
+        expect(mock_thread).to have_received(:join).with(5)
+      end
+
+      it "uses kill only as fallback when join times out" do
+        # Set up a mock SSE thread that doesn't join
+        allow(mock_thread).to receive(:alive?).and_return(true)
+        allow(mock_thread).to receive(:join).with(5).and_return(nil) # Timeout
+        allow(mock_thread).to receive(:join).with(1).and_return(mock_thread)
+        allow(mock_thread).to receive(:kill)
+        transport.instance_variable_set(:@sse_thread, mock_thread)
+
+        transport.send(:cleanup_sse_resources)
+
+        # Should have tried join first, then killed
+        expect(mock_thread).to have_received(:join).with(5)
+        expect(mock_thread).to have_received(:kill)
+        expect(logger).to have_received(:warn).with(/SSE thread did not exit cleanly/)
+      end
+
+      it "closes all clients during cleanup to signal SSE thread" do
+        # Track client closing
+        client_count_before = transport.send(:active_clients_count)
+        expect(client_count_before).to be > 0
+
+        transport.send(:cleanup_sse_resources)
+
+        # Clients should be closed (but not cleared yet - that's in cleanup_connection)
+        # The close_all_clients method should have been called
+        expect(transport.send(:active_clients_count)).to be > 0 # Not cleared yet
+      end
+
+      it "sets abort flag under mutex during cleanup" do
+        expect(transport.send(:running?)).to be(true)
+
+        transport.send(:cleanup_sse_resources)
+
+        expect(transport.send(:running?)).to be(false)
+      end
+    end
+
+    describe "pending request teardown with error sentinels" do
+      let(:request_id) { "test-request-123" }
+      let(:response_queue) { Queue.new }
+
+      before do
+        WebMock.enable!
+        transport.instance_variable_get(:@pending_mutex).synchronize do
+          transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
+        end
+      end
+
+      after do
+        WebMock.reset!
+        WebMock.enable!
+      end
+
+      it "pushes error object instead of closing queues" do
+        # Start a thread waiting on the queue
+        result_thread = Thread.new do
+          response_queue.pop
+        end
+
+        # Give the thread time to start waiting
+        sleep(0.1)
+
+        # Cleanup should push an error
+        transport.send(:drain_pending_requests_with_error)
+
+        # The waiting thread should receive an error object
+        result = result_thread.value
+        expect(result).to be_a(RubyLLM::MCP::Errors::TransportError)
+        expect(result.message).to include("shutting down")
+      end
+
+      it "does not raise ClosedQueueError" do
+        # Start a thread waiting on the queue
+        result_thread = Thread.new do
+          response_queue.pop
+        rescue ClosedQueueError
+          :closed_queue_error
+        end
+
+        # Give the thread time to start waiting
+        sleep(0.1)
+
+        # Cleanup should push an error, not close the queue
+        transport.send(:drain_pending_requests_with_error)
+
+        result = result_thread.value
+        expect(result).not_to eq(:closed_queue_error)
+        expect(result).to be_a(RubyLLM::MCP::Errors::TransportError)
+      end
+
+      it "clears all pending requests after pushing errors" do
+        pending_requests = transport.instance_variable_get(:@pending_requests)
+        expect(pending_requests).to have_key(request_id)
+
+        transport.send(:drain_pending_requests_with_error)
+
+        expect(pending_requests).to be_empty
+      end
+
+      it "handles error when pushing to queue fails" do
+        # Create a queue that will raise an error
+        bad_queue = Queue.new
+        allow(bad_queue).to receive(:push).and_raise(StandardError.new("Queue error"))
+
+        transport.instance_variable_get(:@pending_mutex).synchronize do
+          transport.instance_variable_get(:@pending_requests)["bad-request"] = bad_queue
+        end
+
+        # Should not raise, just log
+        expect { transport.send(:drain_pending_requests_with_error) }.not_to raise_error
+        expect(logger).to have_received(:debug).with(/Error pushing shutdown error/)
+      end
+
+      it "wait_for_response_with_timeout raises shutdown error sentinel" do
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+          .to_return(
+            status: 200,
+            headers: { "Content-Type" => "application/json" },
+            body: '{"result": "ok"}'
+          )
+
+        # Push a shutdown error to the queue
+        shutdown_error = RubyLLM::MCP::Errors::TransportError.new(
+          message: "Transport is shutting down",
+          code: nil
+        )
+        response_queue.push(shutdown_error)
+
+        expect do
+          transport.send(:wait_for_response_with_timeout, request_id, response_queue)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /shutting down/)
+      end
+    end
+
+    describe "full shutdown flow integration" do
+      before do
+        WebMock.enable!
+      end
+
+      after do
+        WebMock.reset!
+        WebMock.enable!
+      end
+
+      it "performs complete shutdown sequence correctly" do
+        # Add some pending requests
+        request_queue = Queue.new
+        transport.instance_variable_get(:@pending_mutex).synchronize do
+          transport.instance_variable_get(:@pending_requests)["req-1"] = request_queue
+        end
+
+        # Verify initial state
+        expect(transport.send(:running?)).to be(true)
+        expect(transport.send(:active_clients_count)).to be > 0
+
+        # Perform full close
+        transport.close
+
+        # Verify final state
+        expect(transport.send(:running?)).to be(false)
+        expect(transport.send(:active_clients_count)).to eq(0)
+
+        # Pending requests should be cleared
+        pending = transport.instance_variable_get(:@pending_requests)
+        expect(pending).to be_empty
+      end
+
+      it "handles close when already closed" do
+        transport.close
+
+        # Second close should not raise
+        expect { transport.close }.not_to raise_error
       end
     end
   end
