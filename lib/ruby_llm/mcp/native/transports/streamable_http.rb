@@ -698,7 +698,9 @@ module RubyLLM
             # Validate JSON-RPC envelope
             validator = Native::JsonRpc::EnvelopeValidator.new(event_data)
             unless validator.valid?
-              RubyLLM::MCP.logger.error("Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}")
+              RubyLLM::MCP.logger.error(
+                "Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}"
+              )
               return nil
             end
 

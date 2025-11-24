@@ -304,7 +304,9 @@ module RubyLLM
             # Validate JSON-RPC envelope
             validator = Native::JsonRpc::EnvelopeValidator.new(event)
             unless validator.valid?
-              RubyLLM::MCP.logger.error("Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}")
+              RubyLLM::MCP.logger.error(
+                "Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}"
+              )
               # SSE is unidirectional from server to client, so we can't send error responses back
               return nil
             end

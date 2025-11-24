@@ -218,7 +218,8 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
 
     it "processes notifications correctly" do
-      notification = '{"jsonrpc": "2.0", "method": "notifications/message", "params": {"level": "info", "data": "test"}}'
+      notification =
+        '{"jsonrpc": "2.0", "method": "notifications/message", "params": {"level": "info", "data": "test"}}'
       result = instance_double(RubyLLM::MCP::Result)
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
