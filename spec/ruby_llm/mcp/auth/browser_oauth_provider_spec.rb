@@ -1190,4 +1190,98 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
       end
     end
   end
+
+  describe "#handle_authentication_challenge" do
+    let(:browser_oauth) do
+      described_class.new(oauth_provider: oauth_provider, callback_port: callback_port, callback_path: callback_path)
+    end
+
+    context "when standard provider can handle challenge" do
+      before do
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+      end
+
+      it "delegates to oauth_provider" do
+        result = browser_oauth.handle_authentication_challenge(
+          www_authenticate: 'Bearer scope="test"'
+        )
+
+        expect(result).to be true
+        expect(oauth_provider).to have_received(:handle_authentication_challenge)
+      end
+
+      it "passes all parameters to oauth_provider" do
+        browser_oauth.handle_authentication_challenge(
+          www_authenticate: 'Bearer scope="test"',
+          resource_metadata_url: "https://example.com/meta",
+          requested_scope: "custom:scope"
+        )
+
+        expect(oauth_provider).to have_received(:handle_authentication_challenge).with(
+          www_authenticate: 'Bearer scope="test"',
+          resource_metadata_url: "https://example.com/meta",
+          requested_scope: "custom:scope"
+        )
+      end
+    end
+
+    context "when interactive auth is required" do
+      let(:tcp_server) { instance_double(TCPServer) }
+      let(:client_socket) { instance_double(TCPSocket) }
+      let(:token) do
+        RubyLLM::MCP::Auth::Token.new(
+          access_token: "new_token",
+          expires_in: 3600
+        )
+      end
+
+      before do
+        allow(oauth_provider).to receive(:handle_authentication_challenge)
+          .and_raise(RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Interactive auth required"))
+        allow(TCPServer).to receive(:new).and_return(tcp_server)
+        allow(tcp_server).to receive(:close)
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive_messages(closed?: false, accept: client_socket)
+        allow(client_socket).to receive(:setsockopt)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?code=test&state=test HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+        allow(client_socket).to receive(:close)
+        allow(oauth_provider).to receive_messages(start_authorization_flow: auth_url,
+                                                  complete_authorization_flow: token)
+      end
+
+      it "falls back to browser-based authentication" do
+        result = browser_oauth.handle_authentication_challenge
+
+        expect(result).to be true
+        expect(oauth_provider).to have_received(:start_authorization_flow)
+        expect(oauth_provider).to have_received(:complete_authorization_flow)
+      end
+
+      it "logs info about falling back to browser auth" do
+        browser_oauth.handle_authentication_challenge
+
+        expect(logger).to have_received(:info).with(/starting browser-based OAuth flow/)
+      end
+    end
+  end
+
+  describe "#parse_www_authenticate" do
+    let(:browser_oauth) do
+      described_class.new(oauth_provider: oauth_provider)
+    end
+
+    it "delegates to oauth_provider" do
+      header = 'Bearer scope="test"'
+      allow(oauth_provider).to receive(:parse_www_authenticate).and_return({ scope: "test" })
+
+      result = browser_oauth.parse_www_authenticate(header)
+
+      expect(result).to eq({ scope: "test" })
+      expect(oauth_provider).to have_received(:parse_www_authenticate).with(header)
+    end
+  end
 end

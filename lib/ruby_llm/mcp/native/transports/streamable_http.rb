@@ -89,6 +89,9 @@ module RubyLLM
             @sse_thread = nil
             @sse_mutex = Mutex.new
 
+            # Track if we've attempted auth flow to prevent infinite loops
+            @auth_retry_attempted = false
+
             # Thread-safe collection of all HTTPX clients
             @clients = []
             @clients_mutex = Mutex.new
@@ -342,10 +345,7 @@ module RubyLLM
             when 404
               handle_session_expired
             when 401
-              # OAuth authentication required
-              raise Errors::AuthenticationRequiredError.new(
-                message: "OAuth authentication required (401 Unauthorized)"
-              )
+              handle_authentication_challenge(response, request_id, original_message)
             when 405
               # Method not allowed - acceptable for some endpoints
               nil
@@ -481,7 +481,72 @@ module RubyLLM
             return nil unless response.respond_to?(:headers)
 
             metadata_url = response.headers["mcp-resource-metadata-url"]
+            if metadata_url
+              @resource_metadata_url = metadata_url
+              RubyLLM::MCP.logger.debug("Extracted resource metadata URL: #{metadata_url}")
+            end
             metadata_url ? URI(metadata_url) : nil
+          end
+
+          def handle_authentication_challenge(response, request_id, original_message)
+            check_retry_guard!
+            check_oauth_provider_configured!
+
+            RubyLLM::MCP.logger.info("Received 401 Unauthorized, attempting automatic authentication")
+
+            www_authenticate = response.headers["www-authenticate"]
+            resource_metadata_url = extract_resource_metadata_url(response)
+
+            attempt_authentication_retry(www_authenticate, resource_metadata_url, request_id, original_message)
+          end
+
+          def check_retry_guard!
+            return unless @auth_retry_attempted
+
+            RubyLLM::MCP.logger.warn("Authentication retry already attempted, raising error")
+            @auth_retry_attempted = false
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized) - retry failed"
+            )
+          end
+
+          def check_oauth_provider_configured!
+            return if @oauth_provider
+
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized) but no OAuth provider configured"
+            )
+          end
+
+          def attempt_authentication_retry(www_authenticate, resource_metadata_url, request_id, original_message)
+            @auth_retry_attempted = true
+
+            success = @oauth_provider.handle_authentication_challenge(
+              www_authenticate: www_authenticate,
+              resource_metadata_url: resource_metadata_url&.to_s,
+              requested_scope: nil
+            )
+
+            if success
+              RubyLLM::MCP.logger.info("Authentication challenge handled successfully, retrying request")
+              result = send_http_request(original_message, request_id, is_initialization: false)
+              @auth_retry_attempted = false
+              return result
+            end
+
+            @auth_retry_attempted = false
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized)"
+            )
+          rescue Errors::AuthenticationRequiredError => e
+            @auth_retry_attempted = false
+            raise e
+          rescue StandardError => e
+            @auth_retry_attempted = false
+            RubyLLM::MCP.logger.error("Authentication challenge handling failed: #{e.message}")
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication failed: #{e.message}"
+            )
           end
 
           def start_sse_stream(options = StartSSEOptions.new)

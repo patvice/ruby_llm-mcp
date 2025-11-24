@@ -219,4 +219,119 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
       expect(events).to eq([])
     end
   end
+
+  describe "OAuth integration" do
+    let(:server_url) { "http://localhost:3000/sse" }
+    let(:storage) { RubyLLM::MCP::Auth::MemoryStorage.new }
+    let(:oauth_provider) do
+      RubyLLM::MCP::Auth::OAuthProvider.new(
+        server_url: server_url,
+        storage: storage
+      )
+    end
+    let(:coordinator) { instance_double(RubyLLM::MCP::Adapters::MCPTransports::CoordinatorStub) }
+    let(:transport_with_oauth) do
+      RubyLLM::MCP::Native::Transports::SSE.new(
+        url: server_url,
+        coordinator: coordinator,
+        request_timeout: 5000,
+        options: { oauth_provider: oauth_provider }
+      )
+    end
+
+    it "accepts OAuth provider in initialization" do
+      expect(transport_with_oauth.instance_variable_get(:@oauth_provider)).to eq(oauth_provider)
+    end
+
+    it "applies OAuth authorization header to requests" do
+      token = RubyLLM::MCP::Auth::Token.new(
+        access_token: "test_token",
+        expires_in: 3600
+      )
+      storage.set_token(server_url, token)
+
+      headers = transport_with_oauth.send(:build_request_headers)
+
+      expect(headers["Authorization"]).to eq("Bearer test_token")
+    end
+
+    it "does not apply OAuth header when no token available" do
+      headers = transport_with_oauth.send(:build_request_headers)
+
+      expect(headers["Authorization"]).to be_nil
+    end
+
+    context "with authentication challenges" do
+      let(:mock_response) { instance_double(HTTPX::Response) }
+
+      before do
+        allow(mock_response).to receive_messages(headers: {
+                                                   "www-authenticate" => 'Bearer scope="mcp:read"',
+                                                   "mcp-resource-metadata-url" => "https://example.com/meta"
+                                                 }, status: 401)
+      end
+
+      it "handles 401 during message POST" do
+        transport_with_oauth.instance_variable_set(:@messages_url, "http://localhost:3000/messages")
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_raise(
+          RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Auth required")
+        )
+
+        expect do
+          transport_with_oauth.send(:handle_authentication_challenge, mock_response, {}, 1)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError)
+
+        expect(oauth_provider).to have_received(:handle_authentication_challenge)
+      end
+
+      it "retries request after successful authentication" do
+        transport_with_oauth.instance_variable_set(:@messages_url, "http://localhost:3000/messages")
+
+        new_token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "new_token",
+          expires_in: 3600
+        )
+        storage.set_token(server_url, new_token)
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+
+        # Mock the retry to succeed by stubbing send_request
+        allow(transport_with_oauth).to receive(:send_request).and_return(nil)
+
+        expect do
+          transport_with_oauth.send(:handle_authentication_challenge, mock_response, { "method" => "test" }, 1)
+        end.not_to raise_error
+      end
+
+      it "prevents infinite retry loop" do
+        transport_with_oauth.instance_variable_set(:@messages_url, "http://localhost:3000/messages")
+        transport_with_oauth.instance_variable_set(:@auth_retry_attempted, true)
+
+        expect do
+          transport_with_oauth.send(:handle_authentication_challenge, mock_response, {}, 1)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /retry failed/)
+      end
+
+      it "handles SSE stream 401 authentication" do
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+
+        expect do
+          transport_with_oauth.send(:handle_sse_authentication_challenge, mock_response)
+        end.not_to raise_error
+
+        expect(oauth_provider).to have_received(:handle_authentication_challenge)
+      end
+
+      it "raises error when SSE auth fails" do
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_raise(
+          RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Auth failed")
+        )
+
+        expect do
+          transport_with_oauth.send(:handle_sse_authentication_challenge, mock_response)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError)
+      end
+    end
+  end
 end

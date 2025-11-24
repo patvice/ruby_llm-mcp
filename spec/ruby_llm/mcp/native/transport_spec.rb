@@ -146,7 +146,8 @@ RSpec.describe RubyLLM::MCP::Native::Transport do
   describe "#build_transport" do
     context "with valid transport type" do
       it "builds SSE transport" do
-        transport = described_class.new(:sse, coordinator, config: config)
+        sse_config = { url: "http://localhost:3000/sse", timeout: 30 }
+        transport = described_class.new(:sse, coordinator, config: sse_config)
         mock_sse = instance_double(RubyLLM::MCP::Native::Transports::SSE)
         allow(RubyLLM::MCP::Native::Transports::SSE).to receive(:new).and_return(mock_sse)
 
@@ -154,8 +155,10 @@ RSpec.describe RubyLLM::MCP::Native::Transport do
 
         expect(protocol).to eq(mock_sse)
         expect(RubyLLM::MCP::Native::Transports::SSE).to have_received(:new).with(
+          url: "http://localhost:3000/sse",
           coordinator: coordinator,
-          **config
+          request_timeout: RubyLLM::MCP.config.request_timeout,
+          options: { timeout: 30 }
         )
       end
 

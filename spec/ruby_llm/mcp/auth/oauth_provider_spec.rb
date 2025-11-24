@@ -397,4 +397,195 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
     # NOTE: State parameter validation is now tested in SessionManager specs
     # These tests were testing internal implementation details
   end
+
+  describe "#handle_authentication_challenge" do
+    let(:provider) do
+      described_class.new(
+        server_url: server_url,
+        storage: storage,
+        logger: logger,
+        grant_type: :authorization_code
+      )
+    end
+
+    context "when token can be refreshed" do
+      let(:expired_token) do
+        token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "expired_token",
+          refresh_token: "refresh_token_123",
+          expires_in: 1
+        )
+        token.instance_variable_set(:@expires_at, Time.now - 3600)
+        token
+      end
+
+      let(:new_token) do
+        RubyLLM::MCP::Auth::Token.new(
+          access_token: "new_token",
+          expires_in: 3600
+        )
+      end
+
+      before do
+        storage.set_token(server_url, expired_token)
+        allow(provider).to receive(:refresh_token).with(expired_token).and_return(new_token)
+      end
+
+      it "refreshes token and returns true" do
+        result = provider.handle_authentication_challenge
+
+        expect(result).to be true
+        expect(provider).to have_received(:refresh_token)
+      end
+
+      it "logs debug information" do
+        provider.handle_authentication_challenge
+
+        expect(logger).to have_received(:debug).with(/Handling authentication challenge/)
+        expect(logger).to have_received(:debug).with(/Attempting token refresh/)
+      end
+    end
+
+    context "when using client credentials grant" do
+      let(:provider) do
+        described_class.new(
+          server_url: server_url,
+          storage: storage,
+          logger: logger,
+          grant_type: :client_credentials
+        )
+      end
+
+      let(:new_token) do
+        RubyLLM::MCP::Auth::Token.new(
+          access_token: "client_creds_token",
+          expires_in: 3600
+        )
+      end
+
+      before do
+        allow(provider).to receive(:client_credentials_flow).and_return(new_token)
+      end
+
+      it "attempts client credentials flow" do
+        result = provider.handle_authentication_challenge
+
+        expect(result).to be true
+        expect(provider).to have_received(:client_credentials_flow)
+      end
+
+      it "passes requested scope to client credentials flow" do
+        provider.handle_authentication_challenge(requested_scope: "custom:scope")
+
+        expect(provider).to have_received(:client_credentials_flow).with(scope: "custom:scope")
+      end
+    end
+
+    context "when interactive auth is required" do
+      it "raises AuthenticationRequiredError" do
+        expect do
+          provider.handle_authentication_challenge
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /interactive authorization is needed/)
+      end
+
+      it "logs warning about interactive auth requirement" do
+        begin
+          provider.handle_authentication_challenge
+        rescue RubyLLM::MCP::Errors::AuthenticationRequiredError
+          # Expected
+        end
+
+        expect(logger).to have_received(:warn).with(/Cannot automatically authenticate/)
+      end
+    end
+
+    context "with WWW-Authenticate header" do
+      let(:www_authenticate) { 'Bearer realm="example", scope="mcp:read mcp:write"' }
+
+      it "parses and updates scope" do
+        expect do
+          provider.handle_authentication_challenge(www_authenticate: www_authenticate)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError)
+
+        expect(provider.scope).to eq("mcp:read mcp:write")
+      end
+
+      it "logs WWW-Authenticate header" do
+        begin
+          provider.handle_authentication_challenge(www_authenticate: www_authenticate)
+        rescue RubyLLM::MCP::Errors::AuthenticationRequiredError
+          # Expected
+        end
+
+        expect(logger).to have_received(:debug).with(/WWW-Authenticate:/)
+      end
+    end
+
+    context "with resource metadata URL" do
+      let(:metadata_url) { "https://example.com/.well-known/oauth-protected-resource" }
+
+      it "logs resource metadata URL" do
+        begin
+          provider.handle_authentication_challenge(resource_metadata_url: metadata_url)
+        rescue RubyLLM::MCP::Errors::AuthenticationRequiredError
+          # Expected
+        end
+
+        expect(logger).to have_received(:debug).with(/Resource metadata URL:/)
+      end
+    end
+  end
+
+  describe "#parse_www_authenticate" do
+    let(:provider) do
+      described_class.new(
+        server_url: server_url,
+        storage: storage
+      )
+    end
+
+    it "parses scope from header" do
+      header = 'Bearer realm="example", scope="mcp:read mcp:write"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result[:scope]).to eq("mcp:read mcp:write")
+    end
+
+    it "parses resource_metadata_url from header" do
+      header = 'Bearer resource_metadata_url="https://example.com/.well-known/oauth"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result[:resource_metadata_url]).to eq("https://example.com/.well-known/oauth")
+    end
+
+    it "parses realm from header" do
+      header = 'Bearer realm="example.com"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result[:realm]).to eq("example.com")
+    end
+
+    it "parses all parameters together" do
+      header = 'Bearer realm="example", scope="mcp:read", resource_metadata_url="https://example.com/meta"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result[:realm]).to eq("example")
+      expect(result[:scope]).to eq("mcp:read")
+      expect(result[:resource_metadata_url]).to eq("https://example.com/meta")
+    end
+
+    it "returns empty hash for non-Bearer header" do
+      header = 'Basic realm="example"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result).to eq({})
+    end
+
+    it "handles case-insensitive Bearer" do
+      header = 'bearer scope="test"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result[:scope]).to eq("test")
+    end
+  end
 end
