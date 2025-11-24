@@ -164,16 +164,17 @@ module RubyLLM
           logger.debug("  Requested scope: #{requested_scope}") if requested_scope
 
           # Parse WWW-Authenticate header if provided
+          final_requested_scope = requested_scope
           if www_authenticate
             challenge_info = parse_www_authenticate(www_authenticate)
-            resource_metadata_url ||= challenge_info[:resource_metadata_url]
-            requested_scope ||= challenge_info[:scope]
+            final_requested_scope ||= challenge_info[:scope]
+            # NOTE: resource_metadata_url from challenge_info could be used for future discovery
           end
 
           # Update scope if server requested different scope
-          if requested_scope && requested_scope != scope
-            logger.debug("Updating scope from '#{scope}' to '#{requested_scope}'")
-            self.scope = requested_scope
+          if final_requested_scope && final_requested_scope != scope
+            logger.debug("Updating scope from '#{scope}' to '#{final_requested_scope}'")
+            self.scope = final_requested_scope
           end
 
           # Try to refresh existing token

@@ -235,7 +235,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
         url: server_url,
         coordinator: coordinator,
         request_timeout: 5000,
-        oauth_provider: oauth_provider
+        options: { oauth_provider: oauth_provider }
       )
     end
 
@@ -265,11 +265,10 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
       let(:mock_response) { instance_double(HTTPX::Response) }
 
       before do
-        allow(mock_response).to receive(:headers).and_return({
-          "www-authenticate" => 'Bearer scope="mcp:read"',
-          "mcp-resource-metadata-url" => "https://example.com/meta"
-        })
-        allow(mock_response).to receive(:status).and_return(401)
+        allow(mock_response).to receive_messages(headers: {
+                                                   "www-authenticate" => 'Bearer scope="mcp:read"',
+                                                   "mcp-resource-metadata-url" => "https://example.com/meta"
+                                                 }, status: 401)
       end
 
       it "handles 401 during message POST" do
@@ -296,12 +295,9 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
         storage.set_token(server_url, new_token)
 
         allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
-        allow(transport_with_oauth).to receive(:send_request).and_call_original
 
-        # Mock the retry to succeed
-        allow(RubyLLM::MCP::Native::Transports::Support::HTTPClient).to receive(:connection).and_return(
-          double(with: double(post: double(status: 200, headers: {})))
-        )
+        # Mock the retry to succeed by stubbing send_request
+        allow(transport_with_oauth).to receive(:send_request).and_return(nil)
 
         expect do
           transport_with_oauth.send(:handle_authentication_challenge, mock_response, { "method" => "test" }, 1)

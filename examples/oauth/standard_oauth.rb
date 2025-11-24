@@ -126,6 +126,3 @@ puts "3. Configure redirect URI: #{REDIRECT_URI}"
 puts "4. Uncomment the interactive code above"
 puts "5. Run: ruby #{__FILE__}"
 puts "=" * 60
-
-
-

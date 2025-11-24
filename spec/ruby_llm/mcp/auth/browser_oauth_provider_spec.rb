@@ -1238,12 +1238,10 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
       before do
         allow(oauth_provider).to receive(:handle_authentication_challenge)
           .and_raise(RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Interactive auth required"))
-        allow(oauth_provider).to receive(:start_authorization_flow).and_return(auth_url)
         allow(TCPServer).to receive(:new).and_return(tcp_server)
         allow(tcp_server).to receive(:close)
-        allow(tcp_server).to receive(:closed?).and_return(false)
         allow(tcp_server).to receive(:wait_readable).and_return(true, false)
-        allow(tcp_server).to receive(:accept).and_return(client_socket)
+        allow(tcp_server).to receive_messages(closed?: false, accept: client_socket)
         allow(client_socket).to receive(:setsockopt)
         allow(client_socket).to receive(:gets).and_return(
           "GET /callback?code=test&state=test HTTP/1.1\r\n",
@@ -1251,7 +1249,8 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         )
         allow(client_socket).to receive(:write)
         allow(client_socket).to receive(:close)
-        allow(oauth_provider).to receive(:complete_authorization_flow).and_return(token)
+        allow(oauth_provider).to receive_messages(start_authorization_flow: auth_url,
+                                                  complete_authorization_flow: token)
       end
 
       it "falls back to browser-based authentication" do

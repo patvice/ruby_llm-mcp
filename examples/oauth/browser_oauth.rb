@@ -82,6 +82,3 @@ puts "3. Configure redirect URI: http://localhost:8080/callback"
 puts "4. Uncomment the authentication code above"
 puts "5. Run: ruby #{__FILE__}"
 puts "=" * 60
-
-
-
