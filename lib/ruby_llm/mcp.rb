@@ -100,9 +100,10 @@ module RubyLLM
   end
 end
 
-require_relative "mcp/railtie" if defined?(Rails::Railtie)
-
 loader = Zeitwerk::Loader.for_gem_extension(RubyLLM)
+
+loader.ignore("#{__dir__}/mcp/railtie.rb")
+
 loader.inflector.inflect("mcp" => "MCP")
 loader.inflector.inflect("sse" => "SSE")
 loader.inflector.inflect("openai" => "OpenAI")
@@ -118,3 +119,7 @@ loader.inflector.inflect("oauth_provider" => "OAuthProvider")
 loader.inflector.inflect("browser_oauth_provider" => "BrowserOAuthProvider")
 
 loader.setup
+
+if defined?(Rails::Railtie)
+  require_relative "mcp/railtie"
+end

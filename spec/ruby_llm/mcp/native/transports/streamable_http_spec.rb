@@ -1194,6 +1194,146 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Plain text error message/)
       end
     end
+
+    context "with OAuth challenge and retry" do
+      let(:oauth_provider) do
+        RubyLLM::MCP::Auth::OAuthProvider.new(
+          server_url: server_url,
+          storage: storage
+        )
+      end
+      let(:transport_with_oauth) do
+        described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: { oauth_provider: oauth_provider }
+        )
+      end
+
+      before do
+        # Set up initial token
+        token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "initial_token",
+          refresh_token: "refresh_token_123",
+          expires_in: 3600
+        )
+        storage.set_token(server_url, token)
+      end
+
+      it "handles 401 with WWW-Authenticate and retries request" do
+        # First request returns 401
+        stub_request(:post, server_url)
+          .with(headers: { "Authorization" => "Bearer initial_token" })
+          .to_return(
+            status: 401,
+            headers: {
+              "WWW-Authenticate" => 'Bearer scope="mcp:read mcp:write"',
+              "mcp-resource-metadata-url" => "https://example.com/.well-known/oauth"
+            }
+          )
+
+        # After refresh, second request succeeds
+        new_token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "refreshed_token",
+          expires_in: 3600
+        )
+
+        # Mock the OAuth provider to update the token and return success
+        allow(oauth_provider).to receive(:handle_authentication_challenge) do
+          storage.set_token(server_url, new_token)
+          true
+        end
+
+        stub_request(:post, server_url)
+          .with(headers: { "Authorization" => "Bearer refreshed_token" })
+          .to_return(
+            status: 200,
+            headers: { "Content-Type" => "application/json" },
+            body: '{"result": {"content": [{"type": "text", "text": "success"}]}}'
+          )
+
+        result = transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+
+        expect(result).to be_a(RubyLLM::MCP::Result)
+        expect(oauth_provider).to have_received(:handle_authentication_challenge)
+      end
+
+      it "prevents infinite retry loop on repeated 401" do
+        # Both requests return 401
+        stub_request(:post, server_url)
+          .to_return(status: 401)
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+
+        expect do
+          transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /retry failed/)
+      end
+
+      it "raises error when no OAuth provider configured" do
+        transport_without_oauth = described_class.new(
+          url: server_url,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: {}
+        )
+
+        stub_request(:post, server_url).to_return(status: 401)
+
+        expect do
+          transport_without_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /no OAuth provider configured/)
+      end
+
+      it "extracts and caches resource metadata URL" do
+        stub_request(:post, server_url)
+          .to_return(
+            status: 401,
+            headers: { "mcp-resource-metadata-url" => "https://example.com/.well-known/oauth" }
+          )
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_raise(
+          RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Auth required")
+        )
+
+        begin
+          transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        rescue RubyLLM::MCP::Errors::AuthenticationRequiredError
+          # Expected
+        end
+
+        expect(logger).to have_received(:debug).with(/Extracted resource metadata URL/)
+      end
+
+      it "logs authentication challenge handling" do
+        stub_request(:post, server_url).to_return(status: 401)
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_raise(
+          RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Auth required")
+        )
+
+        begin
+          transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        rescue RubyLLM::MCP::Errors::AuthenticationRequiredError
+          # Expected
+        end
+
+        expect(logger).to have_received(:info).with(/Received 401 Unauthorized, attempting automatic authentication/)
+      end
+
+      it "handles authentication challenge failure gracefully" do
+        stub_request(:post, server_url).to_return(status: 401)
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_raise(
+          StandardError.new("Network error")
+        )
+
+        expect do
+          transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /Network error/)
+      end
+    end
   end
 
   describe "reconnection options precedence" do

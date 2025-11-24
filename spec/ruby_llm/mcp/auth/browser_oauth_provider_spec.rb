@@ -25,6 +25,10 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     allow(oauth_provider).to receive_messages(redirect_uri: "http://localhost:8080/callback",
                                               server_url: "https://mcp.example.com", scope: "mcp:read mcp:write",
                                               storage: instance_double(RubyLLM::MCP::Auth::MemoryStorage))
+    # Stub Browser::Opener to prevent actual browser from opening in any test
+    opener_double = instance_double(RubyLLM::MCP::Auth::Browser::Opener)
+    allow(opener_double).to receive(:open_browser).and_return(true)
+    allow(RubyLLM::MCP::Auth::Browser::Opener).to receive(:new).and_return(opener_double)
   end
 
   describe "#initialize" do
@@ -191,21 +195,18 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
 
       it "opens browser when auto_open_browser is true" do
         opener = browser_oauth.instance_variable_get(:@opener)
-        allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-        allow(opener).to receive(:system).and_return(true)
 
         browser_oauth.authenticate(auto_open_browser: true)
 
-        expect(opener).to have_received(:system).with("open", auth_url)
+        expect(opener).to have_received(:open_browser).with(auth_url)
       end
 
       it "doesn't open browser when auto_open_browser is false" do
         opener = browser_oauth.instance_variable_get(:@opener)
-        allow(opener).to receive(:system)
 
         browser_oauth.authenticate(auto_open_browser: false)
 
-        expect(opener).not_to have_received(:system)
+        expect(opener).not_to have_received(:open_browser)
       end
 
       it "waits for callback and completes authorization" do
@@ -494,44 +495,44 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
   end
 
   describe "#open_browser" do
-    let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
-    let(:opener) { browser_oauth.instance_variable_get(:@opener) }
+    # Create a real opener instance for these tests, bypassing the global stub
+    let(:real_opener) { RubyLLM::MCP::Auth::Browser::Opener.allocate.tap { |o| o.send(:initialize, logger: logger) } }
     let(:url) { "https://example.com/auth" }
 
     it "calls correct command for macOS" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-      allow(opener).to receive(:system).and_return(true)
+      allow(real_opener).to receive(:system).and_return(true)
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be true
-      expect(opener).to have_received(:system).with("open", url)
+      expect(real_opener).to have_received(:system).with("open", url)
     end
 
     it "calls correct command for Linux" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("linux")
-      allow(opener).to receive(:system).and_return(true)
+      allow(real_opener).to receive(:system).and_return(true)
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be true
-      expect(opener).to have_received(:system).with("xdg-open", url)
+      expect(real_opener).to have_received(:system).with("xdg-open", url)
     end
 
     it "calls correct command for Windows" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("mswin")
-      allow(opener).to receive(:system).and_return(true)
+      allow(real_opener).to receive(:system).and_return(true)
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be true
-      expect(opener).to have_received(:system).with("start", url)
+      expect(real_opener).to have_received(:system).with("start", url)
     end
 
     it "warns on unknown operating system" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("unknown-os")
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be false
       expect(logger).to have_received(:warn).with(/Unknown operating system/)
@@ -539,9 +540,9 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
 
     it "handles system call failures" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-      allow(opener).to receive(:system).and_raise(StandardError.new("Command failed"))
+      allow(real_opener).to receive(:system).and_raise(StandardError.new("Command failed"))
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be false
       expect(logger).to have_received(:warn).with(/Failed to open browser/)
@@ -1188,6 +1189,100 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
           expect(response).to include("My Error Page")
         end
       end
+    end
+  end
+
+  describe "#handle_authentication_challenge" do
+    let(:browser_oauth) do
+      described_class.new(oauth_provider: oauth_provider, callback_port: callback_port, callback_path: callback_path)
+    end
+
+    context "when standard provider can handle challenge" do
+      before do
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+      end
+
+      it "delegates to oauth_provider" do
+        result = browser_oauth.handle_authentication_challenge(
+          www_authenticate: 'Bearer scope="test"'
+        )
+
+        expect(result).to be true
+        expect(oauth_provider).to have_received(:handle_authentication_challenge)
+      end
+
+      it "passes all parameters to oauth_provider" do
+        browser_oauth.handle_authentication_challenge(
+          www_authenticate: 'Bearer scope="test"',
+          resource_metadata_url: "https://example.com/meta",
+          requested_scope: "custom:scope"
+        )
+
+        expect(oauth_provider).to have_received(:handle_authentication_challenge).with(
+          www_authenticate: 'Bearer scope="test"',
+          resource_metadata_url: "https://example.com/meta",
+          requested_scope: "custom:scope"
+        )
+      end
+    end
+
+    context "when interactive auth is required" do
+      let(:tcp_server) { instance_double(TCPServer) }
+      let(:client_socket) { instance_double(TCPSocket) }
+      let(:token) do
+        RubyLLM::MCP::Auth::Token.new(
+          access_token: "new_token",
+          expires_in: 3600
+        )
+      end
+
+      before do
+        allow(oauth_provider).to receive(:handle_authentication_challenge)
+          .and_raise(RubyLLM::MCP::Errors::AuthenticationRequiredError.new(message: "Interactive auth required"))
+        allow(TCPServer).to receive(:new).and_return(tcp_server)
+        allow(tcp_server).to receive(:close)
+        allow(tcp_server).to receive(:wait_readable).and_return(true, false)
+        allow(tcp_server).to receive_messages(closed?: false, accept: client_socket)
+        allow(client_socket).to receive(:setsockopt)
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?code=test&state=test HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:write)
+        allow(client_socket).to receive(:close)
+        allow(oauth_provider).to receive_messages(start_authorization_flow: auth_url,
+                                                  complete_authorization_flow: token)
+      end
+
+      it "falls back to browser-based authentication" do
+        result = browser_oauth.handle_authentication_challenge
+
+        expect(result).to be true
+        expect(oauth_provider).to have_received(:start_authorization_flow)
+        expect(oauth_provider).to have_received(:complete_authorization_flow)
+      end
+
+      it "logs info about falling back to browser auth" do
+        browser_oauth.handle_authentication_challenge
+
+        expect(logger).to have_received(:info).with(/starting browser-based OAuth flow/)
+      end
+    end
+  end
+
+  describe "#parse_www_authenticate" do
+    let(:browser_oauth) do
+      described_class.new(oauth_provider: oauth_provider)
+    end
+
+    it "delegates to oauth_provider" do
+      header = 'Bearer scope="test"'
+      allow(oauth_provider).to receive(:parse_www_authenticate).and_return({ scope: "test" })
+
+      result = browser_oauth.parse_www_authenticate(header)
+
+      expect(result).to eq({ scope: "test" })
+      expect(oauth_provider).to have_received(:parse_www_authenticate).with(header)
     end
   end
 end
