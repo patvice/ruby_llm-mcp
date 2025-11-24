@@ -1,0 +1,528 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+require "json_schemer"
+
+RSpec.describe RubyLLM::MCP::Native::Messages do
+  let(:schema_path) { File.join(__dir__, "../../../fixtures/mcp_definition/2025-06-18-schema.json") }
+  let(:schema_json) { JSON.parse(File.read(schema_path)) }
+  let(:schemer) { JSONSchemer.schema(schema_json) }
+
+  # Mock client for testing
+  let(:mock_client) do
+    instance_double(
+      RubyLLM::MCP::Native::Client,
+      protocol_version: "2025-06-18",
+      client_capabilities: { roots: { listChanged: true } },
+      tracking_progress?: false
+    )
+  end
+
+  let(:mock_client_with_progress) do
+    instance_double(
+      RubyLLM::MCP::Native::Client,
+      protocol_version: "2025-06-18",
+      client_capabilities: { roots: { listChanged: true } },
+      tracking_progress?: true
+    )
+  end
+
+  describe "Constants" do
+    it "defines JSONRPC_VERSION" do
+      expect(described_class::JSONRPC_VERSION).to eq("2.0")
+    end
+
+    it "defines all method constants" do
+      expect(described_class::METHOD_INITIALIZE).to eq("initialize")
+      expect(described_class::METHOD_PING).to eq("ping")
+      expect(described_class::METHOD_TOOLS_LIST).to eq("tools/list")
+      expect(described_class::METHOD_TOOLS_CALL).to eq("tools/call")
+    end
+  end
+
+  describe "Helpers" do
+    # Test helpers indirectly through their usage in Requests
+    # since they're extended into modules, not called directly
+
+    describe "UUID generation" do
+      it "generates valid UUIDs for requests" do
+        body = described_class::Requests.ping
+        expect(body[:id]).to match(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/)
+      end
+
+      it "generates unique IDs for each request" do
+        id1 = described_class::Requests.ping[:id]
+        id2 = described_class::Requests.ping[:id]
+        expect(id1).not_to eq(id2)
+      end
+    end
+
+    describe "progress token handling" do
+      it "adds progress token when tracking is enabled" do
+        body = described_class::Requests.ping(tracking_progress: true)
+        expect(body[:params]).to be_a(Hash)
+        expect(body[:params][:_meta]).to be_a(Hash)
+        expect(body[:params][:_meta][:progressToken]).to be_a(String)
+      end
+
+      it "does not add progress token when tracking is disabled" do
+        body = described_class::Requests.ping(tracking_progress: false)
+        # params should be empty and deleted when no progress tracking
+        expect(body[:params]).to be_nil
+      end
+    end
+
+    describe "cursor handling" do
+      it "adds cursor when provided" do
+        body = described_class::Requests.tool_list(cursor: "cursor-123")
+        expect(body[:params][:cursor]).to eq("cursor-123")
+      end
+
+      it "does not add cursor when nil" do
+        body = described_class::Requests.tool_list(cursor: nil)
+        # When no cursor and no progress tracking, params is empty and deleted
+        if body[:params]
+          expect(body[:params][:cursor]).to be_nil
+        else
+          expect(body[:params]).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "Requests" do
+    describe ".initialize" do
+      let(:body) do
+        described_class::Requests.initialize(
+          protocol_version: "2025-06-18",
+          capabilities: { roots: { listChanged: true } }
+        )
+      end
+
+      it "creates a valid initialize request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("initialize")
+        expect(body[:params]).to be_a(Hash)
+        expect(body[:params][:protocolVersion]).to eq("2025-06-18")
+        expect(body[:params][:capabilities]).to be_a(Hash)
+        expect(body[:params][:clientInfo]).to be_a(Hash)
+      end
+
+      it "validates against InitializeRequest schema" do
+        # Convert symbols to strings for schema validation
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".ping" do
+      let(:body) { described_class::Requests.ping }
+
+      it "creates a valid ping request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("ping")
+      end
+
+      it "validates against PingRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+
+      it "includes progress token when tracking is enabled" do
+        body = described_class::Requests.ping(tracking_progress: true)
+        expect(body[:params]).to be_a(Hash)
+        expect(body[:params][:_meta]).to be_a(Hash)
+        expect(body[:params][:_meta][:progressToken]).to be_a(String)
+      end
+    end
+
+    describe ".tool_list" do
+      let(:body) { described_class::Requests.tool_list }
+
+      it "creates a valid tool list request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("tools/list")
+      end
+
+      it "validates against ListToolsRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+
+      it "includes cursor when provided" do
+        body = described_class::Requests.tool_list(cursor: "cursor-123")
+        expect(body[:params][:cursor]).to eq("cursor-123")
+      end
+    end
+
+    describe ".tool_call" do
+      let(:body) { described_class::Requests.tool_call(name: "test_tool", parameters: { arg: "value" }) }
+
+      it "creates a valid tool call request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("tools/call")
+        expect(body[:params][:name]).to eq("test_tool")
+        expect(body[:params][:arguments]).to eq({ arg: "value" })
+      end
+
+      it "validates against CallToolRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".resource_list" do
+      let(:body) { described_class::Requests.resource_list }
+
+      it "creates a valid resource list request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("resources/list")
+      end
+
+      it "validates against ListResourcesRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".resource_read" do
+      let(:body) { described_class::Requests.resource_read(uri: "file:///test.txt") }
+
+      it "creates a valid resource read request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("resources/read")
+        expect(body[:params][:uri]).to eq("file:///test.txt")
+      end
+
+      it "validates against ReadResourceRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".resource_template_list" do
+      let(:body) { described_class::Requests.resource_template_list }
+
+      it "creates a valid resource template list request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("resources/templates/list")
+      end
+
+      it "validates against ListResourceTemplatesRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".resources_subscribe" do
+      let(:body) { described_class::Requests.resources_subscribe(uri: "file:///test.txt") }
+
+      it "creates a valid resources subscribe request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("resources/subscribe")
+        expect(body[:params][:uri]).to eq("file:///test.txt")
+      end
+
+      it "validates against SubscribeRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".prompt_list" do
+      let(:body) { described_class::Requests.prompt_list }
+
+      it "creates a valid prompt list request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("prompts/list")
+      end
+
+      it "validates against ListPromptsRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".prompt_call" do
+      let(:body) do
+        described_class::Requests.prompt_call(name: "test_prompt", arguments: { arg: "value" })
+      end
+
+      it "creates a valid prompt call request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("prompts/get")
+        expect(body[:params][:name]).to eq("test_prompt")
+        expect(body[:params][:arguments]).to eq({ arg: "value" })
+      end
+
+      it "validates against GetPromptRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".completion_resource" do
+      let(:body) do
+        described_class::Requests.completion_resource(
+          uri: "file:///test.txt",
+          argument: "arg1",
+          value: "val1"
+        )
+      end
+
+      it "creates a valid completion resource request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("completion/complete")
+        expect(body[:params][:ref][:type]).to eq("ref/resource")
+        expect(body[:params][:ref][:uri]).to eq("file:///test.txt")
+        expect(body[:params][:argument][:name]).to eq("arg1")
+        expect(body[:params][:argument][:value]).to eq("val1")
+      end
+
+      it "validates against CompleteRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+
+      it "includes context when provided" do
+        body = described_class::Requests.completion_resource(
+          uri: "file:///test.txt",
+          argument: "arg1",
+          value: "val1",
+          context: { key: "value" }
+        )
+        expect(body[:params][:context][:arguments]).to eq({ key: "value" })
+      end
+    end
+
+    describe ".completion_prompt" do
+      let(:body) do
+        described_class::Requests.completion_prompt(
+          name: "test_prompt",
+          argument: "arg1",
+          value: "val1"
+        )
+      end
+
+      it "creates a valid completion prompt request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("completion/complete")
+        expect(body[:params][:ref][:type]).to eq("ref/prompt")
+        expect(body[:params][:ref][:name]).to eq("test_prompt")
+        expect(body[:params][:argument][:name]).to eq("arg1")
+        expect(body[:params][:argument][:value]).to eq("val1")
+      end
+
+      it "validates against CompleteRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".logging_set_level" do
+      let(:body) { described_class::Requests.logging_set_level(level: "info") }
+
+      it "creates a valid logging set level request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("logging/setLevel")
+        expect(body[:params][:level]).to eq("info")
+      end
+
+      it "validates against SetLevelRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+  end
+
+  describe "Notifications" do
+    describe ".initialized" do
+      let(:body) { described_class::Notifications.initialized }
+
+      it "creates a valid initialized notification" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_nil
+        expect(body[:method]).to eq("notifications/initialized")
+      end
+
+      it "validates against InitializedNotification schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".cancelled" do
+      let(:body) { described_class::Notifications.cancelled(request_id: "req-123", reason: "timeout") }
+
+      it "creates a valid cancelled notification" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_nil
+        expect(body[:method]).to eq("notifications/cancelled")
+        expect(body[:params][:requestId]).to eq("req-123")
+        expect(body[:params][:reason]).to eq("timeout")
+      end
+
+      it "validates against CancelledNotification schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".roots_list_changed" do
+      let(:body) { described_class::Notifications.roots_list_changed }
+
+      it "creates a valid roots list changed notification" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_nil
+        expect(body[:method]).to eq("notifications/roots/list_changed")
+      end
+
+      it "validates against RootsListChangedNotification schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+  end
+
+  describe "Responses" do
+    describe ".ping" do
+      let(:body) { described_class::Responses.ping(id: "req-123") }
+
+      it "creates a valid ping response" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to eq("req-123")
+        expect(body[:result]).to eq({})
+      end
+
+      it "validates against JSONRPCResponse schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".roots_list" do
+      let(:body) { described_class::Responses.roots_list(id: "req-123", roots_paths: ["/path/to/root"]) }
+
+      it "creates a valid roots list response" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to eq("req-123")
+        expect(body[:result][:roots]).to be_an(Array)
+        expect(body[:result][:roots].first[:uri]).to eq("file:///path/to/root")
+        expect(body[:result][:roots].first[:name]).to eq("root")
+      end
+
+      it "validates against ListRootsResult schema" do
+        body_json = JSON.parse(body.to_json)
+        # Wrap in a response structure for validation
+        response_json = {
+          "jsonrpc" => "2.0",
+          "id" => body_json["id"],
+          "result" => body_json["result"]
+        }
+        errors = schemer.validate(response_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".error" do
+      let(:body) { described_class::Responses.error(id: "req-123", message: "Test error", code: -32_000) }
+
+      it "creates a valid error response" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to eq("req-123")
+        expect(body[:error][:code]).to eq(-32_000)
+        expect(body[:error][:message]).to eq("Test error")
+      end
+
+      it "validates against JSONRPCError schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".elicitation" do
+      let(:body) do
+        described_class::Responses.elicitation(
+          id: "req-123",
+          action: "accept",
+          content: { field: "value" }
+        )
+      end
+
+      it "creates a valid elicitation response" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to eq("req-123")
+        expect(body[:result][:action]).to eq("accept")
+        expect(body[:result][:content]).to eq({ field: "value" })
+      end
+
+      it "validates against ElicitResult schema" do
+        body_json = JSON.parse(body.to_json)
+        # Wrap in a response structure for validation
+        response_json = {
+          "jsonrpc" => "2.0",
+          "id" => body_json["id"],
+          "result" => body_json["result"]
+        }
+        errors = schemer.validate(response_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+
+      it "omits content when not provided" do
+        body = described_class::Responses.elicitation(id: "req-123", action: "decline")
+        expect(body[:result][:content]).to be_nil
+      end
+    end
+  end
+
+  describe "UUID generation consistency" do
+    it "generates unique IDs for each request" do
+      ids = 10.times.map { described_class::Requests.ping[:id] }
+      expect(ids.uniq.length).to eq(10)
+    end
+
+    it "generates valid UUID format for all requests" do
+      uuid_pattern = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/
+
+      [
+        described_class::Requests.initialize(protocol_version: "2025-06-18", capabilities: {}),
+        described_class::Requests.ping,
+        described_class::Requests.tool_list,
+        described_class::Requests.resource_list
+      ].each do |body|
+        expect(body[:id]).to match(uuid_pattern)
+      end
+    end
+  end
+end

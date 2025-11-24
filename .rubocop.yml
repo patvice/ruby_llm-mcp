@@ -37,11 +37,12 @@ Naming/AccessorMethodName:
 Layout/LineLength:
   Max: 120
 
-Metrics/MethodLength:
-  Max: 35
-
 Metrics/AbcSize:
   Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
 
 Metrics/ClassLength:
   Enabled: false
@@ -49,13 +50,14 @@ Metrics/ClassLength:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Metrics/PerceivedComplexity:
+Metrics/MethodLength:
+  Max: 35
+
+Metrics/ModuleLength:
   Enabled: false
 
-Metrics/BlockLength:
-  Exclude:
-    - 'spec/**/*'
-
+Metrics/PerceivedComplexity:
+  Enabled: false
 
 RSpec/DescribedClass:
   Enabled: false

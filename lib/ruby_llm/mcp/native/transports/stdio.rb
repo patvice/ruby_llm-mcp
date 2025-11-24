@@ -26,19 +26,12 @@ module RubyLLM
             @stderr_thread = nil
           end
 
-          def request(body, add_id: true, wait_for_response: true)
-            if add_id
-              @id_mutex.synchronize { @id_counter += 1 }
-              request_id = @id_counter
-              body["id"] = request_id
-            else
-              # When add_id is false, the ID should already be in the body
-              # Try both string and symbol keys to be flexible
-              request_id = body["id"] || body[:id]
-            end
+          def request(body, wait_for_response: true)
+            # Extract the request ID from the body (if present)
+            request_id = body["id"] || body[:id]
 
             response_queue = Queue.new
-            if wait_for_response
+            if wait_for_response && request_id
               @pending_mutex.synchronize do
                 @pending_requests[request_id.to_s] = response_queue
               end
@@ -50,12 +43,12 @@ module RubyLLM
               @stdin.puts(body)
               @stdin.flush
             rescue IOError, Errno::EPIPE => e
-              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
               restart_process
               raise RubyLLM::MCP::Errors::TransportError.new(message: e.message, error: e)
             end
 
-            return unless wait_for_response
+            return unless wait_for_response && request_id
 
             begin
               with_timeout(@request_timeout / 1000, request_id: request_id) do

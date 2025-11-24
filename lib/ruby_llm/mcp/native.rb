@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "native/messages"
+
 module RubyLLM
   module MCP
     # Native protocol implementation namespace

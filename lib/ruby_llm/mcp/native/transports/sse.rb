@@ -39,15 +39,12 @@ module RubyLLM
             RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
           end
 
-          def request(body, add_id: true, wait_for_response: true)
-            if add_id
-              @id_mutex.synchronize { @id_counter += 1 }
-              request_id = @id_counter
-              body["id"] = request_id
-            end
+          def request(body, wait_for_response: true)
+            # Extract the request ID from the body (if present)
+            request_id = body["id"] || body[:id]
 
             response_queue = Queue.new
-            if wait_for_response
+            if wait_for_response && request_id
               @pending_mutex.synchronize do
                 @pending_requests[request_id.to_s] = response_queue
               end
@@ -56,12 +53,12 @@ module RubyLLM
             begin
               send_request(body, request_id)
             rescue Errors::TransportError, Errors::TimeoutError => e
-              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
               RubyLLM::MCP.logger.error "Request error (ID: #{request_id}): #{e.message}"
               raise e
             end
 
-            return unless wait_for_response
+            return unless wait_for_response && request_id
 
             begin
               with_timeout(@request_timeout / 1000, request_id: request_id) do

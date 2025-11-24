@@ -38,7 +38,6 @@ module RubyLLM
           @config = config
         end
 
-        # Instance methods
         def supports?(feature)
           self.class.support?(feature)
         end
@@ -54,7 +53,6 @@ module RubyLLM
           end
         end
 
-        # Lifecycle methods
         def start
           raise NotImplementedError, "#{self.class.name} must implement #start"
         end
@@ -75,7 +73,6 @@ module RubyLLM
           raise NotImplementedError, "#{self.class.name} must implement #ping"
         end
 
-        # Capabilities
         def capabilities
           raise NotImplementedError, "#{self.class.name} must implement #capabilities"
         end
@@ -84,7 +81,6 @@ module RubyLLM
           raise NotImplementedError, "#{self.class.name} must implement #client_capabilities"
         end
 
-        # Core MCP methods - Tools
         def tool_list(cursor: nil)
           raise NotImplementedError, "#{self.class.name} must implement #tool_list"
         end
@@ -93,7 +89,6 @@ module RubyLLM
           raise NotImplementedError, "#{self.class.name} must implement #execute_tool"
         end
 
-        # Core MCP methods - Resources
         def resource_list(cursor: nil)
           raise NotImplementedError, "#{self.class.name} must implement #resource_list"
         end
@@ -102,7 +97,6 @@ module RubyLLM
           raise NotImplementedError, "#{self.class.name} must implement #resource_read"
         end
 
-        # Core MCP methods - Prompts
         def prompt_list(cursor: nil)
           raise NotImplementedError, "#{self.class.name} must implement #prompt_list"
         end
@@ -111,12 +105,10 @@ module RubyLLM
           raise NotImplementedError, "#{self.class.name} must implement #execute_prompt"
         end
 
-        # Optional features - Resource Templates
         def resource_template_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
           raise_unsupported_feature(:resource_templates)
         end
 
-        # Optional features - Completions
         def completion_resource(uri:, argument:, value:, context: nil) # rubocop:disable Lint/UnusedMethodArgument
           raise_unsupported_feature(:completions)
         end
@@ -125,17 +117,14 @@ module RubyLLM
           raise_unsupported_feature(:completions)
         end
 
-        # Optional features - Logging
         def set_logging(level:) # rubocop:disable Lint/UnusedMethodArgument
           raise_unsupported_feature(:logging)
         end
 
-        # Optional features - Subscriptions
         def resources_subscribe(uri:) # rubocop:disable Lint/UnusedMethodArgument
           raise_unsupported_feature(:subscriptions)
         end
 
-        # Optional features - Notifications
         def initialize_notification
           raise_unsupported_feature(:notifications)
         end
@@ -148,7 +137,6 @@ module RubyLLM
           raise_unsupported_feature(:notifications)
         end
 
-        # Optional features - Responses
         def ping_response(id:) # rubocop:disable Lint/UnusedMethodArgument
           raise_unsupported_feature(:responses)
         end
@@ -169,7 +157,6 @@ module RubyLLM
           raise_unsupported_feature(:elicitation)
         end
 
-        # Helper for resource registration
         def register_resource(_resource)
           raise_unsupported_feature(:resource_registration)
         end

@@ -691,8 +691,8 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
             body: { "result" => { "content" => [{ "type" => "text", "value" => "ok" }] } }.to_json
           )
 
-        # Request without ID should be handled properly
-        result = transport.request({ "method" => "test" }, add_id: false, wait_for_response: false)
+        # Request without ID should be handled properly (notification)
+        result = transport.request({ "method" => "test" }, wait_for_response: false)
         expect(result.session_id).to eq(session_id)
       end
 

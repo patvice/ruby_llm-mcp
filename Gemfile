@@ -14,6 +14,7 @@ group :development do
   gem "bundler", ">= 2.0"
   gem "debug"
   gem "dotenv", ">= 3.0"
+  gem "json_schemer"
   gem "rake", ">= 13.0"
   gem "rdoc", "~> 6.15"
   gem "reline"

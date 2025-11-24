@@ -24,17 +24,13 @@ module RubyLLM::MCP::Adapters::MCPTransports
         session_id: session_id
       )
 
-      # Set the transport reference on the coordinator so it can send requests
       @coordinator.transport = @native_transport
     end
 
-    # Start the streamable HTTP connection
-    # This only initializes the transport layer, not the MCP protocol
     def start
       @native_transport.start
     end
 
-    # Close the streamable HTTP connection
     def close
       @initialized = false
       @native_transport.close
@@ -52,11 +48,11 @@ module RubyLLM::MCP::Adapters::MCPTransports
         perform_initialization
       end
 
-      # Pass the request through to native transport
-      # add_id: true because MCP SDK provides requests without IDs
-      result = @native_transport.request(request, add_id: true, wait_for_response: true)
+      unless request["id"] || request[:id]
+        request["id"] = SecureRandom.uuid
+      end
+      result = @native_transport.request(request, wait_for_response: true)
 
-      # Convert Result object to hash expected by MCP::Client
       if result.is_a?(RubyLLM::MCP::Result)
         result.response
       else
@@ -68,8 +64,11 @@ module RubyLLM::MCP::Adapters::MCPTransports
 
     def perform_initialization
       # Send initialization request
-      init_request = RubyLLM::MCP::Native::Requests::Initialization.new(@coordinator).initialize_body
-      result = @native_transport.request(init_request, add_id: true, wait_for_response: true)
+      init_request = RubyLLM::MCP::Native::Messages::Requests.initialize(
+        protocol_version: @coordinator.protocol_version,
+        capabilities: @coordinator.client_capabilities
+      )
+      result = @native_transport.request(init_request, wait_for_response: true)
 
       if result.is_a?(RubyLLM::MCP::Result) && result.error?
         raise RubyLLM::MCP::Errors::TransportError.new(
@@ -78,11 +77,8 @@ module RubyLLM::MCP::Adapters::MCPTransports
         )
       end
 
-      initialized_notification = {
-        "jsonrpc" => "2.0",
-        "method" => "notifications/initialized"
-      }
-      @native_transport.request(initialized_notification, add_id: false, wait_for_response: false)
+      initialized_notification = RubyLLM::MCP::Native::Messages::Notifications.initialized
+      @native_transport.request(initialized_notification, wait_for_response: false)
 
       @initialized = true
     end

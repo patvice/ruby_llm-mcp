@@ -96,20 +96,15 @@ module RubyLLM
             @connection = create_connection
           end
 
-          def request(body, add_id: true, wait_for_response: true)
+          def request(body, wait_for_response: true)
             if @rate_limiter&.exceeded?
               sleep(1) while @rate_limiter&.exceeded?
             end
             @rate_limiter&.add
 
-            # Generate a unique request ID for requests
-            if add_id && body.is_a?(Hash) && !body.key?("id")
-              @id_mutex.synchronize { @id_counter += 1 }
-              body["id"] = @id_counter
-            end
-
-            request_id = body.is_a?(Hash) ? body["id"] : nil
-            is_initialization = body.is_a?(Hash) && body["method"] == "initialize"
+            # Extract the request ID from the body (if present)
+            request_id = body.is_a?(Hash) ? (body["id"] || body[:id]) : nil
+            is_initialization = body.is_a?(Hash) && (body["method"] == "initialize" || body[:method] == :initialize)
 
             response_queue = setup_response_queue(request_id, wait_for_response)
             result = send_http_request(body, request_id, is_initialization: is_initialization)
