@@ -24,7 +24,8 @@ module RubyLLM
 
         # Options for starting SSE connections
         class StartSSEOptions
-          attr_reader :resumption_token, :on_resumption_token, :replay_message_id
+          attr_accessor :resumption_token
+          attr_reader :on_resumption_token, :replay_message_id
 
           def initialize(resumption_token: nil, on_resumption_token: nil, replay_message_id: nil)
             @resumption_token = resumption_token
@@ -39,7 +40,7 @@ module RubyLLM
 
           attr_reader :session_id, :protocol_version, :coordinator, :oauth_provider
 
-          def initialize( # rubocop:disable Metrics/ParameterLists
+          def initialize( # rubocop:disable Metrics/MethodLength, Metrics/ParameterLists
             url:,
             request_timeout:,
             coordinator:,
@@ -50,6 +51,7 @@ module RubyLLM
             rate_limit: nil,
             reconnection_options: nil,
             session_id: nil,
+            sse_timeout: nil,
             options: {}
           )
             # Extract options if provided (for backward compatibility)
@@ -61,22 +63,29 @@ module RubyLLM
             reconnection_options = extracted_options.delete(:reconnection_options) || reconnection_options
             rate_limit = extracted_options.delete(:rate_limit) || rate_limit
             session_id = extracted_options.delete(:session_id) || session_id
+            sse_timeout = extracted_options.delete(:sse_timeout) || sse_timeout
 
             @url = URI(url)
             @coordinator = coordinator
             @request_timeout = request_timeout
+            @sse_timeout = sse_timeout
             @headers = headers || {}
             @session_id = session_id
 
             @version = version
-            @reconnection_options = reconnection_options || ReconnectionOptions.new
             @protocol_version = nil
-            @session_id = session_id
 
-            @resource_metadata_url = nil
             @client_id = SecureRandom.uuid
 
-            @reconnection_options = ReconnectionOptions.new(**reconnection)
+            # Reconnection options precedence: explicit > hash > defaults
+            @reconnection_options = if reconnection_options
+                                      reconnection_options
+                                    elsif reconnection && !reconnection.empty?
+                                      ReconnectionOptions.new(**reconnection)
+                                    else
+                                      ReconnectionOptions.new
+                                    end
+
             @oauth_provider = oauth_provider
             @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
@@ -85,9 +94,11 @@ module RubyLLM
             @pending_requests = {}
             @pending_mutex = Mutex.new
             @running = true
-            @abort_controller = nil
+            @sse_stopped = false
+            @state_mutex = Mutex.new
             @sse_thread = nil
             @sse_mutex = Mutex.new
+            @last_sse_event_id = nil
 
             # Track if we've attempted auth flow to prevent infinite loops
             @auth_retry_attempted = false
@@ -124,7 +135,7 @@ module RubyLLM
           end
 
           def alive?
-            @running
+            running?
           end
 
           def close
@@ -134,14 +145,39 @@ module RubyLLM
           end
 
           def start
-            @abort_controller = false
+            @state_mutex.synchronize do
+              @sse_stopped = false
+            end
           end
 
           def set_protocol_version(version)
             @protocol_version = version
           end
 
+          def on_message(&block)
+            @on_message_callback = block
+          end
+
+          def on_error(&block)
+            @on_error_callback = block
+          end
+
+          def on_close(&block)
+            @on_close_callback = block
+          end
+
           private
+
+          def running?
+            @state_mutex.synchronize { @running && !@sse_stopped }
+          end
+
+          def abort!
+            @state_mutex.synchronize do
+              @running = false
+              @sse_stopped = true
+            end
+          end
 
           def terminate_session
             return unless @session_id
@@ -150,10 +186,8 @@ module RubyLLM
               headers = build_common_headers
               response = @connection.delete(@url, headers: headers)
 
-              # Handle HTTPX error responses first
               handle_httpx_error_response!(response, context: { location: "terminating session" })
 
-              # 405 Method Not Allowed is acceptable per spec
               unless [200, 405].include?(response.status)
                 reason_phrase = response.respond_to?(:reason_phrase) ? response.reason_phrase : nil
                 raise Errors::TransportError.new(
@@ -177,7 +211,6 @@ module RubyLLM
 
             error = response.error
 
-            # Special handling for EOFError in SSE contexts
             if allow_eof_for_sse && error.is_a?(EOFError)
               RubyLLM::MCP.logger.info "SSE stream closed: #{response.error.message}"
               return :eof_handled
@@ -227,7 +260,6 @@ module RubyLLM
           end
 
           def create_connection
-            # Use request_timeout for all timeout values (converted from ms to seconds)
             timeout_seconds = @request_timeout / 1000.0
             client = Support::HTTPClient.connection.with(
               timeout: {
@@ -249,7 +281,6 @@ module RubyLLM
             headers["X-CLIENT-ID"] = @client_id
             headers["Origin"] = @url.to_s
 
-            # Apply OAuth authorization if available
             if @oauth_provider
               RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
               RubyLLM::MCP.logger.debug "  Server URL: #{@oauth_provider.server_url}"
@@ -290,7 +321,6 @@ module RubyLLM
 
             request_client = nil
             begin
-              # Set up connection with streaming callbacks if not initialization
               connection = if is_initialization
                              @connection
                            else
@@ -311,7 +341,7 @@ module RubyLLM
 
             client = Support::HTTPClient.connection.plugin(:callbacks)
                                         .on_response_body_chunk do |request, _response, chunk|
-              next unless @running && !@abort_controller
+              next unless running?
 
               RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
               buffer << chunk
@@ -330,10 +360,8 @@ module RubyLLM
           end
 
           def handle_response(response, request_id, original_message)
-            # Handle HTTPX error responses first
             handle_httpx_error_response!(response, context: { location: "handling response", request_id: request_id })
 
-            # Extract session ID if present (only for successful responses)
             session_id = response.headers["mcp-session-id"]
             @session_id = session_id if session_id
 
@@ -404,13 +432,10 @@ module RubyLLM
           def handle_client_error(response)
             status_code = response.respond_to?(:status) ? response.status : "Unknown"
 
-            # Special handling for 403 with OAuth provider
             handle_oauth_authorization_error(response, status_code) if status_code == 403 && @oauth_provider
 
-            # Try to parse and handle structured JSON error
             handle_json_error_response(response, status_code)
 
-            # Fallback: generic error
             response_body = response.respond_to?(:body) ? response.body.to_s : "Unknown error"
             raise Errors::TransportError.new(
               code: status_code,
@@ -442,7 +467,6 @@ module RubyLLM
 
             error_message = error_body["error"]["message"] || error_body["error"]["code"]
 
-            # Handle empty error messages
             if error_message.to_s.empty?
               raise Errors::TransportError.new(
                 code: status_code,
@@ -450,7 +474,6 @@ module RubyLLM
               )
             end
 
-            # Handle session-related errors
             if error_message.to_s.downcase.include?("session")
               raise Errors::TransportError.new(
                 code: response.status,
@@ -458,13 +481,11 @@ module RubyLLM
               )
             end
 
-            # Generic JSON error
             raise Errors::TransportError.new(
               code: response.status,
               message: "Server error: #{error_message}"
             )
           rescue JSON::ParserError
-            # Fall through to generic error in caller
             nil
           end
 
@@ -476,8 +497,6 @@ module RubyLLM
           end
 
           def extract_resource_metadata_url(response)
-            # Extract resource metadata URL from response headers if present
-            # Guard against error responses that don't have headers
             return nil unless response.respond_to?(:headers)
 
             metadata_url = response.headers["mcp-resource-metadata-url"]
@@ -550,7 +569,7 @@ module RubyLLM
           end
 
           def start_sse_stream(options = StartSSEOptions.new)
-            return unless @running && !@abort_controller
+            return unless running?
 
             @sse_mutex.synchronize do
               return if @sse_thread&.alive?
@@ -572,27 +591,20 @@ module RubyLLM
                 headers["Last-Event-ID"] = options.resumption_token
               end
 
-              # Set up SSE streaming connection with callbacks
               connection = create_connection_with_sse_callbacks(options, headers)
               response = connection.get(@url)
 
-              # Handle HTTPX error responses first
               error_result = handle_httpx_error_response!(response, context: { location: "SSE connection" },
                                                                     allow_eof_for_sse: true)
               return if error_result == :eof_handled
 
               case response.status
               when 200
-                # SSE stream established successfully
                 RubyLLM::MCP.logger.debug "SSE stream established"
-                # Response will be processed through callbacks
               when 405, 401
-                # Server doesn't support SSE - this is acceptable
                 RubyLLM::MCP.logger.info "Server does not support SSE streaming"
                 nil
               when 409
-                # Conflict - SSE connection already exists for this session
-                # This is expected when reusing sessions and is acceptable
                 RubyLLM::MCP.logger.debug "SSE stream already exists for this session"
                 nil
               else
@@ -604,14 +616,20 @@ module RubyLLM
               end
             rescue StandardError => e
               RubyLLM::MCP.logger.error "SSE stream error: #{e.message}"
-              # Attempt reconnection with exponential backoff
-
-              if @running && !@abort_controller && attempt_count < @reconnection_options.max_retries
+              if running? && attempt_count < @reconnection_options.max_retries
                 delay = calculate_reconnection_delay(attempt_count)
                 RubyLLM::MCP.logger.info "Reconnecting SSE stream in #{delay}ms..."
 
                 sleep(delay / 1000.0)
                 attempt_count += 1
+
+                # Create new options with the last event ID for resumption
+                options = StartSSEOptions.new(
+                  resumption_token: @last_sse_event_id,
+                  on_resumption_token: options.on_resumption_token,
+                  replay_message_id: options.replay_message_id
+                )
+
                 retry
               end
 
@@ -623,14 +641,19 @@ module RubyLLM
             client = HTTPX.plugin(:callbacks)
             client = add_on_response_body_chunk_callback(client, options)
 
-            # Use request_timeout for all timeout values (converted from ms to seconds)
-            timeout_seconds = @request_timeout / 1000.0
+            sse_timeout_seconds = if @sse_timeout
+                                    @sse_timeout / 1000.0
+                                  else
+                                    # Default to 1 hour for SSE if not specified
+                                    3600
+                                  end
+
             client = client.with(
               timeout: {
                 connect_timeout: 10,
-                read_timeout: timeout_seconds,
-                write_timeout: timeout_seconds,
-                operation_timeout: timeout_seconds
+                read_timeout: sse_timeout_seconds,
+                write_timeout: sse_timeout_seconds,
+                operation_timeout: sse_timeout_seconds
               },
               headers: headers
             )
@@ -648,7 +671,7 @@ module RubyLLM
             buffer = +""
             client.on_response_body_chunk do |request, response, chunk|
               # Only process chunks for text/event-stream and if still running
-              next unless @running && !@abort_controller
+              next unless running?
 
               if chunk.include?("event: stop")
                 RubyLLM::MCP.logger.debug "Closing SSE stream"
@@ -666,6 +689,7 @@ module RubyLLM
                   next unless raw_event && raw_event[:data]
 
                   if raw_event[:id]
+                    @last_sse_event_id = raw_event[:id]
                     options.on_resumption_token&.call(raw_event[:id])
                   end
 
@@ -683,14 +707,17 @@ module RubyLLM
             [initial * (factor**attempt), max_delay].min
           end
 
-          def process_sse_buffer_events(buffer, _request_id)
-            return unless @running && !@abort_controller
+          def process_sse_buffer_events(buffer, request_id)
+            return unless running?
 
             while (event_data = extract_sse_event(buffer))
               raw_event, remaining_buffer = event_data
               buffer.replace(remaining_buffer)
 
-              process_sse_event(raw_event, nil) if raw_event && raw_event[:data]
+              if raw_event && raw_event[:data]
+                RubyLLM::MCP.logger.debug "Processing SSE buffer event for request #{request_id}" if request_id
+                process_sse_event(raw_event, nil)
+              end
             end
           end
 
@@ -725,20 +752,25 @@ module RubyLLM
             event
           end
 
-          def process_sse_event(raw_event, replay_message_id)
+          def process_sse_event(raw_event, replay_message_id) # rubocop:disable Metrics/MethodLength
             return unless raw_event[:data]
-            return unless @running && !@abort_controller
+            return unless running?
 
             begin
               event_data = JSON.parse(raw_event[:data])
 
-              # Handle replay message ID if specified
+              event_type = raw_event[:event] || "message"
+              event_id = raw_event[:id]
+              RubyLLM::MCP.logger.debug "Processing SSE event: type=#{event_type}, id=#{event_id || 'none'}"
+
               if replay_message_id && event_data.is_a?(Hash) && event_data["id"]
                 event_data["id"] = replay_message_id
               end
 
               result = RubyLLM::MCP::Result.new(event_data, session_id: @session_id)
               RubyLLM::MCP.logger.debug "SSE Result Received: #{result.inspect}"
+
+              @on_message_callback&.call(result)
 
               result = @coordinator.process_result(result)
               return if result.nil?
@@ -747,15 +779,23 @@ module RubyLLM
               if request_id
                 @pending_mutex.synchronize do
                   response_queue = @pending_requests.delete(request_id)
-                  response_queue&.push(result)
+                  if response_queue
+                    RubyLLM::MCP.logger.debug "Matched SSE event to pending request: #{request_id}"
+                    response_queue.push(result)
+                  else
+                    RubyLLM::MCP.logger.debug "No pending request found for SSE event: #{request_id}"
+                  end
                 end
               end
             rescue JSON::ParserError => e
               RubyLLM::MCP.logger.warn "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
+              @on_error_callback&.call(e)
             rescue Errors::UnknownRequest => e
               RubyLLM::MCP.logger.warn "Unknown request from MCP server: #{e.message}"
+              @on_error_callback&.call(e)
             rescue StandardError => e
               RubyLLM::MCP.logger.error "Error processing SSE event: #{e.message}"
+              @on_error_callback&.call(e)
               raise Errors::TransportError.new(
                 message: "Error processing SSE event: #{e.message}",
                 error: e
@@ -764,9 +804,16 @@ module RubyLLM
           end
 
           def wait_for_response_with_timeout(request_id, response_queue)
-            with_timeout(@request_timeout / 1000, request_id: request_id) do
+            result = with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
+
+            # Check if we received a shutdown error sentinel
+            if result.is_a?(Errors::TransportError)
+              raise result
+            end
+
+            result
           rescue RubyLLM::MCP::Errors::TimeoutError => e
             log_message = "StreamableHTTP request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
             RubyLLM::MCP.logger.error(log_message)
@@ -775,34 +822,33 @@ module RubyLLM
           end
 
           def cleanup_sse_resources
-            @running = false
-            @abort_controller = true
+            abort!
+
+            # Call on_close hook if registered
+            @on_close_callback&.call
+
+            # Close all HTTPX clients to signal SSE thread to exit
+            close_all_clients
 
             @sse_mutex.synchronize do
               if @sse_thread&.alive?
-                @sse_thread.kill
-                @sse_thread.join(5) # Wait up to 5 seconds for thread to finish
+                unless @sse_thread.join(5)
+                  RubyLLM::MCP.logger.warn "SSE thread did not exit cleanly, forcing termination"
+                  @sse_thread.kill
+                  @sse_thread.join(1)
+                end
                 @sse_thread = nil
               end
             end
 
-            # Clear any pending requests
-            @pending_mutex.synchronize do
-              @pending_requests.each_value do |queue|
-                queue.close if queue.respond_to?(:close)
-              rescue StandardError
-                # Ignore errors when closing queues
-              end
-              @pending_requests.clear
-            end
+            drain_pending_requests_with_error
           end
 
-          def cleanup_connection
+          def close_all_clients
             clients_to_close = []
 
             @clients_mutex.synchronize do
               clients_to_close = @clients.dup
-              @clients.clear
             end
 
             clients_to_close.each do |client|
@@ -810,8 +856,32 @@ module RubyLLM
             rescue StandardError => e
               RubyLLM::MCP.logger.debug "Error closing HTTPX client: #{e.message}"
             end
+          end
+
+          def cleanup_connection
+            close_all_clients
+
+            @clients_mutex.synchronize do
+              @clients.clear
+            end
 
             @connection = nil
+          end
+
+          def drain_pending_requests_with_error
+            shutdown_error = Errors::TransportError.new(
+              message: "Transport is shutting down",
+              code: nil
+            )
+
+            @pending_mutex.synchronize do
+              @pending_requests.each_value do |queue|
+                queue.push(shutdown_error)
+              rescue StandardError => e
+                RubyLLM::MCP.logger.debug "Error pushing shutdown error to queue: #{e.message}"
+              end
+              @pending_requests.clear
+            end
           end
         end
       end

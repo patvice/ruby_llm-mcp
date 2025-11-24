@@ -25,6 +25,10 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
     allow(oauth_provider).to receive_messages(redirect_uri: "http://localhost:8080/callback",
                                               server_url: "https://mcp.example.com", scope: "mcp:read mcp:write",
                                               storage: instance_double(RubyLLM::MCP::Auth::MemoryStorage))
+    # Stub Browser::Opener to prevent actual browser from opening in any test
+    opener_double = instance_double(RubyLLM::MCP::Auth::Browser::Opener)
+    allow(opener_double).to receive(:open_browser).and_return(true)
+    allow(RubyLLM::MCP::Auth::Browser::Opener).to receive(:new).and_return(opener_double)
   end
 
   describe "#initialize" do
@@ -191,21 +195,18 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
 
       it "opens browser when auto_open_browser is true" do
         opener = browser_oauth.instance_variable_get(:@opener)
-        allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-        allow(opener).to receive(:system).and_return(true)
 
         browser_oauth.authenticate(auto_open_browser: true)
 
-        expect(opener).to have_received(:system).with("open", auth_url)
+        expect(opener).to have_received(:open_browser).with(auth_url)
       end
 
       it "doesn't open browser when auto_open_browser is false" do
         opener = browser_oauth.instance_variable_get(:@opener)
-        allow(opener).to receive(:system)
 
         browser_oauth.authenticate(auto_open_browser: false)
 
-        expect(opener).not_to have_received(:system)
+        expect(opener).not_to have_received(:open_browser)
       end
 
       it "waits for callback and completes authorization" do
@@ -494,44 +495,44 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
   end
 
   describe "#open_browser" do
-    let(:browser_oauth) { described_class.new(oauth_provider: oauth_provider) }
-    let(:opener) { browser_oauth.instance_variable_get(:@opener) }
+    # Create a real opener instance for these tests, bypassing the global stub
+    let(:real_opener) { RubyLLM::MCP::Auth::Browser::Opener.allocate.tap { |o| o.send(:initialize, logger: logger) } }
     let(:url) { "https://example.com/auth" }
 
     it "calls correct command for macOS" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-      allow(opener).to receive(:system).and_return(true)
+      allow(real_opener).to receive(:system).and_return(true)
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be true
-      expect(opener).to have_received(:system).with("open", url)
+      expect(real_opener).to have_received(:system).with("open", url)
     end
 
     it "calls correct command for Linux" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("linux")
-      allow(opener).to receive(:system).and_return(true)
+      allow(real_opener).to receive(:system).and_return(true)
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be true
-      expect(opener).to have_received(:system).with("xdg-open", url)
+      expect(real_opener).to have_received(:system).with("xdg-open", url)
     end
 
     it "calls correct command for Windows" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("mswin")
-      allow(opener).to receive(:system).and_return(true)
+      allow(real_opener).to receive(:system).and_return(true)
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be true
-      expect(opener).to have_received(:system).with("start", url)
+      expect(real_opener).to have_received(:system).with("start", url)
     end
 
     it "warns on unknown operating system" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("unknown-os")
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be false
       expect(logger).to have_received(:warn).with(/Unknown operating system/)
@@ -539,9 +540,9 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
 
     it "handles system call failures" do
       allow(RbConfig::CONFIG).to receive(:[]).with("host_os").and_return("darwin")
-      allow(opener).to receive(:system).and_raise(StandardError.new("Command failed"))
+      allow(real_opener).to receive(:system).and_raise(StandardError.new("Command failed"))
 
-      result = opener.open_browser(url)
+      result = real_opener.open_browser(url)
 
       expect(result).to be false
       expect(logger).to have_received(:warn).with(/Failed to open browser/)
