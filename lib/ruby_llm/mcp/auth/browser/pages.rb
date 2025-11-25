@@ -86,7 +86,37 @@ module RubyLLM
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
                   }
 
-                  /* Card */
+                  /* Logo card in top right */
+                  .logo-card {
+                    position: fixed;
+                    top: 1rem;
+                    right: 1rem;
+                    background: var(--card-bg);
+                    border-radius: 0.75rem;
+                    padding: 0.625rem;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    opacity: 0;
+                    transform: translateY(-20px);
+                    animation: slide-in 500ms ease-out 200ms forwards;
+                  }
+                  .logo {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 0.375rem;
+                    border: 1.5px solid var(--logo-border);
+                    flex-shrink: 0;
+                  }
+                  .logo-text {
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    color: var(--text-900);
+                    white-space: nowrap;
+                  }
+
+                  /* Main Card */
                   .card {
                     width: 100%;
                     max-width: 32rem;
@@ -99,17 +129,6 @@ module RubyLLM
                     opacity: 0;
                     transform: scale(0.8);
                     animation: pop-in 500ms ease-out forwards;
-                  }
-
-                  /* MCP logo + border */
-                  .logo {
-                    width: 120px;
-                    height: 120px;
-                    display: block;
-                    margin: 0 auto 1.5rem;
-                    border-radius: 1rem;
-                    border: 2px solid var(--logo-border);
-                    background: transparent;
                   }
 
                   /* SVG check animation */
@@ -189,6 +208,7 @@ module RubyLLM
 
                   /* Animations */
                   @keyframes pop-in { to { opacity: 1; transform: scale(1); } }
+                  @keyframes slide-in { to { opacity: 1; transform: translateY(0); } }
                   @keyframes draw-circle {
                     0% { opacity: 0; stroke-dashoffset: 339.292; }
                     20% { opacity: 1; }
@@ -203,9 +223,21 @@ module RubyLLM
 
                   /* Motion-reduction respect */
                   @media (prefers-reduced-motion: reduce) {
-                    .card, .circle, .tick, .content { animation: none !important; }
-                    .card { opacity: 1; transform: none; }
+                    .card, .logo-card, .circle, .tick, .content { animation: none !important; }
+                    .card, .logo-card { opacity: 1; transform: none; }
                     .content { opacity: 1; transform: none; }
+                  }
+
+                  /* Responsive adjustments */
+                  @media (max-width: 640px) {
+                    .logo-card {
+                      top: 0.75rem;
+                      right: 0.75rem;
+                      padding: 0.5rem;
+                      gap: 0.375rem;
+                    }
+                    .logo { width: 28px; height: 28px; }
+                    .logo-text { font-size: 0.75rem; }
                   }
 
                   /* =========================
@@ -247,7 +279,7 @@ module RubyLLM
                 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151417" />
               </head>
               <body>
-                <main class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
+                <div class="logo-card">
                   <img
                     class="logo"
                     src="https://www.rubyllm-mcp.com/assets/images/rubyllm-mcp-logo.svg"
@@ -255,7 +287,10 @@ module RubyLLM
                     decoding="async"
                     fetchpriority="high"
                   />
+                  <span class="logo-text">RubyLLM::MCP</span>
+                </div>
 
+                <main class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
                   <div class="checkwrap">
                     <svg class="checkmark" viewBox="0 0 120 120" aria-hidden="true">
                       <circle class="circle" cx="60" cy="60" r="54"></circle>
@@ -322,7 +357,37 @@ module RubyLLM
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
                   }
 
-                  /* Card */
+                  /* Logo card in top right */
+                  .logo-card {
+                    position: fixed;
+                    top: 1rem;
+                    right: 1rem;
+                    background: var(--card-bg);
+                    border-radius: 0.75rem;
+                    padding: 0.625rem;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    opacity: 0;
+                    transform: translateY(-20px);
+                    animation: slide-in 500ms ease-out 200ms forwards;
+                  }
+                  .logo {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 0.375rem;
+                    border: 1.5px solid var(--logo-border);
+                    flex-shrink: 0;
+                  }
+                  .logo-text {
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    color: var(--text-900);
+                    white-space: nowrap;
+                  }
+
+                  /* Main Card */
                   .card {
                     width: 100%;
                     max-width: 32rem;
@@ -335,16 +400,6 @@ module RubyLLM
                     opacity: 0;
                     transform: scale(0.8);
                     animation: pop-in 500ms ease-out forwards;
-                  }
-
-                  /* MCP logo */
-                  .logo {
-                    width: 120px;
-                    height: 120px;
-                    display: block;
-                    margin: 0 auto 1.5rem;
-                    border-radius: 1rem;
-                    border: 2px solid var(--logo-border);
                   }
 
                   /* Animated error icon (circle + X) */
@@ -443,6 +498,7 @@ module RubyLLM
 
                   /* Animations */
                   @keyframes pop-in { to { opacity: 1; transform: scale(1); } }
+                  @keyframes slide-in { to { opacity: 1; transform: translateY(0); } }
                   @keyframes draw-circle {
                     0% { opacity: 0; stroke-dashoffset: 339.292; }
                     20% { opacity: 1; }
@@ -456,9 +512,21 @@ module RubyLLM
                   @keyframes rise-in { to { opacity: 1; transform: translateY(0); } }
 
                   @media (prefers-reduced-motion: reduce) {
-                    .card, .circle, .x1, .x2, .content { animation: none !important; }
-                    .card { opacity: 1; transform: none; }
+                    .card, .logo-card, .circle, .x1, .x2, .content { animation: none !important; }
+                    .card, .logo-card { opacity: 1; transform: none; }
                     .content { opacity: 1; transform: none; }
+                  }
+
+                  /* Responsive adjustments */
+                  @media (max-width: 640px) {
+                    .logo-card {
+                      top: 0.75rem;
+                      right: 0.75rem;
+                      padding: 0.5rem;
+                      gap: 0.375rem;
+                    }
+                    .logo { width: 28px; height: 28px; }
+                    .logo-text { font-size: 0.75rem; }
                   }
 
                   /* =========================
@@ -499,8 +567,7 @@ module RubyLLM
                 </style>
               </head>
               <body>
-                <main class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
-                  <!-- MCP Logo -->
+                <div class="logo-card">
                   <img
                     class="logo"
                     src="https://www.rubyllm-mcp.com/assets/images/rubyllm-mcp-logo.svg"
@@ -508,7 +575,10 @@ module RubyLLM
                     decoding="async"
                     fetchpriority="high"
                   />
+                  <span class="logo-text">RubyLLM::MCP</span>
+                </div>
 
+                <main class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
                   <!-- Animated Error Icon -->
                   <div class="iconwrap" aria-hidden="true">
                     <svg class="erroricon" viewBox="0 0 120 120">
