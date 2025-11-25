@@ -9,12 +9,17 @@ module RubyLLM
 
           attr_reader :headers, :id, :coordinator
 
-          def initialize(url:, coordinator:, request_timeout:, version: :http2, headers: {})
+          def initialize(url:, coordinator:, request_timeout:, options: {})
             @event_url = url
             @messages_url = nil
             @coordinator = coordinator
             @request_timeout = request_timeout
-            @version = version
+
+            # Extract options
+            extracted_options = options.dup
+            @version = extracted_options.delete(:version) || :http2
+            headers = extracted_options.delete(:headers) || {}
+            oauth_provider = extracted_options.delete(:oauth_provider)
 
             uri = URI.parse(url)
             @root_url = "#{uri.scheme}://#{uri.host}"
@@ -28,23 +33,33 @@ module RubyLLM
                                        "X-CLIENT-ID" => @client_id
                                      })
 
+            @oauth_provider = oauth_provider
+            @resource_metadata_url = nil
+            @auth_retry_attempted = false
+
             @id_counter = 0
             @id_mutex = Mutex.new
             @pending_requests = {}
             @pending_mutex = Mutex.new
             @connection_mutex = Mutex.new
+            @state_mutex = Mutex.new
             @running = false
             @sse_thread = nil
+            @sse_response = nil
 
             RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
           end
 
-          def request(body, wait_for_response: true)
-            # Extract the request ID from the body (if present)
-            request_id = body["id"] || body[:id]
+          def request(body, wait_for_response: true) # rubocop:disable Metrics/MethodLength
+            request_id = body.is_a?(Hash) ? (body["id"] || body[:id]) : nil
 
-            response_queue = Queue.new
-            if wait_for_response && request_id
+            if wait_for_response && request_id.nil?
+              raise ArgumentError, "Request ID must be provided in message body when wait_for_response is true"
+            end
+
+            response_queue = nil
+            if wait_for_response
+              response_queue = Queue.new
               @pending_mutex.synchronize do
                 @pending_requests[request_id.to_s] = response_queue
               end
@@ -53,41 +68,85 @@ module RubyLLM
             begin
               send_request(body, request_id)
             rescue Errors::TransportError, Errors::TimeoutError => e
-              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
+              if wait_for_response && request_id
+                @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+              end
               RubyLLM::MCP.logger.error "Request error (ID: #{request_id}): #{e.message}"
               raise e
             end
 
-            return unless wait_for_response && request_id
+            return unless wait_for_response
 
+            result = nil
             begin
-              with_timeout(@request_timeout / 1000, request_id: request_id) do
+              result = with_timeout(@request_timeout / 1000, request_id: request_id) do
                 response_queue.pop
               end
             rescue Errors::TimeoutError => e
-              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+              if request_id
+                @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+              end
               RubyLLM::MCP.logger.error "SSE request timeout (ID: #{request_id}) \
                 after #{@request_timeout / 1000} seconds."
               raise e
             end
+
+            raise result if result.is_a?(Errors::TransportError)
+
+            result
           end
 
           def alive?
-            @running
+            running?
+          end
+
+          def running?
+            @state_mutex.synchronize { @running }
           end
 
           def start
-            return if @running
+            @state_mutex.synchronize do
+              return if @running
 
-            @running = true
+              @running = true
+            end
+
             start_sse_listener
           end
 
           def close
+            should_close = @state_mutex.synchronize do
+              return unless @running
+
+              @running = false
+              true
+            end
+
+            return unless should_close
+
             RubyLLM::MCP.logger.info "Closing SSE transport connection"
-            @running = false
-            @sse_thread&.join(1) # Give the thread a second to clean up
+
+            # Close the SSE response stream if it exists
+            begin
+              @sse_response&.body&.close
+            rescue StandardError => e
+              RubyLLM::MCP.logger.debug "Error closing SSE response: #{e.message}"
+            end
+
+            # Wait for the thread to finish (but don't join from within itself)
+            if @sse_thread && Thread.current != @sse_thread
+              @sse_thread.join(1)
+            end
             @sse_thread = nil
+
+            fail_pending_requests!(
+              Errors::TransportError.new(
+                message: "SSE transport closed",
+                code: nil
+              )
+            )
+
+            @messages_url = nil
           end
 
           def set_protocol_version(version)
@@ -97,13 +156,20 @@ module RubyLLM
           private
 
           def send_request(body, request_id)
+            headers = build_request_headers
             http_client = Support::HTTPClient.connection.with(timeout: { request_timeout: @request_timeout / 1000 },
-                                                              headers: @headers)
+                                                              headers: headers)
             response = http_client.post(@messages_url, body: JSON.generate(body))
             handle_httpx_error_response!(response,
                                          context: { location: "message endpoint request", request_id: request_id })
 
-            unless [200, 202].include?(response.status)
+            case response.status
+            when 200, 202
+              # Success
+              nil
+            when 401
+              handle_authentication_challenge(response, body, request_id)
+            else
               message = "Failed to have a successful request to #{@messages_url}: #{response.status} - #{response.body}"
               RubyLLM::MCP.logger.error(message)
               raise Errors::TransportError.new(
@@ -113,8 +179,88 @@ module RubyLLM
             end
           end
 
+          def build_request_headers
+            headers = @headers.dup
+
+            # Apply OAuth authorization if available
+            if @oauth_provider
+              RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."
+              token = @oauth_provider.access_token
+              if token
+                headers["Authorization"] = token.to_header
+                RubyLLM::MCP.logger.debug "Applied OAuth authorization header"
+              else
+                RubyLLM::MCP.logger.warn "OAuth provider present but no valid token available!"
+              end
+            end
+
+            headers
+          end
+
+          def handle_authentication_challenge(response, original_body, request_id)
+            check_retry_guard!
+            check_oauth_provider_configured!
+
+            RubyLLM::MCP.logger.info("Received 401 Unauthorized, attempting automatic authentication")
+
+            www_authenticate = response.headers["www-authenticate"]
+            resource_metadata_url = response.headers["mcp-resource-metadata-url"]
+            @resource_metadata_url = resource_metadata_url if resource_metadata_url
+
+            attempt_authentication_retry(www_authenticate, resource_metadata_url, original_body, request_id)
+          end
+
+          def check_retry_guard!
+            return unless @auth_retry_attempted
+
+            RubyLLM::MCP.logger.warn("Authentication retry already attempted, raising error")
+            @auth_retry_attempted = false
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized) - retry failed"
+            )
+          end
+
+          def check_oauth_provider_configured!
+            return if @oauth_provider
+
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized) but no OAuth provider configured"
+            )
+          end
+
+          def attempt_authentication_retry(www_authenticate, resource_metadata_url, original_body, request_id)
+            @auth_retry_attempted = true
+
+            success = @oauth_provider.handle_authentication_challenge(
+              www_authenticate: www_authenticate,
+              resource_metadata_url: resource_metadata_url,
+              requested_scope: nil
+            )
+
+            if success
+              RubyLLM::MCP.logger.info("Authentication challenge handled successfully, retrying request")
+              send_request(original_body, request_id)
+              @auth_retry_attempted = false
+              return
+            end
+
+            @auth_retry_attempted = false
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required (401 Unauthorized)"
+            )
+          rescue Errors::AuthenticationRequiredError => e
+            @auth_retry_attempted = false
+            raise e
+          rescue StandardError => e
+            @auth_retry_attempted = false
+            RubyLLM::MCP.logger.error("Authentication challenge handling failed: #{e.message}")
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication failed: #{e.message}"
+            )
+          end
+
           def start_sse_listener
-            @connection_mutex.synchronize do
+            @connection_mutex.synchronize do # rubocop:disable Metrics/BlockLength
               return if sse_thread_running?
 
               RubyLLM::MCP.logger.info "Starting SSE listener thread"
@@ -125,27 +271,61 @@ module RubyLLM
               end
 
               @sse_thread = Thread.new do
-                listen_for_events while @running
+                listen_for_events
               end
               @sse_thread.abort_on_exception = true
 
-              with_timeout(@request_timeout / 1000) do
-                endpoint = response_queue.pop
-                set_message_endpoint(endpoint)
+              begin
+                with_timeout(@request_timeout / 1000) do
+                  endpoint = response_queue.pop
+                  set_message_endpoint(endpoint)
+                end
+              rescue Errors::TimeoutError => e
+                @pending_mutex.synchronize do
+                  @pending_requests.delete("endpoint")
+                end
+                RubyLLM::MCP.logger.error "Timeout waiting for endpoint event: #{e.message}"
+                raise e
+              rescue StandardError => e
+                @pending_mutex.synchronize do
+                  @pending_requests.delete("endpoint")
+                end
+                raise e
               end
             end
           end
 
           def set_message_endpoint(endpoint)
-            uri = URI.parse(endpoint)
+            endpoint_url = if endpoint.is_a?(String)
+                             endpoint
+                           elsif endpoint.is_a?(Hash)
+                             # Support richer endpoint metadata (e.g., { "url": "...", "last_event_id": "..." })
+                             endpoint["url"] || endpoint[:url]
+                           else
+                             endpoint.to_s
+                           end
+
+            unless endpoint_url && !endpoint_url.empty?
+              raise Errors::TransportError.new(
+                message: "Invalid endpoint event: missing URL",
+                code: nil
+              )
+            end
+
+            uri = URI.parse(endpoint_url)
 
             @messages_url = if uri.host.nil?
-                              "#{@root_url}#{endpoint}"
+                              "#{@root_url}#{endpoint_url}"
                             else
-                              endpoint
+                              endpoint_url
                             end
 
             RubyLLM::MCP.logger.info "SSE message endpoint set to: #{@messages_url}"
+          rescue URI::InvalidURIError => e
+            raise Errors::TransportError.new(
+              message: "Invalid endpoint URL: #{e.message}",
+              code: nil
+            )
           end
 
           def sse_thread_running?
@@ -153,16 +333,16 @@ module RubyLLM
           end
 
           def listen_for_events
-            stream_events_from_server
+            stream_events_from_server while running?
           rescue StandardError => e
             handle_connection_error("SSE connection error", e)
           end
 
           def stream_events_from_server
             sse_client = create_sse_client
-            response = sse_client.get(@event_url, stream: true)
-            validate_sse_response!(response)
-            process_event_stream(response)
+            @sse_response = sse_client.get(@event_url, stream: true)
+            validate_sse_response!(@sse_response)
+            process_event_stream(@sse_response)
           end
 
           def create_sse_client
@@ -175,6 +355,12 @@ module RubyLLM
           def validate_sse_response!(response)
             return unless response.status >= 400
 
+            # Handle 401 specially for OAuth
+            if response.status == 401
+              handle_sse_authentication_challenge(response)
+              return
+            end
+
             error_body = read_error_body(response)
             error_message = "HTTP #{response.status} error from SSE endpoint: #{error_body}"
             RubyLLM::MCP.logger.error error_message
@@ -184,12 +370,58 @@ module RubyLLM
             raise StandardError, error_message
           end
 
+          def handle_sse_authentication_challenge(response)
+            unless @oauth_provider
+              raise Errors::AuthenticationRequiredError.new(
+                message: "OAuth authentication required for SSE stream but no OAuth provider configured"
+              )
+            end
+
+            RubyLLM::MCP.logger.info("SSE stream received 401, attempting authentication")
+
+            www_authenticate = response.headers["www-authenticate"]
+            resource_metadata_url = response.headers["mcp-resource-metadata-url"]
+
+            begin
+              success = @oauth_provider.handle_authentication_challenge(
+                www_authenticate: www_authenticate,
+                resource_metadata_url: resource_metadata_url,
+                requested_scope: nil
+              )
+
+              if success
+                RubyLLM::MCP.logger.info("Authentication successful, SSE stream will reconnect")
+                # The caller will retry the SSE connection
+                return
+              end
+            rescue Errors::AuthenticationRequiredError
+              raise
+            rescue StandardError => e
+              RubyLLM::MCP.logger.error("SSE authentication failed: #{e.message}")
+            end
+
+            raise Errors::AuthenticationRequiredError.new(
+              message: "OAuth authentication required for SSE stream"
+            )
+          end
+
           def handle_client_error!(error_message, status_code)
-            @running = false
-            raise Errors::TransportError.new(
+            transport_error = Errors::TransportError.new(
               message: error_message,
               code: status_code
             )
+            close
+
+            raise transport_error
+          end
+
+          def fail_pending_requests!(error)
+            @pending_mutex.synchronize do
+              @pending_requests.each_value do |queue|
+                queue.push(error)
+              end
+              @pending_requests.clear
+            end
           end
 
           def process_event_stream(response)
@@ -200,7 +432,7 @@ module RubyLLM
           end
 
           def handle_event_line?(event_line, event_buffer, response)
-            unless @running
+            unless running?
               response.body.close
               return false
             end
@@ -225,7 +457,6 @@ module RubyLLM
           end
 
           def read_error_body(response)
-            # Try to read the error body from the response
             body = ""
             begin
               response.each do |chunk|
@@ -238,11 +469,12 @@ module RubyLLM
           end
 
           def handle_connection_error(message, error)
-            return unless @running
+            return unless running?
 
             error_message = "#{message}: #{error.message}"
-            RubyLLM::MCP.logger.error "#{error_message}. Reconnecting in 1 seconds..."
-            sleep 1
+            RubyLLM::MCP.logger.error "#{error_message}. Closing SSE transport."
+
+            close
           end
 
           def handle_httpx_error_response!(response, context:)
@@ -265,37 +497,64 @@ module RubyLLM
           end
 
           def process_event(raw_event)
-            # Return if we believe that are getting a partial event
             return if raw_event[:data].nil?
 
             if raw_event[:event] == "endpoint"
-              request_id = "endpoint"
-              event = raw_event[:data]
-              return if event.nil?
-
-              RubyLLM::MCP.logger.debug "Received endpoint event: #{event}"
-              @pending_mutex.synchronize do
-                response_queue = @pending_requests.delete(request_id)
-                response_queue&.push(event)
-              end
+              process_endpoint_event(raw_event)
             else
-              event = parse_and_validate_event(raw_event[:data])
-              return if event.nil?
+              process_message_event(raw_event)
+            end
+          end
 
-              request_id = event["id"]&.to_s
-              result = RubyLLM::MCP::Result.new(event)
+          def process_endpoint_event(raw_event)
+            request_id = "endpoint"
+            event_data = raw_event[:data]
+            return if event_data.nil?
 
-              result = @coordinator.process_result(result)
-              return if result.nil?
+            endpoint = begin
+              JSON.parse(event_data)
+            rescue JSON::ParserError
+              event_data
+            end
 
-              @pending_mutex.synchronize do
-                # You can receieve duplicate events for the same request id, and we will ignore thoses
-                if result.matching_id?(request_id) && @pending_requests.key?(request_id)
-                  response_queue = @pending_requests.delete(request_id)
-                  response_queue&.push(result)
-                end
+            RubyLLM::MCP.logger.debug "Received endpoint event: #{endpoint.inspect}"
+
+            @pending_mutex.synchronize do
+              response_queue = @pending_requests.delete(request_id)
+              response_queue&.push(endpoint)
+            end
+          end
+
+          def process_message_event(raw_event)
+            event = parse_and_validate_event(raw_event[:data])
+            return if event.nil?
+
+            request_id = event["id"]&.to_s
+            result = RubyLLM::MCP::Result.new(event)
+
+            result = @coordinator.process_result(result)
+            return if result.nil?
+
+            return if request_id.nil?
+
+            response_queue = nil
+            matching_result = false
+
+            @pending_mutex.synchronize do
+              if @pending_requests.key?(request_id)
+                matching_result = if result.is_a?(RubyLLM::MCP::Result)
+                                    result.matching_id?(request_id)
+                                  else
+                                    true
+                                  end
+
+                response_queue = @pending_requests.delete(request_id) if matching_result
+              else
+                matching_result = false
               end
             end
+
+            response_queue&.push(result) if matching_result
           end
 
           def parse_and_validate_event(data)
@@ -313,9 +572,9 @@ module RubyLLM
 
             event
           rescue JSON::ParserError => e
-            # We can sometimes get partial endpoint events, so we will ignore them
-            unless @endpoint.nil?
-              RubyLLM::MCP.logger.info "Failed to parse SSE event data: #{data} - #{e.message}"
+            # Partial endpoint events can arrive while establishing the stream; log once we know the URL.
+            if @messages_url
+              RubyLLM::MCP.logger.debug "Failed to parse SSE event data: #{data} - #{e.message}"
             end
             nil
           end

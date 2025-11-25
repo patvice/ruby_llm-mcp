@@ -155,6 +155,38 @@ module RubyLLM
           @oauth_provider.complete_authorization_flow(code, state)
         end
 
+        # Handle authentication challenge with browser-based auth
+        # @param www_authenticate [String, nil] WWW-Authenticate header value
+        # @param resource_metadata_url [String, nil] Resource metadata URL from response
+        # @param requested_scope [String, nil] Scope from WWW-Authenticate challenge
+        # @return [Boolean] true if authentication was completed successfully
+        def handle_authentication_challenge(www_authenticate: nil, resource_metadata_url: nil, requested_scope: nil)
+          @logger.debug("BrowserOAuthProvider handling authentication challenge")
+
+          # Try standard provider's automatic handling first (token refresh, client credentials)
+          begin
+            return @oauth_provider.handle_authentication_challenge(
+              www_authenticate: www_authenticate,
+              resource_metadata_url: resource_metadata_url,
+              requested_scope: requested_scope
+            )
+          rescue Errors::AuthenticationRequiredError
+            # Standard provider couldn't handle it - need interactive auth
+            @logger.info("Automatic authentication failed, starting browser-based OAuth flow")
+          end
+
+          # Perform full browser-based authentication
+          authenticate(auto_open_browser: true)
+          true
+        end
+
+        # Parse WWW-Authenticate header (delegate to oauth_provider)
+        # @param header [String] WWW-Authenticate header value
+        # @return [Hash] parsed challenge information
+        def parse_www_authenticate(header)
+          @oauth_provider.parse_www_authenticate(header)
+        end
+
         private
 
         # Validate and synchronize redirect_uri between this provider and oauth_provider

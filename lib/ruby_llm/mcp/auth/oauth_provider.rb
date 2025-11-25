@@ -150,6 +150,88 @@ module RubyLLM
           request.headers["Authorization"] = token.to_header
         end
 
+        # Handle authentication challenge from server (401 response)
+        # Attempts to refresh token or raises error if interactive auth required
+        # @param www_authenticate [String, nil] WWW-Authenticate header value
+        # @param resource_metadata_url [String, nil] Resource metadata URL from response
+        # @param requested_scope [String, nil] Scope from WWW-Authenticate challenge
+        # @return [Boolean] true if authentication was refreshed successfully
+        # @raise [Errors::AuthenticationRequiredError] if interactive auth is required
+        def handle_authentication_challenge(www_authenticate: nil, resource_metadata_url: nil, requested_scope: nil)
+          logger.debug("Handling authentication challenge")
+          logger.debug("  WWW-Authenticate: #{www_authenticate}") if www_authenticate
+          logger.debug("  Resource metadata URL: #{resource_metadata_url}") if resource_metadata_url
+          logger.debug("  Requested scope: #{requested_scope}") if requested_scope
+
+          # Parse WWW-Authenticate header if provided
+          final_requested_scope = requested_scope
+          if www_authenticate
+            challenge_info = parse_www_authenticate(www_authenticate)
+            final_requested_scope ||= challenge_info[:scope]
+            # NOTE: resource_metadata_url from challenge_info could be used for future discovery
+          end
+
+          # Update scope if server requested different scope
+          if final_requested_scope && final_requested_scope != scope
+            logger.debug("Updating scope from '#{scope}' to '#{final_requested_scope}'")
+            self.scope = final_requested_scope
+          end
+
+          # Try to refresh existing token
+          token = storage.get_token(server_url)
+          if token&.refresh_token
+            logger.debug("Attempting token refresh with existing refresh token")
+            refreshed_token = refresh_token(token)
+            return true if refreshed_token
+          end
+
+          # If we have client credentials, try that flow
+          if grant_type == :client_credentials
+            logger.debug("Attempting client credentials flow")
+            begin
+              new_token = client_credentials_flow(scope: requested_scope)
+              return true if new_token
+            rescue StandardError => e
+              logger.warn("Client credentials flow failed: #{e.message}")
+            end
+          end
+
+          # Cannot automatically authenticate - interactive auth required
+          logger.warn("Cannot automatically authenticate - interactive authorization required")
+          raise Errors::AuthenticationRequiredError.new(
+            message: "OAuth authentication required. Token refresh failed and interactive authorization is needed."
+          )
+        end
+
+        # Parse WWW-Authenticate header to extract challenge parameters
+        # @param header [String] WWW-Authenticate header value
+        # @return [Hash] parsed challenge information
+        def parse_www_authenticate(header)
+          result = {}
+
+          # Example: Bearer realm="example", scope="mcp:read mcp:write", resource_metadata_url="https://..."
+          if header =~ /Bearer\s+(.+)/i
+            params = ::Regexp.last_match(1)
+
+            # Extract scope
+            if params =~ /scope="([^"]+)"/
+              result[:scope] = ::Regexp.last_match(1)
+            end
+
+            # Extract resource metadata URL
+            if params =~ /resource_metadata_url="([^"]+)"/
+              result[:resource_metadata_url] = ::Regexp.last_match(1)
+            end
+
+            # Extract realm
+            if params =~ /realm="([^"]+)"/
+              result[:realm] = ::Regexp.last_match(1)
+            end
+          end
+
+          result
+        end
+
         private
 
         # Create HTTP client for OAuth requests

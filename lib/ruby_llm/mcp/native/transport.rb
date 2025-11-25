@@ -58,9 +58,23 @@ module RubyLLM
             transport_config.merge!(options)
           end
 
+          # Handle SSE transport specially - it uses options hash pattern
+          if transport_type == :sse
+            url = transport_config.delete(:url) || transport_config.delete("url")
+            request_timeout = transport_config.delete(:request_timeout) ||
+                              transport_config.delete("request_timeout") ||
+                              MCP.config.request_timeout
+            # Everything else goes into options
+            options_hash = transport_config.dup
+            transport_config.clear
+            transport_config[:url] = url
+            transport_config[:request_timeout] = request_timeout
+            transport_config[:options] = options_hash
+          end
+
           # Remove OAuth-specific params from transports that don't support them
           # This allows other arbitrary params (like timeout) to pass through for testing
-          unless %i[streamable streamable_http].include?(transport_type)
+          unless %i[streamable streamable_http sse].include?(transport_type)
             transport_config.delete(:oauth_provider)
             transport_config.delete(:oauth)
           end

@@ -12,10 +12,12 @@ module RubyLLM::MCP::Adapters::MCPTransports
 
       @native_transport = RubyLLM::MCP::Native::Transports::SSE.new(
         url: url,
-        headers: headers,
-        version: version,
         coordinator: @coordinator,
-        request_timeout: request_timeout
+        request_timeout: request_timeout,
+        options: {
+          headers: headers,
+          version: version
+        }
       )
     end
 

@@ -20,6 +20,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     transport.instance_variable_set(:@id_mutex, Mutex.new)
     transport.instance_variable_set(:@pending_requests, {})
     transport.instance_variable_set(:@pending_mutex, Mutex.new)
+    transport.instance_variable_set(:@state_mutex, Mutex.new)
     transport.instance_variable_set(:@running, true)
     transport.instance_variable_set(:@stdin, mock_stdin)
     transport.instance_variable_set(:@stdout, mock_stdout)
@@ -40,7 +41,8 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     allow(mock_stdout).to receive(:close)
     allow(mock_stderr).to receive(:close)
     allow(mock_wait_thread).to receive(:join).with(1)
-    allow(mock_wait_thread).to receive(:alive?).and_return(true)
+    allow(mock_wait_thread).to receive(:join).with(2)
+    allow(mock_wait_thread).to receive_messages(alive?: false, pid: 12_345)
     allow(coordinator).to receive(:process_result)
   end
 
@@ -72,8 +74,24 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
 
     it "returns false when transport is not running" do
-      mock_transport.instance_variable_set(:@running, false)
+      mock_transport.instance_variable_get(:@state_mutex).synchronize do
+        mock_transport.instance_variable_set(:@running, false)
+      end
       expect(mock_transport.alive?).to be(false)
+    end
+  end
+
+  describe "#running?" do
+    it "safely checks running state with mutex" do
+      mock_transport.instance_variable_get(:@state_mutex).synchronize do
+        mock_transport.instance_variable_set(:@running, true)
+      end
+      expect(mock_transport.running?).to be(true)
+
+      mock_transport.instance_variable_get(:@state_mutex).synchronize do
+        mock_transport.instance_variable_set(:@running, false)
+      end
+      expect(mock_transport.running?).to be(false)
     end
   end
 
@@ -148,9 +166,8 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
 
     context "when handling errors" do
       it "raises TransportError on IOError" do
-        request_body = { "method" => "test" }
+        request_body = { "method" => "test", "id" => "test-io-error" }
         allow(mock_stdin).to receive(:puts).and_raise(IOError.new("Broken pipe"))
-        allow(mock_transport).to receive(:restart_process)
 
         expect { mock_transport.request(request_body) }.to raise_error(RubyLLM::MCP::Errors::TransportError) do |error|
           expect(error.message).to include("Broken pipe")
@@ -159,14 +176,21 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       end
 
       it "raises TransportError on EPIPE" do
-        request_body = { "method" => "test" }
+        request_body = { "method" => "test", "id" => "test-epipe-error" }
         allow(mock_stdin).to receive(:puts).and_raise(Errno::EPIPE.new("Broken pipe"))
-        allow(mock_transport).to receive(:restart_process)
 
         expect { mock_transport.request(request_body) }.to raise_error(RubyLLM::MCP::Errors::TransportError) do |error|
           expect(error.message).to include("Broken pipe")
           expect(error.error).to be_a(Errno::EPIPE)
         end
+      end
+
+      it "raises ArgumentError when request_id is nil with wait_for_response" do
+        request_body = { "method" => "test" }
+
+        expect do
+          mock_transport.request(request_body, wait_for_response: true)
+        end.to raise_error(ArgumentError, /Request ID must be provided/)
       end
 
       it "raises TimeoutError when request times out" do
@@ -287,12 +311,32 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       expect(transport.instance_variable_get(:@args)).to eq(%w[arg1 arg2])
     end
 
-    it "stores environment variables correctly" do
-      transport = described_class.allocate
-      test_env = { "TEST_VAR" => "test_value" }
-      transport.instance_variable_set(:@env, test_env)
+    it "merges user environment variables with default environment" do
+      transport = described_class.new(
+        command: "echo",
+        coordinator: coordinator,
+        request_timeout: 5000,
+        env: { "TEST_VAR" => "test_value", "PATH" => "/custom/path" }
+      )
 
-      expect(transport.instance_variable_get(:@env)).to eq(test_env)
+      stored_env = transport.instance_variable_get(:@env)
+      expect(stored_env["TEST_VAR"]).to eq("test_value")
+      expect(stored_env["PATH"]).to eq("/custom/path") # User override takes precedence
+      # Should still have other default env vars
+      expect(stored_env.keys.length).to be > 2
+    end
+
+    it "uses default environment when no custom env provided" do
+      transport = described_class.new(
+        command: "echo",
+        coordinator: coordinator,
+        request_timeout: 5000
+      )
+
+      stored_env = transport.instance_variable_get(:@env)
+      # Should have default environment variables
+      expect(stored_env.keys.length).to be > 0
+      expect(stored_env).to include(ENV.to_h)
     end
 
     it "stores request timeout correctly" do
@@ -303,12 +347,40 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
   end
 
-  describe "process restart behavior" do
-    it "can handle restart scenarios" do
-      allow(mock_transport).to receive(:start_process)
-      allow(mock_transport).to receive(:close)
+  describe "error handling and closing" do
+    it "fails pending requests when closing with error" do
+      queue1 = Queue.new
+      queue2 = Queue.new
+      mock_transport.instance_variable_get(:@pending_requests)["1"] = queue1
+      mock_transport.instance_variable_get(:@pending_requests)["2"] = queue2
 
-      expect { mock_transport.send(:restart_process) }.not_to raise_error
+      error = RubyLLM::MCP::Errors::TransportError.new(message: "Test error")
+      mock_transport.send(:fail_pending_requests!, error)
+
+      expect(queue1.pop).to eq(error)
+      expect(queue2.pop).to eq(error)
+      expect(mock_transport.instance_variable_get(:@pending_requests)).to be_empty
+    end
+
+    it "closes transport on stream error when running" do
+      allow(mock_transport).to receive(:running?).and_return(true)
+      allow(mock_transport).to receive(:safe_close_with_error)
+
+      error = IOError.new("Test error")
+      mock_transport.send(:handle_stream_error, error, "Test stream")
+
+      expect(mock_transport).to have_received(:safe_close_with_error).with(error)
+    end
+
+    it "does not close transport on stream error when not running" do
+      allow(mock_transport).to receive(:running?).and_return(false)
+      allow(mock_transport).to receive(:safe_close_with_error)
+      allow(RubyLLM::MCP.logger).to receive(:debug)
+
+      error = IOError.new("Test error")
+      mock_transport.send(:handle_stream_error, error, "Test stream")
+
+      expect(mock_transport).not_to have_received(:safe_close_with_error)
     end
   end
 
@@ -316,7 +388,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     let(:real_stdin) { IO.pipe[1] }
     let(:real_stdout) { IO.pipe[0] }
     let(:real_stderr) { IO.pipe[0] }
-    let(:real_wait_thread) { instance_double(Process::Waiter, alive?: true, join: nil) }
+    let(:real_wait_thread) { instance_double(Process::Waiter, alive?: true, join: nil, pid: 12_345) }
 
     let(:transport_with_threads) do
       transport = described_class.allocate
@@ -330,6 +402,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       transport.instance_variable_set(:@id_mutex, Mutex.new)
       transport.instance_variable_set(:@pending_requests, {})
       transport.instance_variable_set(:@pending_mutex, Mutex.new)
+      transport.instance_variable_set(:@state_mutex, Mutex.new)
       transport.instance_variable_set(:@running, true)
       transport.instance_variable_set(:@stdin, real_stdin)
       transport.instance_variable_set(:@stdout, real_stdout)
@@ -372,7 +445,9 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       allow(RubyLLM::MCP.logger).to receive(:error) { error_calls += 1 }
       allow(RubyLLM::MCP.logger).to receive(:debug) { debug_calls += 1 }
 
-      transport_with_threads.instance_variable_set(:@running, false)
+      transport_with_threads.instance_variable_get(:@state_mutex).synchronize do
+        transport_with_threads.instance_variable_set(:@running, false)
+      end
       real_stdout.close
 
       sleep 0.2
@@ -390,7 +465,9 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       allow(RubyLLM::MCP.logger).to receive(:error) { error_calls += 1 }
       allow(RubyLLM::MCP.logger).to receive(:debug) { debug_calls += 1 }
       allow(RubyLLM::MCP.logger).to receive(:info)
-      transport_with_threads.instance_variable_set(:@running, false)
+      transport_with_threads.instance_variable_get(:@state_mutex).synchronize do
+        transport_with_threads.instance_variable_set(:@running, false)
+      end
       real_stderr.close
       sleep 0.2
 
@@ -419,7 +496,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       expect(stderr_thread.join(2)).to eq(stderr_thread), "Stderr thread should exit cleanly"
     end
 
-    it "logs errors and restarts when @running is true and stream closes unexpectedly" do
+    it "closes transport when @running is true and stream closes unexpectedly" do
       transport_with_threads.send(:start_reader_thread)
       # Give thread time to start
       sleep 0.1
@@ -430,17 +507,19 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       end
       allow(RubyLLM::MCP.logger).to receive(:debug)
 
-      restart_called = false
-      allow(transport_with_threads).to receive(:restart_process) do
-        restart_called = true
-        transport_with_threads.instance_variable_set(:@running, false)
+      close_called = false
+      allow(transport_with_threads).to receive(:safe_close_with_error) do |_error|
+        close_called = true
+        transport_with_threads.instance_variable_get(:@state_mutex).synchronize do
+          transport_with_threads.instance_variable_set(:@running, false)
+        end
       end
       real_stdout.close
 
       deadline = Time.now + 2
-      sleep 0.1 until restart_called || Time.now > deadline
+      sleep 0.1 until close_called || Time.now > deadline
 
-      expect(restart_called).to be(true), "Expected restart_process to be called within 2 seconds"
+      expect(close_called).to be(true), "Expected safe_close_with_error to be called within 2 seconds"
     end
   end
 end
