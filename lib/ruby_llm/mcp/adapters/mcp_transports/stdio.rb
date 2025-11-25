@@ -18,16 +18,13 @@ module RubyLLM::MCP::Adapters::MCPTransports
         request_timeout: request_timeout
       )
 
-      # Set transport reference so coordinator can send notifications
       @coordinator.transport = @native_transport
     end
 
-    # Start the stdio process
     def start
       @native_transport.start
     end
 
-    # Close the stdio process
     def close
       @native_transport.close
     end
@@ -38,14 +35,13 @@ module RubyLLM::MCP::Adapters::MCPTransports
     # @param request [Hash] A JSON-RPC request object
     # @return [Hash] A JSON-RPC response object
     def send_request(request:)
-      # Ensure transport is started
       start unless @native_transport.alive?
 
-      # The native transport expects the body without "jsonrpc" key added yet
-      # and will add IDs automatically
-      result = @native_transport.request(request, add_id: false, wait_for_response: true)
+      unless request["id"] || request[:id]
+        request["id"] = SecureRandom.uuid
+      end
+      result = @native_transport.request(request, wait_for_response: true)
 
-      # Convert Result object to hash expected by MCP::Client
       if result.is_a?(RubyLLM::MCP::Result)
         result.response
       else

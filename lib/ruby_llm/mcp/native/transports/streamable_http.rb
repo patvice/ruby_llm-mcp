@@ -110,20 +110,15 @@ module RubyLLM
             @connection = create_connection
           end
 
-          def request(body, add_id: true, wait_for_response: true)
+          def request(body, wait_for_response: true)
             if @rate_limiter&.exceeded?
               sleep(1) while @rate_limiter&.exceeded?
             end
             @rate_limiter&.add
 
-            # Generate a unique request ID for requests
-            if add_id && body.is_a?(Hash) && !body.key?("id")
-              @id_mutex.synchronize { @id_counter += 1 }
-              body["id"] = @id_counter
-            end
-
-            request_id = body.is_a?(Hash) ? body["id"] : nil
-            is_initialization = body.is_a?(Hash) && body["method"] == "initialize"
+            # Extract the request ID from the body (if present)
+            request_id = body.is_a?(Hash) ? (body["id"] || body[:id]) : nil
+            is_initialization = body.is_a?(Hash) && (body["method"] == "initialize" || body[:method] == :initialize)
 
             response_queue = setup_response_queue(request_id, wait_for_response)
             result = send_http_request(body, request_id, is_initialization: is_initialization)
@@ -400,7 +395,7 @@ module RubyLLM
                 response_body = "{}"
               end
 
-              json_response = JSON.parse(response_body)
+              json_response = parse_and_validate_http_response(response_body)
               result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
               if request_id
@@ -757,7 +752,8 @@ module RubyLLM
             return unless running?
 
             begin
-              event_data = JSON.parse(raw_event[:data])
+              event_data = parse_and_validate_sse_event(raw_event[:data])
+              return unless event_data
 
               event_type = raw_event[:event] || "message"
               event_id = raw_event[:id]
@@ -801,6 +797,46 @@ module RubyLLM
                 error: e
               )
             end
+          end
+
+          def parse_and_validate_sse_event(data)
+            event_data = JSON.parse(data)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(event_data)
+            unless validator.valid?
+              RubyLLM::MCP.logger.error(
+                "Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}"
+              )
+              return nil
+            end
+
+            event_data
+          end
+
+          def parse_and_validate_http_response(response_body)
+            json_response = JSON.parse(response_body)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(json_response)
+            unless validator.valid?
+              error_msg = "Invalid JSON-RPC envelope: #{validator.error_message}"
+              RubyLLM::MCP.logger.error("#{error_msg}\nRaw: #{response_body}")
+              raise Errors::TransportError.new(
+                message: error_msg,
+                code: Native::JsonRpc::ErrorCodes::INVALID_REQUEST
+              )
+            end
+
+            json_response
+          rescue JSON::ParserError => e
+            error_msg = "JSON parse error: #{e.message}"
+            RubyLLM::MCP.logger.error("#{error_msg}\nRaw: #{response_body}")
+            raise Errors::TransportError.new(
+              message: error_msg,
+              code: Native::JsonRpc::ErrorCodes::PARSE_ERROR,
+              error: e
+            )
           end
 
           def wait_for_response_with_timeout(request_id, response_queue)

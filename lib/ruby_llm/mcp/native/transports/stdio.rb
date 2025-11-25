@@ -32,8 +32,8 @@ module RubyLLM
             @stderr_thread = nil
           end
 
-          def request(body, add_id: true, wait_for_response: true)
-            request_id = prepare_request_id(body, add_id, wait_for_response)
+          def request(body, wait_for_response: true)
+            request_id = prepare_request_id(body, wait_for_response)
             response_queue = register_pending_request(request_id, wait_for_response)
 
             send_request(body, request_id)
@@ -76,17 +76,11 @@ module RubyLLM
 
           private
 
-          def prepare_request_id(body, add_id, wait_for_response)
-            request_id = if add_id
-                           @id_mutex.synchronize { @id_counter += 1 }
-                           body["id"] = @id_counter
-                           @id_counter
-                         else
-                           body["id"] || body[:id]
-                         end
+          def prepare_request_id(body, wait_for_response)
+            request_id = body["id"] || body[:id]
 
             if wait_for_response && request_id.nil?
-              raise ArgumentError, "Request ID must be provided when wait_for_response is true and add_id is false"
+              raise ArgumentError, "Request ID must be provided in message body when wait_for_response is true"
             end
 
             request_id
@@ -279,7 +273,9 @@ module RubyLLM
           end
 
           def process_response(line)
-            response = JSON.parse(line)
+            response = parse_and_validate_envelope(line)
+            return unless response
+
             request_id = response["id"]&.to_s
             result = RubyLLM::MCP::Result.new(response)
             RubyLLM::MCP.logger.debug "Result Received: #{result.inspect}"
@@ -293,8 +289,65 @@ module RubyLLM
                 response_queue&.push(result)
               end
             end
+          end
+
+          def parse_and_validate_envelope(line)
+            response = JSON.parse(line)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(response)
+            unless validator.valid?
+              RubyLLM::MCP.logger.error("Invalid JSON-RPC envelope: #{validator.error_message}\nRaw: #{line}")
+
+              # If this is a request with an id, send an error response
+              if response.is_a?(Hash) && response["id"]
+                send_invalid_request_error(response["id"], validator.error_message)
+              end
+
+              return nil
+            end
+
+            response
           rescue JSON::ParserError => e
-            RubyLLM::MCP.logger.error("Error parsing response as JSON: #{e.message}\nRaw response: #{line}")
+            RubyLLM::MCP.logger.error("JSON parse error: #{e.message}\nRaw response: #{line}")
+
+            # JSON-RPC 2.0 §5.1: Parse error should return error with id: null
+            send_parse_error(e.message)
+            nil
+          end
+
+          def send_invalid_request_error(id, detail)
+            error_body = Native::Messages::Responses.error(
+              id: id,
+              message: "Invalid Request",
+              code: Native::JsonRpc::ErrorCodes::INVALID_REQUEST,
+              data: { detail: detail }
+            )
+
+            begin
+              body_json = JSON.generate(error_body)
+              @stdin.puts(body_json)
+              @stdin.flush
+            rescue IOError, Errno::EPIPE => e
+              RubyLLM::MCP.logger.error("Failed to send invalid request error: #{e.message}")
+            end
+          end
+
+          def send_parse_error(detail)
+            error_body = Native::Messages::Responses.error(
+              id: nil,
+              message: "Parse error",
+              code: Native::JsonRpc::ErrorCodes::PARSE_ERROR,
+              data: { detail: detail }
+            )
+
+            begin
+              body_json = JSON.generate(error_body)
+              @stdin.puts(body_json)
+              @stdin.flush
+            rescue IOError, Errno::EPIPE => e
+              RubyLLM::MCP.logger.error("Failed to send parse error: #{e.message}")
+            end
           end
         end
       end

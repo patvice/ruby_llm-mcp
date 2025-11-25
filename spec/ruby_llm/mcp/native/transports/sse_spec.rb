@@ -350,7 +350,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
       end
 
       it "processes valid JSON events" do
-        raw_event = { data: '{"id": "123", "result": {"success": true}}' }
+        raw_event = { data: '{"jsonrpc": "2.0", "id": "123", "result": {"success": true}}' }
         result = instance_double(RubyLLM::MCP::Result)
 
         allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)

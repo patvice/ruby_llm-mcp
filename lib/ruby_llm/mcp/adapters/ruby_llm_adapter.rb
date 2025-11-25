@@ -10,13 +10,11 @@ module RubyLLM
       class RubyLLMAdapter < BaseAdapter
         extend Forwardable
 
-        # Declare all supported features
         supports :tools, :prompts, :resources, :resource_templates,
                  :completions, :logging, :sampling, :roots,
                  :notifications, :progress_tracking, :human_in_the_loop,
                  :elicitation, :subscriptions, :list_changed_notifications
 
-        # Declare all supported transports
         supports_transport :stdio, :sse, :streamable, :streamable_http
 
         attr_reader :native_client
@@ -25,11 +23,7 @@ module RubyLLM
           validate_transport!(transport_type)
           super
 
-          # Extract request_timeout from config to pass explicitly to Native::Client
-          # This ensures the client's request_timeout is used instead of the global default
           request_timeout = config.delete(:request_timeout)
-
-          # Prepare OAuth provider if OAuth config is present
           transport_config = prepare_transport_config(config, transport_type)
 
           @native_client = Native::Client.new(
@@ -49,7 +43,6 @@ module RubyLLM
           )
         end
 
-        # Delegate all protocol methods to Native::Client
         def_delegators :@native_client,
                        :start, :stop, :restart!, :alive?, :ping,
                        :capabilities, :client_capabilities, :protocol_version,
@@ -65,7 +58,6 @@ module RubyLLM
                        :sampling_create_message_response,
                        :error_response, :elicitation_response
 
-        # Handle resource registration in adapter (public API concern)
         def register_resource(resource)
           client.linked_resources << resource
           client.resources[resource.name] = resource
@@ -73,16 +65,12 @@ module RubyLLM
 
         private
 
-        # Prepare transport configuration with OAuth provider if needed
         def prepare_transport_config(config, transport_type)
           transport_config = config.dup
 
-          # Only prepare OAuth for HTTP-based transports
           if %i[sse streamable streamable_http].include?(transport_type)
-            # Create OAuth provider if OAuth config is present
             oauth_provider = Auth::TransportOauthHelper.create_oauth_provider(transport_config) if Auth::TransportOauthHelper.oauth_config_present?(transport_config)
 
-            # Prepare options for HTTP transports
             Auth::TransportOauthHelper.prepare_http_transport_config(transport_config, oauth_provider)
           elsif transport_type == :stdio
             Auth::TransportOauthHelper.prepare_stdio_transport_config(transport_config)

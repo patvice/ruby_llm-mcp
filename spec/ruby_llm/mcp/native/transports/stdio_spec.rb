@@ -108,8 +108,8 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
   end
 
   describe "#request" do
-    it "sends a request and adds an ID" do
-      request_body = { "method" => "test" }
+    it "sends a request with provided ID" do
+      request_body = { "method" => "test", "id" => "test-uuid-123" }
       captured_json = nil
 
       allow(mock_stdin).to receive(:puts) { |json_body| captured_json = json_body }
@@ -117,7 +117,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
 
       # Mock successful response
       response_queue = Queue.new
-      mock_result = RubyLLM::MCP::Result.new({ "id" => 1, "result" => {} })
+      mock_result = RubyLLM::MCP::Result.new({ "id" => "test-uuid-123", "result" => {} })
       response_queue.push(mock_result)
       allow(Queue).to receive(:new).and_return(response_queue)
 
@@ -134,7 +134,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
 
       parsed = JSON.parse(captured_json)
       expect(parsed["method"]).to eq("test")
-      expect(parsed["id"]).to be_a(Integer)
+      expect(parsed["id"]).to eq("test-uuid-123")
     end
 
     it "handles requests without waiting for response" do
@@ -147,19 +147,26 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       expect(mock_stdin).to have_received(:flush)
     end
 
-    it "increments ID counter for multiple requests" do
+    it "handles multiple requests with different IDs" do
       allow(mock_stdin).to receive(:puts)
       allow(mock_stdin).to receive(:flush)
 
-      mock_transport.request({ "method" => "test1" }, wait_for_response: false)
-      mock_transport.request({ "method" => "test2" }, wait_for_response: false)
+      captured_jsons = []
+      allow(mock_stdin).to receive(:puts) { |json_body| captured_jsons << json_body }
 
-      expect(mock_transport.instance_variable_get(:@id_counter)).to eq(2)
+      mock_transport.request({ "method" => "test1", "id" => "id-1" }, wait_for_response: false)
+      mock_transport.request({ "method" => "test2", "id" => "id-2" }, wait_for_response: false)
+
+      parsed1 = JSON.parse(captured_jsons[0])
+      parsed2 = JSON.parse(captured_jsons[1])
+
+      expect(parsed1["id"]).to eq("id-1")
+      expect(parsed2["id"]).to eq("id-2")
     end
 
     context "when handling errors" do
       it "raises TransportError on IOError" do
-        request_body = { "method" => "test" }
+        request_body = { "method" => "test", "id" => "test-io-error" }
         allow(mock_stdin).to receive(:puts).and_raise(IOError.new("Broken pipe"))
 
         expect { mock_transport.request(request_body) }.to raise_error(RubyLLM::MCP::Errors::TransportError) do |error|
@@ -169,7 +176,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
       end
 
       it "raises TransportError on EPIPE" do
-        request_body = { "method" => "test" }
+        request_body = { "method" => "test", "id" => "test-epipe-error" }
         allow(mock_stdin).to receive(:puts).and_raise(Errno::EPIPE.new("Broken pipe"))
 
         expect { mock_transport.request(request_body) }.to raise_error(RubyLLM::MCP::Errors::TransportError) do |error|
@@ -182,20 +189,20 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
         request_body = { "method" => "test" }
 
         expect do
-          mock_transport.request(request_body, add_id: false, wait_for_response: true)
+          mock_transport.request(request_body, wait_for_response: true)
         end.to raise_error(ArgumentError, /Request ID must be provided/)
       end
 
       it "raises TimeoutError when request times out" do
-        request_body = { "method" => "test" }
+        request_body = { "method" => "test", "id" => "timeout-test-id" }
         allow(mock_stdin).to receive(:puts)
         allow(mock_stdin).to receive(:flush)
 
         # Mock timeout behavior
-        allow(RubyLLM::MCP::Native::Transports::Support::Timeout).to receive(:with_timeout).and_raise(
+        allow(mock_transport).to receive(:with_timeout).and_raise(
           RubyLLM::MCP::Errors::TimeoutError.new(
             message: "Request timed out",
-            request_id: 1
+            request_id: "timeout-test-id"
           )
         )
 
@@ -210,7 +217,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
           short_timeout_transport.request(request_body)
         rescue RubyLLM::MCP::Errors::TimeoutError => e
           expect(e.message).to include("timed out")
-          expect(e.request_id).to be_a(Integer)
+          expect(e.request_id).to eq("timeout-test-id")
         end
       end
     end
@@ -231,11 +238,12 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
 
       mock_transport.send(:process_response, invalid_response)
 
-      expect(RubyLLM::MCP.logger).to have_received(:error).with(/Error parsing response as JSON/)
+      expect(RubyLLM::MCP.logger).to have_received(:error).with(/JSON parse error/)
     end
 
     it "processes notifications correctly" do
-      notification = '{"method": "notifications/message", "params": {"level": "info", "data": "test"}}'
+      notification =
+        '{"jsonrpc": "2.0", "method": "notifications/message", "params": {"level": "info", "data": "test"}}'
       result = instance_double(RubyLLM::MCP::Result)
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
@@ -248,7 +256,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
 
     it "processes requests correctly" do
-      request = '{"id": "123", "method": "tools/call", "params": {}}'
+      request = '{"jsonrpc": "2.0", "id": "123", "method": "tools/call", "params": {}}'
       result = instance_double(RubyLLM::MCP::Result)
 
       allow(RubyLLM::MCP::Result).to receive(:new).and_return(result)
@@ -261,7 +269,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
     end
 
     it "handles responses with matching request IDs" do
-      response = '{"id": "1", "result": {"data": "test"}}'
+      response = '{"jsonrpc": "2.0", "id": "1", "result": {"data": "test"}}'
       result = instance_double(RubyLLM::MCP::Result)
       response_queue = Queue.new
 

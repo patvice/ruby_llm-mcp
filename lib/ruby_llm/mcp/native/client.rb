@@ -126,13 +126,13 @@ module RubyLLM
         end
 
         def ping
-          ping_request = Native::Requests::Ping.new(self)
+          body = Native::Messages::Requests.ping(tracking_progress: tracking_progress?)
           if alive?
-            result = ping_request.call
+            result = request(body)
           else
             transport.start
 
-            result = ping_request.call
+            result = request(body)
             @transport = nil
           end
 
@@ -151,11 +151,16 @@ module RubyLLM
         end
 
         def initialize_request
-          Native::Requests::Initialization.new(self).call
+          body = Native::Messages::Requests.initialize(
+            protocol_version: protocol_version,
+            capabilities: client_capabilities
+          )
+          request(body)
         end
 
         def tool_list(cursor: nil)
-          result = Native::Requests::ToolList.new(self, cursor: cursor).call
+          body = Native::Messages::Requests.tool_list(cursor: cursor, tracking_progress: tracking_progress?)
+          result = request(body)
           result.raise_error! if result.error?
 
           if result.next_cursor?
@@ -178,11 +183,14 @@ module RubyLLM
             return result
           end
 
-          Native::Requests::ToolCall.new(self, name: name, parameters: parameters).call
+          body = Native::Messages::Requests.tool_call(name: name, parameters: parameters,
+                                                      tracking_progress: tracking_progress?)
+          request(body)
         end
 
         def resource_list(cursor: nil)
-          result = Native::Requests::ResourceList.new(self, cursor: cursor).call
+          body = Native::Messages::Requests.resource_list(cursor: cursor, tracking_progress: tracking_progress?)
+          result = request(body)
           result.raise_error! if result.error?
 
           if result.next_cursor?
@@ -193,11 +201,14 @@ module RubyLLM
         end
 
         def resource_read(uri:)
-          Native::Requests::ResourceRead.new(self, uri: uri).call
+          body = Native::Messages::Requests.resource_read(uri: uri, tracking_progress: tracking_progress?)
+          request(body)
         end
 
         def resource_template_list(cursor: nil)
-          result = Native::Requests::ResourceTemplateList.new(self, cursor: cursor).call
+          body = Native::Messages::Requests.resource_template_list(cursor: cursor,
+                                                                   tracking_progress: tracking_progress?)
+          result = request(body)
           result.raise_error! if result.error?
 
           if result.next_cursor?
@@ -208,11 +219,13 @@ module RubyLLM
         end
 
         def resources_subscribe(uri:)
-          Native::Requests::ResourcesSubscribe.new(self, uri: uri).call
+          body = Native::Messages::Requests.resources_subscribe(uri: uri, tracking_progress: tracking_progress?)
+          request(body, wait_for_response: false)
         end
 
         def prompt_list(cursor: nil)
-          result = Native::Requests::PromptList.new(self, cursor: cursor).call
+          body = Native::Messages::Requests.prompt_list(cursor: cursor, tracking_progress: tracking_progress?)
+          result = request(body)
           result.raise_error! if result.error?
 
           if result.next_cursor?
@@ -223,21 +236,26 @@ module RubyLLM
         end
 
         def execute_prompt(name:, arguments:)
-          Native::Requests::PromptCall.new(self, name: name, arguments: arguments).call
+          body = Native::Messages::Requests.prompt_call(name: name, arguments: arguments,
+                                                        tracking_progress: tracking_progress?)
+          request(body)
         end
 
         def completion_resource(uri:, argument:, value:, context: nil)
-          Native::Requests::CompletionResource.new(self, uri: uri, argument: argument, value: value,
-                                                         context: context).call
+          body = Native::Messages::Requests.completion_resource(uri: uri, argument: argument, value: value,
+                                                                context: context, tracking_progress: tracking_progress?)
+          request(body)
         end
 
         def completion_prompt(name:, argument:, value:, context: nil)
-          Native::Requests::CompletionPrompt.new(self, name: name, argument: argument, value: value,
-                                                       context: context).call
+          body = Native::Messages::Requests.completion_prompt(name: name, argument: argument, value: value,
+                                                              context: context, tracking_progress: tracking_progress?)
+          request(body)
         end
 
         def set_logging(level:)
-          Native::Requests::LoggingSetLevel.new(self, level: level).call
+          body = Native::Messages::Requests.logging_set_level(level: level, tracking_progress: tracking_progress?)
+          request(body)
         end
 
         def set_progress_tracking(enabled:)
@@ -247,38 +265,46 @@ module RubyLLM
         ## Notifications
         #
         def initialize_notification
-          Native::Notifications::Initialize.new(self).call
+          body = Native::Messages::Notifications.initialized
+          request(body, wait_for_response: false)
         end
 
         def cancelled_notification(reason:, request_id:)
-          Native::Notifications::Cancelled.new(self, reason: reason, request_id: request_id).call
+          body = Native::Messages::Notifications.cancelled(request_id: request_id, reason: reason)
+          request(body, wait_for_response: false)
         end
 
         def roots_list_change_notification
-          Native::Notifications::RootsListChange.new(self).call
+          body = Native::Messages::Notifications.roots_list_changed
+          request(body, wait_for_response: false)
         end
 
         ## Responses
         #
         def ping_response(id:)
-          Native::Responses::Ping.new(self, id: id).call
+          body = Native::Messages::Responses.ping(id: id)
+          request(body, wait_for_response: false)
         end
 
         def roots_list_response(id:)
-          Native::Responses::RootsList.new(self, id: id).call
+          body = Native::Messages::Responses.roots_list(id: id, roots_paths: roots_paths)
+          request(body, wait_for_response: false)
         end
 
-        def sampling_create_message_response(id:, model:, message:, **options)
-          Native::Responses::SamplingCreateMessage.new(self, id: id, model: model, message: message,
-                                                             **options).call
+        def sampling_create_message_response(id:, model:, message:, **_options)
+          body = Native::Messages::Responses.sampling_create_message(id: id, model: model, message: message)
+          request(body, wait_for_response: false)
         end
 
-        def error_response(id:, message:, code: -32_000)
-          Native::Responses::Error.new(self, id: id, message: message, code: code).call
+        def error_response(id:, message:, code: Native::JsonRpc::ErrorCodes::SERVER_ERROR, data: nil)
+          body = Native::Messages::Responses.error(id: id, message: message, code: code, data: data)
+          request(body, wait_for_response: false)
         end
 
         def elicitation_response(id:, elicitation:)
-          Native::Responses::Elicitation.new(self, id: id, elicitation: elicitation).call
+          body = Native::Messages::Responses.elicitation(id: id, action: elicitation[:action],
+                                                         content: elicitation[:content])
+          request(body, wait_for_response: false)
         end
 
         def client_capabilities

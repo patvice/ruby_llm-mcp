@@ -32,6 +32,10 @@ module RubyLLM
 
         @result_is_error = response.dig("result", "isError") || false
         @next_cursor = response.dig("result", "nextCursor")
+
+        # Track whether result/error keys exist (for JSON-RPC detection)
+        @has_result = response.key?("result")
+        @has_error = response.key?("error")
       end
 
       REQUEST_METHODS.each do |method_name, method_value|
@@ -65,7 +69,7 @@ module RubyLLM
       end
 
       def notification?
-        @method&.include?("notifications") || false
+        @id.nil? && !@method.nil?
       end
 
       def next_cursor?
@@ -73,15 +77,15 @@ module RubyLLM
       end
 
       def request?
-        !@method.nil? && !notification? && @result.none? && @error.none?
+        !@id.nil? && !@method.nil?
       end
 
       def response?
-        !@id.nil? && (@result || @error.any?) && !@method
+        !@id.nil? && @method.nil? && (@has_result || @has_error)
       end
 
       def success?
-        !@result.empty?
+        @has_result
       end
 
       def tool_success?

@@ -39,21 +39,30 @@ module RubyLLM
           if roots_paths&.any?
             coordinator.roots_list_response(id: result.id)
           else
-            coordinator.error_response(id: result.id, message: "Roots are not enabled", code: -32_000)
+            coordinator.error_response(
+              id: result.id,
+              message: "Roots are not enabled",
+              code: Native::JsonRpc::ErrorCodes::SERVER_ERROR
+            )
           end
         rescue StandardError => e
           RubyLLM::MCP.logger.error("Error in roots request: #{e.message}\n#{e.backtrace.join("\n")}")
           coordinator.error_response(
             id: result.id,
-            message: "Error processing roots request: #{e.message}",
-            code: -32_000
+            message: "Internal error processing roots request",
+            code: Native::JsonRpc::ErrorCodes::INTERNAL_ERROR,
+            data: { detail: e.message }
           )
         end
 
         def handle_sampling_response(result)
           unless MCP.config.sampling.enabled?
             RubyLLM::MCP.logger.info("Sampling is disabled, yet server requested sampling")
-            coordinator.error_response(id: result.id, message: "Sampling is disabled", code: -32_000)
+            coordinator.error_response(
+              id: result.id,
+              message: "Sampling is disabled",
+              code: Native::JsonRpc::ErrorCodes::SERVER_ERROR
+            )
             return
           end
 
@@ -63,8 +72,9 @@ module RubyLLM
           RubyLLM::MCP.logger.error("Error in sampling request: #{e.message}\n#{e.backtrace.join("\n")}")
           coordinator.error_response(
             id: result.id,
-            message: "Error processing sampling request: #{e.message}",
-            code: -32_000
+            message: "Internal error processing sampling request",
+            code: Native::JsonRpc::ErrorCodes::INTERNAL_ERROR,
+            data: { detail: e.message }
           )
         end
 
@@ -74,9 +84,11 @@ module RubyLLM
         end
 
         def handle_unknown_request(result)
-          coordinator.error_response(id: result.id,
-                                     message: "Unknown method and could not respond: #{result.method}",
-                                     code: -32_000)
+          coordinator.error_response(
+            id: result.id,
+            message: "Method not found: #{result.method}",
+            code: Native::JsonRpc::ErrorCodes::METHOD_NOT_FOUND
+          )
         end
       end
     end

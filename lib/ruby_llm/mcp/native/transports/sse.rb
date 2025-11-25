@@ -50,19 +50,11 @@ module RubyLLM
             RubyLLM::MCP.logger.info "Initializing SSE transport to #{@event_url} with client ID #{@client_id}"
           end
 
-          def request(body, add_id: true, wait_for_response: true) # rubocop:disable Metrics/MethodLength
-            request_id = nil
-
-            if add_id
-              @id_mutex.synchronize { @id_counter += 1 }
-              request_id = @id_counter
-              body["id"] = request_id
-            elsif body.is_a?(Hash)
-              request_id = body["id"] || body[:id]
-            end
+          def request(body, wait_for_response: true) # rubocop:disable Metrics/MethodLength
+            request_id = body.is_a?(Hash) ? (body["id"] || body[:id]) : nil
 
             if wait_for_response && request_id.nil?
-              raise ArgumentError, "Request ID must be provided when wait_for_response is true and add_id is false"
+              raise ArgumentError, "Request ID must be provided in message body when wait_for_response is true"
             end
 
             response_queue = nil
@@ -141,8 +133,10 @@ module RubyLLM
               RubyLLM::MCP.logger.debug "Error closing SSE response: #{e.message}"
             end
 
-            # Wait for the thread to finish
-            @sse_thread&.join(1)
+            # Wait for the thread to finish (but don't join from within itself)
+            if @sse_thread && Thread.current != @sse_thread
+              @sse_thread.join(1)
+            end
             @sse_thread = nil
 
             fail_pending_requests!(
@@ -279,6 +273,7 @@ module RubyLLM
               @sse_thread = Thread.new do
                 listen_for_events
               end
+              @sse_thread.abort_on_exception = true
 
               begin
                 with_timeout(@request_timeout / 1000) do
@@ -479,13 +474,7 @@ module RubyLLM
             error_message = "#{message}: #{error.message}"
             RubyLLM::MCP.logger.error "#{error_message}. Closing SSE transport."
 
-            transport_error = Errors::TransportError.new(
-              message: error_message,
-              code: nil
-            )
             close
-
-            @coordinator&.handle_error(transport_error)
           end
 
           def handle_httpx_error_response!(response, context:)
@@ -537,14 +526,7 @@ module RubyLLM
           end
 
           def process_message_event(raw_event)
-            event = begin
-              JSON.parse(raw_event[:data])
-            rescue JSON::ParserError => e
-              if @messages_url
-                RubyLLM::MCP.logger.debug "Failed to parse SSE event data: #{raw_event[:data]} - #{e.message}"
-              end
-              nil
-            end
+            event = parse_and_validate_event(raw_event[:data])
             return if event.nil?
 
             request_id = event["id"]&.to_s
@@ -553,13 +535,48 @@ module RubyLLM
             result = @coordinator.process_result(result)
             return if result.nil?
 
+            return if request_id.nil?
+
+            response_queue = nil
+            matching_result = false
+
             @pending_mutex.synchronize do
-              # You can receive duplicate events for the same request id, and we will ignore those
-              if result.matching_id?(request_id) && @pending_requests.key?(request_id)
-                response_queue = @pending_requests.delete(request_id)
-                response_queue&.push(result)
+              if @pending_requests.key?(request_id)
+                matching_result = if result.is_a?(RubyLLM::MCP::Result)
+                                    result.matching_id?(request_id)
+                                  else
+                                    true
+                                  end
+
+                response_queue = @pending_requests.delete(request_id) if matching_result
+              else
+                matching_result = false
               end
             end
+
+            response_queue&.push(result) if matching_result
+          end
+
+          def parse_and_validate_event(data)
+            event = JSON.parse(data)
+
+            # Validate JSON-RPC envelope
+            validator = Native::JsonRpc::EnvelopeValidator.new(event)
+            unless validator.valid?
+              RubyLLM::MCP.logger.error(
+                "Invalid JSON-RPC envelope in SSE event: #{validator.error_message}\nRaw: #{data}"
+              )
+              # SSE is unidirectional from server to client, so we can't send error responses back
+              return nil
+            end
+
+            event
+          rescue JSON::ParserError => e
+            # Partial endpoint events can arrive while establishing the stream; log once we know the URL.
+            if @messages_url
+              RubyLLM::MCP.logger.debug "Failed to parse SSE event data: #{data} - #{e.message}"
+            end
+            nil
           end
 
           def parse_event(raw)

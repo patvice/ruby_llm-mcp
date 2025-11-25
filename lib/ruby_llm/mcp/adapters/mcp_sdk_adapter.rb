@@ -33,16 +33,12 @@ module RubyLLM
           return if @mcp_client
 
           transport = build_transport
-
-          # Explicitly start the transport BEFORE creating the MCP client
-          # This ensures the stdio process is running before the client tries to use it
           transport.start if transport.respond_to?(:start)
 
           @mcp_client = ::MCP::Client.new(transport: transport)
         end
 
         def stop
-          # Close the transport if it has a close method
           if @mcp_client && @mcp_client.transport.respond_to?(:close)
             @mcp_client.transport.close
           end
@@ -59,7 +55,6 @@ module RubyLLM
         end
 
         def ping # rubocop:disable Naming/PredicateMethod
-          # Auto-start if not started
           ensure_started
           alive?
         end
@@ -107,33 +102,28 @@ module RubyLLM
         end
 
         def prompt_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
-          # The MCP gem does not support prompts
           []
         end
 
         def execute_prompt(name:, arguments:)
-          # The MCP gem does not support prompts
           raise NotImplementedError, "Prompts are not supported by the MCP SDK (gem 'mcp')"
         end
 
         def resource_template_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
-          # The MCP gem does not support resource templates
           []
         end
 
-        # Notifications
         def cancelled_notification(reason:, request_id:)
           return unless @mcp_client&.transport.respond_to?(:native_transport)
 
           native_transport = @mcp_client.transport.native_transport
           return unless native_transport
 
-          # Use the Native::Notifications::Cancelled class directly
-          RubyLLM::MCP::Native::Notifications::Cancelled.new(
-            native_transport,
-            reason: reason,
-            request_id: request_id
-          ).call
+          body = RubyLLM::MCP::Native::Messages::Notifications.cancelled(
+            request_id: request_id,
+            reason: reason
+          )
+          native_transport.request(body, wait_for_response: false)
         end
 
         # These methods remain as NotImplementedError from base class:
@@ -198,7 +188,6 @@ module RubyLLM
               request_timeout: @config[:request_timeout] || 10_000
             )
           when :streamable, :streamable_http
-            # Prepare OAuth provider if OAuth config is present
             config_copy = @config.dup
             oauth_provider = Auth::TransportOauthHelper.create_oauth_provider(config_copy) if Auth::TransportOauthHelper.oauth_config_present?(config_copy)
 
@@ -233,7 +222,6 @@ module RubyLLM
         end
 
         def transform_resource(resource)
-          # MCP gem returns resources as hashes, not objects
           {
             "name" => resource["name"],
             "uri" => resource["uri"],
@@ -253,12 +241,10 @@ module RubyLLM
                       [{ "type" => "text", "text" => result.to_s }]
                     end
 
-          # Extract isError flag if present
           is_error = if result.is_a?(Hash) && result["result"]
                        result["result"]["isError"]
                      end
 
-          # Result expects response["result"] to contain the data
           result_data = { "content" => content }
           result_data["isError"] = is_error unless is_error.nil?
 
@@ -279,14 +265,12 @@ module RubyLLM
         end
 
         def transform_resource_content(result)
-          # The MCP gem returns an array of content hashes
           contents = if result.is_a?(Array)
                        result.map { |r| transform_single_resource_content(r) }
                      else
                        [transform_single_resource_content(result)]
                      end
 
-          # Result expects response["result"] to contain the data
           Result.new({
                        "result" => {
                          "contents" => contents
@@ -295,7 +279,6 @@ module RubyLLM
         end
 
         def transform_single_resource_content(result)
-          # MCP gem returns resource contents as hashes, not objects
           {
             "uri" => result["uri"],
             "mimeType" => result["mimeType"],
