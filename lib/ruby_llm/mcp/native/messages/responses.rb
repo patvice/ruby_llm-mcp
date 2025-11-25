@@ -37,6 +37,12 @@ module RubyLLM
           end
 
           def sampling_create_message(id:, message:, model:)
+            stop_reason = if message.respond_to?(:stop_reason) && message.stop_reason
+                            snake_to_camel(message.stop_reason)
+                          else
+                            "endTurn"
+                          end
+
             {
               jsonrpc: JSONRPC_VERSION,
               id: id,
@@ -44,9 +50,7 @@ module RubyLLM
                 role: message.role,
                 content: format_content(message.content),
                 model: model,
-                # TODO: We are going to assume it was a endTurn
-                # Look into getting RubyLLM to expose stopReason in message response
-                stopReason: "endTurn"
+                stopReason: stop_reason
               }
             }
           end
@@ -89,6 +93,12 @@ module RubyLLM
             end
           end
           private_class_method :format_content
+
+          def snake_to_camel(str)
+            parts = str.split("_")
+            parts.first + parts[1..].map(&:capitalize).join
+          end
+          private_class_method :snake_to_camel
         end
       end
     end

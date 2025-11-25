@@ -56,9 +56,11 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
 
         client.start
 
+        # Wait for the tool to become available
+        tool = wait_for_tool(client, "sample_with_cancellation")
+
         # Call the tool in a thread so we can cancel it
         tool_thread = Thread.new do
-          tool = client.tool("sample_with_cancellation")
           tool.execute
         end
 
@@ -109,10 +111,12 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
 
         client.start
 
+        # Wait for the tool to become available
+        tool = wait_for_tool(client, "sample_with_cancellation")
+
         # Start multiple sampling requests
         threads = 3.times.map do
           Thread.new do
-            tool = client.tool("sample_with_cancellation")
             tool.execute
           end
         end

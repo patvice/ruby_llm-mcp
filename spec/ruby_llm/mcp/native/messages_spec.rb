@@ -504,6 +504,165 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
         expect(body[:result][:content]).to be_nil
       end
     end
+
+    describe ".sampling_create_message" do
+      # rubocop:disable RSpec/VerifiedDoubles
+      let(:mock_content) do
+        double("Content", text: "Hello, world!")
+      end
+
+      context "when message has no stop_reason" do
+        let(:mock_message) do
+          double(
+            "Message",
+            role: "assistant",
+            content: mock_content
+          ).tap do |msg|
+            allow(msg).to receive(:respond_to?).with(:stop_reason).and_return(false)
+          end
+        end
+
+        let(:body) do
+          described_class::Responses.sampling_create_message(
+            id: "req-123",
+            message: mock_message,
+            model: "gpt-4"
+          )
+        end
+
+        it "creates a valid sampling response with default stopReason" do
+          expect(body[:jsonrpc]).to eq("2.0")
+          expect(body[:id]).to eq("req-123")
+          expect(body[:result][:role]).to eq("assistant")
+          expect(body[:result][:model]).to eq("gpt-4")
+          expect(body[:result][:stopReason]).to eq("endTurn")
+        end
+
+        it "validates against CreateMessageResult schema" do
+          body_json = JSON.parse(body.to_json)
+          response_json = {
+            "jsonrpc" => "2.0",
+            "id" => body_json["id"],
+            "result" => body_json["result"]
+          }
+          errors = schemer.validate(response_json).to_a
+          expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+        end
+      end
+
+      context "when message has stop_reason nil" do
+        let(:mock_message) do
+          double(
+            "Message",
+            role: "assistant",
+            content: mock_content,
+            stop_reason: nil
+          ).tap do |msg|
+            allow(msg).to receive(:respond_to?).with(:stop_reason).and_return(true)
+          end
+        end
+
+        let(:body) do
+          described_class::Responses.sampling_create_message(
+            id: "req-123",
+            message: mock_message,
+            model: "gpt-4"
+          )
+        end
+
+        it "uses default stopReason when nil" do
+          expect(body[:result][:stopReason]).to eq("endTurn")
+        end
+      end
+
+      context "when message has stop_reason values" do
+        shared_examples "converts stop_reason correctly" do |snake_case_value, camel_case_value|
+          let(:mock_message) do
+            double(
+              "Message",
+              role: "assistant",
+              content: mock_content,
+              stop_reason: snake_case_value
+            ).tap do |msg|
+              allow(msg).to receive(:respond_to?).with(:stop_reason).and_return(true)
+            end
+          end
+
+          let(:body) do
+            described_class::Responses.sampling_create_message(
+              id: "req-123",
+              message: mock_message,
+              model: "gpt-4"
+            )
+          end
+
+          it "converts #{snake_case_value} to #{camel_case_value}" do
+            expect(body[:result][:stopReason]).to eq(camel_case_value)
+          end
+
+          it "validates against CreateMessageResult schema" do
+            body_json = JSON.parse(body.to_json)
+            response_json = {
+              "jsonrpc" => "2.0",
+              "id" => body_json["id"],
+              "result" => body_json["result"]
+            }
+            errors = schemer.validate(response_json).to_a
+            expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+          end
+        end
+
+        context "with stop_reason: end_turn" do
+          it_behaves_like "converts stop_reason correctly", "end_turn", "endTurn"
+        end
+
+        context "with stop_reason: max_tokens" do
+          it_behaves_like "converts stop_reason correctly", "max_tokens", "maxTokens"
+        end
+
+        context "with stop_reason: stop_sequence" do
+          it_behaves_like "converts stop_reason correctly", "stop_sequence", "stopSequence"
+        end
+
+        context "with stop_reason: tool_use" do
+          it_behaves_like "converts stop_reason correctly", "tool_use", "toolUse"
+        end
+
+        context "with stop_reason: pause_turn" do
+          it_behaves_like "converts stop_reason correctly", "pause_turn", "pauseTurn"
+        end
+
+        context "with stop_reason: refusal" do
+          it_behaves_like "converts stop_reason correctly", "refusal", "refusal"
+        end
+      end
+
+      context "with custom stop_reason values" do
+        let(:mock_message) do
+          double(
+            "Message",
+            role: "assistant",
+            content: mock_content,
+            stop_reason: "custom_stop_reason"
+          ).tap do |msg|
+            allow(msg).to receive(:respond_to?).with(:stop_reason).and_return(true)
+          end
+        end
+
+        let(:body) do
+          described_class::Responses.sampling_create_message(
+            id: "req-123",
+            message: mock_message,
+            model: "gpt-4"
+          )
+        end
+
+        it "converts unknown snake_case values to camelCase" do
+          expect(body[:result][:stopReason]).to eq("customStopReason")
+        end
+      end
+      # rubocop:enable RSpec/VerifiedDoubles
+    end
   end
 
   describe "UUID generation consistency" do

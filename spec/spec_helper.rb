@@ -21,6 +21,7 @@ require "ruby_llm/mcp"
 require "mcp" if RUBY_VERSION >= "3.2.0"
 
 require_relative "support/client_runner"
+require_relative "support/client_sync_helpers"
 require_relative "support/test_server_manager"
 require_relative "support/mcp_test_configuration"
 require_relative "support/simple_multiply_tool"
