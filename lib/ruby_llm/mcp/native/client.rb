@@ -44,6 +44,10 @@ module RubyLLM
 
           @transport = nil
           @capabilities = nil
+
+          # Track in-flight server-initiated requests for cancellation
+          @in_flight_requests = {}
+          @in_flight_mutex = Mutex.new
         end
 
         def request(body, **options)
@@ -341,6 +345,41 @@ module RubyLLM
 
         def transport
           @transport ||= Native::Transport.new(@transport_type, self, config: @config)
+        end
+
+        # Register a server-initiated request that can be cancelled
+        # @param request_id [String] The ID of the request
+        # @param cancellable_operation [CancellableOperation, nil] The operation that can be cancelled
+        def register_in_flight_request(request_id, cancellable_operation = nil)
+          @in_flight_mutex.synchronize do
+            @in_flight_requests[request_id.to_s] = cancellable_operation
+          end
+        end
+
+        # Unregister a completed or cancelled request
+        # @param request_id [String] The ID of the request
+        def unregister_in_flight_request(request_id)
+          @in_flight_mutex.synchronize do
+            @in_flight_requests.delete(request_id.to_s)
+          end
+        end
+
+        # Cancel an in-flight server-initiated request
+        # @param request_id [String] The ID of the request to cancel
+        # @return [Boolean] true if the request was found and cancelled, false otherwise
+        def cancel_in_flight_request(request_id) # rubocop:disable Naming/PredicateMethod
+          operation = nil
+          @in_flight_mutex.synchronize do
+            operation = @in_flight_requests[request_id.to_s]
+          end
+
+          if operation.respond_to?(:cancel)
+            operation.cancel
+            true
+          else
+            RubyLLM::MCP.logger.warn("Request #{request_id} cannot be cancelled or was already completed")
+            false
+          end
         end
       end
     end

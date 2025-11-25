@@ -128,4 +128,57 @@ export function setupClientInteractionTools(server: McpServer) {
       };
     }
   });
+
+  server.tool(
+    "sample_with_cancellation",
+    "Test cancellation by initiating a slow sampling request that can be cancelled",
+    {},
+    async ({}) => {
+      try {
+        // Start a sampling request that will take time
+        // The client should have a slow sampling callback configured
+        // The test will send a cancellation notification while this is in-flight
+        const result = await server.server.createMessage({
+          messages: [
+            {
+              role: "user" as const,
+              content: {
+                type: "text" as const,
+                text: "This request should be cancelled by the client",
+              },
+            },
+          ],
+          model: "gpt-4o",
+          modelPreferences: {
+            hints: [{ name: "gpt-4o" }],
+          },
+          systemPrompt: "You are a helpful assistant.",
+          maxTokens: 100,
+        });
+
+        // If we get here, the request completed (wasn't cancelled)
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Cancellation test FAILED: Request completed when it should have been cancelled. Result: ${JSON.stringify(
+                result
+              )}`,
+            },
+          ],
+          isError: true,
+        };
+      } catch (error: any) {
+        // An error is expected if cancellation worked
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Cancellation test PASSED: Request was cancelled (${error.message})`,
+            },
+          ],
+        };
+      }
+    }
+  );
 }
