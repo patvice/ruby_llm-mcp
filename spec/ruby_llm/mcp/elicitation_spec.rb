@@ -382,4 +382,100 @@ RSpec.describe RubyLLM::MCP::Elicitation do
       expect { elicitation.validate_response }.not_to raise_error
     end
   end
+
+  describe "Handler Class Support" do
+    let(:mock_coordinator) { instance_double(RubyLLM::MCP::Native::Client) }
+    let(:mock_result) do
+      instance_double(RubyLLM::MCP::Result,
+                      id: "handler-test-123",
+                      params: {
+                        "message" => "Test handler",
+                        "requestedSchema" => {
+                          "type" => "object",
+                          "properties" => { "value" => { "type" => "string" } }
+                        }
+                      })
+    end
+
+    before do
+      RubyLLM::MCP::Handlers::ElicitationRegistry.clear
+    end
+
+    after do
+      RubyLLM::MCP::Handlers::ElicitationRegistry.clear
+    end
+
+    it "works with custom handler classes" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::ElicitationHandler) do
+        def execute
+          accept({ "value" => "handler response" })
+        end
+      end
+
+      allow(mock_coordinator).to receive(:elicitation_callback).and_return(handler_class)
+      allow(mock_coordinator).to receive(:elicitation_response)
+
+      elicitation = RubyLLM::MCP::Elicitation.new(mock_coordinator, mock_result)
+
+      expect(mock_coordinator).to receive(:elicitation_response).with(
+        hash_including(
+          id: "handler-test-123",
+          elicitation: hash_including(action: "accept", content: { "value" => "handler response" })
+        )
+      )
+
+      elicitation.execute
+    end
+
+    it "supports async handlers with pending response" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::ElicitationHandler) do
+        async_execution timeout: 60
+
+        def execute
+          :pending
+        end
+      end
+
+      allow(mock_coordinator).to receive(:elicitation_callback).and_return(handler_class)
+
+      elicitation = RubyLLM::MCP::Elicitation.new(mock_coordinator, mock_result)
+
+      # Should not respond immediately
+      expect(mock_coordinator).not_to receive(:elicitation_response)
+      elicitation.execute
+
+      # Should be stored in registry
+      expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(1)
+
+      # Complete it via registry
+      allow(mock_coordinator).to receive(:elicitation_response)
+      RubyLLM::MCP::Handlers::ElicitationRegistry.complete(
+        "handler-test-123",
+        response: { "value" => "async response" }
+      )
+
+      # Should be removed after completion
+      expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
+    end
+
+    it "maintains backward compatibility with block callbacks" do
+      block_callback = lambda do |elicitation|
+        elicitation.structured_response = { "value" => "block response" }
+        true
+      end
+
+      allow(mock_coordinator).to receive(:elicitation_callback).and_return(block_callback)
+      allow(mock_coordinator).to receive(:elicitation_response)
+
+      elicitation = RubyLLM::MCP::Elicitation.new(mock_coordinator, mock_result)
+
+      expect(mock_coordinator).to receive(:elicitation_response).with(
+        hash_including(
+          elicitation: hash_including(action: "accept", content: { "value" => "block response" })
+        )
+      )
+
+      elicitation.execute
+    end
+  end
 end

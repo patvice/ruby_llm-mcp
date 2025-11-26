@@ -46,17 +46,16 @@ module RubyLLM
         @max_tokens = params["maxTokens"]
       end
 
-      def execute
-        return unless callback_guard_success?
+  def execute
+    # Check if handler is a class or block
+    handler = @coordinator.sampling_callback
 
-        model = preferred_model
-        return unless model
-
-        chat_message = chat(model)
-        @coordinator.sampling_create_message_response(
-          id: @id, message: chat_message, model: model
-        )
-      end
+    if Handlers.handler_class?(handler)
+      execute_with_handler_class(handler)
+    else
+      execute_with_block
+    end
+  end
 
       def message
         @message ||= raw_messages.map { |message| message.fetch("content")&.fetch("text") }.join("\n")
@@ -73,7 +72,78 @@ module RubyLLM
 
       alias to_json to_h
 
-      private
+  private
+
+  # Execute using handler class
+      def execute_with_handler_class(handler_class)
+        handler_instance = handler_class.new(
+          sample: self,
+          coordinator: @coordinator
+        )
+
+        result = handler_instance.call
+
+        # Handle different return types
+        case result
+        when Hash
+          handle_handler_hash_result(result)
+        when TrueClass, FalseClass
+          handle_handler_boolean_result(result)
+        else
+          # Unexpected return type
+          RubyLLM::MCP.logger.error("Handler returned unexpected type: #{result.class}")
+          @coordinator.error_response(id: @id, message: "Internal error in sampling handler")
+        end
+      rescue StandardError => e
+        RubyLLM::MCP.logger.error("Error in sampling handler: #{e.message}\n#{e.backtrace.join("\n")}")
+        @coordinator.error_response(id: @id, message: "Error executing sampling request: #{e.message}")
+      end
+
+      # Handle hash result from handler
+      def handle_handler_hash_result(result)
+        if result[:accepted] == false
+          @coordinator.error_response(id: @id, message: result[:message] || REJECTED_MESSAGE)
+        elsif result[:accepted] == true && result[:response]
+          # Handler provided the response directly
+          model = preferred_model
+          return unless model
+          @coordinator.sampling_create_message_response(
+            id: @id, message: result[:response], model: model
+          )
+        else
+          # Invalid hash structure
+          @coordinator.error_response(id: @id, message: "Invalid handler response")
+        end
+      end
+
+      # Handle boolean result from handler
+      def handle_handler_boolean_result(result)
+        unless result
+          @coordinator.error_response(id: @id, message: REJECTED_MESSAGE)
+          return
+        end
+
+        model = preferred_model
+        return unless model
+
+        chat_message = chat(model)
+        @coordinator.sampling_create_message_response(
+          id: @id, message: chat_message, model: model
+        )
+      end
+
+      # Execute using block (legacy/backward compatible)
+      def execute_with_block
+        return unless callback_guard_success?
+
+        model = preferred_model
+        return unless model
+
+        chat_message = chat(model)
+        @coordinator.sampling_create_message_response(
+          id: @id, message: chat_message, model: model
+        )
+      end
 
       def callback_guard_success?
         return true unless @coordinator.sampling_callback_enabled?

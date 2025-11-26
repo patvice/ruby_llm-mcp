@@ -63,6 +63,184 @@ result = tool.execute(data: "some data to analyze")
 puts result
 ```
 
+## Handler Classes
+
+{: .label .label-green }
+1.0+
+
+Handler classes provide a powerful, object-oriented way to handle sampling requests with better testability and reusability.
+
+### Why Use Handler Classes?
+
+- **Reusable**: Define once, use across multiple clients
+- **Testable**: Easy to unit test without full MCP setup
+- **Composable**: Use hooks, guards, and options for complex logic
+- **Maintainable**: Clearer separation of concerns
+
+### Basic Handler Class
+
+```ruby
+class MySamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  def execute
+    model = sample.model_preferences.model || "gpt-4"
+    response = default_chat_completion(model)
+    accept(response)
+  end
+end
+
+# Use globally
+RubyLLM::MCP.configure do |config|
+  config.sampling.enabled = true
+  config.sampling.handler = MySamplingHandler
+end
+
+# Or per-client
+client.on_sampling(MySamplingHandler)
+```
+
+### Handler with Guards
+
+```ruby
+class SecureSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  guard :check_message_length
+  guard :check_content_safety
+
+  def execute
+    model = sample.model_preferences.model || "gpt-4"
+    response = default_chat_completion(model)
+    accept(response)
+  end
+
+  private
+
+  def check_message_length
+    return true if sample.message.length < 10_000
+    reject("Message too long: #{sample.message.length} characters")
+  end
+
+  def check_content_safety
+    return true unless sample.message.include?("jailbreak")
+    reject("Unsafe content detected")
+  end
+end
+```
+
+### Handler with Options
+
+```ruby
+class ConfigurableSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  option :default_model, default: "gpt-4"
+  option :max_tokens, default: 4000
+  option :allowed_models, default: []
+
+  guard :check_allowed_models
+
+  def execute
+    model = select_model
+    response = default_chat_completion(model)
+    accept(response)
+  end
+
+  private
+
+  def select_model
+    sample.model_preferences.model || options[:default_model]
+  end
+
+  def check_allowed_models
+    return true if options[:allowed_models].empty?
+    return true if options[:allowed_models].include?(select_model)
+
+    reject("Model '#{select_model}' not allowed")
+  end
+end
+
+# Use with custom options
+client.on_sampling(
+  ConfigurableSamplingHandler,
+  default_model: "gpt-3.5-turbo",
+  allowed_models: ["gpt-3.5-turbo", "gpt-4"]
+)
+```
+
+### Handler with Hooks
+
+```ruby
+class LoggingSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  before_execute do
+    logger.info("Sampling request from: #{sample.model_preferences.model}")
+    @start_time = Time.now
+  end
+
+  after_execute do |result|
+    duration = Time.now - @start_time
+    logger.info("Sampling completed in #{duration}s")
+    metrics.record("sampling.duration", duration)
+  end
+
+  def execute
+    model = sample.model_preferences.model || "gpt-4"
+    response = default_chat_completion(model)
+    accept(response)
+  end
+end
+```
+
+### Built-in Auto-Approve Handler
+
+```ruby
+# Simple auto-approve handler included with the gem
+client.on_sampling(
+  RubyLLM::MCP::Handlers::AutoApproveSamplingHandler,
+  default_model: "gpt-4",
+  max_message_length: 10_000,
+  allowed_models: ["gpt-4", "gpt-3.5-turbo"]
+)
+```
+
+### Testing Handler Classes
+
+```ruby
+RSpec.describe MySamplingHandler do
+  let(:sample) do
+    double(
+      RubyLLM::MCP::Sample,
+      message: "Test message",
+      model_preferences: double(model: "gpt-4"),
+      system_prompt: "You are helpful",
+      raw_messages: []
+    )
+  end
+
+  let(:coordinator) { double("Coordinator") }
+  let(:handler) { described_class.new(sample: sample, coordinator: coordinator) }
+
+  it "accepts valid requests" do
+    # Mock chat completion
+    allow(handler).to receive(:default_chat_completion).and_return("Response")
+
+    result = handler.call
+
+    expect(result[:accepted]).to be true
+    expect(result[:response]).to eq("Response")
+  end
+end
+```
+
+### Backward Compatibility
+
+Handler classes are fully backward compatible with block-based callbacks:
+
+```ruby
+# Old way (still works)
+client.on_sampling do |sample|
+  sample.message.length < 10_000
+end
+
+# New way (preferred)
+client.on_sampling(MySamplingHandler)
+```
+
 ## Model Selection
 
 ### Static Model Selection

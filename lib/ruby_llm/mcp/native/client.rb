@@ -175,16 +175,26 @@ module RubyLLM
         end
 
         def execute_tool(name:, parameters:)
-          if @human_in_the_loop_callback && !@human_in_the_loop_callback.call(name, parameters)
-            result = Result.new(
-              {
-                "result" => {
-                  "isError" => true,
-                  "content" => [{ "type" => "text", "text" => "Tool call was cancelled by the client" }]
-                }
-              }
-            )
-            return result
+          if @human_in_the_loop_callback
+            approval_result = @human_in_the_loop_callback.call(name, parameters)
+
+            # Handle different approval result types
+            case approval_result
+            when Handlers::Promise
+              # Wait for async promise resolution
+              approved = approval_result.wait
+              unless approved
+                return create_cancelled_result
+              end
+            when TrueClass
+              # Approved, continue
+            when FalseClass
+              # Denied, return cancelled result
+              return create_cancelled_result
+            else
+              # Unexpected type, log warning and continue
+              RubyLLM::MCP.logger.warn("Human-in-the-loop callback returned unexpected type: #{approval_result.class}")
+            end
           end
 
           body = Native::Messages::Requests.tool_call(name: name, parameters: parameters,
@@ -380,6 +390,20 @@ module RubyLLM
             RubyLLM::MCP.logger.warn("Request #{request_id} cannot be cancelled or was already completed")
             false
           end
+        end
+
+        private
+
+        # Create a result for cancelled tool execution
+        def create_cancelled_result
+          Result.new(
+            {
+              "result" => {
+                "isError" => true,
+                "content" => [{ "type" => "text", "text" => "Tool call was cancelled by the client" }]
+              }
+            }
+          )
         end
       end
     end

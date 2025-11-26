@@ -13,6 +13,7 @@ module RubyLLM
         def execute(result)
           operation = CancellableOperation.new(result.id)
           coordinator.register_in_flight_request(result.id, operation)
+          is_deferred = false
 
           begin
             # Execute in a separate thread that can be terminated on cancellation
@@ -27,7 +28,7 @@ module RubyLLM
                 handle_sampling_response(result)
                 true
               elsif result.elicitation?
-                handle_elicitation_response(result)
+                is_deferred = handle_elicitation_response(result)
                 true
               else
                 handle_unknown_request(result)
@@ -39,9 +40,12 @@ module RubyLLM
           rescue Errors::RequestCancelled => e
             RubyLLM::MCP.logger.info("Request #{result.id} was cancelled: #{e.message}")
             # Don't send response - cancellation means result is unused
+            # Clean up if this was a deferred elicitation
+            Handlers::ElicitationRegistry.remove(result.id) if is_deferred
             true
           ensure
-            coordinator.unregister_in_flight_request(result.id)
+            # Only unregister if not deferred (async operations stay registered)
+            coordinator.unregister_in_flight_request(result.id) unless is_deferred
           end
         end
 
@@ -94,7 +98,20 @@ module RubyLLM
 
         def handle_elicitation_response(result)
           RubyLLM::MCP.logger.info("Elicitation request: #{result.inspect}")
-          Elicitation.new(coordinator, result).execute
+          elicitation = Elicitation.new(coordinator, result)
+          elicitation.execute
+
+          # Return true if this elicitation is deferred (async)
+          elicitation.instance_variable_get(:@deferred)
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Error in elicitation request: #{e.message}\n#{e.backtrace.join("\n")}")
+          coordinator.error_response(
+            id: result.id,
+            message: "Internal error processing elicitation request",
+            code: Native::JsonRpc::ErrorCodes::INTERNAL_ERROR,
+            data: { detail: e.message }
+          )
+          false
         end
 
         def handle_unknown_request(result)
