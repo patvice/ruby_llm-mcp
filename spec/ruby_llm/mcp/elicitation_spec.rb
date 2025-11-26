@@ -440,21 +440,27 @@ RSpec.describe RubyLLM::MCP::Elicitation do
 
       elicitation = RubyLLM::MCP::Elicitation.new(mock_coordinator, mock_result)
 
+      # Track calls to elicitation_response
+      response_called = false
+      allow(mock_coordinator).to receive(:elicitation_response) do |_args|
+        response_called = true
+      end
+
       # Should not respond immediately
-      expect(mock_coordinator).not_to receive(:elicitation_response)
       elicitation.execute
+      expect(response_called).to be(false)
 
       # Should be stored in registry
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(1)
 
       # Complete it via registry
-      allow(mock_coordinator).to receive(:elicitation_response)
       RubyLLM::MCP::Handlers::ElicitationRegistry.complete(
         "handler-test-123",
         response: { "value" => "async response" }
       )
 
-      # Should be removed after completion
+      # Should have called elicitation_response and be removed after completion
+      expect(response_called).to be(true)
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
     end
 

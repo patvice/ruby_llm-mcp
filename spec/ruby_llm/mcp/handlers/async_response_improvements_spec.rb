@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "AsyncResponse Improvements" do
+RSpec.describe "AsyncResponse Improvements" do # rubocop:disable RSpec/DescribeClass
   describe "callback execution safety" do
     it "executes callbacks outside mutex to prevent deadlocks" do
       async_resp = RubyLLM::MCP::Handlers::AsyncResponse.new(
@@ -13,15 +13,14 @@ RSpec.describe "AsyncResponse Improvements" do
       deadlock_occurred = false
       callback_executed = false
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |_state, _data|
         # Try to register another callback from within callback
         # This would deadlock if callbacks were executed inside mutex
-        begin
-          async_resp.on_complete { |s, d| nil }
-          callback_executed = true
-        rescue ThreadError
-          deadlock_occurred = true
-        end
+
+        async_resp.on_complete { |_s, _d| nil }
+        callback_executed = true
+      rescue ThreadError
+        deadlock_occurred = true
       end
 
       async_resp.complete("test")
@@ -42,11 +41,11 @@ RSpec.describe "AsyncResponse Improvements" do
       results = []
 
       # Register multiple callbacks
-      async_resp.on_complete { |state, data| raise "Error in first callback" }
-      async_resp.on_complete { |state, data| results << "callback-1" }
-      async_resp.on_complete { |state, data| raise "Error in third callback" }
-      async_resp.on_complete { |state, data| results << "callback-2" }
-      async_resp.on_complete { |state, data| results << "callback-3" }
+      async_resp.on_complete { |_state, _data| raise "Error in first callback" }
+      async_resp.on_complete { |_state, _data| results << "callback-1" }
+      async_resp.on_complete { |_state, _data| raise "Error in third callback" }
+      async_resp.on_complete { |_state, _data| results << "callback-2" }
+      async_resp.on_complete { |_state, _data| results << "callback-3" }
 
       # Complete should not raise
       expect { async_resp.complete("data") }.not_to raise_error
@@ -55,7 +54,7 @@ RSpec.describe "AsyncResponse Improvements" do
       sleep 0.1
 
       # Successful callbacks should have executed
-      expect(results).to match_array(["callback-1", "callback-2", "callback-3"])
+      expect(results).to match_array(%w[callback-1 callback-2 callback-3])
     end
 
     it "handles concurrent callback registrations during completion" do
@@ -67,7 +66,7 @@ RSpec.describe "AsyncResponse Improvements" do
       results = []
 
       # Register initial callback
-      async_resp.on_complete { |state, data| results << "initial" }
+      async_resp.on_complete { |_state, _data| results << "initial" }
 
       # Start completion in one thread
       completion_thread = Thread.new do
@@ -78,7 +77,7 @@ RSpec.describe "AsyncResponse Improvements" do
       # Register more callbacks concurrently
       registration_threads = 5.times.map do |i|
         Thread.new do
-          async_resp.on_complete { |state, data| results << "concurrent-#{i}" }
+          async_resp.on_complete { |_state, _data| results << "concurrent-#{i}" }
         end
       end
 
@@ -128,7 +127,7 @@ RSpec.describe "AsyncResponse Improvements" do
       )
 
       callback_count = 0
-      async_resp.on_complete { |state, data| callback_count += 1 }
+      async_resp.on_complete { |_state, _data| callback_count += 1 }
 
       # Complete once
       async_resp.complete("data")
@@ -179,7 +178,7 @@ RSpec.describe "AsyncResponse Improvements" do
         timeout: nil
       )
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |_state, _data|
         raise StandardError, "Intentional test error"
       end
 
@@ -196,7 +195,7 @@ RSpec.describe "AsyncResponse Improvements" do
         timeout: nil
       )
 
-      async_resp.on_complete { |state, data| raise "Error" }
+      async_resp.on_complete { |_state, _data| raise "Error" }
 
       async_resp.complete("data")
       sleep 0.1
@@ -237,7 +236,7 @@ RSpec.describe "AsyncResponse Improvements" do
         timeout_handler: timeout_handler
       )
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |state, _data|
         callback_called = true if state == :timed_out
       end
 
@@ -287,7 +286,7 @@ RSpec.describe "AsyncResponse Improvements" do
 
       states_received = []
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |state, _data|
         states_received << state
       end
 
@@ -308,7 +307,7 @@ RSpec.describe "AsyncResponse Improvements" do
 
       states_received = []
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |state, _data|
         states_received << state
       end
 

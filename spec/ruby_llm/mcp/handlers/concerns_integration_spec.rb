@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "Handlers::Concerns Integration" do
+RSpec.describe "Handlers::Concerns Integration" do # rubocop:disable RSpec/DescribeClass
   describe "Complete handler with all concerns" do
     let(:notification_service) { double("NotificationService") }
 
@@ -34,6 +34,7 @@ RSpec.describe "Handlers::Concerns Integration" do
 
         def execute
           return deny("Tool is denied") if tool_denied?
+
           approve
         end
 
@@ -41,6 +42,7 @@ RSpec.describe "Handlers::Concerns Integration" do
 
         def check_tool_safety
           return "Tool not in safe list" unless tool_allowed?
+
           true
         end
       end
@@ -51,7 +53,7 @@ RSpec.describe "Handlers::Concerns Integration" do
         tool_name: "read_file",
         parameters: { path: "/tmp/test.txt" },
         approval_id: "test-123",
-        allowed_tools: ["read_file", "list_files"]
+        allowed_tools: %w[read_file list_files]
       )
 
       expect(RubyLLM::MCP.logger).to receive(:info).with(/Processing approval/)
@@ -180,11 +182,13 @@ RSpec.describe "Handlers::Concerns Integration" do
 
         def check_model_allowed
           return "Model #{sample.model} not allowed" unless model_allowed?(sample.model)
+
           true
         end
 
         def check_token_limit
           return "Too many tokens requested" if sample.max_tokens > options[:max_tokens]
+
           true
         end
       end

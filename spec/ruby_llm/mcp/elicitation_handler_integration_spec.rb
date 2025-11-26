@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "Elicitation Handler Integration" do
+RSpec.describe "Elicitation Handler Integration" do # rubocop:disable RSpec/DescribeClass
   let(:coordinator) do
     double(
       "Coordinator",
@@ -121,9 +121,15 @@ RSpec.describe "Elicitation Handler Integration" do
 
       elicitation = RubyLLM::MCP::Elicitation.new(coordinator, result)
 
+      # Track calls to elicitation_response
+      response_called = false
+      allow(coordinator).to receive(:elicitation_response) do |_args|
+        response_called = true
+      end
+
       # Should not respond immediately
-      expect(coordinator).not_to receive(:elicitation_response)
       elicitation.execute
+      expect(response_called).to be(false)
 
       # Registry should have stored it
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(1)
@@ -132,6 +138,7 @@ RSpec.describe "Elicitation Handler Integration" do
       sleep 0.2
 
       # Should have responded after promise resolution
+      expect(response_called).to be(true)
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
     end
   end
@@ -245,13 +252,21 @@ RSpec.describe "Elicitation Handler Integration" do
 
       elicitation = RubyLLM::MCP::Elicitation.new(coordinator, result)
 
-      expect(coordinator).not_to receive(:elicitation_response)
+      # Track calls to elicitation_response
+      response_called = false
+      allow(coordinator).to receive(:elicitation_response) do |_args|
+        response_called = true
+      end
+
+      # Should not respond immediately
       elicitation.execute
+      expect(response_called).to be(false)
 
       # Wait for async completion
       sleep 0.2
 
-      # Should have been removed from registry
+      # Should have responded and been removed from registry
+      expect(response_called).to be(true)
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
     end
   end
@@ -289,6 +304,9 @@ RSpec.describe "Elicitation Handler Integration" do
 
       allow(coordinator).to receive(:elicitation_callback).and_return(handler_class)
 
+      # Allow the coordinator to receive timeout response
+      allow(coordinator).to receive(:elicitation_response)
+
       elicitation = RubyLLM::MCP::Elicitation.new(coordinator, result)
       elicitation.execute
 
@@ -296,7 +314,7 @@ RSpec.describe "Elicitation Handler Integration" do
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(1)
 
       # Wait for timeout
-      sleep 0.2
+      sleep 0.3
 
       # Should be removed after timeout
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)

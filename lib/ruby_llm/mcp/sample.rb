@@ -46,16 +46,16 @@ module RubyLLM
         @max_tokens = params["maxTokens"]
       end
 
-  def execute
-    # Check if handler is a class or block
-    handler = @coordinator.sampling_callback
+      def execute
+        # Check if handler is a class or block
+        handler = @coordinator.sampling_callback
 
-    if Handlers.handler_class?(handler)
-      execute_with_handler_class(handler)
-    else
-      execute_with_block
-    end
-  end
+        if Handlers.handler_class?(handler)
+          execute_with_handler_class(handler)
+        else
+          execute_with_block
+        end
+      end
 
       def message
         @message ||= raw_messages.map { |message| message.fetch("content")&.fetch("text") }.join("\n")
@@ -72,9 +72,9 @@ module RubyLLM
 
       alias to_json to_h
 
-  private
+      private
 
-  # Execute using handler class
+      # Execute using handler class
       def execute_with_handler_class(handler_class)
         handler_instance = handler_class.new(
           sample: self,
@@ -107,6 +107,7 @@ module RubyLLM
           # Handler provided the response directly
           model = preferred_model
           return unless model
+
           @coordinator.sampling_create_message_response(
             id: @id, message: result[:response], model: model
           )

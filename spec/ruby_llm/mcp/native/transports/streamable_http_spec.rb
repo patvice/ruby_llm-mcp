@@ -540,7 +540,6 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
       end
 
       context "when client doesn't have close method" do
-        # rubocop:disable RSpec/VerifiedDoubles
         let(:mock_client) { double("client_without_close") }
         # rubocop:enable RSpec/VerifiedDoubles
 

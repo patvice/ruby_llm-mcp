@@ -53,7 +53,7 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::Lifecycle do
       end
 
       handler = handler_class.new
-      result = handler.call
+      handler.call
 
       expect(handler.before_block).to be true
       expect(handler.after_block).to eq("block_result")

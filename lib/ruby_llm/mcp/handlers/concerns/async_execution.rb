@@ -56,7 +56,10 @@ module RubyLLM
                  (respond_to?(:elicitation) && elicitation&.id) ||
                  (respond_to?(:approval_id) && approval_id)
 
-            raise ArgumentError, "elicitation_id must be provided or handler must have elicitation/approval_id" unless id
+            unless id
+              raise ArgumentError,
+                    "elicitation_id must be provided or handler must have elicitation/approval_id"
+            end
 
             AsyncResponse.new(
               elicitation_id: id,

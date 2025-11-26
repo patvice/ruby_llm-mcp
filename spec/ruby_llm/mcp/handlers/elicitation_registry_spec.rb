@@ -117,7 +117,7 @@ RSpec.describe RubyLLM::MCP::Handlers::ElicitationRegistry do
   end
 
   describe "timeout handling" do
-    xit "automatically times out elicitation after timeout period" do
+    it "automatically times out elicitation after timeout period" do
       elicitation_with_timeout = double(
         "Elicitation",
         id: elicitation_id,
