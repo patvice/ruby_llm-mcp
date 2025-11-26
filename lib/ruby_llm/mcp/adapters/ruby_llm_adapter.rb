@@ -83,8 +83,57 @@ module RubyLLM
 
         def build_human_in_the_loop_callback(client)
           lambda do |name, params|
-            !client.human_in_the_loop? || client.on[:human_in_the_loop].call(name, params)
+            return true unless client.human_in_the_loop?
+
+            handler_or_block = client.on[:human_in_the_loop]
+
+            # Check if it's a handler class
+            if Handlers.handler_class?(handler_or_block)
+              execute_handler_class(handler_or_block, name, params, client)
+            else
+              # Legacy block-based callback
+              handler_or_block.call(name, params)
+            end
           end
+        end
+
+        def execute_handler_class(handler_class, name, params, client)
+          approval_id = SecureRandom.uuid
+
+          handler_instance = handler_class.new(
+            tool_name: name,
+            parameters: params,
+            approval_id: approval_id,
+            coordinator: @native_client
+          )
+
+          result = handler_instance.call
+
+          # Handle different return types
+          case result
+          when Hash
+            result[:approved] == true
+          when Handlers::Promise
+            result # Return promise to Native::Client
+          when :pending
+            # Create and return promise for registry pattern
+            promise = Handlers::Promise.new
+            Handlers::HumanInTheLoopRegistry.store(approval_id, {
+              promise: promise,
+              timeout: handler_instance.timeout,
+              tool_name: name,
+              parameters: params
+            })
+            promise
+          when TrueClass, FalseClass
+            result
+          else
+            RubyLLM::MCP.logger.error("Handler returned unexpected type: #{result.class}")
+            false
+          end
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Error in human-in-the-loop handler: #{e.message}\n#{e.backtrace.join("\n")}")
+          false
         end
       end
     end

@@ -231,4 +231,49 @@ RSpec.describe RubyLLM::MCP::Sample do
       end
     end
   end
+
+  describe "Handler Class Support" do
+    it "works with custom handler classes" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::SamplingHandler) do
+        def execute
+          accept("Handler response")
+        end
+      end
+
+      coordinator = double("Coordinator", sampling_callback_enabled?: true)
+      allow(coordinator).to receive(:sampling_callback).and_return(handler_class)
+      allow(coordinator).to receive(:sampling_create_message_response)
+      allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
+
+      sample = RubyLLM::MCP::Sample.new(result, coordinator)
+
+      expect(coordinator).to receive(:sampling_create_message_response).with(
+        hash_including(message: "Handler response")
+      )
+
+      sample.execute
+    end
+
+    it "maintains backward compatibility with block callbacks" do
+      coordinator = double("Coordinator", sampling_callback_enabled?: true)
+      block_callback = ->(s) { s.message.length < 100 }
+      allow(coordinator).to receive(:sampling_callback).and_return(block_callback)
+      allow(coordinator).to receive(:sampling_create_message_response)
+      allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
+
+      # Mock chat
+      chat = double("Chat")
+      allow(RubyLLM::Chat).to receive(:new).and_return(chat)
+      allow(chat).to receive(:add_message)
+      allow(chat).to receive(:complete).and_return("Block response")
+
+      sample = RubyLLM::MCP::Sample.new(result, coordinator)
+
+      expect(coordinator).to receive(:sampling_create_message_response).with(
+        hash_including(message: "Block response")
+      )
+
+      sample.execute
+    end
+  end
 end

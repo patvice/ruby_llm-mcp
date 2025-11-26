@@ -262,6 +262,148 @@ client.on_human_in_the_loop do |name, params|
 end
 ```
 
+### Handler Classes
+
+{: .label .label-green }
+1.0+
+
+Handler classes provide a powerful, testable way to handle approvals with async support.
+
+#### Basic Handler Class
+
+```ruby
+class SafeToolHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  option :safe_tools, default: ["read_file", "list_files"]
+
+  def execute
+    if options[:safe_tools].include?(tool_name)
+      approve
+    else
+      deny("Tool '#{tool_name}' requires explicit approval")
+    end
+  end
+end
+
+# Use globally
+RubyLLM::MCP.configure do |config|
+  config.on_human_in_the_loop SafeToolHandler
+end
+
+# Or per-client
+client.on_human_in_the_loop(SafeToolHandler, safe_tools: ["read_file", "list_files"])
+```
+
+#### Handler with Guards
+
+```ruby
+class ParameterValidationHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  guard :check_parameters
+  guard :check_path_safety
+
+  def execute
+    # Logic here only runs if guards pass
+    approve
+  end
+
+  private
+
+  def check_parameters
+    return true unless parameters[:path]
+    return true unless parameters[:path].include?("..")
+
+    "Path traversal detected"
+  end
+
+  def check_path_safety
+    return true unless parameters[:path]
+    return true unless parameters[:path].start_with?("/etc")
+
+    "Access to system directories denied"
+  end
+end
+```
+
+#### Async Approval via Websocket
+
+Perfect for requiring real user approval via UI:
+
+```ruby
+class WebsocketApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  async_execution timeout: 300 # 5 minutes
+
+  option :websocket_service, required: true
+  option :user_id, required: true
+
+  on_timeout do
+    deny("User did not respond in time")
+  end
+
+  def execute
+    # Send approval request to user's browser/app
+    options[:websocket_service].broadcast(
+      "approvals_#{options[:user_id]}",
+      {
+        type: "approval_request",
+        id: approval_id,
+        tool: tool_name,
+        parameters: parameters
+      }
+    )
+
+    # Return :pending - approval happens later via registry
+    :pending
+  end
+end
+
+# Configure handler
+client.on_human_in_the_loop(
+  WebsocketApprovalHandler,
+  websocket_service: ActionCable.server,
+  user_id: current_user.id
+)
+
+# When user approves/denies via websocket:
+class ApprovalsChannel < ApplicationCable::Channel
+  def approve(data)
+    RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.approve(
+      data["approval_id"]
+    )
+  end
+
+  def deny(data)
+    RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.deny(
+      data["approval_id"],
+      reason: data["reason"]
+    )
+  end
+end
+```
+
+#### Built-in Auto-Approve Handler
+
+```ruby
+# Simple auto-approve handler included with the gem
+client.on_human_in_the_loop(
+  RubyLLM::MCP::Handlers::AutoApproveToolHandler,
+  safe_tools: ["read_file", "list_files"],
+  dangerous_tools: ["delete_file", "execute_command"]
+)
+```
+
+#### Backward Compatibility
+
+Handler classes are fully backward compatible:
+
+```ruby
+# Old way (still works)
+client.on_human_in_the_loop do |name, params|
+  name != "dangerous_tool"
+end
+
+# New way (preferred for complex logic)
+client.on_human_in_the_loop(MyApprovalHandler)
+```
+
 ## Streaming Responses
 
 Monitor tool execution in real-time:
