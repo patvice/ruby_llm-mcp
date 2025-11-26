@@ -2,6 +2,7 @@
 
 require "spec_helper"
 
+# rubocop:disable Naming/PredicateMethod
 RSpec.describe RubyLLM::MCP::Handlers::Concerns::GuardChecks do
   let(:base_handler_class) do
     Class.new do
@@ -29,7 +30,7 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::GuardChecks do
         end
       end
 
-      expect(handler_class.guards).to eq([:check_something, :check_another])
+      expect(handler_class.guards).to eq(%i[check_something check_another])
     end
 
     it "executes guards before execute" do
@@ -137,7 +138,8 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::GuardChecks do
         end
       end
 
-      expect(child_class.guards).to eq([:parent_guard, :child_guard])
+      expect(child_class.guards).to eq(%i[parent_guard child_guard])
     end
   end
 end
+# rubocop:enable Naming/PredicateMethod

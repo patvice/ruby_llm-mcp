@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "Promise Improvements" do
+RSpec.describe "Promise Improvements" do # rubocop:disable RSpec/DescribeClass
   describe "condition variable waiting" do
     it "wakes up immediately when resolved" do
       promise = RubyLLM::MCP::Handlers::Promise.new
@@ -113,13 +113,17 @@ RSpec.describe "Promise Improvements" do
       callback_executed = false
       mutex_held = false
 
-      promise.then do |value|
+      promise.then do |_value|
         # Try to check if mutex is locked (it shouldn't be during callback)
         callback_executed = true
         # If we can synchronize, mutex was released
         promise.instance_variable_get(:@mutex).try_lock
         mutex_held = !promise.instance_variable_get(:@mutex).locked?
-        promise.instance_variable_get(:@mutex).unlock rescue nil
+        begin
+          promise.instance_variable_get(:@mutex).unlock
+        rescue StandardError
+          nil
+        end
       end
 
       promise.resolve("value")
@@ -134,7 +138,7 @@ RSpec.describe "Promise Improvements" do
       promise = RubyLLM::MCP::Handlers::Promise.new
       callback_executed = false
 
-      promise.catch do |reason|
+      promise.catch do |_reason|
         callback_executed = true
       end
 

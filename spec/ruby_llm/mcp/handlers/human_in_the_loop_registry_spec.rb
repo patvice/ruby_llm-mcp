@@ -122,7 +122,7 @@ RSpec.describe RubyLLM::MCP::Handlers::HumanInTheLoopRegistry do
   end
 
   describe "timeout handling" do
-    xit "automatically times out approval after timeout period" do
+    it "automatically times out approval after timeout period" do
       context_with_timeout = approval_context.merge(timeout: 0.1)
 
       described_class.store(approval_id, context_with_timeout)

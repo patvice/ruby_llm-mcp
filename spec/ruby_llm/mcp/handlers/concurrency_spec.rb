@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "Handler Concurrency" do
+RSpec.describe "Handler Concurrency" do # rubocop:disable RSpec/DescribeClass
   before do
     RubyLLM::MCP::Handlers::ElicitationRegistry.clear
     RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.clear
@@ -318,15 +318,15 @@ RSpec.describe "Handler Concurrency" do
       callback_results = []
 
       # Register callbacks, some will fail
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |_state, _data|
         raise "Intentional error"
       end
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |_state, _data|
         callback_results << "callback-1"
       end
 
-      async_resp.on_complete do |state, data|
+      async_resp.on_complete do |_state, _data|
         callback_results << "callback-2"
       end
 
@@ -356,7 +356,7 @@ RSpec.describe "Handler Concurrency" do
           }
         )
 
-        elicitation = RubyLLM::MCP::Elicitation.new(coordinator, result)
+        RubyLLM::MCP::Elicitation.new(coordinator, result)
         # Create a mock elicitation with timeout method
         elicitation_with_timeout = double(
           "ElicitationWithTimeout",

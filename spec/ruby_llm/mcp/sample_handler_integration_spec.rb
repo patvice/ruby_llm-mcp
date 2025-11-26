@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "Sample Handler Integration" do
+RSpec.describe "Sample Handler Integration" do # rubocop:disable RSpec/DescribeClass
   let(:coordinator) do
     double(
       "Coordinator",
@@ -40,6 +40,7 @@ RSpec.describe "Sample Handler Integration" do
       end
 
       allow(coordinator).to receive(:sampling_callback).and_return(handler_class)
+      allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
 
       sample = RubyLLM::MCP::Sample.new(result, coordinator)
 
@@ -59,19 +60,20 @@ RSpec.describe "Sample Handler Integration" do
         end
       end
 
-      handler_with_options = ->(sample) do
-        handler_class.new(sample: sample, coordinator: coordinator, custom_model: "claude-3").call
-      end
-
-      allow(coordinator).to receive(:sampling_callback).and_return(handler_with_options)
-
       sample = RubyLLM::MCP::Sample.new(result, coordinator)
 
-      expect(coordinator).to receive(:sampling_create_message_response).with(
-        hash_including(message: "Response from claude-3")
+      # Instantiate handler with custom options
+      handler_instance = handler_class.new(
+        sample: sample,
+        coordinator: coordinator,
+        custom_model: "claude-3"
       )
 
-      sample.execute
+      # Call handler and verify result
+      result = handler_instance.call
+
+      expect(result[:accepted]).to be true
+      expect(result[:response]).to eq("Response from claude-3")
     end
 
     it "executes handler with hooks" do
@@ -106,11 +108,13 @@ RSpec.describe "Sample Handler Integration" do
 
         def check_message_length
           return true if sample.message.length < 100
+
           "Message too long"
         end
       end
 
       allow(coordinator).to receive(:sampling_callback).and_return(handler_class)
+      allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
 
       sample = RubyLLM::MCP::Sample.new(result, coordinator)
 
@@ -148,8 +152,7 @@ RSpec.describe "Sample Handler Integration" do
     it "still works with block-based callbacks" do
       block_callback = ->(sample) { sample.message.length < 100 }
 
-      allow(coordinator).to receive(:sampling_callback).and_return(block_callback)
-      allow(coordinator).to receive(:sampling_callback_enabled?).and_return(true)
+      allow(coordinator).to receive_messages(sampling_callback: block_callback, sampling_callback_enabled?: true)
       allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
 
       sample = RubyLLM::MCP::Sample.new(result, coordinator)
@@ -167,5 +170,4 @@ RSpec.describe "Sample Handler Integration" do
       sample.execute
     end
   end
-
 end

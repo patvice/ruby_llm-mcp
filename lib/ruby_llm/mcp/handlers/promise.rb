@@ -7,16 +7,16 @@ module RubyLLM
       class Promise
         attr_reader :state, :value, :reason
 
-      # Initialize a new promise
-      def initialize
-        @state = :pending
-        @value = nil
-        @reason = nil
-        @mutex = Mutex.new
-        @condition = ConditionVariable.new
-        @then_callbacks = []
-        @catch_callbacks = []
-      end
+        # Initialize a new promise
+        def initialize
+          @state = :pending
+          @value = nil
+          @reason = nil
+          @mutex = Mutex.new
+          @condition = ConditionVariable.new
+          @then_callbacks = []
+          @catch_callbacks = []
+        end
 
         # Register a callback for successful resolution
         # @param callback [Proc] callback to execute on resolution
@@ -151,6 +151,7 @@ module RubyLLM
                 if remaining <= 0
                   raise Timeout::Error, "Promise timed out after #{timeout} seconds"
                 end
+
                 @condition.wait(@mutex, remaining)
               end
             else
@@ -169,25 +170,21 @@ module RubyLLM
         # Note: Executes in background thread to avoid blocking
         def execute_callback(callback, arg)
           Thread.new do
-            begin
-              callback.call(arg)
-            rescue StandardError => e
-              RubyLLM::MCP.logger.error(
-                "Error in promise callback: #{e.message}\n#{e.backtrace.join("\n")}"
-              )
-            end
-          end
-        end
-
-        # Execute a callback synchronously (for testing and immediate execution)
-        def execute_callback_sync(callback, arg)
-          begin
             callback.call(arg)
           rescue StandardError => e
             RubyLLM::MCP.logger.error(
               "Error in promise callback: #{e.message}\n#{e.backtrace.join("\n")}"
             )
           end
+        end
+
+        # Execute a callback synchronously (for testing and immediate execution)
+        def execute_callback_sync(callback, arg)
+          callback.call(arg)
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error(
+            "Error in promise callback: #{e.message}\n#{e.backtrace.join("\n")}"
+          )
         end
       end
     end

@@ -24,15 +24,15 @@ module RubyLLM
         @timeout = nil
       end
 
-  def execute
-    handler = @coordinator.elicitation_callback
+      def execute
+        handler = @coordinator.elicitation_callback
 
-    if Handlers.handler_class?(handler)
-      execute_with_handler_class(handler)
-    else
-      execute_with_block
-    end
-  end
+        if Handlers.handler_class?(handler)
+          execute_with_handler_class(handler)
+        else
+          execute_with_block
+        end
+      end
 
       def message
         @result.params["message"]
@@ -87,13 +87,11 @@ module RubyLLM
       end
 
       # Get timeout value for this elicitation
-      def timeout
-        @timeout
-      end
+      attr_reader :timeout
 
-  private
+      private
 
-  # Execute using handler class
+      # Execute using handler class
       def execute_with_handler_class(handler_class)
         handler_instance = handler_class.new(
           elicitation: self,
@@ -155,12 +153,7 @@ module RubyLLM
             id: @id,
             elicitation: { action: REJECT_ACTION, content: nil }
           )
-        when :cancel
-          @coordinator.elicitation_response(
-            id: @id,
-            elicitation: { action: CANCEL_ACTION, content: nil }
-          )
-        else
+        else # :cancel or unknown action -> cancel
           @coordinator.elicitation_response(
             id: @id,
             elicitation: { action: CANCEL_ACTION, content: nil }

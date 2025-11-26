@@ -301,7 +301,7 @@ RSpec.describe RubyLLM::MCP::Tool do
   end
 
   describe "params_schema" do
-    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+    let(:mock_coordinator) { double("Coordinator", name: "test") }
 
     it "returns the input schema as-is" do
       tool_response = {
@@ -430,7 +430,7 @@ RSpec.describe RubyLLM::MCP::Tool do
   end
 
   describe "input schema validation and normalization" do
-    let(:mock_coordinator) { double("Coordinator", name: "test") } # rubocop:disable RSpec/VerifiedDoubles
+    let(:mock_coordinator) { double("Coordinator", name: "test") }
 
     describe "normalization for malformed schemas" do
       it "normalizes object schema missing properties field" do

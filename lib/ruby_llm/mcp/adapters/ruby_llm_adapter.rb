@@ -97,7 +97,7 @@ module RubyLLM
           end
         end
 
-        def execute_handler_class(handler_class, name, params, client)
+        def execute_handler_class(handler_class, name, params, _client)
           approval_id = SecureRandom.uuid
 
           handler_instance = handler_class.new(
@@ -113,20 +113,18 @@ module RubyLLM
           case result
           when Hash
             result[:approved] == true
-          when Handlers::Promise
-            result # Return promise to Native::Client
+          when Handlers::Promise, TrueClass, FalseClass
+            result # Return promise to Native::Client or boolean
           when :pending
             # Create and return promise for registry pattern
             promise = Handlers::Promise.new
             Handlers::HumanInTheLoopRegistry.store(approval_id, {
-              promise: promise,
-              timeout: handler_instance.timeout,
-              tool_name: name,
-              parameters: params
-            })
+                                                     promise: promise,
+                                                     timeout: handler_instance.timeout,
+                                                     tool_name: name,
+                                                     parameters: params
+                                                   })
             promise
-          when TrueClass, FalseClass
-            result
           else
             RubyLLM::MCP.logger.error("Handler returned unexpected type: #{result.class}")
             false

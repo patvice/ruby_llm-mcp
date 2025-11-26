@@ -28,62 +28,62 @@ module RubyLLM
           schedule_timeout if @timeout
         end
 
-    # Complete the async operation with data
-    # @param data [Object] the completion data
-    def complete(data)
-      callbacks_to_execute = nil
+        # Complete the async operation with data
+        # @param data [Object] the completion data
+        def complete(data)
+          callbacks_to_execute = nil
 
-      transitioned = transition_state(:completed) do
-        @result = data
-        callbacks_to_execute = @completion_callbacks.dup
-      end
+          transitioned = transition_state(:completed) do
+            @result = data
+            callbacks_to_execute = @completion_callbacks.dup
+          end
 
-      if transitioned
-        duration = Time.now - @created_at
-        RubyLLM::MCP.logger.debug("AsyncResponse #{@elicitation_id} completed after #{duration.round(3)}s")
-      end
+          if transitioned
+            duration = Time.now - @created_at
+            RubyLLM::MCP.logger.debug("AsyncResponse #{@elicitation_id} completed after #{duration.round(3)}s")
+          end
 
-      # Execute callbacks outside mutex to avoid deadlocks
-      execute_callbacks_safely(callbacks_to_execute, :completed, data) if transitioned && callbacks_to_execute
-    end
+          # Execute callbacks outside mutex to avoid deadlocks
+          execute_callbacks_safely(callbacks_to_execute, :completed, data) if transitioned && callbacks_to_execute
+        end
 
-    # Reject the async operation
-    # @param reason [String] reason for rejection
-    def reject(reason)
-      callbacks_to_execute = nil
+        # Reject the async operation
+        # @param reason [String] reason for rejection
+        def reject(reason)
+          callbacks_to_execute = nil
 
-      transitioned = transition_state(:rejected) do
-        @error = reason
-        callbacks_to_execute = @completion_callbacks.dup
-      end
+          transitioned = transition_state(:rejected) do
+            @error = reason
+            callbacks_to_execute = @completion_callbacks.dup
+          end
 
-      execute_callbacks_safely(callbacks_to_execute, :rejected, reason) if transitioned && callbacks_to_execute
-    end
+          execute_callbacks_safely(callbacks_to_execute, :rejected, reason) if transitioned && callbacks_to_execute
+        end
 
-    # Cancel the async operation
-    # @param reason [String] reason for cancellation
-    def cancel(reason)
-      callbacks_to_execute = nil
+        # Cancel the async operation
+        # @param reason [String] reason for cancellation
+        def cancel(reason)
+          callbacks_to_execute = nil
 
-      transitioned = transition_state(:cancelled) do
-        @error = reason
-        callbacks_to_execute = @completion_callbacks.dup
-      end
+          transitioned = transition_state(:cancelled) do
+            @error = reason
+            callbacks_to_execute = @completion_callbacks.dup
+          end
 
-      execute_callbacks_safely(callbacks_to_execute, :cancelled, reason) if transitioned && callbacks_to_execute
-    end
+          execute_callbacks_safely(callbacks_to_execute, :cancelled, reason) if transitioned && callbacks_to_execute
+        end
 
-    # Mark as timed out
-    def timeout!
-      callbacks_to_execute = nil
+        # Mark as timed out
+        def timeout!
+          callbacks_to_execute = nil
 
-      transitioned = transition_state(:timed_out) do
-        @error = "Operation timed out"
-        callbacks_to_execute = @completion_callbacks.dup
-      end
+          transitioned = transition_state(:timed_out) do
+            @error = "Operation timed out"
+            callbacks_to_execute = @completion_callbacks.dup
+          end
 
-      execute_callbacks_safely(callbacks_to_execute, :timed_out, @error) if transitioned && callbacks_to_execute
-    end
+          execute_callbacks_safely(callbacks_to_execute, :timed_out, @error) if transitioned && callbacks_to_execute
+        end
 
         # Register a callback for when operation completes/fails
         # @param callback [Proc] callback to execute
@@ -137,24 +137,22 @@ module RubyLLM
           end
         end
 
-    # Execute callbacks safely in isolation
-    # @param callbacks [Array] callbacks to execute
-    # @param state [Symbol] the state to pass to callbacks
-    # @param data [Object] the data to pass to callbacks
-    def execute_callbacks_safely(callbacks, state, data)
-      return unless callbacks
+        # Execute callbacks safely in isolation
+        # @param callbacks [Array] callbacks to execute
+        # @param state [Symbol] the state to pass to callbacks
+        # @param data [Object] the data to pass to callbacks
+        def execute_callbacks_safely(callbacks, state, data)
+          return unless callbacks
 
-      callbacks.each do |callback|
-        begin
-          callback.call(state, data)
-        rescue StandardError => e
-          RubyLLM::MCP.logger.error(
-            "Error in async response callback: #{e.message}\n#{e.backtrace.join("\n")}"
-          )
-          # Continue executing other callbacks even if one fails
+          callbacks.each do |callback|
+            callback.call(state, data)
+          rescue StandardError => e
+            RubyLLM::MCP.logger.error(
+              "Error in async response callback: #{e.message}\n#{e.backtrace.join("\n")}"
+            )
+            # Continue executing other callbacks even if one fails
+          end
         end
-      end
-    end
 
         # Schedule timeout check
         def schedule_timeout
@@ -169,10 +167,8 @@ module RubyLLM
 
         # Handle timeout event
         def handle_timeout
-          if @timeout_handler
-            if @timeout_handler.is_a?(Proc)
-              @timeout_handler.call
-            end
+          if @timeout_handler.is_a?(Proc)
+            @timeout_handler.call
           end
         rescue StandardError => e
           RubyLLM::MCP.logger.error(

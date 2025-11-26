@@ -178,8 +178,24 @@ module RubyLLM
           if approval && approval[:promise]
             RubyLLM::MCP.logger.warn("Approval #{id} timed out")
             approval[:promise].resolve(false)
-            remove(id)
+            # Remove from registry without cancelling timeout (we're IN the timeout thread)
+            remove_without_timeout_cancel(id)
           end
+        end
+
+        # Remove from registry without cancelling timeout thread
+        # Used when called from within the timeout thread itself
+        def remove_without_timeout_cancel(id)
+          @registry_mutex.synchronize do
+            @registry.delete(id)
+          end
+
+          # Clean up timeout thread reference
+          @timeouts_mutex.synchronize do
+            @timeouts.delete(id)
+          end
+
+          RubyLLM::MCP.logger.debug("Removed approval #{id} from registry")
         end
       end
     end

@@ -218,21 +218,24 @@ module RubyLLM
 
           # Handler class provided
           @on[:human_in_the_loop] = if options.any?
-                                       ->(name, params) do
-                                         handler_class.new(
-                                           tool_name: name,
-                                           parameters: params,
-                                           approval_id: SecureRandom.uuid,
-                                           coordinator: @adapter.native_client,
-                                           **options
-                                         ).call
-                                       end
-                                     else
-                                       handler_class
-                                     end
+                                      lambda do |name, params|
+                                        handler_class.new(
+                                          tool_name: name,
+                                          parameters: params,
+                                          approval_id: SecureRandom.uuid,
+                                          coordinator: @adapter.native_client,
+                                          **options
+                                        ).call
+                                      end
+                                    else
+                                      handler_class
+                                    end
         elsif block_given?
           # Block provided (backward compatible)
           @on[:human_in_the_loop] = block
+        else
+          # Clear handler when called without arguments
+          @on[:human_in_the_loop] = nil
         end
 
         self
@@ -270,7 +273,7 @@ module RubyLLM
 
           # Handler class provided
           @on[:sampling] = if options.any?
-                             ->(sample) do
+                             lambda do |sample|
                                handler_class.new(sample: sample, coordinator: @adapter.native_client, **options).call
                              end
                            else
@@ -279,6 +282,9 @@ module RubyLLM
         elsif block_given?
           # Block provided (backward compatible)
           @on[:sampling] = block
+        else
+          # Clear handler when called without arguments
+          @on[:sampling] = nil
         end
 
         self
@@ -297,7 +303,7 @@ module RubyLLM
 
           # Handler class provided
           @on[:elicitation] = if options.any?
-                                ->(elicitation) do
+                                lambda do |elicitation|
                                   handler_class.new(
                                     elicitation: elicitation,
                                     coordinator: @adapter.native_client,
@@ -310,6 +316,9 @@ module RubyLLM
         elsif block_given?
           # Block provided (backward compatible)
           @on[:elicitation] = block
+        else
+          # Clear handler when called without arguments
+          @on[:elicitation] = nil
         end
 
         self

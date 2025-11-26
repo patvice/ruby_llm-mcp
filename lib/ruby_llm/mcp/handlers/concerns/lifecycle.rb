@@ -47,8 +47,6 @@ module RubyLLM
           # Main entry point - orchestrates hooks and execution
           # @return [Object] result from execute method
           def call
-            result = nil
-
             # Execute before hooks
             execute_hooks(self.class.before_hooks)
 

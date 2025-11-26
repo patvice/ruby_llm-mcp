@@ -65,6 +65,8 @@ RSpec/DescribedClass:
 RSpec/ExampleLength:
   Max: 30
 
+RSpec/MessageSpies:
+  Enabled: false
 
 RSpec/MultipleExpectations:
   Max: 10
@@ -74,3 +76,6 @@ RSpec/MultipleMemoizedHelpers:
 
 RSpec/NestedGroups:
   Max: 10
+
+RSpec/VerifiedDoubles:
+  Enabled: false

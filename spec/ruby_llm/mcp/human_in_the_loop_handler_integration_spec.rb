@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "Human-in-the-Loop Handler Integration" do
+RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpec/DescribeClass
   let(:coordinator) do
     double(
       "Coordinator",
@@ -143,7 +143,7 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do
     end
 
     it "can be approved via registry" do
-      handler_class = Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
+      Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
         async_execution
 
         def execute
