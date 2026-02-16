@@ -133,11 +133,14 @@ module RubyLLM
       end
 
       def format_name(name)
-        if @with_prefix
-          "#{@adapter.client.name}_#{name}"
-        else
-          name
-        end
+        raw_name = if @with_prefix
+                     "#{@adapter.client.name}_#{name}"
+                   else
+                     name.to_s
+                   end
+
+        normalized = raw_name.dup.force_encoding("UTF-8").unicode_normalize(:nfkd)
+        normalized.encode("ASCII", replace: "").gsub(/[^a-zA-Z0-9_-]/, "-")
       end
 
       def normalize_schema(schema)
