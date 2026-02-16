@@ -13,14 +13,22 @@ module RubyLLM
           # Approve the tool execution
           # @return [Hash] structured approval response
           def approve
-            { approved: true }
+            { status: :approved }
           end
 
           # Deny the tool execution
           # @param reason [String] reason for denial
           # @return [Hash] structured denial response
           def deny(reason = "Denied by user")
-            { approved: false, reason: reason }
+            { status: :denied, reason: reason }
+          end
+
+          # Defer approval to complete asynchronously via registry.
+          # @param timeout [Numeric, nil] timeout in seconds; falls back to handler timeout
+          # @return [Hash] structured deferred response
+          def defer(timeout: nil)
+            resolved_timeout = timeout || (respond_to?(:timeout) ? self.timeout : nil)
+            { status: :deferred, timeout: resolved_timeout }
           end
 
           # Override guard_failed to return denial (if GuardChecks is included)
@@ -32,3 +40,6 @@ module RubyLLM
     end
   end
 end
+
+
+

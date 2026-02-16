@@ -7,6 +7,17 @@ module RubyLLM
       CANCEL_ACTION = "cancel"
       REJECT_ACTION = "reject"
 
+      class DeferredCancellation
+        def initialize(id)
+          @id = id
+        end
+
+        def cancel
+          Handlers::ElicitationRegistry.cancel(@id, reason: "Cancelled by server")
+          true
+        end
+      end
+
       attr_writer :structured_response
       attr_reader :id, :requested_schema
 
@@ -22,6 +33,7 @@ module RubyLLM
         @deferred = false
         @async_response = nil
         @timeout = nil
+        @deferred_request_registered = false
       end
 
       def execute
@@ -61,6 +73,8 @@ module RubyLLM
             elicitation: { action: CANCEL_ACTION, content: nil }
           )
         end
+
+        finalize_deferred_request
       end
 
       # Cancel async elicitation
@@ -73,6 +87,8 @@ module RubyLLM
           id: @id,
           elicitation: { action: CANCEL_ACTION, content: nil }
         )
+
+        finalize_deferred_request
       end
 
       # Mark as timed out
@@ -84,6 +100,8 @@ module RubyLLM
           id: @id,
           elicitation: { action: CANCEL_ACTION, content: nil }
         )
+
+        finalize_deferred_request
       end
 
       # Get timeout value for this elicitation
@@ -165,9 +183,10 @@ module RubyLLM
       def handle_async_response(async_response)
         @deferred = true
         @async_response = async_response
+        register_deferred_request_cancellation
 
         # Store in registry
-        Handlers::ElicitationRegistry.store(@id, self)
+        Handlers::ElicitationRegistry.store(@id, self, schedule_timeout: false)
 
         # Set up completion callback
         async_response.on_complete do |state, data|
@@ -184,6 +203,7 @@ module RubyLLM
       # Handle promise
       def handle_promise(promise)
         @deferred = true
+        register_deferred_request_cancellation
 
         # Store in registry
         Handlers::ElicitationRegistry.store(@id, self)
@@ -203,9 +223,26 @@ module RubyLLM
       # Handle :pending response
       def handle_pending_response
         @deferred = true
+        register_deferred_request_cancellation
 
         # Store in registry for later completion
         Handlers::ElicitationRegistry.store(@id, self)
+      end
+
+      def register_deferred_request_cancellation
+        return if @deferred_request_registered
+        return unless @coordinator.respond_to?(:register_in_flight_request)
+
+        @coordinator.register_in_flight_request(@id, DeferredCancellation.new(@id))
+        @deferred_request_registered = true
+      end
+
+      def finalize_deferred_request
+        return unless @deferred_request_registered
+        return unless @coordinator.respond_to?(:unregister_in_flight_request)
+
+        @coordinator.unregister_in_flight_request(@id)
+        @deferred_request_registered = false
       end
 
       # Handle boolean result from handler
@@ -233,20 +270,22 @@ module RubyLLM
 
       # Execute using block (legacy/backward compatible)
       def execute_with_block
-        success = @coordinator.elicitation_callback&.call(self)
+        result = @coordinator.elicitation_callback&.call(self)
 
-        if success
-          valid = validate_response
-          if valid
-            @coordinator.elicitation_response(id: @id,
-                                              elicitation: {
-                                                action: ACCEPT_ACTION, content: @structured_response
-                                              })
-          else
-            @coordinator.elicitation_response(id: @id, elicitation: { action: CANCEL_ACTION, content: nil })
-          end
+        case result
+        when Hash
+          handle_handler_hash_result(result)
+        when Handlers::AsyncResponse
+          handle_async_response(result)
+        when Handlers::Promise
+          handle_promise(result)
+        when :pending
+          handle_pending_response
+        when TrueClass, FalseClass
+          handle_handler_boolean_result(result)
         else
-          @coordinator.elicitation_response(id: @id, elicitation: { action: REJECT_ACTION, content: nil })
+          # Legacy compatibility: treat any truthy callback value as acceptance
+          handle_handler_boolean_result(!!result)
         end
       end
     end

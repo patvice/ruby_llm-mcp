@@ -147,6 +147,22 @@ RSpec.describe RubyLLM::MCP::Elicitation do
         expect(result.to_s).to include("true")
       end
 
+      it "supports handler classes configured via client.on_elicitation" do
+        handler_class = Class.new(RubyLLM::MCP::Handlers::ElicitationHandler) do
+          def execute
+            accept({ "confirmed" => true, "response" => "handled by class" })
+          end
+        end
+
+        client.on_elicitation(handler_class)
+
+        tool = client.tool("simple_elicitation")
+        result = tool.execute(message: "Please confirm your choice")
+
+        expect(result).to be_a(RubyLLM::MCP::Content)
+        expect(result.to_s).to include("handled by class")
+      end
+
       it "executes complex elicitation with structured schema validation" do # rubocop:disable RSpec/ExampleLength
         # Set up elicitation handler that provides valid structured data
         client.on_elicitation do |elicitation|

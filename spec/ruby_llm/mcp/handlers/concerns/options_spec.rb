@@ -8,6 +8,7 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::Options do
       include RubyLLM::MCP::Handlers::Concerns::Options
 
       option :test_option, default: "default_value"
+      option :flag_option, default: false
       option :required_option, required: true
       option :dynamic_option, default: -> { "dynamic_#{Time.now.to_i}" }
     end
@@ -25,6 +26,11 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::Options do
         required_option: "req"
       )
       expect(handler.test_option).to eq("custom")
+    end
+
+    it "applies false defaults correctly" do
+      handler = test_handler_class.new(required_option: "req")
+      expect(handler.flag_option).to be(false)
     end
 
     it "evaluates proc defaults at initialization" do

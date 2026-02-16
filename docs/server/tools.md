@@ -208,58 +208,20 @@ Control tool execution with human approval:
 
 ### Basic Human-in-the-Loop
 
-```ruby
-# Set up human approval for all tools
-client.on_human_in_the_loop do |name, params|
-  puts "Tool: #{name}"
-  puts "Parameters: #{params}"
-  print "Allow execution? (y/n): "
-  gets.chomp.downcase == 'y'
-end
-
-# Execute tool (will prompt for approval)
-result = client.execute_tool(
-  name: "delete_file",
-  parameters: { path: "important.txt" }
-)
-```
-
-### Conditional Human-in-the-Loop
+Human-in-the-loop approvals are configured with handler classes:
 
 ```ruby
-# Only require approval for dangerous operations
-client.on_human_in_the_loop do |name, params|
-  dangerous_tools = ["delete_file", "modify_file", "execute_command"]
-
-  if dangerous_tools.include?(name)
-    puts "⚠️  Dangerous operation requested!"
-    puts "Tool: #{name}"
-    puts "Parameters: #{params}"
-    print "Allow execution? (y/n): "
-    gets.chomp.downcase == 'y'
-  else
-    true  # Allow safe operations automatically
+class BasicApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  def execute
+    if tool_name == "delete_file"
+      deny("Deletion requires explicit approval")
+    else
+      approve
+    end
   end
 end
-```
 
-### Programmatic Guards
-
-Use logic to determine approval:
-
-```ruby
-client.on_human_in_the_loop do |name, params|
-  case name
-  when "delete_file"
-    # Don't allow deletion of important files
-    !params[:path].include?("important")
-  when "api_call"
-    # Only allow API calls to trusted domains
-    params[:url].start_with?("https://api.trusted.com")
-  else
-    true
-  end
-end
+client.on_human_in_the_loop(BasicApprovalHandler)
 ```
 
 ### Handler Classes
@@ -350,8 +312,8 @@ class WebsocketApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
       }
     )
 
-    # Return :pending - approval happens later via registry
-    :pending
+    # Return deferred decision - approval happens later via registry
+    defer
   end
 end
 
@@ -390,18 +352,14 @@ client.on_human_in_the_loop(
 )
 ```
 
-#### Backward Compatibility
+#### Return Contract
 
-Handler classes are fully backward compatible:
+Human-in-the-loop handlers return structured decisions:
 
 ```ruby
-# Old way (still works)
-client.on_human_in_the_loop do |name, params|
-  name != "dangerous_tool"
-end
-
-# New way (preferred for complex logic)
-client.on_human_in_the_loop(MyApprovalHandler)
+approve                              # => { status: :approved }
+deny("Too dangerous")                # => { status: :denied, reason: "Too dangerous" }
+defer(timeout: 300)                  # => { status: :deferred, timeout: 300 }
 ```
 
 ## Streaming Responses

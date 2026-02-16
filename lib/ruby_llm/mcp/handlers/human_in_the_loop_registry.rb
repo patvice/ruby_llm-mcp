@@ -3,199 +3,266 @@
 module RubyLLM
   module MCP
     module Handlers
-      # Registry for tracking pending human-in-the-loop approvals
-      # Provides thread-safe storage and retrieval for async completions
+      # Registry for tracking pending human-in-the-loop approvals.
+      # Registries are scoped per native client, with global ID routing so
+      # approval IDs can still be completed externally.
       class HumanInTheLoopRegistry
+        GLOBAL_OWNER = "__global__"
+
         class << self
-          # Get the singleton registry instance
           def instance
-            @instance ||= new
+            for_owner(GLOBAL_OWNER)
           end
 
-          # Delegate class methods to instance
+          def for_owner(owner_id)
+            key = owner_id.to_s
+            registries_mutex.synchronize do
+              @registries ||= {}
+              @registries[key] ||= new(owner_id: key)
+            end
+          end
+
+          def release(owner_id)
+            key = owner_id.to_s
+            registry = registries_mutex.synchronize { (@registries ||= {}).delete(key) }
+            registry&.shutdown
+          end
+
+          # Backward-compatible global store path.
           def store(id, approval)
             instance.store(id, approval)
           end
 
           def retrieve(id)
-            instance.retrieve(id)
+            route_registry(id)&.retrieve(id)
           end
 
           def remove(id)
-            instance.remove(id)
+            route_registry(id)&.remove(id)
           end
 
           def approve(id)
-            instance.approve(id)
+            registry = route_registry(id)
+            if registry
+              registry.approve(id)
+            else
+              RubyLLM::MCP.logger.warn("Attempted to approve unknown approval #{id}")
+              false
+            end
           end
 
           def deny(id, reason: "Denied")
-            instance.deny(id, reason: reason)
+            registry = route_registry(id)
+            if registry
+              registry.deny(id, reason: reason)
+            else
+              RubyLLM::MCP.logger.warn("Attempted to deny unknown approval #{id}")
+              false
+            end
           end
 
-          def clear
-            instance.clear
+          def clear(owner_id: nil)
+            if owner_id
+              release(owner_id)
+            else
+              registries = registries_mutex.synchronize do
+                current = (@registries ||= {}).values
+                @registries = {}
+                current
+              end
+              registries.each(&:shutdown)
+            end
           end
 
-          def size
-            instance.size
+          def size(owner_id: nil)
+            if owner_id
+              registry = registries_mutex.synchronize { (@registries ||= {})[owner_id.to_s] }
+              registry ? registry.size : 0
+            else
+              registries_mutex.synchronize { (@registries ||= {}).values.sum(&:size) }
+            end
+          end
+
+          def register_approval(id, owner_id)
+            approval_index_mutex.synchronize do
+              @approval_index ||= {}
+              @approval_index[id.to_s] = owner_id.to_s
+            end
+          end
+
+          def unregister_approval(id)
+            approval_index_mutex.synchronize do
+              (@approval_index ||= {}).delete(id.to_s)
+            end
+          end
+
+          def route_registry(id)
+            owner_id = approval_index_mutex.synchronize { (@approval_index ||= {})[id.to_s] }
+            if owner_id
+              registries_mutex.synchronize { (@registries ||= {})[owner_id] }
+            else
+              registries_mutex.synchronize { (@registries ||= {})[GLOBAL_OWNER] }
+            end
+          end
+
+          private
+
+          def registries_mutex
+            @registries_mutex ||= Mutex.new
+          end
+
+          def approval_index_mutex
+            @approval_index_mutex ||= Mutex.new
           end
         end
 
-        # Stores approval context: { promise:, timeout:, tool_name:, parameters: }
-        def initialize
+        attr_reader :owner_id
+
+        def initialize(owner_id:)
+          @owner_id = owner_id
           @registry = {}
-          @timeouts = {}
+          @deadlines = {}
           @registry_mutex = Mutex.new
-          @timeouts_mutex = Mutex.new
+          @condition = ConditionVariable.new
+          @stopped = false
+          start_timeout_scheduler
         end
 
-        # Store an approval in the registry
-        # @param id [String] approval ID
-        # @param approval_context [Hash] context with promise, timeout, etc.
+        # Store approval context: { promise:, timeout:, tool_name:, parameters: }
         def store(id, approval_context)
+          key = id.to_s
+          timeout = approval_context[:timeout]
+
           @registry_mutex.synchronize do
-            @registry[id] = approval_context
+            @registry[key] = approval_context
+            if timeout
+              @deadlines[key] = monotonic_now + timeout.to_f
+            else
+              @deadlines.delete(key)
+            end
+            @condition.signal
           end
 
-          # Set up timeout if specified
-          if approval_context[:timeout]
-            schedule_timeout(id, approval_context[:timeout])
-          end
-
-          RubyLLM::MCP.logger.debug("Stored approval #{id} in registry")
+          self.class.register_approval(key, owner_id)
+          RubyLLM::MCP.logger.debug("Stored approval #{key} in registry for #{owner_id}")
         end
 
-        # Retrieve an approval from the registry
-        # @param id [String] approval ID
-        # @return [Hash, nil] approval context or nil if not found
         def retrieve(id)
-          @registry_mutex.synchronize do
-            @registry[id]
-          end
+          @registry_mutex.synchronize { @registry[id.to_s] }
         end
 
-        # Remove an approval from the registry
-        # @param id [String] approval ID
-        # @return [Hash, nil] removed approval context or nil
         def remove(id)
+          key = id.to_s
           approval = nil
 
-          # Cancel timeout first (before removing from registry)
-          cancel_timeout(id)
-
-          # Remove from registry
-          approval = @registry_mutex.synchronize do
-            @registry.delete(id)
+          @registry_mutex.synchronize do
+            approval = @registry.delete(key)
+            @deadlines.delete(key)
+            @condition.signal
           end
 
-          RubyLLM::MCP.logger.debug("Removed approval #{id} from registry") if approval
+          self.class.unregister_approval(key) if approval
+          RubyLLM::MCP.logger.debug("Removed approval #{key} from registry for #{owner_id}") if approval
           approval
-        ensure
-          # Ensure timeout thread is cleaned up even if removal fails
-          cancel_timeout(id) unless approval
         end
 
-        # Approve a pending request
-        # @param id [String] approval ID
         def approve(id)
-          approval = retrieve(id)
-
-          if approval && approval[:promise]
-            RubyLLM::MCP.logger.info("Approving #{id}")
-            approval[:promise].resolve(true)
-            remove(id)
-          else
+          approval = remove(id)
+          unless approval && approval[:promise]
             RubyLLM::MCP.logger.warn("Attempted to approve unknown approval #{id}")
+            return false
           end
+
+          RubyLLM::MCP.logger.info("Approving #{id}")
+          approval[:promise].resolve(true)
+          true
         end
 
-        # Deny a pending request
-        # @param id [String] approval ID
-        # @param reason [String] denial reason
         def deny(id, reason: "Denied")
-          approval = retrieve(id)
-
-          if approval && approval[:promise]
-            RubyLLM::MCP.logger.info("Denying #{id}: #{reason}")
-            approval[:promise].resolve(false)
-            remove(id)
-          else
+          approval = remove(id)
+          unless approval && approval[:promise]
             RubyLLM::MCP.logger.warn("Attempted to deny unknown approval #{id}")
+            return false
           end
+
+          RubyLLM::MCP.logger.info("Denying #{id}: #{reason}")
+          approval[:promise].resolve(false)
+          true
         end
 
-        # Clear all pending approvals
         def clear
-          ids = @registry_mutex.synchronize { @registry.keys }
-          ids.each { |id| cancel_timeout(id) }
-          @registry_mutex.synchronize { @registry.clear }
-          RubyLLM::MCP.logger.debug("Cleared human-in-the-loop registry")
+          approvals = @registry_mutex.synchronize do
+            current = @registry.dup
+            @registry.clear
+            @deadlines.clear
+            @condition.broadcast
+            current
+          end
+
+          approvals.each_key { |id| self.class.unregister_approval(id) }
+          RubyLLM::MCP.logger.debug("Cleared human-in-the-loop registry for #{owner_id}")
         end
 
-        # Get number of pending approvals
-        # @return [Integer] count of pending approvals
         def size
           @registry_mutex.synchronize { @registry.size }
         end
 
+        def shutdown
+          clear
+          @registry_mutex.synchronize do
+            @stopped = true
+            @condition.broadcast
+          end
+          @scheduler_thread&.join(0.5)
+        rescue StandardError => e
+          RubyLLM::MCP.logger.debug("Error shutting down approval registry #{owner_id}: #{e.message}")
+        ensure
+          @scheduler_thread = nil
+        end
+
         private
 
-        # Schedule timeout for an approval
-        def schedule_timeout(id, timeout_seconds)
-          timeout_thread = Thread.new do
-            sleep timeout_seconds
-            handle_timeout(id)
-          end
-
-          @timeouts_mutex.synchronize do
-            @timeouts[id] = timeout_thread
+        def start_timeout_scheduler
+          @scheduler_thread = Thread.new do
+            loop do
+              expired_ids = wait_for_expired_ids
+              break if expired_ids.nil?
+              expired_ids.each { |id| handle_timeout(id) }
+            end
           end
         end
 
-        # Cancel scheduled timeout
-        # Ensures thread is properly terminated and resources are freed
-        def cancel_timeout(id)
-          timeout_thread = @timeouts_mutex.synchronize do
-            @timeouts.delete(id)
-          end
-
-          return unless timeout_thread
-
-          # Safely terminate the thread
-          begin
-            timeout_thread.kill if timeout_thread.alive?
-            timeout_thread.join(0.1) # Wait briefly for cleanup
-          rescue StandardError => e
-            RubyLLM::MCP.logger.debug("Error cancelling timeout thread for #{id}: #{e.message}")
-          end
-        end
-
-        # Handle timeout event
-        def handle_timeout(id)
-          approval = retrieve(id)
-
-          if approval && approval[:promise]
-            RubyLLM::MCP.logger.warn("Approval #{id} timed out")
-            approval[:promise].resolve(false)
-            # Remove from registry without cancelling timeout (we're IN the timeout thread)
-            remove_without_timeout_cancel(id)
-          end
-        end
-
-        # Remove from registry without cancelling timeout thread
-        # Used when called from within the timeout thread itself
-        def remove_without_timeout_cancel(id)
+        def wait_for_expired_ids
           @registry_mutex.synchronize do
-            @registry.delete(id)
-          end
+            loop do
+              return nil if @stopped
 
-          # Clean up timeout thread reference
-          @timeouts_mutex.synchronize do
-            @timeouts.delete(id)
-          end
+              now = monotonic_now
+              expired_ids = @deadlines.each_with_object([]) do |(id, deadline), ids|
+                ids << id if deadline <= now
+              end
+              return expired_ids unless expired_ids.empty?
 
-          RubyLLM::MCP.logger.debug("Removed approval #{id} from registry")
+              if @deadlines.empty?
+                @condition.wait(@registry_mutex)
+              else
+                wait_time = @deadlines.values.min - now
+                @condition.wait(@registry_mutex, wait_time) if wait_time.positive?
+              end
+            end
+          end
+        end
+
+        def handle_timeout(id)
+          approval = remove(id)
+          return unless approval && approval[:promise]
+
+          RubyLLM::MCP.logger.warn("Approval #{id} timed out")
+          approval[:promise].resolve(false)
+        end
+
+        def monotonic_now
+          Process.clock_gettime(Process::CLOCK_MONOTONIC)
         end
       end
     end

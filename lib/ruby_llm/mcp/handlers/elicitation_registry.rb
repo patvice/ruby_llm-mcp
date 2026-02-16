@@ -13,8 +13,8 @@ module RubyLLM
           end
 
           # Delegate class methods to instance
-          def store(id, elicitation)
-            instance.store(id, elicitation)
+          def store(id, elicitation, schedule_timeout: true)
+            instance.store(id, elicitation, schedule_timeout: schedule_timeout)
           end
 
           def retrieve(id)
@@ -52,13 +52,13 @@ module RubyLLM
         # Store an elicitation in the registry
         # @param id [String] elicitation ID
         # @param elicitation [RubyLLM::MCP::Elicitation] elicitation object
-        def store(id, elicitation)
+        def store(id, elicitation, schedule_timeout: true)
           @registry_mutex.synchronize do
             @registry[id] = elicitation
           end
 
           # Set up timeout if specified
-          if elicitation.timeout
+          if schedule_timeout && elicitation.timeout
             schedule_timeout(id, elicitation.timeout)
           end
 

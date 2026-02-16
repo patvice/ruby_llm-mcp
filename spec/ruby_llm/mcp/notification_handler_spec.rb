@@ -25,7 +25,7 @@ RSpec.describe RubyLLM::MCP::NotificationHandler do
 
   describe "notifications/cancelled" do
     it "calls cancel_in_flight_request on the client with the request ID" do
-      allow(client).to receive(:cancel_in_flight_request).and_return(true)
+      allow(client).to receive(:cancel_in_flight_request).and_return(:cancelled)
 
       notification = RubyLLM::MCP::Notification.new(
         { "method" => "notifications/cancelled", "params" => { "requestId" => "req-123", "reason" => "Timeout" } }
@@ -37,7 +37,7 @@ RSpec.describe RubyLLM::MCP::NotificationHandler do
     end
 
     it "handles cancellation when request is not found" do
-      allow(client).to receive(:cancel_in_flight_request).and_return(false)
+      allow(client).to receive(:cancel_in_flight_request).and_return(:not_found)
 
       notification = RubyLLM::MCP::Notification.new(
         { "method" => "notifications/cancelled", "params" => { "requestId" => "req-456" } }
@@ -47,7 +47,7 @@ RSpec.describe RubyLLM::MCP::NotificationHandler do
     end
 
     it "handles cancellation without a reason" do
-      allow(client).to receive(:cancel_in_flight_request).and_return(true)
+      allow(client).to receive(:cancel_in_flight_request).and_return(:cancelled)
 
       notification = RubyLLM::MCP::Notification.new(
         { "method" => "notifications/cancelled", "params" => { "requestId" => "req-789" } }

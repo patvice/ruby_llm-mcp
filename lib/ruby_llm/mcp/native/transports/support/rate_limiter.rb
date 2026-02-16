@@ -5,7 +5,7 @@ module RubyLLM
     module Native
       module Transports
         module Support
-          class RateLimit
+          class RateLimiter
             def initialize(limit: 10, interval: 1000)
               @limit = limit
               @interval = interval

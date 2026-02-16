@@ -57,7 +57,7 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::ApprovalActions do
       )
 
       result = handler.call
-      expect(result).to eq({ approved: true })
+      expect(result).to eq({ status: :approved })
     end
   end
 
@@ -76,7 +76,7 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::ApprovalActions do
       )
 
       result = handler.call
-      expect(result).to eq({ approved: false, reason: "Denied by user" })
+      expect(result).to eq({ status: :denied, reason: "Denied by user" })
     end
 
     it "returns denial hash with custom reason" do
@@ -93,7 +93,26 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::ApprovalActions do
       )
 
       result = handler.call
-      expect(result).to eq({ approved: false, reason: "Tool is too dangerous" })
+      expect(result).to eq({ status: :denied, reason: "Tool is too dangerous" })
+    end
+  end
+
+  describe "#defer" do
+    it "returns deferred status with explicit timeout" do
+      handler_class_with_defer = Class.new(handler_class) do
+        def execute
+          defer(timeout: 12)
+        end
+      end
+
+      handler = handler_class_with_defer.new(
+        tool_name: tool_name,
+        parameters: parameters,
+        approval_id: approval_id
+      )
+
+      result = handler.call
+      expect(result).to eq({ status: :deferred, timeout: 12 })
     end
   end
 
@@ -128,7 +147,10 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::ApprovalActions do
       )
 
       result = handler.call
-      expect(result).to eq({ approved: false, reason: "Tool not allowed" })
+      expect(result).to eq({ status: :denied, reason: "Tool not allowed" })
     end
   end
 end
+
+
+

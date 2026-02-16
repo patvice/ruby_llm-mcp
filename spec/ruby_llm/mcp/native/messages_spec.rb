@@ -454,6 +454,42 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
       end
     end
 
+    describe ".sampling_create_message" do
+      it "maps snake_case stop reasons to MCP camelCase values" do
+        message = double(
+          "Message",
+          role: "assistant",
+          content: "Done",
+          stop_reason: "max_tokens"
+        )
+
+        body = described_class::Responses.sampling_create_message(
+          id: "req-123",
+          model: "gpt-4o",
+          message: message
+        )
+
+        expect(body[:result][:stopReason]).to eq("maxTokens")
+      end
+
+      it "defaults stop reason to endTurn when message does not provide one" do
+        message = double(
+          "Message",
+          role: "assistant",
+          content: "Done",
+          stop_reason: nil
+        )
+
+        body = described_class::Responses.sampling_create_message(
+          id: "req-123",
+          model: "gpt-4o",
+          message: message
+        )
+
+        expect(body[:result][:stopReason]).to eq("endTurn")
+      end
+    end
+
     describe ".error" do
       let(:body) { described_class::Responses.error(id: "req-123", message: "Test error", code: -32_000) }
 

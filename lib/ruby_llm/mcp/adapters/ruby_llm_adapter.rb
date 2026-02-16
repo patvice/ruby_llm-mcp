@@ -37,8 +37,8 @@ module RubyLLM
             logging_level: client.on_logging_level,
             elicitation_enabled: client.elicitation_enabled?,
             progress_tracking_enabled: client.tracking_progress?,
-            elicitation_callback: ->(elicitation) { client.on[:elicitation]&.call(elicitation) },
-            sampling_callback: ->(sample) { client.on[:sampling]&.call(sample) },
+            elicitation_callback: build_elicitation_callback(client),
+            sampling_callback: build_sampling_callback(client),
             notification_callback: ->(notification) { NotificationHandler.new(client).execute(notification) }
           )
         end
@@ -83,55 +83,104 @@ module RubyLLM
 
         def build_human_in_the_loop_callback(client)
           lambda do |name, params|
-            return true unless client.human_in_the_loop?
+            return Handlers::ApprovalDecision.approved unless client.human_in_the_loop?
 
-            handler_or_block = client.on[:human_in_the_loop]
+            handler_config = normalize_human_in_the_loop_handler(client.on[:human_in_the_loop])
+            unless handler_config
+              RubyLLM::MCP.logger.error(
+                "Human-in-the-loop callback must be a handler class configuration"
+              )
+              return Handlers::ApprovalDecision.denied(reason: "Invalid approval handler configuration")
+            end
 
-            # Check if it's a handler class
+            execute_handler_class(
+              handler_config[:class],
+              name,
+              params,
+              handler_options: handler_config[:options]
+            )
+          end
+        end
+
+        def build_sampling_callback(client)
+          lambda do |sample|
+            return nil unless client.sampling_callback_enabled?
+
+            handler_or_block = client.on[:sampling]
+
             if Handlers.handler_class?(handler_or_block)
-              execute_handler_class(handler_or_block, name, params, client)
+              handler_or_block.new(sample: sample, coordinator: @native_client).call
             else
-              # Legacy block-based callback
-              handler_or_block.call(name, params)
+              handler_or_block.call(sample)
             end
           end
         end
 
-        def execute_handler_class(handler_class, name, params, _client)
-          approval_id = SecureRandom.uuid
+        def build_elicitation_callback(client)
+          lambda do |elicitation|
+            return nil unless client.elicitation_enabled?
+
+            handler_or_block = client.on[:elicitation]
+
+            if Handlers.handler_class?(handler_or_block)
+              handler_or_block.new(elicitation: elicitation, coordinator: @native_client).call
+            else
+              handler_or_block.call(elicitation)
+            end
+          end
+        end
+
+        def execute_handler_class(handler_class, name, params, handler_options: {})
+          approval_id = "#{@native_client.registry_owner_id}:#{SecureRandom.uuid}"
 
           handler_instance = handler_class.new(
             tool_name: name,
             parameters: params,
             approval_id: approval_id,
-            coordinator: @native_client
+            coordinator: @native_client,
+            **handler_options
           )
 
           result = handler_instance.call
+          decision = Handlers::ApprovalDecision.from_handler_result(
+            result,
+            approval_id: approval_id,
+            default_timeout: handler_instance.timeout
+          )
 
-          # Handle different return types
-          case result
-          when Hash
-            result[:approved] == true
-          when Handlers::Promise, TrueClass, FalseClass
-            result # Return promise to Native::Client or boolean
-          when :pending
-            # Create and return promise for registry pattern
+          if decision.deferred?
             promise = Handlers::Promise.new
-            Handlers::HumanInTheLoopRegistry.store(approval_id, {
-                                                     promise: promise,
-                                                     timeout: handler_instance.timeout,
-                                                     tool_name: name,
-                                                     parameters: params
-                                                   })
-            promise
-          else
-            RubyLLM::MCP.logger.error("Handler returned unexpected type: #{result.class}")
-            false
+            @native_client.human_in_the_loop_registry.store(
+              approval_id,
+              {
+                promise: promise,
+                timeout: decision.timeout,
+                tool_name: name,
+                parameters: params
+              }
+            )
+            return decision.with_promise(promise)
           end
+
+          decision
+        rescue Errors::InvalidApprovalDecision => e
+          RubyLLM::MCP.logger.error("Invalid human-in-the-loop handler decision: #{e.message}")
+          Handlers::ApprovalDecision.denied(reason: "Invalid approval decision")
         rescue StandardError => e
           RubyLLM::MCP.logger.error("Error in human-in-the-loop handler: #{e.message}\n#{e.backtrace.join("\n")}")
-          false
+          Handlers::ApprovalDecision.denied(reason: "Approval handler error")
+        end
+
+        def normalize_human_in_the_loop_handler(handler_config)
+          if handler_config.is_a?(Hash)
+            handler_class = handler_config[:class] || handler_config["class"]
+            options = handler_config[:options] || handler_config["options"] || {}
+            return nil unless Handlers.handler_class?(handler_class)
+
+            { class: handler_class, options: options }
+          elsif Handlers.handler_class?(handler_config)
+            { class: handler_config, options: {} }
+          end
         end
       end
     end

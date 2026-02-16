@@ -19,15 +19,13 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
   end
 
   describe "sync handler usage" do
-    it "approves with custom handler class" do
+    it "returns structured approved/denied decisions" do
       handler_class = Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
         def execute
-          # Auto-approve read operations
           tool_name.start_with?("read") ? approve : deny("Only read operations allowed")
         end
       end
 
-      # Test approval
       handler = handler_class.new(
         tool_name: "read_file",
         parameters: { path: "test.txt" },
@@ -35,9 +33,8 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         coordinator: coordinator
       )
       result = handler.call
-      expect(result[:approved]).to be true
+      expect(result).to eq({ status: :approved })
 
-      # Test denial
       handler = handler_class.new(
         tool_name: "delete_file",
         parameters: { path: "test.txt" },
@@ -45,11 +42,10 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         coordinator: coordinator
       )
       result = handler.call
-      expect(result[:approved]).to be false
-      expect(result[:reason]).to include("Only read operations allowed")
+      expect(result).to eq({ status: :denied, reason: "Only read operations allowed" })
     end
 
-    it "uses guards to filter requests" do
+    it "uses guards to produce denied decisions" do
       handler_class = Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
         guard :check_safe_path
 
@@ -65,7 +61,6 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         end
       end
 
-      # Relative path should pass guard
       handler = handler_class.new(
         tool_name: "read_file",
         parameters: { path: "relative/test.txt" },
@@ -73,9 +68,8 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         coordinator: coordinator
       )
       result = handler.call
-      expect(result[:approved]).to be true
+      expect(result).to eq({ status: :approved })
 
-      # Absolute path should fail guard
       handler = handler_class.new(
         tool_name: "read_file",
         parameters: { path: "/absolute/test.txt" },
@@ -83,50 +77,17 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         coordinator: coordinator
       )
       result = handler.call
-      expect(result[:approved]).to be false
-      expect(result[:reason]).to include("Absolute paths")
+      expect(result).to eq({ status: :denied, reason: "Absolute paths require approval" })
     end
   end
 
-  describe "async handler with promise" do
-    it "handles promise-based async approval" do
+  describe "async handler usage" do
+    it "returns structured deferred decisions" do
       handler_class = Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
-        def execute
-          promise = create_promise
-
-          # Simulate async approval
-          Thread.new do
-            sleep 0.1
-            promise.resolve(true)
-          end
-
-          promise
-        end
-      end
-
-      handler = handler_class.new(
-        tool_name: "execute_command",
-        parameters: { command: "ls" },
-        approval_id: "approval-1",
-        coordinator: coordinator
-      )
-
-      result = handler.call
-      expect(result).to be_a(RubyLLM::MCP::Handlers::Promise)
-
-      # Wait for resolution
-      approved = result.wait
-      expect(approved).to be true
-    end
-  end
-
-  describe "async handler with :pending" do
-    it "stores in registry for later completion" do
-      handler_class = Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
-        async_execution
+        async_execution timeout: 30
 
         def execute
-          :pending
+          defer
         end
       end
 
@@ -137,24 +98,14 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         coordinator: coordinator
       )
 
-      # Should return pending
       result = handler.call
-      expect(result).to eq(:pending)
+      expect(result).to eq({ status: :deferred, timeout: 30 })
     end
 
     it "can be approved via registry" do
-      Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
-        async_execution
-
-        def execute
-          :pending
-        end
-      end
-
       approval_id = "approval-registry-test"
       promise = RubyLLM::MCP::Handlers::Promise.new
 
-      # Manually store in registry (normally done by adapter)
       RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.store(
         approval_id,
         {
@@ -165,15 +116,11 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         }
       )
 
-      # Approve via registry (simulating external approval)
       RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.approve(approval_id)
 
-      # Promise should be resolved
       sleep 0.1
       expect(promise.fulfilled?).to be true
       expect(promise.value).to be true
-
-      # Should be removed from registry
       expect(RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.size).to eq(0)
     end
 
@@ -191,36 +138,15 @@ RSpec.describe "Human-in-the-Loop Handler Integration" do # rubocop:disable RSpe
         }
       )
 
-      # Deny via registry
       RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.deny(
         approval_id,
         reason: "Too dangerous"
       )
 
-      # Promise should be resolved with false
       sleep 0.1
       expect(promise.fulfilled?).to be true
       expect(promise.value).to be false
-
-      # Should be removed from registry
       expect(RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.size).to eq(0)
-    end
-  end
-
-  describe "backward compatibility with blocks" do
-    it "still works with block-based callbacks" do
-      # Simulate block-based callback
-      block_callback = lambda do |name, params|
-        name == "safe_tool" && params[:safe] == true
-      end
-
-      # Test approval
-      result = block_callback.call("safe_tool", { safe: true })
-      expect(result).to be true
-
-      # Test denial
-      result = block_callback.call("dangerous_tool", { safe: false })
-      expect(result).to be false
     end
   end
 end

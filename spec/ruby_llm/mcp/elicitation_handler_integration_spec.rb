@@ -228,6 +228,36 @@ RSpec.describe "Elicitation Handler Integration" do # rubocop:disable RSpec/Desc
       # Should be removed from registry
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
     end
+
+    it "unregisters deferred in-flight request on completion" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::ElicitationHandler) do
+        async_execution timeout: 60
+
+        def execute
+          :pending
+        end
+      end
+
+      allow(coordinator).to receive(:elicitation_callback).and_return(handler_class)
+      allow(coordinator).to receive(:register_in_flight_request)
+      allow(coordinator).to receive(:unregister_in_flight_request)
+      allow(coordinator).to receive(:elicitation_response)
+
+      elicitation = RubyLLM::MCP::Elicitation.new(coordinator, result)
+      elicitation.execute
+
+      expect(coordinator).to have_received(:register_in_flight_request).with(
+        "elicit-123",
+        an_instance_of(RubyLLM::MCP::Elicitation::DeferredCancellation)
+      )
+
+      RubyLLM::MCP::Handlers::ElicitationRegistry.complete(
+        "elicit-123",
+        response: { "confirmed" => true }
+      )
+
+      expect(coordinator).to have_received(:unregister_in_flight_request).with("elicit-123")
+    end
   end
 
   describe "async handler with AsyncResponse" do
@@ -317,6 +347,29 @@ RSpec.describe "Elicitation Handler Integration" do # rubocop:disable RSpec/Desc
       sleep 0.3
 
       # Should be removed after timeout
+      expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
+    end
+
+    it "sends only one timeout response for AsyncResponse handlers" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::ElicitationHandler) do
+        async_execution timeout: 0.1
+
+        def execute
+          defer
+        end
+      end
+
+      allow(coordinator).to receive(:elicitation_callback).and_return(handler_class)
+
+      response_count = 0
+      allow(coordinator).to receive(:elicitation_response) { response_count += 1 }
+
+      elicitation = RubyLLM::MCP::Elicitation.new(coordinator, result)
+      elicitation.execute
+
+      sleep 0.35
+
+      expect(response_count).to eq(1)
       expect(RubyLLM::MCP::Handlers::ElicitationRegistry.size).to eq(0)
     end
   end

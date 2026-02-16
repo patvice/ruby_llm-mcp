@@ -197,6 +197,27 @@ RSpec.describe RubyLLM::MCP::Sample do
       expect(result.to_s).to include("Error in preferred model")
     end
 
+    it "supports handler classes configured via client.on_sampling" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::SamplingHandler) do
+        def execute
+          reject("handler class rejection")
+        end
+      end
+
+      RubyLLM::MCP.configure do |config|
+        config.sampling.enabled = true
+        config.sampling.preferred_model = "gpt-4o"
+      end
+
+      client.on_sampling(handler_class)
+      client.start
+
+      tool = client.tool("sampling-test")
+      result = tool.execute
+
+      expect(result.to_s).to include("handler class rejection")
+    end
+
     COMPLEX_FUNCTION_MODELS.each do |model|
       context "with #{model[:provider]} #{model[:model]}" do
         it "executes a chat message and provides information to the server without a guard" do

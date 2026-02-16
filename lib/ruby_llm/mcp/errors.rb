@@ -78,6 +78,8 @@ module RubyLLM
 
       class AdapterConfigurationError < BaseError; end
 
+      class InvalidApprovalDecision < BaseError; end
+
       class RequestCancelled < BaseError
         attr_reader :request_id
 

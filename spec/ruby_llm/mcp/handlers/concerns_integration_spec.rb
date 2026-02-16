@@ -59,7 +59,7 @@ RSpec.describe "Handlers::Concerns Integration" do # rubocop:disable RSpec/Descr
       expect(RubyLLM::MCP.logger).to receive(:info).with(/Processing approval/)
 
       result = handler.call
-      expect(result).to eq({ approved: true })
+      expect(result).to eq({ status: :approved })
     end
 
     it "denies if tool is in deny list" do
@@ -71,7 +71,7 @@ RSpec.describe "Handlers::Concerns Integration" do # rubocop:disable RSpec/Descr
       )
 
       result = handler.call
-      expect(result).to eq({ approved: false, reason: "Tool is denied" })
+      expect(result).to eq({ status: :denied, reason: "Tool is denied" })
     end
 
     it "fails guard if tool not in allowed list" do
@@ -83,7 +83,7 @@ RSpec.describe "Handlers::Concerns Integration" do # rubocop:disable RSpec/Descr
       )
 
       result = handler.call
-      expect(result).to eq({ approved: false, reason: "Tool not in safe list" })
+      expect(result).to eq({ status: :denied, reason: "Tool not in safe list" })
     end
   end
 

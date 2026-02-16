@@ -51,7 +51,7 @@ module RubyLLM
       #
       #     def execute
       #       notify_user(tool_name, parameters)
-      #       defer # Returns AsyncResponse
+      #       defer # Returns { status: :deferred, timeout: 300 }
       #     end
       #
       #     private
@@ -91,3 +91,6 @@ module RubyLLM
     end
   end
 end
+
+
+

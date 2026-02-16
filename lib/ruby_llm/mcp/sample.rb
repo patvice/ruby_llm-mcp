@@ -135,30 +135,25 @@ module RubyLLM
 
       # Execute using block (legacy/backward compatible)
       def execute_with_block
-        return unless callback_guard_success?
+        callback_result = run_sampling_callback
 
-        model = preferred_model
-        return unless model
-
-        chat_message = chat(model)
-        @coordinator.sampling_create_message_response(
-          id: @id, message: chat_message, model: model
-        )
+        case callback_result
+        when Hash
+          handle_handler_hash_result(callback_result)
+        when TrueClass, FalseClass
+          handle_handler_boolean_result(callback_result)
+        else
+          # Legacy compatibility: any truthy callback result means "allow sampling"
+          handle_handler_boolean_result(!!callback_result)
+        end
       end
 
-      def callback_guard_success?
+      def run_sampling_callback
         return true unless @coordinator.sampling_callback_enabled?
 
         callback_result = @coordinator.sampling_callback&.call(self)
         # If callback returns nil, it means no guard was configured - allow it
-        return true if callback_result.nil?
-
-        unless callback_result
-          @coordinator.error_response(id: @id, message: REJECTED_MESSAGE)
-          return false
-        end
-
-        true
+        callback_result.nil? ? true : callback_result
       rescue StandardError => e
         RubyLLM::MCP.logger.error("Error in callback guard: #{e.message}, #{e.backtrace.join("\n")}")
         @coordinator.error_response(id: @id, message: "Error executing sampling request")

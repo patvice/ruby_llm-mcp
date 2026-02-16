@@ -55,7 +55,7 @@ module RubyLLM
             self.class.options_config.each do |name, config|
               if provided_options.key?(name)
                 final_options[name] = provided_options[name]
-              elsif config[:default]
+              elsif config.key?(:default)
                 final_options[name] = config[:default].is_a?(Proc) ? config[:default].call : config[:default]
               end
             end
@@ -71,7 +71,7 @@ module RubyLLM
           # Validate that required options are present
           def validate_required_options!
             self.class.options_config.each do |name, config|
-              if config[:required] && !@options.key?(name)
+              if config[:required] && (!@options.key?(name) || @options[name].nil?)
                 raise ArgumentError, "Required option '#{name}' not provided for #{self.class.name}"
               end
             end
@@ -81,3 +81,5 @@ module RubyLLM
     end
   end
 end
+
+

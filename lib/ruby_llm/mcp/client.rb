@@ -212,27 +212,15 @@ module RubyLLM
       def on_human_in_the_loop(handler_class = nil, **options, &block)
         require_feature!(:human_in_the_loop)
 
+        if block_given?
+          raise ArgumentError, "Block-based human-in-the-loop callbacks are no longer supported. Use a handler class."
+        end
+
         if handler_class
           # Validate handler class
           validate_handler_class!(handler_class, :execute)
 
-          # Handler class provided
-          @on[:human_in_the_loop] = if options.any?
-                                      lambda do |name, params|
-                                        handler_class.new(
-                                          tool_name: name,
-                                          parameters: params,
-                                          approval_id: SecureRandom.uuid,
-                                          coordinator: @adapter.native_client,
-                                          **options
-                                        ).call
-                                      end
-                                    else
-                                      handler_class
-                                    end
-        elsif block_given?
-          # Block provided (backward compatible)
-          @on[:human_in_the_loop] = block
+          @on[:human_in_the_loop] = { class: handler_class, options: options }
         else
           # Clear handler when called without arguments
           @on[:human_in_the_loop] = nil

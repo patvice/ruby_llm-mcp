@@ -82,12 +82,17 @@ module RubyLLM
           "Received cancellation for request #{request_id}: #{reason}"
         )
 
-        success = client.cancel_in_flight_request(request_id)
+        outcome = client.cancel_in_flight_request(request_id)
 
-        unless success
-          RubyLLM::MCP.logger.debug(
-            "Request #{request_id} was not found or already completed"
-          )
+        case outcome
+        when :cancelled, :already_cancelled, :already_completed
+          RubyLLM::MCP.logger.debug("Cancellation outcome for #{request_id}: #{outcome}")
+        when :not_found
+          RubyLLM::MCP.logger.debug("Request #{request_id} was not found or already completed")
+        when :not_cancellable
+          RubyLLM::MCP.logger.warn("Request #{request_id} is not cancellable")
+        else
+          RubyLLM::MCP.logger.warn("Cancellation for #{request_id} returned unexpected outcome: #{outcome.inspect}")
         end
       end
 

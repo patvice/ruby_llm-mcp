@@ -25,7 +25,7 @@ module RubyLLM
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :title, :description, :adapter, :annotations, :tool_response, :with_prefix
+      attr_reader :name, :title, :description, :adapter, :annotations, :tool_response, :with_prefix, :output_schema
 
       def initialize(adapter, tool_response, with_prefix: false)
         super()
@@ -62,23 +62,31 @@ module RubyLLM
           error = result.to_error
           return { error: error.to_s }
         end
+        content = result.value["content"]
+        content = [content].compact unless content.is_a?(Array)
 
-        text_values = result.value["content"].map { |content| content["text"] }.compact.join("\n")
+        text_values = content.map { |c| c.is_a?(Hash) ? c["text"] : c.to_s }.compact.join("\n")
+
         if result.execution_error?
           return { error: "Tool execution error: #{text_values}" }
         end
 
+        # Validate structured content if present AND output schema is defined
         if result.value.key?("structuredContent") && !@output_schema.nil?
-          is_valid = JSON::Validator.validate(@output_schema, result.value["structuredContent"])
+          clean_schema = @output_schema.except("$schema")
+          structured_content = result.value["structuredContent"]
+          is_valid = JSON::Validator.validate(clean_schema, structured_content)
           unless is_valid
-            return { error: "Structued outputs was not invalid: #{result.value['structuredContent']}" }
+            return { error: "Structured output is not valid: #{structured_content}" }
           end
 
-          return text_values
+          # Return structured content as JSON - this is the authoritative, schema-validated data
+          # The LLM needs the structured data to give accurate responses
+          return create_content_for_message({ "type" => "text", "text" => structured_content.to_json })
         end
 
         if text_values.empty?
-          create_content_for_message(result.value.dig("content", 0))
+          create_content_for_message(content.first)
         else
           create_content_for_message({ "type" => "text", "text" => text_values })
         end
@@ -88,7 +96,7 @@ module RubyLLM
         {
           name: @name,
           description: @description,
-          params_schema: @@normalized_input_schema,
+          params_schema: @normalized_input_schema,
           annotations: @annotations&.to_h
         }
       end

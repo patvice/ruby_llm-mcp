@@ -185,4 +185,32 @@ RSpec.describe RubyLLM::MCP::Handlers::HumanInTheLoopRegistry do
       expect(described_class.size).to eq(0)
     end
   end
+
+  describe "client-scoped registries" do
+    it "routes approvals by id across multiple owner registries" do
+      owner_a = described_class.for_owner("owner-a")
+      owner_b = described_class.for_owner("owner-b")
+      promise_a = RubyLLM::MCP::Handlers::Promise.new
+      promise_b = RubyLLM::MCP::Handlers::Promise.new
+
+      owner_a.store("owner-a:approval-1", approval_context.merge(promise: promise_a))
+      owner_b.store("owner-b:approval-1", approval_context.merge(promise: promise_b))
+
+      described_class.approve("owner-a:approval-1")
+      described_class.deny("owner-b:approval-1")
+
+      sleep 0.1
+      expect(promise_a.value).to be true
+      expect(promise_b.value).to be false
+    end
+
+    it "releases scoped registries on demand" do
+      owner = described_class.for_owner("owner-release")
+      owner.store("owner-release:approval-1", approval_context)
+
+      expect(described_class.size).to be >= 1
+      described_class.release("owner-release")
+      expect(described_class.retrieve("owner-release:approval-1")).to be_nil
+    end
+  end
 end
