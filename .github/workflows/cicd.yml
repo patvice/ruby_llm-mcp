@@ -37,7 +37,26 @@ jobs:
           cd spec/fixtures/pagination-server && bun install
 
       - name: Run specs
-        run: bundle exec rake
+        run: bundle exec rake spec
+        env:
+          CI: "true"
+          GITHUB_ACTIONS: "true"
+
+  rubocop:
+    name: RuboCop (4.0)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+
+      - name: Run RuboCop
+        run: bundle exec rake rubocop
         env:
           CI: "true"
           GITHUB_ACTIONS: "true"
