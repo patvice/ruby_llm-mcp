@@ -88,7 +88,7 @@ module RubyLLM
                                     end
 
             @oauth_provider = oauth_provider
-            @rate_limiter = Support::RateLimit.new(**rate_limit) if rate_limit
+            @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
             @id_counter = 0
             @id_mutex = Mutex.new
