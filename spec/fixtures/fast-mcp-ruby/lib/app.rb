@@ -149,14 +149,14 @@ bind_address = if is_ci
 
 unless is_silent
   # Run the Rack application with MCP middleware
-  puts "Starting Rack application with MCP middleware on http://#{bind_address}"
-  puts "Docker mode: #{is_ci ? 'enabled' : 'disabled'}"
-  puts "Allowed IPs: #{allowed_ips.join(', ')}"
-  puts "MCP endpoints:"
-  puts "  - http://#{bind_address}/mcp/sse (SSE endpoint)"
-  puts "  - http://#{bind_address}/mcp/messages (JSON-RPC endpoint)"
-  puts "  - http://#{bind_address}/health (Health check endpoint)"
-  puts "Press Ctrl+C to stop"
+  warn "Starting Rack application with MCP middleware on http://#{bind_address}"
+  warn "Docker mode: #{is_ci ? 'enabled' : 'disabled'}"
+  warn "Allowed IPs: #{allowed_ips.join(', ')}"
+  warn "MCP endpoints:"
+  warn "  - http://#{bind_address}/mcp/sse (SSE endpoint)"
+  warn "  - http://#{bind_address}/mcp/messages (JSON-RPC endpoint)"
+  warn "  - http://#{bind_address}/health (Health check endpoint)"
+  warn "Press Ctrl+C to stop"
 end
 
 # Use the Puma server directly instead of going through Rack::Handler

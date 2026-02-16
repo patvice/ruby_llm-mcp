@@ -120,21 +120,21 @@ class TestServerManager
         start_server_type(:sse)
         start_server_type(:pagination)
       rescue StandardError => e
-        puts "Failed to start test server: #{e.message}"
+        warn "Failed to start test server: #{e.message}"
         stop_server
         raise
       end
     end
 
     def wait_for_external_servers
-      puts "Waiting for external servers to be ready..."
+      warn "Waiting for external servers to be ready..."
 
       # Wait for HTTP-based servers
       wait_for_external_server(:http)
       wait_for_external_server(:pagination)
       wait_for_external_server(:sse)
 
-      puts "All external servers are ready!"
+      warn "All external servers are ready!"
     end
 
     def wait_for_external_server(server_type)
@@ -145,7 +145,7 @@ class TestServerManager
 
       begin
         wait_for_port(port)
-        puts "External #{server_type} server is ready on port #{port}"
+        warn "External #{server_type} server is ready on port #{port}"
       rescue Timeout::Error
         raise "External #{server_type} server on port #{port} is not responding after timeout"
       end
@@ -196,7 +196,7 @@ class TestServerManager
       rescue Errno::ESRCH, Errno::ECHILD
         # Process already dead or doesn't exist
       rescue StandardError => e
-        puts "Warning: Failed to cleanly shutdown #{server_type} server: #{e.message}"
+        warn "Warning: Failed to cleanly shutdown #{server_type} server: #{e.message}"
       ensure
         send("#{pid_accessor}=", nil)
       end

@@ -2,7 +2,6 @@
 
 require_relative "lib/ruby_llm/mcp/version"
 
-# rubocop:disable Metrics/BlockLength
 Gem::Specification.new do |spec|
   spec.name = "ruby_llm-mcp"
   spec.version = RubyLLM::MCP::VERSION
@@ -47,4 +46,3 @@ Gem::Specification.new do |spec|
   # Users who want to use adapter: :mcp_sdk should add to their Gemfile:
   #   gem 'mcp', '~> 0.4'
 end
-# rubocop:enable Metrics/BlockLength

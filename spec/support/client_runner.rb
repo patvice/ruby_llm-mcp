@@ -19,7 +19,7 @@ class ClientRunner
       configs.each do |config|
         # Skip MCP SDK clients if the gem is not installed
         if config[:adapter] == :mcp_sdk && !mcp_sdk_available?
-          puts "Skipping #{config[:name]} - MCP SDK gem not installed"
+          warn "Skipping #{config[:name]} - MCP SDK gem not installed"
           next
         end
 

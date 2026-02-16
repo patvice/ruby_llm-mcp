@@ -336,14 +336,14 @@ module RubyLLM
             buffer = +""
 
             client = Support::HTTPClient.connection.plugin(:callbacks)
-                                        .on_response_body_chunk do |request, _response, chunk|
+            client = client.on_response_body_chunk do |request, _response, chunk|
               next unless running?
 
               RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
               buffer << chunk
               process_sse_buffer_events(buffer, request_id&.to_s)
             end
-            .with(
+            client = client.with(
               timeout: {
                 connect_timeout: @request_timeout / 1000,
                 read_timeout: @request_timeout / 1000,
