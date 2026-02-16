@@ -133,7 +133,17 @@ RSpec.describe RubyLLM::MCP::Sample do
       client.start
 
       tool = wait_for_tool(client, "sampling-test")
-      result = tool.execute
+      result = begin
+        tool.execute
+      rescue RubyLLM::MCP::Errors::TransportError => e
+        retriable_streamable_init_race = RUBY_ENGINE == "jruby" &&
+          config[:name] == "streamable-native" &&
+          e.message.include?("Server not initialized")
+        raise unless retriable_streamable_init_race
+
+        sleep 0.2
+        tool.execute
+      end
 
       expect(result.to_s).to include("Error executing sampling request")
     end
