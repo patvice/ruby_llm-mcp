@@ -252,6 +252,23 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect(result).to be_nil
       end
 
+      it "handles 201 Created as a successful JSON response" do
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+          .to_return(
+            status: 201,
+            headers: { "Content-Type" => "application/json" },
+            body: {
+              "jsonrpc" => "2.0",
+              "id" => 1,
+              "result" => { "content" => [{ "type" => "text", "text" => "created" }] }
+            }.to_json
+          )
+
+        result = transport.request({ "method" => "initialize", "id" => 1 }, wait_for_response: false)
+        expect(result).to be_a(RubyLLM::MCP::Result)
+        expect(result.result["content"][0]["text"]).to eq("created")
+      end
+
       it "handles 500 Internal Server Error" do
         stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
