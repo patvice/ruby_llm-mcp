@@ -48,6 +48,24 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
 
       expect(provider.storage).to eq(custom_storage)
     end
+
+    it "configures HTTPX with request_timeout" do
+      session = instance_double(HTTPX::Session)
+      allow(HTTPX).to receive(:plugin).with(:follow_redirects).and_return(session)
+      allow(session).to receive(:with).and_return(session)
+
+      described_class.new(
+        server_url: server_url,
+        redirect_uri: redirect_uri
+      )
+
+      expect(session).to have_received(:with) do |options|
+        expect(options[:timeout]).to eq(request_timeout: RubyLLM::MCP::Auth::DEFAULT_OAUTH_TIMEOUT)
+        expect(options[:headers]["Accept"]).to eq("application/json")
+        expect(options[:headers]["MCP-Protocol-Version"]).to eq(RubyLLM::MCP.config.protocol_version)
+        expect(options[:headers]["User-Agent"]).to match(%r{\ARubyLLM-MCP/})
+      end
+    end
   end
 
   describe ".normalize_url (class method)" do

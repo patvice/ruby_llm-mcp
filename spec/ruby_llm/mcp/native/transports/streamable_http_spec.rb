@@ -334,6 +334,21 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         end.not_to raise_error
       end
 
+      it "handles SSE 401 without disabling fallback and logs auth-specific message" do
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
+          .with(headers: { "Accept" => "text/event-stream" })
+          .to_return(status: 401)
+
+        options = RubyLLM::MCP::Native::Transports::StartSSEOptions.new
+
+        expect do
+          transport.send(:start_sse, options)
+        end.not_to raise_error
+
+        expect(transport.send(:sse_fallback_available?)).to be(true)
+        expect(logger).to have_received(:info).with(/SSE stream unauthorized \(401\)/)
+      end
+
       context "when handling malformed SSE events" do
         it "logs warning and continues" do
           raw_event = { data: "invalid json data" }
@@ -662,6 +677,36 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect do
           transport.send(:start_sse, options)
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Connection refused/)
+      end
+
+      it "disables future SSE fallback attempts after a 405 response" do
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
+          .with(headers: { "Accept" => "text/event-stream" })
+          .to_return(status: 405)
+
+        options = RubyLLM::MCP::Native::Transports::StartSSEOptions.new
+        transport.send(:start_sse, options)
+
+        expect(transport.send(:sse_fallback_available?)).to be(false)
+      end
+
+      it "does not leak fallback disable across transport instances" do
+        stub_request(:get, TestServerManager::HTTP_SERVER_URL)
+          .with(headers: { "Accept" => "text/event-stream" })
+          .to_return(status: 405)
+
+        options = RubyLLM::MCP::Native::Transports::StartSSEOptions.new
+        transport.send(:start_sse, options)
+        expect(transport.send(:sse_fallback_available?)).to be(false)
+
+        second_transport = described_class.new(
+          url: TestServerManager::HTTP_SERVER_URL,
+          request_timeout: 5000,
+          coordinator: mock_coordinator,
+          options: {}
+        )
+
+        expect(second_transport.send(:sse_fallback_available?)).to be(true)
       end
     end
 
@@ -1905,6 +1950,219 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
 
         # Second close should not raise
         expect { transport.close }.not_to raise_error
+      end
+    end
+  end
+
+  describe "rate limiting" do
+    before do
+      WebMock.enable!
+    end
+
+    after do
+      WebMock.reset!
+      WebMock.enable!
+    end
+
+    let(:transport_with_rate_limit) do
+      described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        rate_limit: { limit: 2, interval: 1.0 },
+        options: {}
+      )
+    end
+
+    it "initializes rate limiter when rate_limit option provided" do
+      rate_limiter = transport_with_rate_limit.instance_variable_get(:@rate_limiter)
+
+      expect(rate_limiter).to be_a(RubyLLM::MCP::Native::Transports::Support::RateLimit)
+    end
+
+    it "does not initialize rate limiter when rate_limit option not provided" do
+      transport_without_limit = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        options: {}
+      )
+
+      rate_limiter = transport_without_limit.instance_variable_get(:@rate_limiter)
+      expect(rate_limiter).to be_nil
+    end
+
+    it "adds request timestamps when making requests" do
+      stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+        .to_return(
+          status: 200,
+          headers: { "Content-Type" => "application/json" },
+          body: '{"jsonrpc": "2.0", "id": 1, "result": {}}'
+        )
+
+      rate_limiter = transport_with_rate_limit.instance_variable_get(:@rate_limiter)
+      expect(rate_limiter.exceeded?).to be(false)
+
+      transport_with_rate_limit.request(
+        { "method" => "test", "id" => 1 },
+        wait_for_response: false
+      )
+
+      # After one request, should still be under limit
+      expect(rate_limiter.exceeded?).to be(false)
+
+      transport_with_rate_limit.request(
+        { "method" => "test", "id" => 2 },
+        wait_for_response: false
+      )
+
+      # Now at limit
+      expect(rate_limiter.exceeded?).to be(true)
+    end
+
+    it "throttles requests when rate limit exceeded" do
+      stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+        .to_return(
+          status: 200,
+          headers: { "Content-Type" => "application/json" },
+          body: '{"jsonrpc": "2.0", "id": 1, "result": {}}'
+        )
+
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      # Make 3 rapid requests with a limit of 2 per second
+      3.times do |i|
+        transport_with_rate_limit.request(
+          { "method" => "test", "id" => i + 1 },
+          wait_for_response: false
+        )
+      end
+
+      elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
+
+      # Third request should have waited at least 1 second
+      expect(elapsed).to be >= 1.0
+    end
+
+    it "allows requests within rate limit without throttling" do
+      stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+        .to_return(
+          status: 200,
+          headers: { "Content-Type" => "application/json" },
+          body: '{"jsonrpc": "2.0", "id": 1, "result": {}}'
+        )
+
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      # Make only 2 requests (at the limit, not over)
+      2.times do |i|
+        transport_with_rate_limit.request(
+          { "method" => "test", "id" => i + 1 },
+          wait_for_response: false
+        )
+      end
+
+      elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
+
+      # Should complete quickly without waiting
+      expect(elapsed).to be < 0.5
+    end
+
+    it "allows requests after rate limit window expires" do
+      stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+        .to_return(
+          status: 200,
+          headers: { "Content-Type" => "application/json" },
+          body: '{"jsonrpc": "2.0", "id": 1, "result": {}}'
+        )
+
+      # Use a very short interval for testing
+      short_limit_transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        coordinator: mock_coordinator,
+        request_timeout: 5000,
+        rate_limit: { limit: 2, interval: 0.1 },
+        options: {}
+      )
+
+      # Make 2 requests (at the limit)
+      2.times do |i|
+        short_limit_transport.request(
+          { "method" => "test", "id" => i + 1 },
+          wait_for_response: false
+        )
+      end
+
+      rate_limiter = short_limit_transport.instance_variable_get(:@rate_limiter)
+      expect(rate_limiter.exceeded?).to be(true)
+
+      # Wait for interval to expire
+      sleep(0.15)
+
+      # Now should be under limit again
+      expect(rate_limiter.exceeded?).to be(false)
+    end
+  end
+
+  describe "204 No Content response handling for session termination" do
+    before do
+      WebMock.enable!
+    end
+
+    after do
+      WebMock.reset!
+      WebMock.enable!
+    end
+
+    it "accepts 204 status for session termination" do
+      transport.instance_variable_set(:@session_id, "test-session")
+
+      stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
+        .to_return(status: 204)
+
+      # Should not raise an error for 204 (acceptable per MCP spec)
+      expect do
+        transport.send(:terminate_session)
+      end.not_to raise_error
+
+      # Session should be cleared
+      expect(transport.instance_variable_get(:@session_id)).to be_nil
+    end
+
+    it "accepts 200 status for session termination" do
+      transport.instance_variable_set(:@session_id, "test-session")
+
+      stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
+        .to_return(status: 200)
+
+      expect do
+        transport.send(:terminate_session)
+      end.not_to raise_error
+
+      expect(transport.instance_variable_get(:@session_id)).to be_nil
+    end
+
+    it "handles all valid session termination statuses" do
+      [200, 204, 404, 405].each do |status|
+        transport = described_class.new(
+          url: TestServerManager::HTTP_SERVER_URL,
+          coordinator: mock_coordinator,
+          request_timeout: 5000,
+          options: {}
+        )
+
+        transport.instance_variable_set(:@session_id, "test-session-#{status}")
+
+        stub_request(:delete, TestServerManager::HTTP_SERVER_URL)
+          .to_return(status: status)
+
+        expect do
+          transport.send(:terminate_session)
+        end.not_to raise_error, "Expected status #{status} to be accepted"
+
+        expect(transport.instance_variable_get(:@session_id)).to be_nil
+
+        WebMock.reset!
       end
     end
   end

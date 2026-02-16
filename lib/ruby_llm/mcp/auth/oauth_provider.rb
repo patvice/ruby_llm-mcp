@@ -244,7 +244,7 @@ module RubyLLM
           headers["MCP-Protocol-Version"] = RubyLLM::MCP.config.protocol_version
 
           HTTPX.plugin(:follow_redirects).with(
-            timeout: { total: DEFAULT_OAUTH_TIMEOUT },
+            timeout: { request_timeout: DEFAULT_OAUTH_TIMEOUT },
             headers: headers
           )
         end
