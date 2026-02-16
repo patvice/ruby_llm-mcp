@@ -99,7 +99,7 @@ RSpec.describe RubyLLM::MCP::Sample do
     it "client will response with an error message if server requests sample and sampling is not enabled" do
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       result = tool.execute
 
       expect(result.to_s).to include("Sampling is disabled")
@@ -115,7 +115,7 @@ RSpec.describe RubyLLM::MCP::Sample do
       end
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       result = tool.execute
 
       expect(result.to_s).to include("Sampling test failed")
@@ -132,7 +132,7 @@ RSpec.describe RubyLLM::MCP::Sample do
 
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       result = tool.execute
 
       expect(result.to_s).to include("Error executing sampling request")
@@ -150,7 +150,7 @@ RSpec.describe RubyLLM::MCP::Sample do
       end
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       tool.execute
 
       expect(sample).to be_a(RubyLLM::MCP::Sample)
@@ -185,7 +185,7 @@ RSpec.describe RubyLLM::MCP::Sample do
 
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       result = tool.execute
 
       expect(result.to_s).to include("gemini-2.0-flash")
@@ -203,7 +203,7 @@ RSpec.describe RubyLLM::MCP::Sample do
 
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       result = tool.execute
 
       expect(result.to_s).to include("Failed to determine preferred model")
@@ -225,7 +225,7 @@ RSpec.describe RubyLLM::MCP::Sample do
       client.on_sampling(handler_class)
       client.start
 
-      tool = client.tool("sampling-test")
+      tool = wait_for_tool(client, "sampling-test")
       result = tool.execute
 
       expect(result.to_s).to include("handler class rejection")
@@ -240,7 +240,7 @@ RSpec.describe RubyLLM::MCP::Sample do
           end
           client.start
 
-          tool = client.tool("sampling-test")
+          tool = wait_for_tool(client, "sampling-test")
           result = tool.execute
 
           expect(result.to_s).to include("Sampling test completed")
@@ -257,7 +257,7 @@ RSpec.describe RubyLLM::MCP::Sample do
           end
           client.start
 
-          tool = client.tool("sampling-test")
+          tool = wait_for_tool(client, "sampling-test")
           result = tool.execute
 
           expect(result.to_s).to include("Sampling test completed")
