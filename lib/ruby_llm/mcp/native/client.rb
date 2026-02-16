@@ -7,8 +7,10 @@ module RubyLLM
       # This is the core protocol implementation that handles all MCP operations
       # It's self-contained and could potentially be extracted as a separate gem
       class Client
+        TOOL_CALL_CANCELLED_MESSAGE = "Tool call was cancelled by the client"
+
         attr_reader :name, :transport_type, :config, :capabilities, :protocol_version, :elicitation_callback,
-                    :sampling_callback
+                    :sampling_callback, :human_in_the_loop_registry, :registry_owner_id
 
         def initialize( # rubocop:disable Metrics/ParameterLists
           name:,
@@ -48,6 +50,10 @@ module RubyLLM
           # Track in-flight server-initiated requests for cancellation
           @in_flight_requests = {}
           @in_flight_mutex = Mutex.new
+
+          # Human-in-the-loop approvals are scoped per client lifecycle.
+          @registry_owner_id = "native-client-#{SecureRandom.uuid}"
+          @human_in_the_loop_registry = Handlers::HumanInTheLoopRegistry.for_owner(@registry_owner_id)
         end
 
         def request(body, **options)
@@ -117,6 +123,8 @@ module RubyLLM
           @capabilities = nil
           @transport = nil
           @protocol_version = Native::Protocol.default_negotiated_version
+          Handlers::HumanInTheLoopRegistry.release(@registry_owner_id)
+          @human_in_the_loop_registry = Handlers::HumanInTheLoopRegistry.for_owner(@registry_owner_id)
         end
 
         def restart!
@@ -175,16 +183,9 @@ module RubyLLM
         end
 
         def execute_tool(name:, parameters:)
-          if @human_in_the_loop_callback && !@human_in_the_loop_callback.call(name, parameters)
-            result = Result.new(
-              {
-                "result" => {
-                  "isError" => true,
-                  "content" => [{ "type" => "text", "text" => "Tool call was cancelled by the client" }]
-                }
-              }
-            )
-            return result
+          if @human_in_the_loop_callback
+            approved = evaluate_tool_approval(name: name, parameters: parameters)
+            return create_cancelled_result unless approved
           end
 
           body = Native::Messages::Requests.tool_call(name: name, parameters: parameters,
@@ -366,20 +367,102 @@ module RubyLLM
 
         # Cancel an in-flight server-initiated request
         # @param request_id [String] The ID of the request to cancel
-        # @return [Boolean] true if the request was found and cancelled, false otherwise
-        def cancel_in_flight_request(request_id) # rubocop:disable Naming/PredicateMethod
+        # @return [Symbol] cancellation outcome
+        #   :cancelled, :already_cancelled, :already_completed, :not_found, :not_cancellable, :failed
+        def cancel_in_flight_request(request_id)
           operation = nil
           @in_flight_mutex.synchronize do
             operation = @in_flight_requests[request_id.to_s]
           end
 
-          if operation.respond_to?(:cancel)
-            operation.cancel
-            true
-          else
-            RubyLLM::MCP.logger.warn("Request #{request_id} cannot be cancelled or was already completed")
-            false
+          unless operation
+            RubyLLM::MCP.logger.debug("Request #{request_id} was not found for cancellation")
+            return :not_found
           end
+
+          unless operation.respond_to?(:cancel)
+            RubyLLM::MCP.logger.warn("Request #{request_id} cannot be cancelled or was already completed")
+            return :not_cancellable
+          end
+
+          outcome = normalize_cancellation_outcome(operation.cancel)
+          if %i[cancelled already_cancelled already_completed].include?(outcome)
+            unregister_in_flight_request(request_id)
+          end
+
+          outcome
+        end
+
+        private
+
+        def evaluate_tool_approval(name:, parameters:)
+          decision = @human_in_the_loop_callback.call(name, parameters)
+          unless decision.is_a?(Handlers::ApprovalDecision)
+            RubyLLM::MCP.logger.error(
+              "Human-in-the-loop callback must return ApprovalDecision, got #{decision.class}"
+            )
+            return false
+          end
+
+          return true if decision.approved?
+          return false if decision.denied?
+          return wait_for_deferred_approval(decision) if decision.deferred?
+
+          RubyLLM::MCP.logger.error(
+            "Human-in-the-loop callback returned unknown decision status '#{decision.status.inspect}'"
+          )
+          false
+        rescue Errors::InvalidApprovalDecision => e
+          RubyLLM::MCP.logger.error("Invalid approval decision: #{e.message}")
+          false
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Error evaluating tool approval: #{e.message}")
+          false
+        end
+
+        def wait_for_deferred_approval(decision)
+          unless decision.promise
+            RubyLLM::MCP.logger.error("Deferred approval #{decision.approval_id} missing promise")
+            return false
+          end
+
+          approved = decision.promise.wait(timeout: decision.timeout)
+          approved == true
+        rescue Timeout::Error
+          RubyLLM::MCP.logger.warn(
+            "Deferred approval #{decision.approval_id} timed out after #{decision.timeout} seconds"
+          )
+          human_in_the_loop_registry.deny(
+            decision.approval_id,
+            reason: "Timed out waiting for approval"
+          )
+          false
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Deferred approval #{decision.approval_id} failed: #{e.message}")
+          false
+        end
+
+        def normalize_cancellation_outcome(raw_outcome)
+          case raw_outcome
+          when Symbol
+            raw_outcome
+          when true
+            :cancelled
+          else
+            :failed
+          end
+        end
+
+        # Create a result for cancelled tool execution
+        def create_cancelled_result
+          Result.new(
+            {
+              "result" => {
+                "isError" => true,
+                "content" => [{ "type" => "text", "text" => TOOL_CALL_CANCELLED_MESSAGE }]
+              }
+            }
+          )
         end
       end
     end

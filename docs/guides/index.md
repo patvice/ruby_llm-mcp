@@ -23,6 +23,7 @@ This section contains guides for using RubyLLM MCP.
 
 - **[OAuth 2.1 Authentication]({% link guides/oauth.md %})** {: .label .label-green } 1.0 - OAuth 2.1 support with PKCE and browser authentication
 - **[Rails OAuth Integration]({% link guides/rails-oauth.md %})** {: .label .label-green } 1.0 - Multi-user OAuth for Rails applications
+- **[Client Handlers]({% link guides/client-handlers.md %})** {: .label .label-green } 1.0 - How handler classes work and how to get started
 
 ## Upgrading
 

@@ -24,7 +24,7 @@ RSpec.describe RubyLLM::MCP::Native::CancellableOperation do
     end
 
     it "returns true after cancel is called" do
-      operation.cancel
+      expect(operation.cancel).to eq(:cancelled)
       expect(operation.cancelled?).to be true
     end
   end
@@ -74,7 +74,7 @@ RSpec.describe RubyLLM::MCP::Native::CancellableOperation do
 
   describe "#cancel" do
     it "sets the cancelled flag" do
-      operation.cancel
+      expect(operation.cancel).to eq(:cancelled)
       expect(operation.cancelled?).to be true
     end
 
@@ -96,7 +96,7 @@ RSpec.describe RubyLLM::MCP::Native::CancellableOperation do
         sleep 0.01 until started
 
         # Cancel while executing
-        operation.cancel
+        expect(operation.cancel).to eq(:cancelled)
 
         # Wait for the thread to complete
         execution_thread.join
@@ -109,7 +109,12 @@ RSpec.describe RubyLLM::MCP::Native::CancellableOperation do
 
     context "when no thread is executing" do
       it "does not raise an error" do
-        expect { operation.cancel }.not_to raise_error
+        expect(operation.cancel).to eq(:cancelled)
+      end
+
+      it "returns already_cancelled when cancelled twice" do
+        operation.cancel
+        expect(operation.cancel).to eq(:already_cancelled)
       end
     end
   end

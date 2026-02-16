@@ -209,9 +209,23 @@ module RubyLLM
         @on.key?(:human_in_the_loop) && !@on[:human_in_the_loop].nil?
       end
 
-      def on_human_in_the_loop(&block)
+      def on_human_in_the_loop(handler_class = nil, **options)
         require_feature!(:human_in_the_loop)
-        @on[:human_in_the_loop] = block
+
+        if block_given?
+          raise ArgumentError, "Block-based human-in-the-loop callbacks are no longer supported. Use a handler class."
+        end
+
+        if handler_class
+          # Validate handler class
+          validate_handler_class!(handler_class, :execute)
+
+          @on[:human_in_the_loop] = { class: handler_class, options: options }
+        else
+          # Clear handler when called without arguments
+          @on[:human_in_the_loop] = nil
+        end
+
         self
       end
 
@@ -238,9 +252,29 @@ module RubyLLM
         @on.key?(:sampling) && !@on[:sampling].nil?
       end
 
-      def on_sampling(&block)
+      def on_sampling(handler_class = nil, **options, &block)
         require_feature!(:sampling)
-        @on[:sampling] = block
+
+        if handler_class
+          # Validate handler class
+          validate_handler_class!(handler_class, :execute)
+
+          # Handler class provided
+          @on[:sampling] = if options.any?
+                             lambda do |sample|
+                               handler_class.new(sample: sample, coordinator: @adapter.native_client, **options).call
+                             end
+                           else
+                             handler_class
+                           end
+        elsif block_given?
+          # Block provided (backward compatible)
+          @on[:sampling] = block
+        else
+          # Clear handler when called without arguments
+          @on[:sampling] = nil
+        end
+
         self
       end
 
@@ -248,9 +282,33 @@ module RubyLLM
         @on.key?(:elicitation) && !@on[:elicitation].nil?
       end
 
-      def on_elicitation(&block)
+      def on_elicitation(handler_class = nil, **options, &block)
         require_feature!(:elicitation)
-        @on[:elicitation] = block
+
+        if handler_class
+          # Validate handler class
+          validate_handler_class!(handler_class, :execute)
+
+          # Handler class provided
+          @on[:elicitation] = if options.any?
+                                lambda do |elicitation|
+                                  handler_class.new(
+                                    elicitation: elicitation,
+                                    coordinator: @adapter.native_client,
+                                    **options
+                                  ).call
+                                end
+                              else
+                                handler_class
+                              end
+        elsif block_given?
+          # Block provided (backward compatible)
+          @on[:elicitation] = block
+        else
+          # Clear handler when called without arguments
+          @on[:elicitation] = nil
+        end
+
         self
       end
 
@@ -395,6 +453,20 @@ module RubyLLM
 
         # Create new storage shared with client
         @oauth_storage ||= Auth::MemoryStorage.new
+      end
+
+      # Validate that a handler class has required methods
+      # @param handler_class [Class] the handler class to validate
+      # @param required_method [Symbol] the method that must be defined
+      # @raise [ArgumentError] if validation fails
+      def validate_handler_class!(handler_class, required_method)
+        unless Handlers.handler_class?(handler_class)
+          raise ArgumentError, "Handler must be a class, got #{handler_class.class}"
+        end
+
+        unless handler_class.method_defined?(required_method)
+          raise ArgumentError, "Handler class #{handler_class} must define ##{required_method} method"
+        end
       end
     end
   end

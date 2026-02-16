@@ -49,7 +49,7 @@ module RubyLLM
 
       class Sampling
         attr_accessor :enabled
-        attr_writer :preferred_model
+        attr_writer :preferred_model, :handler
 
         def initialize
           set_defaults
@@ -69,6 +69,21 @@ module RubyLLM
           @preferred_model
         end
 
+        # Set or get the handler (class or block)
+        # @param handler_class [Class, nil] handler class
+        # @param options [Hash] options to pass to handler
+        # @return [Object] the current handler
+        def handler(handler_class = nil, **options)
+          if handler_class
+            @handler = if options.any?
+                         { class: handler_class, options: options }
+                       else
+                         handler_class
+                       end
+          end
+          @handler
+        end
+
         def enabled?
           @enabled
         end
@@ -79,6 +94,7 @@ module RubyLLM
           @enabled = false
           @preferred_model = nil
           @guard = nil
+          @handler = nil
         end
       end
 
@@ -212,8 +228,14 @@ module RubyLLM
         @on_progress
       end
 
-      def on_human_in_the_loop(&block)
-        @on_human_in_the_loop = block if block_given?
+      def on_human_in_the_loop(handler_class = nil, **options)
+        if block_given?
+          raise ArgumentError, "Block-based human-in-the-loop callbacks are no longer supported. Use a handler class."
+        end
+
+        if handler_class
+          @on_human_in_the_loop = { class: handler_class, options: options }
+        end
         @on_human_in_the_loop
       end
 

@@ -107,9 +107,12 @@ module RubyLLM
           end
 
           def wait_for_request_response(request_id, response_queue)
-            with_timeout(@request_timeout / 1000, request_id: request_id) do
+            result = with_timeout(@request_timeout / 1000, request_id: request_id) do
               response_queue.pop
             end
+            raise result if result.is_a?(RubyLLM::MCP::Errors::TransportError)
+
+            result
           rescue RubyLLM::MCP::Errors::TimeoutError => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
             log_message = "Stdio request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"

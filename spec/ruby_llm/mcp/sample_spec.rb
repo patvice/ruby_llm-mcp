@@ -197,6 +197,27 @@ RSpec.describe RubyLLM::MCP::Sample do
       expect(result.to_s).to include("Error in preferred model")
     end
 
+    it "supports handler classes configured via client.on_sampling" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::SamplingHandler) do
+        def execute
+          reject("handler class rejection")
+        end
+      end
+
+      RubyLLM::MCP.configure do |config|
+        config.sampling.enabled = true
+        config.sampling.preferred_model = "gpt-4o"
+      end
+
+      client.on_sampling(handler_class)
+      client.start
+
+      tool = client.tool("sampling-test")
+      result = tool.execute
+
+      expect(result.to_s).to include("handler class rejection")
+    end
+
     COMPLEX_FUNCTION_MODELS.each do |model|
       context "with #{model[:provider]} #{model[:model]}" do
         it "executes a chat message and provides information to the server without a guard" do
@@ -229,6 +250,51 @@ RSpec.describe RubyLLM::MCP::Sample do
           expect(result.to_s).to include("Sampling test completed")
         end
       end
+    end
+  end
+
+  describe "Handler Class Support" do
+    it "works with custom handler classes" do
+      handler_class = Class.new(RubyLLM::MCP::Handlers::SamplingHandler) do
+        def execute
+          accept("Handler response")
+        end
+      end
+
+      coordinator = double("Coordinator", sampling_callback_enabled?: true)
+      allow(coordinator).to receive(:sampling_callback).and_return(handler_class)
+      allow(coordinator).to receive(:sampling_create_message_response)
+      allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
+
+      sample = RubyLLM::MCP::Sample.new(result, coordinator)
+
+      expect(coordinator).to receive(:sampling_create_message_response).with(
+        hash_including(message: "Handler response")
+      )
+
+      sample.execute
+    end
+
+    it "maintains backward compatibility with block callbacks" do
+      coordinator = double("Coordinator", sampling_callback_enabled?: true)
+      block_callback = ->(s) { s.message.length < 100 }
+      allow(coordinator).to receive(:sampling_callback).and_return(block_callback)
+      allow(coordinator).to receive(:sampling_create_message_response)
+      allow(RubyLLM::MCP.config.sampling).to receive(:preferred_model).and_return("gpt-4")
+
+      # Mock chat
+      chat = double("Chat")
+      allow(RubyLLM::Chat).to receive(:new).and_return(chat)
+      allow(chat).to receive(:add_message)
+      allow(chat).to receive(:complete).and_return("Block response")
+
+      sample = RubyLLM::MCP::Sample.new(result, coordinator)
+
+      expect(coordinator).to receive(:sampling_create_message_response).with(
+        hash_including(message: "Block response")
+      )
+
+      sample.execute
     end
   end
 end
