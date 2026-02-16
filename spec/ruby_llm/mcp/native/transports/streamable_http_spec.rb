@@ -1976,7 +1976,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     it "initializes rate limiter when rate_limit option provided" do
       rate_limiter = transport_with_rate_limit.instance_variable_get(:@rate_limiter)
 
-      expect(rate_limiter).to be_a(RubyLLM::MCP::Native::Transports::Support::RateLimit)
+      expect(rate_limiter).to be_a(RubyLLM::MCP::Native::Transports::Support::RateLimiter)
     end
 
     it "does not initialize rate limiter when rate_limit option not provided" do
