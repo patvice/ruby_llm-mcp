@@ -9,13 +9,21 @@ module RubyLLM::MCP::Adapters::MCPTransports
     attr_reader :name, :protocol_version
     attr_accessor :transport
 
-    def initialize
+    def initialize(protocol_version:, notification_callback: nil)
       @name = "MCP-SDK-Adapter"
-      @protocol_version = RubyLLM::MCP::Native::Protocol.default_negotiated_version
+      @protocol_version = protocol_version
       @transport = nil
+      @notification_callback = notification_callback
     end
 
     def process_result(result)
+      if result&.notification?
+        @notification_callback&.call(result.notification)
+        return nil
+      end
+
+      return nil if result&.request?
+
       result
     end
 

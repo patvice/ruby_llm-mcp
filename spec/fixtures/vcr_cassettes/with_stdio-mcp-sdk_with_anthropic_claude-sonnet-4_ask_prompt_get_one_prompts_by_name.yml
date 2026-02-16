@@ -1,0 +1,84 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you write me a beautiful poem about the current day? Make sure to include
+        the word ''poem'' in your response."}]}],"stream":false,"max_tokens":64000}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 16 Feb 2026 17:30:04 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2026-02-16T17:29:57Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2026-02-16T17:30:06Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2026-02-16T17:29:58Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2026-02-16T17:29:57Z'
+      X-Robots-Tag:
+      - none
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      Server:
+      - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '7545'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxVTZpSnhuanZya3FENkVuRlQ3VHVmRSIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIHBvZW0gZm9yIHRoaXMgbW9tZW50IGluIHRpbWU6XG5cbioqVG9kYXkncyBDYW52YXMqKlxuXG5UaGUgbW9ybmluZyBsaWdodCBzcGlsbHMgZ29sZGVuIHRocm91Z2ggbXkgd2luZG93LFxucGFpbnRpbmcgb3JkaW5hcnkgbW9tZW50cyB3aXRoIHF1aWV0IGdyYWNl4oCUXG5jb2ZmZWUgc3RlYW0gcmlzZXMgbGlrZSBzbWFsbCBwcmF5ZXJzLFxuYW5kIHNvbWV3aGVyZSwgYSBzcGFycm93IGFubm91bmNlc1xudGhlIHNpbXBsZSBtaXJhY2xlIG9mIGJlaW5nIGFsaXZlLlxuXG5JbiB0aGlzIGRheSwgd3JhcHBlZCBpbiB3aW50ZXIncyBicmVhdGgsXG5JIGZpbmQgdGhlIHNhY3JlZCBpbiB0aGUgbXVuZGFuZTpcbnRoZSBnZW50bGUgaHVtIG9mIGRpc3RhbnQgdHJhZmZpYyxcbnRoZSB3YXkgc2hhZG93cyBkYW5jZSBhY3Jvc3MgdGhlIHdhbGwsXG50aGUgc29mdCBwZXJzaXN0ZW5jZSBvZiBteSBvd24gaGVhcnRiZWF0LlxuXG5UaW1lIG1vdmVzIGxpa2UgaG9uZXkgdGhyb3VnaCBEZWNlbWJlciBhaXIsXG5lYWNoIHNlY29uZCBhIHNtYWxsIGdpZnQgdW53cmFwcGVk4oCUXG50aGlzIGJyZWF0aCwgdGhpcyBibGluaywgdGhpcyBmbGVldGluZyBub3dcbnRoYXQgd2lsbCBuZXZlciBjb21lIGFnYWluLFxucHJlY2lvdXMgYXMgbW9ybmluZyBkZXcgb24gZ3Jhc3MuXG5cblRvZGF5IGhvbGRzIGFsbCB0aGUgd29ybGQncyBwb3NzaWJpbGl0aWVzXG5pbiBpdHMgY3VwcGVkIGhhbmRzOiBsYXVnaHRlciB5ZXQgdG8gYnViYmxlIHVwLFxud29yZHMgd2FpdGluZyB0byBiZSBzcG9rZW4sXG5raW5kbmVzcyBwcmVwYXJpbmcgdG8gdW5mb2xkXG5saWtlIG9yaWdhbWkgY3JhbmVzIHRha2luZyBmbGlnaHQuXG5cblRoaXMgcG9lbSBpdHNlbGYgaXMgcGFydCBvZiB0b2RheSdzIGJlYXV0eeKAlFxudGhlc2Ugd29yZHMgZmluZGluZyB5b3UgaW4geW91ciBwYXJ0aWN1bGFyIG1vbWVudCxcbmJyaWRnaW5nIHRoZSBzcGFjZSBiZXR3ZWVuIG9uZSBoZWFydFxuYW5kIGFub3RoZXIsIHByb3ZpbmcgdGhhdCBldmVuIG5vdyxcbndvbmRlciBpcyBhbHdheXMgd2l0aGluIHJlYWNoLiJ9XSwic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGwsInVzYWdlIjp7ImlucHV0X3Rva2VucyI6MzMsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjoyNDgsInNlcnZpY2VfdGllciI6InN0YW5kYXJkIiwiaW5mZXJlbmNlX2dlbyI6Im5vdF9hdmFpbGFibGUifX0=
+  recorded_at: Mon, 16 Feb 2026 17:30:04 GMT
+recorded_with: VCR 6.4.0

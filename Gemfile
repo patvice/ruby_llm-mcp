@@ -5,8 +5,8 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
-  if RUBY_VERSION >= "3.2.0"
-    gem "mcp", "~> 0.4"
+  if RUBY_VERSION >= "3.1.0"
+    gem "mcp", "~> 0.7"
   end
 
   # Development dependencies

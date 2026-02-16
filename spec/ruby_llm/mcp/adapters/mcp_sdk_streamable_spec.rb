@@ -31,15 +31,15 @@ RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/
   let(:client) { MCPSdkStreamableRunner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    if RUBY_VERSION < "3.2.0"
-      skip "Specs require Ruby 3.2+"
+    if RUBY_VERSION < "3.1.0" || !ClientRunner.mcp_sdk_available?
+      skip "Specs require Ruby 3.1+ with the mcp gem available"
     else
       MCPSdkStreamableRunner.instance.start
     end
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    if RUBY_VERSION >= "3.2.0"
+    if RUBY_VERSION >= "3.1.0" && ClientRunner.mcp_sdk_available?
       MCPSdkStreamableRunner.instance.stop
     end
   end

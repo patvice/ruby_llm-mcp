@@ -124,7 +124,7 @@ gem 'ruby_llm-mcp'
 Optional (for `:mcp_sdk` adapter):
 
 ```ruby
-gem 'mcp', '~> 0.4'
+gem 'mcp', '~> 0.7'
 ```
 
 Then run:
@@ -138,8 +138,6 @@ bundle install
 1. Set your RubyLLM provider credentials (for example `OPENAI_API_KEY`).
 2. Start or access an MCP server.
 3. Create a `RubyLLM::MCP.client` and attach its tools/resources/prompts to chat flows.
-
-Full docs: [rubyllm-mcp.com](https://rubyllm-mcp.com)
 
 ## Contributing
 

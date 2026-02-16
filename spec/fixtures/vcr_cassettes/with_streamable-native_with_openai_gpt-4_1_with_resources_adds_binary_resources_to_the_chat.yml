@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:33:32 GMT
+      - Mon, 16 Feb 2026 17:23:45 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '8675'
+      - '12965'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '8700'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -70,20 +70,52 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        ewogICJpZCI6ICJjaGF0Y21wbC1DYVZmdnNzRkdIN0lwNjRiRjRZQXY3dHR4SDAxOSIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc2MjgxNzYwMywKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJJIGhhdmUgYWNjZXNzIHRvIGEgYnJvYWQgcmFuZ2Ugb2YgcmVzb3VyY2VzIGFuZCBjYXBhYmlsaXRpZXMgdG8gYXNzaXN0IHlvdSwgaW5jbHVkaW5nOlxuXG4xLiAqKkdlbmVyYWwgS25vd2xlZGdlOioqICBcbiAgIC0gVmFzdCBnZW5lcmFsIGtub3dsZWRnZSBiYXNlLCBjb3ZlcmluZyBhIHdpZGUgcmFuZ2Ugb2YgdG9waWNzIHVwIHRvIG15IGxhdGVzdCB1cGRhdGUgKEp1bmUgMjAyNCkuXG5cbjIuICoqQ29udmVyc2F0aW9uYWwgQWJpbGl0aWVzOioqICBcbiAgIC0gSSBjYW4gYW5zd2VyIHF1ZXN0aW9ucywgaGF2ZSBkaXNjdXNzaW9ucywgYW5kIGFzc2lzdCB3aXRoIGJyYWluc3Rvcm1pbmcgb3IgaWRlYSBnZW5lcmF0aW9uLlxuXG4zLiAqKlJlc2VhcmNoIGFuZCBTdW1tYXJpemF0aW9uOioqICBcbiAgIC0gSSBjYW4gc3VtbWFyaXplIGFydGljbGVzLCBwYXBlcnMsIGFuZCBzb3VyY2VzIHlvdSBwcm92aWRlLCBhcyB3ZWxsIGFzIG9mZmVyIGNvbmNpc2UgZXhwbGFuYXRpb25zLlxuXG40LiAqKldyaXRpbmcgYW5kIEVkaXRpbmc6KiogIFxuICAgLSBIZWxwIHdpdGggZXNzYXlzLCBlbWFpbHMsIGNyZWF0aXZlIHdyaXRpbmcsIGNvZGluZyBwcm9qZWN0cywgcsOpc3Vtw6lzLCBhbmQgdGVjaG5pY2FsIGRvY3VtZW50cy5cblxuNS4gKipJbWFnZSBBbmFseXNpczoqKiAgXG4gICAtIEkgY2FuIGRlc2NyaWJlIGFuZCBhbmFseXplIGltYWdlcyB5b3UgdXBsb2FkIChidXQgbm90IHJlY29nbml6ZSBzcGVjaWZpYyBwZW9wbGUgb3IgaW50ZXJwcmV0IHNlbnNpdGl2ZSBjb250ZW50KS5cblxuNi4gKipNYXRoIGFuZCBTY2llbmNlOioqICBcbiAgIC0gU29sdmUgbWF0aCBwcm9ibGVtcywgZXhwbGFpbiBzY2llbnRpZmljIGNvbmNlcHRzLCBhbmQgYXNzaXN0IHdpdGggZXF1YXRpb25zIGFuZCBjYWxjdWxhdGlvbnMuXG5cbjcuICoqQ29kaW5nIEhlbHA6KiogIFxuICAgLSBXcml0ZSwgZGVidWcsIGFuZCBleHBsYWluIGNvZGUgaW4gbWFueSBwcm9ncmFtbWluZyBsYW5ndWFnZXMuXG5cbjguICoqUHJvZHVjdGl2aXR5IFRvb2xzOioqICBcbiAgIC0gR2VuZXJhdGUgY2FsZW5kYXJzLCB0by1kbyBsaXN0cywgYW5kIG9yZ2FuaXplIHN0dWR5L3dvcmsgcGxhbnMuXG5cbioqV2hhdCBJICpkb27igJl0KiBoYXZlIGRpcmVjdCBhY2Nlc3MgdG86Kipcbi0gKipSZWFsLXRpbWUgaW50ZXJuZXQgYnJvd3Npbmc6KiogSSBjYW7igJl0IGxvb2sgdGhpbmdzIHVwIGxpdmUgb24gdGhlIGludGVybmV0LlxuLSAqKlBlcnNvbmFsIGRhdGE6KiogSSBkb27igJl0IGhhdmUgYWNjZXNzIHRvIHlvdXIgcGVyc29uYWwgaW5mb3JtYXRpb24gdW5sZXNzIHlvdSBzaGFyZSBpdCBkdXJpbmcgb3VyIGNvbnZlcnNhdGlvbi5cbi0gKipTdWJzY3JpcHRpb24tb25seSBvciBwYXl3YWxsZWQgY29udGVudDoqKiBJIGNhbuKAmXQgYWNjZXNzIGNvbnRlbnQgdGhhdCByZXF1aXJlcyBhIHBhaWQgc3Vic2NyaXB0aW9uIHVubGVzcyB5b3UgcHJvdmlkZSBpdC5cblxuTGV0IG1lIGtub3cgd2hhdCB5b3UgbmVlZCBoZWxwIHdpdGghIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMjgyLAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMzIwLAogICAgInRvdGFsX3Rva2VucyI6IDYwMiwKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwX2QzOGM3ZjRmYTciCn0K
-  recorded_at: Mon, 10 Nov 2025 23:33:32 GMT
-recorded_with: VCR 6.3.1
+      string: |
+        {
+          "id": "chatcmpl-D9wbksSNhrXLfw6q2Lqo5REL3hKrO",
+          "object": "chat.completion",
+          "created": 1771262612,
+          "model": "gpt-4.1-2025-04-14",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "I have access to the following resources and capabilities:\n\n### 1. **Knowledge Base**\n- My training includes a vast range of general knowledge up to **October 2023** (with some information up to June 2024), including facts about science, technology, history, literature, entertainment, and more.\n- I **do not have real-time access** to the internet, so I cannot browse current web pages, news sites, or access social media, but I can use information I was trained on and summaries of commonly available sources.\n\n### 2. **Image Capabilities**\n- I can **analyze and describe images**, identify objects, read text (OCR), answer questions about images, and offer insights on visual content.\n- I **cannot identify or recognize specific people** in images, and I follow strict privacy and safety guidelines.\n\n### 3. **Text Generation**\n- I can generate text in many formats: essays, code, stories, emails, summaries, explanations, and more.\n\n### 4. **Programming Help**\n- I can help write, debug, and explain code in many programming languages (Python, JavaScript, HTML/CSS, Java, and others).\n\n### 5. **Language Translation**\n- I can translate text between multiple languages.\n\n### 6. **Learning Assistance**\n- I can help with math problems, explain scientific concepts, summarize articles, and aid in study or research.\n\n### 7. **Conversation & Brainstorming**\n- I can simulate conversation, role-play, and assist in brainstorming ideas or creative work.\n\n---\n\n**What I *cannot* do:**\n- Access or retrieve real-time, unpublished, or private information.\n- Interact directly with databases, external apps, or tools unless you provide the data or content.\n- Perform real-world actions or integrations (e.g., make phone calls, purchase items).\n- Provide personal opinions or experiences as I am an AI and do not possess them.\n\n**If you have a specific task or need, let me know!**",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 282,
+            "completion_tokens": 409,
+            "total_tokens": 691,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_f8bea53fbd"
+        }
+  recorded_at: Mon, 16 Feb 2026 17:23:45 GMT
+recorded_with: VCR 6.4.0

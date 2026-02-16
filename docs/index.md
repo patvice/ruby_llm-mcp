@@ -135,7 +135,7 @@ gem 'ruby_llm-mcp'
 Optional (for `:mcp_sdk` adapter):
 
 ```ruby
-gem 'mcp', '~> 0.4'
+gem 'mcp', '~> 0.7'
 ```
 
 Then run:

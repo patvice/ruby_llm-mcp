@@ -10,7 +10,7 @@ http_interactions:
         to create a greeting."}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:37:59 GMT
+      - Mon, 16 Feb 2026 17:28:10 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1639
+      - gfet4t7; dur=3510
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, here are a few French greetings for Alice, ranging from casual to more formal:\n\n*   **Bonjour Alice!** (Good day, Alice!) - This is a safe and standard greeting for any time of day.\n*   **Salut Alice!** (Hi, Alice!) - This is a more casual greeting, suitable for friends or people you know well.\n*   **Bonsoir Alice!** (Good evening, Alice!) - Use this in the evening or at night.\n*   **Bienvenue Alice!** (Welcome, Alice!) - If you are welcoming her somewhere.\n*   **Comment allez-vous Alice?** (How are you, Alice?) - More formal\n*   **Comment vas-tu Alice?** (How are you, Alice?) - More casual\n\nWhich one is most appropriate depends on your relationship with Alice and the time of day.\n"
+                    "text": "Okay, I need a little more information! To create the best greeting for Alice in French, I need to know:\n\n*   **What is the context?** (e.g., Is it a formal setting? Informal? Is this in an email, a letter, or face-to-face?)\n*   **What time of day is it?** (Morning, afternoon, or evening?)\n*   **What is your relationship to Alice?** (Do you know her well? Is she a new acquaintance? Is she a colleague?)\n\nOnce I have these details, I can tailor the greeting perfectly.\n\n**Here are some examples based on different scenarios:**\n\n*   **Formal, any time of day:** *Bonjour, Alice.* (Hello, Alice.)\n*   **Informal, any time of day:** *Salut, Alice !* (Hi, Alice!) or *Coucou, Alice !* (Hey, Alice!)\n*   **Formal, morning:** *Bonjour, Madame/Mademoiselle Alice.* (Good morning, Mrs./Miss Alice.)\n*   **Informal, morning:** *Bonjour, Alice !* (Good morning, Alice!)\n*   **Formal, afternoon/evening:** *Bonsoir, Madame/Mademoiselle Alice.* (Good evening, Mrs./Miss Alice.)\n*   **Informal, afternoon/evening:** *Bonsoir, Alice !* (Good evening, Alice!)\n*   **If you haven't seen her in a while (informal):** *Alice ! Comment vas-tu ?* (Alice! How are you?)\n*   **If you haven't seen her in a while (formal):** *Alice, comment allez-vous ?* (Alice, how are you?)\n\n**Please provide the context, time of day, and your relationship with Alice so I can create the most appropriate greeting!**\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.23703428415151742
+              "avgLogprobs": -0.24034685518298743
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 19,
-            "candidatesTokenCount": 182,
-            "totalTokenCount": 201,
+            "candidatesTokenCount": 393,
+            "totalTokenCount": 412,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 182
+                "tokenCount": 393
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "VncSaaPFFfPzjrEPr_PB6Qk"
+          "responseId": "plOTaeuFMcfL_uMPl5GLoQs"
         }
-  recorded_at: Mon, 10 Nov 2025 23:37:59 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:28:10 GMT
+recorded_with: VCR 6.4.0

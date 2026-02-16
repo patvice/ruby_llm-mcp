@@ -6,9 +6,13 @@ module RubyLLM::MCP::Adapters::MCPTransports
   class Stdio
     attr_reader :native_transport
 
-    def initialize(command:, args: [], env: {}, request_timeout: 10_000)
+    def initialize(command:, args: [], env: {}, request_timeout: 10_000, # rubocop:disable Metrics/ParameterLists
+                   protocol_version: RubyLLM::MCP.config.protocol_version, notification_callback: nil)
       # Create a minimal coordinator-like object for the native transport
-      @coordinator = CoordinatorStub.new
+      @coordinator = CoordinatorStub.new(
+        protocol_version: protocol_version,
+        notification_callback: notification_callback
+      )
 
       @native_transport = RubyLLM::MCP::Native::Transports::Stdio.new(
         command: command,

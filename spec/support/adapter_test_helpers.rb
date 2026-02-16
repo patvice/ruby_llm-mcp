@@ -49,6 +49,9 @@ module AdapterTestHelpers
                        end
 
     filtered_configs.each do |config|
+      # Skip if this is an MCP SDK client and the gem is not available
+      next if config[:adapter] == :mcp_sdk && !ClientRunner.mcp_sdk_available?
+
       context "with #{config[:name]}" do
         let(:client) { ClientRunner.fetch_client(config[:name]) }
 

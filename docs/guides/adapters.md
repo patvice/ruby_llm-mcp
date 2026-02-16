@@ -28,7 +28,7 @@ RubyLLM MCP provides two key architectural components:
 
 **Adapters** - Choose which SDK implementation powers your MCP clients:
 - Use the native `:ruby_llm` adapter for full MCP feature support built inside the gem
-- Use the official `:mcp_sdk` adapter maintained by Anthropic (requires Ruby 3.2+)
+- Use the official `:mcp_sdk` adapter maintained by Anthropic (requires Ruby 3.1+)
 - Mix both adapters in the same application for different servers
 
 **Transports** - Handle the communication layer between your Ruby client and MCP servers:
@@ -57,14 +57,14 @@ The default, full-featured adapter that implements the complete MCP protocol wit
 Wraps the official MCP SDK maintained by Anthropic.
 
 {: .important }
-> **Ruby 3.2+ Required**
-> The official `mcp` gem requires Ruby 3.2 or higher. If you're using an older Ruby version, use the `:ruby_llm` adapter instead.
+> **Ruby 3.1+ Required**
+> The official `mcp` gem requires Ruby 2.7+, and RubyLLM MCP requires Ruby 3.1.3+. If you're using an older Ruby version, use the `:ruby_llm` adapter instead.
 
 **Key Features:**
 - ✅ Official Anthropic-maintained implementation
-- ✅ Core MCP features (tools, resources, prompts)
+- ✅ Core MCP features (tools, resources, prompts, resource templates, logging)
 - ✅ Basic transports (stdio, HTTP) with custom wrapper support
-- ⚠️ No custom transport registration - requires Ruby 3.2+
+- ⚠️ No custom transport registration - requires Ruby 3.1+
 
 **Best for:** Reference implementation compatibility and core MCP features only.
 
@@ -75,15 +75,15 @@ Wraps the official MCP SDK maintained by Anthropic.
 | **Core Features** |
 | Tools (list/call) | ✅ | ✅ |
 | Resources (list/read) | ✅ | ✅ |
-| Prompts (list/get) | ✅ | ❌ |
-| Resource Templates | ✅ | ❌ |
+| Prompts (list/get) | ✅ | ✅ |
+| Resource Templates | ✅ | ✅ |
 | **Transports** |
 | stdio | ✅ | ✅ |
 | HTTP/Streamable | ✅ | ✅ |
 | SSE | ✅ | ✅ |
 | **Advanced Features** |
 | Completions | ✅ | ❌ |
-| Logging | ✅ | ❌ |
+| Logging | ✅ | ✅ |
 | Sampling | ✅ | ❌ |
 | Roots | ✅ | ❌ |
 | Notifications | ✅ | ❌ |
@@ -280,14 +280,14 @@ mcp_servers:
 ### Installation
 
 {: .warning }
-> **Ruby 3.2+ Required**
-> The official `mcp` gem requires Ruby 3.2 or higher. Ensure your Ruby version is compatible before proceeding.
+> **Ruby 3.1+ Required**
+> The official `mcp` gem supports Ruby 2.7+, and RubyLLM MCP supports Ruby 3.1.3+.
 
 The official MCP SDK is an optional dependency. Add it to your Gemfile when using the `:mcp_sdk` adapter:
 
 ```ruby
 gem 'ruby_llm-mcp', '~> 1.0'
-gem 'mcp', '~> 0.4'  # Required for mcp_sdk adapter (Ruby 3.2+)
+gem 'mcp', '~> 0.7'  # Required for mcp_sdk adapter
 ```
 
 Then run:
@@ -496,8 +496,8 @@ client = RubyLLM::MCP.client(
 1. **Start with `:ruby_llm`** if you're unsure - it supports all features
 2. **Use `:mcp_sdk`** when you specifically need the official implementation
 3. **Check feature requirements** before choosing an adapter
-4. **Consider transport needs** - SSE requires `:ruby_llm`
-5. **Check Ruby version** - `:mcp_sdk` requires Ruby 3.2+
+4. **Consider transport and feature needs** - advanced client features still require `:ruby_llm`
+5. **Check Ruby version** - `:mcp_sdk` requires Ruby 3.1+
 
 ### Upgrading from 1.0
 
@@ -523,16 +523,16 @@ If you see errors about unsupported features:
 If you see transport errors:
 
 1. Verify the transport is compatible with your adapter
-2. SSE only works with `:ruby_llm`
-3. Use `:stdio` or `:http` for maximum compatibility
+2. Prefer `:stdio` or `:streamable` for maximum compatibility
+3. Use `:http` for simple JSON request/response servers
 
 ### Missing MCP gem
 
 If you see "LoadError: cannot load such file -- mcp":
 
-1. Add `gem 'mcp', '~> 0.4'` to your Gemfile
+1. Add `gem 'mcp', '~> 0.7'` to your Gemfile
 2. Run `bundle install`
-3. Ensure you're running Ruby 3.2 or higher
+3. Ensure you're running Ruby 3.1 or higher
 4. This is only needed when using `adapter: :mcp_sdk`
 
 ### Ruby Version Compatibility
@@ -540,7 +540,7 @@ If you see "LoadError: cannot load such file -- mcp":
 If you encounter issues with the `:mcp_sdk` adapter:
 
 1. Check your Ruby version: `ruby -v`
-2. The `mcp` gem requires Ruby 3.2 or higher
+2. The `mcp` gem requires Ruby 2.7 or higher (RubyLLM MCP requires 3.1.3+)
 3. Switch to `:ruby_llm` adapter if you're on an older Ruby version
 4. Consider upgrading Ruby if you need the official SDK
 
