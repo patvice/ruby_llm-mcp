@@ -137,8 +137,8 @@ RSpec.describe RubyLLM::MCP::Sample do
         tool.execute
       rescue RubyLLM::MCP::Errors::TransportError => e
         retriable_streamable_init_race = RUBY_ENGINE == "jruby" &&
-          config[:name] == "streamable-native" &&
-          e.message.include?("Server not initialized")
+                                         config[:name] == "streamable-native" &&
+                                         e.message.include?("Server not initialized")
         raise unless retriable_streamable_init_race
 
         sleep 0.2
