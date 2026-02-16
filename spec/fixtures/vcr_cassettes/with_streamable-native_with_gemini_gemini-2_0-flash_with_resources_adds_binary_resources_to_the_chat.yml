@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:33:06 GMT
+      - Mon, 16 Feb 2026 17:23:17 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=3043
+      - gfet4t7; dur=2440
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have access to a vast amount of information. Here's a breakdown of what I can do:\n\n*   **Vast Knowledge Base:** I've been trained on a massive dataset of text and code, which allows me to answer questions, generate different creative text formats (like poems, code, scripts, musical pieces, email, letters, etc.), translate languages, write different kinds of creative content, and answer your questions in an informative way.\n*   **Image Understanding:** As demonstrated by my response to the image you provided, I can analyze and understand the content of images.\n*   **Real-time Information (with limitations):** I can access real-time information, such as current events or stock prices, but my knowledge of events after my last training cut-off is limited. I also don't have perfect access to all information available on the internet.\n*   **Code Execution:** I can execute code in various programming languages, which is useful for performing calculations, data analysis, and more.\n*   **No Personal Experiences:** I don't have personal experiences, emotions, or opinions. My responses are based on the data I've been trained on.\n*   **No Memory:** I don't remember previous conversations unless they are explicitly stored or referenced within the current interaction.\n\nIn essence, I am a powerful tool for accessing and processing information, generating content, and assisting with a wide range of tasks. However, it's important to remember that I am an AI and my abilities are limited by my training data and programming."
+                    "text": "As a large language model, I have access to a vast amount of information in the form of text and code. This includes:\n\n*   **A massive dataset of text and code:** This is the foundation of my knowledge and allows me to understand and generate human-like text.\n*   **The ability to access and process information from the real world through Google Search:** This allows me to answer questions based on current events, facts, and other information available on the internet.\n\nHowever, I do *not* have access to:\n\n*   **Personal information:** I cannot access your private data, files, or browsing history.\n*   **Real-time sensor data:** I do not have access to real-time information from sensors (like cameras, microphones, or GPS).\n*   **External systems or APIs unless specifically enabled:** I cannot directly interact with external systems or APIs unless my programming allows it.\n\nIn the context of the image you provided, I can use my knowledge to identify that it's a picture of a dog, as well as make inferences about its breed, age, and behavior based on the visual cues in the image and my training data."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.33153586224232134
+              "avgLogprobs": -0.38056770960489911
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 275,
-            "candidatesTokenCount": 321,
-            "totalTokenCount": 596,
+            "candidatesTokenCount": 240,
+            "totalTokenCount": 515,
             "promptTokensDetails": [
               {
                 "modality": "IMAGE",
@@ -81,12 +81,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 321
+                "tokenCount": 240
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "L3YSad32MIST_uMP-oqamAY"
+          "responseId": "glKTaazuMLKc-8YPg8jTAQ"
         }
-  recorded_at: Mon, 10 Nov 2025 23:33:06 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:23:17 GMT
+recorded_with: VCR 6.4.0

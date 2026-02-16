@@ -32,15 +32,15 @@ RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/
   let(:client) { MCPSdkStdioRunner.instance.client }
 
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    if RUBY_VERSION < "3.2.0"
-      skip "Specs require Ruby 3.2+"
+    if RUBY_VERSION < "3.1.0" || !ClientRunner.mcp_sdk_available?
+      skip "Specs require Ruby 3.1+ with the mcp gem available"
     else
       MCPSdkStdioRunner.instance.start
     end
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    if RUBY_VERSION >= "3.2.0"
+    if RUBY_VERSION >= "3.1.0" && ClientRunner.mcp_sdk_available?
       MCPSdkStdioRunner.instance.stop
     end
   end
@@ -76,6 +76,51 @@ RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/
       content = resource.content
       expect(content).not_to be_nil
       expect(content).to be_a(String)
+    end
+  end
+
+  describe "prompts" do
+    it "can list prompts over stdio" do
+      prompts = client.prompts
+      expect(prompts.count).to be > 0
+      expect(prompts.first).to be_a(RubyLLM::MCP::Prompt)
+    end
+
+    it "can execute a prompt over stdio" do
+      prompt = client.prompt("say_hello")
+      messages = prompt.fetch
+
+      expect(messages).not_to be_empty
+      expect(messages.first).to be_a(RubyLLM::Message)
+      expect(messages.first.content).to include("Hello")
+    end
+  end
+
+  describe "resource templates" do
+    it "can list resource templates over stdio" do
+      templates = client.resource_templates
+
+      expect(templates.count).to be > 0
+      expect(templates.first).to be_a(RubyLLM::MCP::ResourceTemplate)
+    end
+  end
+
+  describe "logging" do
+    it "can set log level and receive logging notifications over stdio" do
+      received_notification = nil
+      client.on_logging(level: RubyLLM::MCP::Logging::DEBUG) do |notification|
+        received_notification = notification
+      end
+
+      client.tool("log_message").execute(message: "stdio sdk log", level: "debug", logger: "sdk-stdio")
+
+      Timeout.timeout(3) do
+        sleep 0.05 until received_notification
+      end
+
+      expect(received_notification.params["level"]).to eq("debug")
+      expect(received_notification.params["logger"]).to eq("sdk-stdio")
+      expect(received_notification.params.dig("data", "message")).to eq("stdio sdk log")
     end
   end
 

@@ -1,0 +1,54 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you create a greeting
+        for Alice in French?"}]},{"role":"user","parts":[{"text":"Please use the prompt
+        to create a greeting."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 16 Feb 2026 17:30:31 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=3701
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJjYW5kaWRhdGVzIjogWwogICAgewogICAgICAiY29udGVudCI6IHsKICAgICAgICAicGFydHMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJ0ZXh0IjogIk9rYXksIHRvIGdpdmUgeW91IHRoZSBiZXN0IGdyZWV0aW5nIGZvciBBbGljZSBpbiBGcmVuY2gsIEkgbmVlZCBhIGxpdHRsZSBtb3JlIGNvbnRleHQuICBQbGVhc2UgdGVsbCBtZTpcblxuKiAgICoqV2hhdCBpcyB0aGUgc2l0dWF0aW9uPyoqIElzIGl0IGZvcm1hbCBvciBpbmZvcm1hbD9cbiogICAqKldoYXQgdGltZSBvZiBkYXkgaXMgaXQ/KiogKE1vcm5pbmcsIGFmdGVybm9vbiwgZXZlbmluZz8pXG4qICAgKipJcyB0aGVyZSBhbnl0aGluZyBlbHNlIHNwZWNpYWwgeW91IHdhbnQgdG8gaW5jbHVkZT8qKiAoZS5nLiwgXCJXZWxjb21lLFwiIFwiSXQncyBuaWNlIHRvIHNlZSB5b3UsXCIgZXRjLilcblxuSGVyZSBhcmUgc29tZSBleGFtcGxlIGdyZWV0aW5ncyBiYXNlZCBvbiB0aGUgY29tbW9uIHNjZW5hcmlvc1xuXG4qKkluZm9ybWFsLCBhbnkgdGltZSBvZiBkYXk6KipcblxuKiAgICoqU2FsdXQgQWxpY2UgISoqIChIaSBBbGljZSEpXG4qICAgKipDb3Vjb3UgQWxpY2UgISoqIChIZXkgQWxpY2UhKVxuKiAgICoqQWxpY2UgISoqIChKdXN0IGhlciBuYW1lLCBsaWtlIFwiQWxpY2UhXCIpXG5cbioqRm9ybWFsLCBhbnkgdGltZSBvZiBkYXk6KipcblxuKiAgICoqQm9uam91ciBBbGljZS4qKiAoSGVsbG8gQWxpY2UuKVxuXG4qKkRlcGVuZGluZyBvbiB0aGUgdGltZSBvZiBkYXk6KipcblxuKiAgICoqQm9uam91ciBBbGljZS4qKiAoR29vZCBtb3JuaW5nL0dvb2QgZGF5IEFsaWNlLCAqZ2VuZXJhbGx5IHVzZWQgdW50aWwgbHVuY2h0aW1lKilcbiogICAqKkJvbiBhcHLDqHMtbWlkaSBBbGljZS4qKiAoR29vZCBhZnRlcm5vb24gQWxpY2UsICp1c2VkIGZyb20gbHVuY2h0aW1lIHRvIGVhcmx5IGV2ZW5pbmcqKVxuKiAgICoqQm9uc29pciBBbGljZS4qKiAoR29vZCBldmVuaW5nIEFsaWNlLCAqdXNlZCBmcm9tIGVhcmx5IGV2ZW5pbmcgb253YXJkcyopXG5cbioqSW5jbHVkaW5nIFwiV2VsY29tZVwiOioqXG5cbiogICAqKkJpZW52ZW51ZSBBbGljZSAhKiogKFdlbGNvbWUgQWxpY2UhKVxuKiAgICoqQm9uam91ciBBbGljZSwgYmllbnZlbnVlICEqKiAoSGVsbG8gQWxpY2UsIHdlbGNvbWUhKVxuXG4qKkluY2x1ZGluZyBcIkl0J3MgbmljZSB0byBzZWUgeW91L21lZXQgeW91XCI6KipcblxuKiAgICoqKEVuY2hhbnTDqShlKSBBbGljZSAhKiogKFBsZWFzZWQgdG8gbWVldCB5b3UgQWxpY2UhIC0gVXNlIFwiZW5jaGFudMOpXCIgaWYgeW91IGFyZSBtYWxlLCBcImVuY2hhbnTDqWVcIiBpZiB5b3UgYXJlIGZlbWFsZS4pXG4qICAgKipSYXZpKGUpIGRlIHZvdXMgdm9pciwgQWxpY2UgISoqIChHbGFkIHRvIHNlZSB5b3UsIEFsaWNlISAtIFVzZSBcInJhdmlcIiBpZiB5b3UgYXJlIG1hbGUsIFwicmF2aWVcIiBpZiB5b3UgYXJlIGZlbWFsZS4gTW9yZSBmb3JtYWwuKVxuKiAgICoqQ29udGVudChlKSBkZSB2b3VzIHZvaXIsIEFsaWNlICEqKiAoSGFwcHkgdG8gc2VlIHlvdSwgQWxpY2UhIC0gVXNlIFwiY29udGVudFwiIGlmIHlvdSBhcmUgbWFsZSwgXCJjb250ZW50ZVwiIGlmIHlvdSBhcmUgZmVtYWxlLiBNb3JlIGZvcm1hbC4pXG5cblRoZSBtb3JlIGluZm9ybWF0aW9uIHlvdSBnaXZlIG1lLCB0aGUgYmV0dGVyIEkgY2FuIHRhaWxvciB0aGUgZ3JlZXRpbmchXG4iCiAgICAgICAgICB9CiAgICAgICAgXSwKICAgICAgICAicm9sZSI6ICJtb2RlbCIKICAgICAgfSwKICAgICAgImZpbmlzaFJlYXNvbiI6ICJTVE9QIiwKICAgICAgImF2Z0xvZ3Byb2JzIjogLTAuMjU3NTA4NzU4OTUwMDIyNDUKICAgIH0KICBdLAogICJ1c2FnZU1ldGFkYXRhIjogewogICAgInByb21wdFRva2VuQ291bnQiOiAxOSwKICAgICJjYW5kaWRhdGVzVG9rZW5Db3VudCI6IDQ1MiwKICAgICJ0b3RhbFRva2VuQ291bnQiOiA0NzEsCiAgICAicHJvbXB0VG9rZW5zRGV0YWlscyI6IFsKICAgICAgewogICAgICAgICJtb2RhbGl0eSI6ICJURVhUIiwKICAgICAgICAidG9rZW5Db3VudCI6IDE5CiAgICAgIH0KICAgIF0sCiAgICAiY2FuZGlkYXRlc1Rva2Vuc0RldGFpbHMiOiBbCiAgICAgIHsKICAgICAgICAibW9kYWxpdHkiOiAiVEVYVCIsCiAgICAgICAgInRva2VuQ291bnQiOiA0NTIKICAgICAgfQogICAgXQogIH0sCiAgIm1vZGVsVmVyc2lvbiI6ICJnZW1pbmktMi4wLWZsYXNoIiwKICAicmVzcG9uc2VJZCI6ICJNMVNUYVpyOEticXZfdU1QNDYzNHNBcyIKfQo=
+  recorded_at: Mon, 16 Feb 2026 17:30:31 GMT
+recorded_with: VCR 6.4.0

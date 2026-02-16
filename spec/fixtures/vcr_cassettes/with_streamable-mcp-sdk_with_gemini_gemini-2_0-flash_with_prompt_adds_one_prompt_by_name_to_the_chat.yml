@@ -1,0 +1,89 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]},{"role":"user","parts":[{"text":"Please provide the content
+        from the prompt."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 16 Feb 2026 17:29:40 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2817
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "Here is a poem about the current day:\n\nThe dawn unfurls, a painter's gentle hand,\nAcross the canvas of the sleeping land.\nA blush of rose, then gold, a fiery grace,\nKisses the dew upon each waking face\nOf flower and leaf, and bird in hurried flight,\nA symphony of sound, a morning light.\n\nThe sun climbs high, a promise in its gleam,\nTo chase away the lingering night's dim dream.\nThe world unfolds, its myriad tasks begun,\nBeneath a sky where cotton clouds now run.\nA busy hum, a whisper in the breeze,\nCarried on the rustling of the trees.\n\nThis day, a gift, a moment to embrace,\nTo find the beauty in this very place.\nTo breathe the air, and feel the sun's warm kiss,\nAnd cherish all the fragile joys of this.\nA canvas waiting, blank and clean and bright,\nTo fill with color, darkness, and with light.\n\nAnd if tonight, I try to capture how\nThis day has felt, upon my heart and brow,\nI'll weave a string of words, a whispered plea,\nTo hold this moment close, eternally.\nPerhaps this *poem* is all I have to give,\nTo show the preciousness of how we live.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.66993109497501657
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 33,
+            "candidatesTokenCount": 283,
+            "totalTokenCount": 316,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 33
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 283
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "AVSTaabaKbG8_uMPvZzigQs"
+        }
+  recorded_at: Mon, 16 Feb 2026 17:29:40 GMT
+recorded_with: VCR 6.4.0

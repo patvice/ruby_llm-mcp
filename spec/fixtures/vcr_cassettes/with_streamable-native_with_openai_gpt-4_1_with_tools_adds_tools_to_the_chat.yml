@@ -8,13 +8,13 @@ http_interactions:
       string: "{\"model\":\"gpt-4.1\",\"messages\":[{\"role\":\"user\",\"content\":\"Can
         you add 1 and 2?\"}],\"stream\":false,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"add\",\"description\":\"Addes
         two numbers together\",\"parameters\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[\"a\",\"b\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"return_set_evn\",\"description\":\"Returns
-        the set environment variable\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"malformed_tool\",\"description\":\"A
+        the set environment variable\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"malformed_tool\",\"description\":\"A
         malformed tool\",\"parameters\":{\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"tool_error\",\"description\":\"Returns
         an error\",\"parameters\":{\"type\":\"object\",\"properties\":{\"shouldError\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"timeout_tool\",\"description\":\"Sleeps
         for a given number of seconds\",\"parameters\":{\"type\":\"object\",\"properties\":{\"seconds\":{\"type\":\"number\"}},\"required\":[\"seconds\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"fetch_site\",\"description\":\"Fetches
         website content and returns it as text\",\"parameters\":{\"type\":\"object\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\"},\"headers\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"value\":{\"type\":\"string\"}},\"required\":[\"name\",\"value\"],\"additionalProperties\":false}}},\"required\":[\"url\",\"headers\"],\"additionalProperties\":false}]}},\"required\":[\"website\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
-        the jackhammer audio file as a base64-encoded WAV\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_dog_image\",\"description\":\"Returns
-        the dog image as a base64-encoded PNG\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_file_resource\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"get_file_resource\",\"description\":\"Returns
         a file resource reference\",\"parameters\":{\"type\":\"object\",\"properties\":{\"filename\":{\"type\":\"string\",\"default\":\"example.txt\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"list_messages\",\"description\":\"\",\"parameters\":{\"type\":\"object\",\"properties\":{\"channel\":{\"type\":\"string\"}},\"required\":[\"channel\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
         authentication permissions\",\"parameters\":{\"type\":\"object\",\"properties\":{\"permission\":{\"type\":\"string\",\"enum\":[\"read\",\"write\"]}},\"required\":[\"permission\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_weather_from_locations\",\"description\":\"Get
         the weather from a list of locations\",\"parameters\":{\"type\":\"object\",\"properties\":{\"locations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[\"locations\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
@@ -24,12 +24,13 @@ http_interactions:
         of steps (default: 3)\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"simple_progress\",\"description\":\"Send
         a single progress notification\",\"parameters\":{\"type\":\"object\",\"properties\":{\"progress\":{\"type\":\"number\",\"minimum\":0,\"maximum\":100}},\"required\":[\"progress\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"log_message\",\"description\":\"Logs
         a message\",\"parameters\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"level\":{\"type\":\"string\"},\"logger\":{\"type\":\"string\"}},\"required\":[\"message\",\"level\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
-        a resource\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"send_list_changed\",\"description\":\"List
+        a resource\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"send_list_changed\",\"description\":\"List
         changed\",\"parameters\":{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\",\"enum\":[\"tools\",\"resources\",\"prompts\"]}},\"required\":[\"type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"client-capabilities\",\"description\":\"Get
-        the capabilities of the client and return them back\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"ping_client\",\"description\":\"Sends
-        a ping to the client to test connectivity\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"roots-test\",\"description\":\"Test
-        the roots list for a client\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"sampling-test\",\"description\":\"Test
-        the sampling tool\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        the capabilities of the client and return them back\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"sample_with_cancellation\",\"description\":\"Test
+        cancellation by initiating a slow sampling request that can be cancelled\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
         data and returns structured results\",\"parameters\":{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"summary\",\"detailed\"]}},\"required\":[\"data\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"invalid_structured_output\",\"description\":\"Tool
         that returns invalid structured data\",\"parameters\":{\"type\":\"object\",\"properties\":{\"trigger_error\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"create_report\",\"description\":\"Creates
         a report and returns it as a resource\",\"parameters\":{\"type\":\"object\",\"properties\":{\"title\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"text\",\"json\"]}},\"required\":[\"title\",\"content\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"user_preference_collector\",\"description\":\"Collects
@@ -47,7 +48,7 @@ http_interactions:
         message for elicitation\"}},\"required\":[\"message\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}}]}"
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -62,7 +63,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:33:12 GMT
+      - Mon, 16 Feb 2026 17:23:23 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -74,13 +75,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '483'
+      - '975'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '497'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -101,13 +102,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -116,9 +114,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVfjzNNMLV8BnXBJgKp0KyQuthDv",
+          "id": "chatcmpl-D9wbazhZnsOpALJ9E7btCCMjdjNd1",
           "object": "chat.completion",
-          "created": 1762817591,
+          "created": 1771262602,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -128,7 +126,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_h9IwNzFk5hRisT99Di21dMBy",
+                    "id": "call_T1BXrovPmx6KZX5lNuFRF3AN",
                     "type": "function",
                     "function": {
                       "name": "add",
@@ -144,9 +142,9 @@ http_interactions:
             }
           ],
           "usage": {
-            "prompt_tokens": 935,
+            "prompt_tokens": 958,
             "completion_tokens": 17,
-            "total_tokens": 952,
+            "total_tokens": 975,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -159,24 +157,24 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:33:12 GMT
+  recorded_at: Mon, 16 Feb 2026 17:23:23 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: "{\"model\":\"gpt-4.1\",\"messages\":[{\"role\":\"user\",\"content\":\"Can
-        you add 1 and 2?\"},{\"role\":\"assistant\",\"tool_calls\":[{\"id\":\"call_h9IwNzFk5hRisT99Di21dMBy\",\"type\":\"function\",\"function\":{\"name\":\"add\",\"arguments\":\"{\\\"a\\\":1,\\\"b\\\":2}\"}}]},{\"role\":\"tool\",\"content\":\"3\",\"tool_call_id\":\"call_h9IwNzFk5hRisT99Di21dMBy\"}],\"stream\":false,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"add\",\"description\":\"Addes
+        you add 1 and 2?\"},{\"role\":\"assistant\",\"tool_calls\":[{\"id\":\"call_T1BXrovPmx6KZX5lNuFRF3AN\",\"type\":\"function\",\"function\":{\"name\":\"add\",\"arguments\":\"{\\\"a\\\":1,\\\"b\\\":2}\"}}]},{\"role\":\"tool\",\"content\":\"3\",\"tool_call_id\":\"call_T1BXrovPmx6KZX5lNuFRF3AN\"}],\"stream\":false,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"add\",\"description\":\"Addes
         two numbers together\",\"parameters\":{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\"},\"b\":{\"type\":\"number\"}},\"required\":[\"a\",\"b\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"return_set_evn\",\"description\":\"Returns
-        the set environment variable\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"malformed_tool\",\"description\":\"A
+        the set environment variable\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"malformed_tool\",\"description\":\"A
         malformed tool\",\"parameters\":{\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"tool_error\",\"description\":\"Returns
         an error\",\"parameters\":{\"type\":\"object\",\"properties\":{\"shouldError\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"timeout_tool\",\"description\":\"Sleeps
         for a given number of seconds\",\"parameters\":{\"type\":\"object\",\"properties\":{\"seconds\":{\"type\":\"number\"}},\"required\":[\"seconds\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"fetch_site\",\"description\":\"Fetches
         website content and returns it as text\",\"parameters\":{\"type\":\"object\",\"properties\":{\"website\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\"},\"headers\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\"},\"value\":{\"type\":\"string\"}},\"required\":[\"name\",\"value\"],\"additionalProperties\":false}}},\"required\":[\"url\",\"headers\"],\"additionalProperties\":false}]}},\"required\":[\"website\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_jackhammer_audio\",\"description\":\"Returns
-        the jackhammer audio file as a base64-encoded WAV\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_dog_image\",\"description\":\"Returns
-        the dog image as a base64-encoded PNG\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_file_resource\",\"description\":\"Returns
+        the jackhammer audio file as a base64-encoded WAV\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"get_dog_image\",\"description\":\"Returns
+        the dog image as a base64-encoded PNG\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"get_file_resource\",\"description\":\"Returns
         a file resource reference\",\"parameters\":{\"type\":\"object\",\"properties\":{\"filename\":{\"type\":\"string\",\"default\":\"example.txt\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"list_messages\",\"description\":\"\",\"parameters\":{\"type\":\"object\",\"properties\":{\"channel\":{\"type\":\"string\"}},\"required\":[\"channel\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"upgrade_auth\",\"description\":\"Upgrade
         authentication permissions\",\"parameters\":{\"type\":\"object\",\"properties\":{\"permission\":{\"type\":\"string\",\"enum\":[\"read\",\"write\"]}},\"required\":[\"permission\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_weather_from_locations\",\"description\":\"Get
         the weather from a list of locations\",\"parameters\":{\"type\":\"object\",\"properties\":{\"locations\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[\"locations\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"get_weather_from_geocode\",\"description\":\"Get
@@ -186,12 +184,13 @@ http_interactions:
         of steps (default: 3)\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"simple_progress\",\"description\":\"Send
         a single progress notification\",\"parameters\":{\"type\":\"object\",\"properties\":{\"progress\":{\"type\":\"number\",\"minimum\":0,\"maximum\":100}},\"required\":[\"progress\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"log_message\",\"description\":\"Logs
         a message\",\"parameters\":{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"},\"level\":{\"type\":\"string\"},\"logger\":{\"type\":\"string\"}},\"required\":[\"message\",\"level\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"changes_plain_text_resource\",\"description\":\"Reference
-        a resource\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"send_list_changed\",\"description\":\"List
+        a resource\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"send_list_changed\",\"description\":\"List
         changed\",\"parameters\":{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\",\"enum\":[\"tools\",\"resources\",\"prompts\"]}},\"required\":[\"type\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"client-capabilities\",\"description\":\"Get
-        the capabilities of the client and return them back\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"ping_client\",\"description\":\"Sends
-        a ping to the client to test connectivity\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"roots-test\",\"description\":\"Test
-        the roots list for a client\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"sampling-test\",\"description\":\"Test
-        the sampling tool\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
+        the capabilities of the client and return them back\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"ping_client\",\"description\":\"Sends
+        a ping to the client to test connectivity\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"roots-test\",\"description\":\"Test
+        the roots list for a client\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"sampling-test\",\"description\":\"Test
+        the sampling tool\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"sample_with_cancellation\",\"description\":\"Test
+        cancellation by initiating a slow sampling request that can be cancelled\",\"parameters\":{\"$schema\":\"http://json-schema.org/draft-07/schema#\",\"type\":\"object\",\"properties\":{}}}},{\"type\":\"function\",\"function\":{\"name\":\"structured_data_analyzer\",\"description\":\"Analyzes
         data and returns structured results\",\"parameters\":{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"summary\",\"detailed\"]}},\"required\":[\"data\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"invalid_structured_output\",\"description\":\"Tool
         that returns invalid structured data\",\"parameters\":{\"type\":\"object\",\"properties\":{\"trigger_error\":{\"type\":\"boolean\"}},\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"create_report\",\"description\":\"Creates
         a report and returns it as a resource\",\"parameters\":{\"type\":\"object\",\"properties\":{\"title\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"},\"format\":{\"type\":\"string\",\"enum\":[\"text\",\"json\"]}},\"required\":[\"title\",\"content\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}},{\"type\":\"function\",\"function\":{\"name\":\"user_preference_collector\",\"description\":\"Collects
@@ -209,7 +208,7 @@ http_interactions:
         message for elicitation\"}},\"required\":[\"message\"],\"additionalProperties\":false,\"$schema\":\"http://json-schema.org/draft-07/schema#\"}}}]}"
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -224,7 +223,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:33:12 GMT
+      - Mon, 16 Feb 2026 17:23:24 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -236,13 +235,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '452'
+      - '1453'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '466'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -263,13 +262,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -278,16 +274,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVfkokdHlNDHkgJoNujXvIYbnwSE",
+          "id": "chatcmpl-D9wbb5kf8Lf6qqmOg0kXug8yxYda7",
           "object": "chat.completion",
-          "created": 1762817592,
+          "created": 1771262603,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "1 + 2 = 3.",
+                "content": "1 plus 2 equals 3.",
                 "refusal": null,
                 "annotations": []
               },
@@ -296,9 +292,9 @@ http_interactions:
             }
           ],
           "usage": {
-            "prompt_tokens": 960,
+            "prompt_tokens": 983,
             "completion_tokens": 9,
-            "total_tokens": 969,
+            "total_tokens": 992,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -311,7 +307,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:33:12 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:23:24 GMT
+recorded_with: VCR 6.4.0

@@ -10,7 +10,7 @@ http_interactions:
         image do you have?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:33:09 GMT
+      - Mon, 16 Feb 2026 17:23:20 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=941
+      - gfet4t7; dur=1031
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have an image of a light-colored dog, possibly a golden retriever puppy, yawning. It is standing on a white background.\n"
+                    "text": "Based on the information you provided, I have an image of a light-colored, perhaps golden retriever, puppy. It appears to be yawning.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.23003504957471574
+              "avgLogprobs": -0.59796225229899092
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 273,
-            "candidatesTokenCount": 28,
-            "totalTokenCount": 301,
+            "candidatesTokenCount": 30,
+            "totalTokenCount": 303,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -81,12 +81,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 28
+                "tokenCount": 30
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "NXYSac_BBrm-_uMPjczS8AY"
+          "responseId": "h1KTaeqpIpXa-8YP5a6p8Aw"
         }
-  recorded_at: Mon, 10 Nov 2025 23:33:09 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:23:20 GMT
+recorded_with: VCR 6.4.0

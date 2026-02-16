@@ -44,5 +44,5 @@ Gem::Specification.new do |spec|
 
   # Optional dependency for mcp_sdk adapter
   # Users who want to use adapter: :mcp_sdk should add to their Gemfile:
-  #   gem 'mcp', '~> 0.4'
+  #   gem 'mcp', '~> 0.7'
 end

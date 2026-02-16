@@ -10,8 +10,7 @@ module RubyLLM
     module Adapters
       class MCPSdkAdapter < BaseAdapter
         # Only declare features the official MCP SDK supports
-        # Note: The MCP gem (as of v0.4) does NOT support prompts or resource templates
-        supports :tools, :resources
+        supports :tools, :resources, :prompts, :resource_templates, :logging
 
         # Supported transports:
         # - stdio: Via custom wrapper using native stdio transport ✓ FULLY TESTED
@@ -19,7 +18,7 @@ module RubyLLM
         # - http: Via MCP::Client::HTTP (for simple JSON-only HTTP servers)
         supports_transport :stdio, :http, :sse, :streamable, :streamable_http
 
-        attr_reader :transport_type, :config
+        attr_reader :transport_type, :config, :mcp_client
 
         def initialize(client, transport_type:, config: {})
           validate_transport!(transport_type)
@@ -27,6 +26,7 @@ module RubyLLM
           super
 
           @mcp_client = nil
+          @notification_handler = NotificationHandler.new(client)
         end
 
         def start
@@ -36,6 +36,7 @@ module RubyLLM
           transport.start if transport.respond_to?(:start)
 
           @mcp_client = ::MCP::Client.new(transport: transport)
+          set_logging(level: client.on_logging_level) if client.logging_handler_enabled?
         end
 
         def stop
@@ -61,11 +62,12 @@ module RubyLLM
 
         def capabilities
           # Return minimal capabilities for official SDK
-          # Note: Prompts are not supported by the MCP gem
-          ServerCapabilities.new({
-                                   "tools" => {},
-                                   "resources" => {}
-                                 })
+          @capabilities ||= ServerCapabilities.new(
+            "tools" => {},
+            "resources" => {},
+            "prompts" => {},
+            "logging" => {}
+          )
         end
 
         def client_capabilities
@@ -102,15 +104,42 @@ module RubyLLM
         end
 
         def prompt_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
-          []
+          ensure_started
+          @mcp_client.prompts.map { |prompt| transform_prompt(prompt) }
         end
 
         def execute_prompt(name:, arguments:)
-          raise NotImplementedError, "Prompts are not supported by the MCP SDK (gem 'mcp')"
+          ensure_started
+          response = @mcp_client.transport.send_request(
+            request: {
+              jsonrpc: "2.0",
+              id: SecureRandom.uuid,
+              method: "prompts/get",
+              params: {
+                name: name,
+                arguments: arguments
+              }
+            }
+          )
+
+          transform_prompt_result(response)
         end
 
         def resource_template_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
-          []
+          ensure_started
+          @mcp_client.resource_templates.map { |resource_template| transform_resource_template(resource_template) }
+        end
+
+        def set_logging(level:)
+          ensure_started
+          @mcp_client.transport.send_request(
+            request: {
+              jsonrpc: "2.0",
+              id: SecureRandom.uuid,
+              method: "logging/setLevel",
+              params: { level: level }
+            }
+          )
         end
 
         def cancelled_notification(reason:, request_id:)
@@ -129,7 +158,6 @@ module RubyLLM
         # These methods remain as NotImplementedError from base class:
         # - completion_resource
         # - completion_prompt
-        # - set_logging
         # - resources_subscribe
         # - initialize_notification
         # - roots_list_change_notification
@@ -148,9 +176,9 @@ module RubyLLM
 
         def require_mcp_gem!
           require "mcp"
-          if ::MCP::VERSION < "0.4"
+          if Gem::Version.new(::MCP::VERSION) < Gem::Version.new("0.7.0")
             raise Errors::AdapterConfigurationError.new(message: <<~MSG)
-              The official MCP SDK version 0.4 or higher is required to use the :mcp_sdk adapter.
+              The official MCP SDK version 0.7 or higher is required to use the :mcp_sdk adapter.
             MSG
           end
         rescue LoadError
@@ -158,13 +186,18 @@ module RubyLLM
             The official MCP SDK is required to use the :mcp_sdk adapter.
 
             Add to your Gemfile:
-              gem 'mcp', '~> 0.4'
+              gem 'mcp', '~> 0.7'
 
             Then run: bundle install
           MSG
         end
 
-        def build_transport
+        def build_transport # rubocop:disable Metrics/MethodLength
+          protocol_version = @config[:protocol_version] || RubyLLM::MCP.config.protocol_version
+          notification_callback = lambda do |notification|
+            @notification_handler.execute(notification)
+          end
+
           case @transport_type
           when :http
             # MCP::Client::HTTP is for simple JSON-only HTTP servers
@@ -178,14 +211,18 @@ module RubyLLM
               command: @config[:command],
               args: @config[:args] || [],
               env: @config[:env] || {},
-              request_timeout: @config[:request_timeout] || 10_000
+              request_timeout: @config[:request_timeout] || 10_000,
+              protocol_version: protocol_version,
+              notification_callback: notification_callback
             )
           when :sse
             MCPTransports::SSE.new(
               url: @config[:url],
               headers: @config[:headers] || {},
               version: @config[:version] || :http2,
-              request_timeout: @config[:request_timeout] || 10_000
+              request_timeout: @config[:request_timeout] || 10_000,
+              protocol_version: protocol_version,
+              notification_callback: notification_callback
             )
           when :streamable, :streamable_http
             config_copy = @config.dup
@@ -199,7 +236,9 @@ module RubyLLM
               reconnection: @config[:reconnection] || {},
               oauth_provider: oauth_provider,
               rate_limit: @config[:rate_limit],
-              session_id: @config[:session_id]
+              session_id: @config[:session_id],
+              protocol_version: protocol_version,
+              notification_callback: notification_callback
             )
           end
         end
@@ -217,17 +256,44 @@ module RubyLLM
           {
             "name" => tool.name,
             "description" => tool.description,
-            "inputSchema" => tool.input_schema
-          }
+            "inputSchema" => tool.input_schema,
+            "outputSchema" => tool.output_schema
+          }.compact
         end
 
         def transform_resource(resource)
           {
             "name" => resource["name"],
             "uri" => resource["uri"],
+            "title" => resource["title"],
             "description" => resource["description"],
-            "mimeType" => resource["mimeType"]
-          }
+            "mimeType" => resource["mimeType"],
+            "annotations" => resource["annotations"],
+            "icons" => resource["icons"],
+            "_meta" => resource["_meta"]
+          }.compact
+        end
+
+        def transform_prompt(prompt)
+          {
+            "name" => prompt["name"],
+            "title" => prompt["title"],
+            "description" => prompt["description"],
+            "arguments" => prompt["arguments"]
+          }.compact
+        end
+
+        def transform_resource_template(resource_template)
+          {
+            "name" => resource_template["name"],
+            "uriTemplate" => resource_template["uriTemplate"],
+            "title" => resource_template["title"],
+            "description" => resource_template["description"],
+            "mimeType" => resource_template["mimeType"],
+            "annotations" => resource_template["annotations"],
+            "icons" => resource_template["icons"],
+            "_meta" => resource_template["_meta"]
+          }.compact
         end
 
         def transform_tool_result(result)
@@ -285,6 +351,16 @@ module RubyLLM
             "text" => result["text"],
             "blob" => result["blob"]
           }
+        end
+
+        def transform_prompt_result(result)
+          if result.is_a?(Hash) && result.key?("result")
+            Result.new(result)
+          else
+            Result.new({
+                         "result" => result || {}
+                       })
+          end
         end
       end
     end

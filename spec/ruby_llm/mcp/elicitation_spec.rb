@@ -155,11 +155,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
             elicitation.structured_response = {
               "name" => "John Doe",
               "email" => "john@example.com",
-              "age" => 30,
-              "preferences" => {
-                "theme" => "dark",
-                "language" => "en"
-              }
+              "age" => 30
             }
             true
           when /settings/

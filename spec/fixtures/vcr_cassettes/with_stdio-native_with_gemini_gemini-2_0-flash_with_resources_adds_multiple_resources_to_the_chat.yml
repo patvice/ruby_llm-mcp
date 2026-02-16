@@ -17,7 +17,7 @@ http_interactions:
         information do you have from the provided resources?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -38,7 +38,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:31:20 GMT
+      - Mon, 16 Feb 2026 17:21:35 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -48,7 +48,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1454
+      - gfet4t7; dur=3410
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,19 +62,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have information from the following files:\n\n*   **plain_text.txt:** Contains the text \"A plain text file\" and \"Plan text information\"\n*   **test.txt:** Contains the text \"Hello, this is a test file!\\nThis content will be served by the MCP resource.\\nYou can modify this file and it will be cached for 5 minutes.\"\n*   **second_file.txt:** Contains the text \"This is the second file that I want to be able to use as a resource\"\n*   **my.md:** Contains the following markdown content:\n\n    ```markdown\n    # My Markdown File\n\n    This is a markdown file that I want to be able to use as a resource\n\n    ## Section 1\n\n    This is a section in my markdown file\n\n    ## Section 2\n\n    This is another section in my markdown file\n    ```\n"
+                    "text": "Okay, based on the provided file list and content, here's a summary of what I know:\n\n**File Inventory:**\n\n*   **`plain_text.txt`**:  Described as \"A plain text file.\"  (No content given, just the description).\n\n*   **`Plan text informationtest.txt`**: Described as \"A text file.\"\n    *   **Content:**\n        *   \"Hello, this is a test file!\"\n        *   \"This content will be served by the MCP resource.\"\n        *   \"You can modify this file and it will be cached for 5 minutes.\"\n\n*   **`second_file.txt`**: Described as \"A second text file.\"\n    *   **Content:**\n        *   \"This is the second file that I want to be able to use as a resource\"\n\n*   **`my.md`**: Described as \"A markdown file.\"\n    *   **Content:**\n        *   \"# My Markdown File\"\n        *   \"This is a markdown file that I want to be able to use as a resource\"\n        *   \"## Section 1\"\n        *   \"This is a section in my markdown file\"\n        *   \"## Section 2\"\n        *   \"This is another section in my markdown file\"\n\n**Key Observations & Inferences:**\n\n*   **MCP Resource:** The phrase \"MCP resource\" suggests these files are intended to be served or managed by some system or application called MCP.\n*   **Caching:**  The \"5 minutes\" caching instruction in `Plan text informationtest.txt` implies the MCP system caches these files, and changes to them might not be immediately reflected.\n*   **Resource Usage:** The text in `second_file.txt` and `my.md` explicitly states a desire to use those files as resources within the MCP system.\n*   **File Types:**  The files include `.txt` (plain text) and `.md` (markdown) formats, indicating the system might need to handle different content types.\n*   **Purpose:**  The overall collection suggests a test setup for serving text and markdown files as resources, likely with caching enabled.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.067789163539018579
+              "avgLogprobs": -0.30000160007597781
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 154,
-            "candidatesTokenCount": 189,
-            "totalTokenCount": 343,
+            "candidatesTokenCount": 473,
+            "totalTokenCount": 627,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -84,12 +84,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 189
+                "tokenCount": 473
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "xnUSafmjKJfvjrEPzKKd6QU"
+          "responseId": "G1KTadH9MKrj_uMP68Xn8AM"
         }
-  recorded_at: Mon, 10 Nov 2025 23:31:20 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:21:35 GMT
+recorded_with: VCR 6.4.0

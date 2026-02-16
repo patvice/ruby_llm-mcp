@@ -278,6 +278,7 @@ module RubyLLM
               begin
                 with_timeout(@request_timeout / 1000) do
                   endpoint = response_queue.pop
+                  raise endpoint if endpoint.is_a?(StandardError)
                   set_message_endpoint(endpoint)
                 end
               rescue Errors::TimeoutError => e
@@ -470,6 +471,8 @@ module RubyLLM
 
           def handle_connection_error(message, error)
             return unless running?
+            # Ignore errors from a previous listener thread after restart.
+            return if Thread.current != @sse_thread
 
             error_message = "#{message}: #{error.message}"
             RubyLLM::MCP.logger.error "#{error_message}. Closing SSE transport."
