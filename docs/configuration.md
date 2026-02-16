@@ -23,6 +23,12 @@ This covers all the configuration options available for RubyLLM MCP clients, inc
 Configure RubyLLM MCP globally before creating clients:
 
 ```ruby
+class GlobalApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  def execute
+    tool_name.start_with?("read_") ? approve : deny("Requires explicit approval")
+  end
+end
+
 RubyLLM::MCP.configure do |config|
   # Set logging options
   config.log_file = $stdout
@@ -42,9 +48,7 @@ RubyLLM::MCP.configure do |config|
   config.on_progress do |progress|
     puts "Progress: #{progress}"
   end
-  config.on_human_in_the_loop do |human_in_the_loop|
-    puts "Human in the loop: #{human_in_the_loop}"
-  end
+  config.on_human_in_the_loop(GlobalApprovalHandler)
   config.on_logging do |level, message|
     puts "Logging: #{level} - #{message}"
   end
@@ -362,6 +366,18 @@ client.on_elicitation do |elicitation|
   elicitation.structured_response = response
   true
 end
+
+# Or use a handler class per-client
+class InteractiveElicitationHandler < RubyLLM::MCP::Handlers::ElicitationHandler
+  option :ui, required: true
+
+  def execute
+    response = options[:ui].collect(elicitation.message, elicitation.requested_schema)
+    response ? accept(response) : reject("User declined")
+  end
+end
+
+client.on_elicitation(InteractiveElicitationHandler, ui: MyUI.new)
 ```
 
 ### OAuth Authentication

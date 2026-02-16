@@ -734,7 +734,7 @@ config: {
 
 - [Rails OAuth Integration]({% link guides/rails-oauth.md %}) - Multi-user setup
 - [Rails Integration]({% link guides/rails-integration.md %}) - Basic Rails setup
-- [Transports]({% link guides/transports.md %}) - Transport configuration
+- [Configuration]({% link configuration.md %}) - Transport configuration
 
 ---
 

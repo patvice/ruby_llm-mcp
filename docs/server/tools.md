@@ -224,6 +224,8 @@ end
 client.on_human_in_the_loop(BasicApprovalHandler)
 ```
 
+Block-based human-in-the-loop callbacks are no longer supported.
+
 ### Handler Classes
 
 {: .label .label-green }
@@ -296,10 +298,6 @@ class WebsocketApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
   option :websocket_service, required: true
   option :user_id, required: true
 
-  on_timeout do
-    deny("User did not respond in time")
-  end
-
   def execute
     # Send approval request to user's browser/app
     options[:websocket_service].broadcast(
@@ -341,14 +339,22 @@ class ApprovalsChannel < ApplicationCable::Channel
 end
 ```
 
-#### Built-in Auto-Approve Handler
+If no approval/denial arrives before timeout, the deferred approval is denied automatically and tool execution is cancelled.
+
+#### Reusable Policy Handler
 
 ```ruby
-# Simple auto-approve handler included with the gem
+class PolicyApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  option :safe_tools, default: []
+
+  def execute
+    options[:safe_tools].include?(tool_name) ? approve : deny("Tool requires approval")
+  end
+end
+
 client.on_human_in_the_loop(
-  RubyLLM::MCP::Handlers::AutoApproveToolHandler,
-  safe_tools: ["read_file", "list_files"],
-  dangerous_tools: ["delete_file", "execute_command"]
+  PolicyApprovalHandler,
+  safe_tools: ["read_file", "list_files"]
 )
 ```
 

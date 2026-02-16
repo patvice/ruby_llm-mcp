@@ -35,8 +35,6 @@ Elicitation is a new feature in MCP Protocol 2025-06-18.
 
 **Note:** Elicitation is only available for clients that support the `2025-06-18` protocol version.
 
-Additional, in this current version the original request still needs to complete in the bounds of the initial request timeout. In some cases (like if you were to get real user input) that may take longer than what a normal request would take. A solution to this will come out in future versions.
-
 ## Basic Elicitation Configuration
 
 ### Global Configuration
@@ -178,14 +176,11 @@ class MyElicitationHandler < RubyLLM::MCP::Handlers::ElicitationHandler
   end
 end
 
-# Use globally
-RubyLLM::MCP.configure do |config|
-  config.on_elicitation MyElicitationHandler
-end
-
-# Or per-client
+# Register handler classes per-client
 client.on_elicitation(MyElicitationHandler)
 ```
+
+Global elicitation hooks (`config.on_elicitation`) remain available for block-based callbacks.
 
 ### Handler with Options
 
@@ -256,11 +251,6 @@ class WebsocketElicitationHandler < RubyLLM::MCP::Handlers::ElicitationHandler
 
   option :user_id, required: true
   option :websocket_service, required: true
-
-  on_timeout do
-    logger.warn("Elicitation #{elicitation.id} timed out")
-    cancel("User did not respond in time")
-  end
 
   def execute
     # Send to user's websocket
@@ -343,10 +333,6 @@ class ActionCableElicitationHandler < RubyLLM::MCP::Handlers::ElicitationHandler
   async_execution timeout: 300
 
   option :user_id, required: true
-
-  on_timeout do
-    reject("Request timed out")
-  end
 
   def execute
     # Broadcast to user's channel
@@ -461,17 +447,6 @@ function ElicitationModal() {
 }
 ```
 
-### Built-in Registry Handler
-
-```ruby
-# Simple registry-based handler included with the gem
-client.on_elicitation(
-  RubyLLM::MCP::Handlers::RegistryElicitationHandler,
-  websocket_broadcaster: ActionCable.server,
-  channel_name: "elicitation_#{current_user.id}"
-)
-```
-
 ### Backward Compatibility
 
 Handler classes are fully backward compatible:
@@ -491,7 +466,22 @@ client.on_elicitation(WebsocketElicitationHandler, user_id: current_user.id)
 
 ## Response Actions
 
-Your elicitation handler should return one of these values to indicate the action:
+Elicitation handlers can return synchronous or async outcomes:
+
+### Handler class return contract
+
+```ruby
+accept({ "confirmed" => true })  # => { action: :accept, response: {...} }
+reject("User declined")          # => { action: :reject, reason: "User declined" }
+cancel("Cancelled by user")      # => { action: :cancel, reason: "Cancelled by user" }
+
+# Async options:
+:pending                         # Store in registry for later completion
+create_promise                   # Resolve/reject later
+defer                            # Return AsyncResponse
+```
+
+Use `RubyLLM::MCP::Handlers::ElicitationRegistry.complete` or `.cancel` to finish deferred requests.
 
 ### Accept (true)
 

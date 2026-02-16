@@ -12,6 +12,13 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 
+sass:
+  quiet_deps: true
+  silence_deprecations:
+    - import
+    - global-builtin
+    - color-functions
+
 # Just the Docs settings
 
 logo: "/assets/images/rubyllm-mcp-logo-text.svg"

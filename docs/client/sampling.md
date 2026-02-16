@@ -88,13 +88,11 @@ class MySamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
   end
 end
 
-# Use globally
+# Sampling handlers are configured per-client
 RubyLLM::MCP.configure do |config|
   config.sampling.enabled = true
-  config.sampling.handler = MySamplingHandler
 end
 
-# Or per-client
 client.on_sampling(MySamplingHandler)
 ```
 
@@ -115,12 +113,12 @@ class SecureSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
 
   def check_message_length
     return true if sample.message.length < 10_000
-    reject("Message too long: #{sample.message.length} characters")
+    "Message too long: #{sample.message.length} characters"
   end
 
   def check_content_safety
     return true unless sample.message.include?("jailbreak")
-    reject("Unsafe content detected")
+    "Unsafe content detected"
   end
 end
 ```
@@ -151,7 +149,7 @@ class ConfigurableSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
     return true if options[:allowed_models].empty?
     return true if options[:allowed_models].include?(select_model)
 
-    reject("Model '#{select_model}' not allowed")
+    "Model '#{select_model}' not allowed"
   end
 end
 
@@ -186,16 +184,19 @@ class LoggingSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
 end
 ```
 
-### Built-in Auto-Approve Handler
+### Reusable Default Handler
 
 ```ruby
-# Simple auto-approve handler included with the gem
-client.on_sampling(
-  RubyLLM::MCP::Handlers::AutoApproveSamplingHandler,
-  default_model: "gpt-4",
-  max_message_length: 10_000,
-  allowed_models: ["gpt-4", "gpt-3.5-turbo"]
-)
+class DefaultSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  option :default_model, default: "gpt-4"
+
+  def execute
+    response = default_chat_completion(options[:default_model])
+    accept(response)
+  end
+end
+
+client.on_sampling(DefaultSamplingHandler, default_model: "gpt-4o")
 ```
 
 ### Testing Handler Classes
@@ -283,23 +284,27 @@ end
 ### Model Selection Based on Request
 
 ```ruby
-RubyLLM::MCP.configure do |config|
-  config.sampling.enabled = true
+class RequestAwareSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  def execute
+    model = choose_model(sample.message)
+    response = default_chat_completion(model)
+    accept(response)
+  end
 
-  config.sampling.preferred_model do |model_preferences|
-    # Access the full sampling request context
-    messages = model_preferences.messages
+  private
 
-    # Choose model based on message content
-    if messages.any? { |msg| msg.content.include?("code") }
-      "gpt-4" # Use GPT-4 for code-related tasks
-    elsif messages.length > 10
-      "gpt-3.5-turbo" # Use faster model for long conversations
+  def choose_model(text)
+    if text.include?("code")
+      "gpt-4"
+    elsif text.length > 2_000
+      "gpt-3.5-turbo"
     else
-      "gpt-4" # Default for other cases
+      "gpt-4"
     end
   end
 end
+
+client.on_sampling(RequestAwareSamplingHandler)
 ```
 
 ## Guards and Filtering
@@ -313,7 +318,7 @@ RubyLLM::MCP.configure do |config|
 
   # Only allow samples that contain "Hello"
   config.sampling.guard do |sample|
-    sample.messages.any? { |msg| msg.content.include?("Hello") }
+    sample.message.include?("Hello")
   end
 end
 ```
@@ -327,14 +332,9 @@ RubyLLM::MCP.configure do |config|
 
   # Filter based on message content
   config.sampling.guard do |sample|
-    messages = sample.messages
-
     # Don't allow requests containing sensitive keywords
     sensitive_keywords = ["password", "secret", "private_key"]
-
-    messages.none? do |message|
-      sensitive_keywords.any? { |keyword| message.content.include?(keyword) }
-    end
+    sensitive_keywords.none? { |keyword| sample.message.include?(keyword) }
   end
 end
 ```
@@ -377,27 +377,32 @@ RubyLLM::MCP.configure do |config|
 end
 ```
 
-### User-Based Guards
+### Context-Aware Guards with Handler Options
 
 ```ruby
-RubyLLM::MCP.configure do |config|
-  config.sampling.enabled = true
-  config.sampling.preferred_model = "gpt-4"
+class TenantSamplingHandler < RubyLLM::MCP::Handlers::SamplingHandler
+  option :allowed_tenants, default: []
+  option :tenant_id, required: true
 
-  config.sampling.guard do |sample|
-    # Check if user is authorized (if server provides user context)
-    user_id = sample.metadata&.dig("user_id")
+  def execute
+    return reject("Tenant not authorized") unless allowed_tenant?
 
-    if user_id
-      # Check user permissions
-      authorized_users = ["user1", "user2", "admin"]
-      authorized_users.include?(user_id)
-    else
-      # Allow anonymous requests
-      true
-    end
+    response = default_chat_completion("gpt-4")
+    accept(response)
+  end
+
+  private
+
+  def allowed_tenant?
+    options[:allowed_tenants].include?(options[:tenant_id])
   end
 end
+
+client.on_sampling(
+  TenantSamplingHandler,
+  tenant_id: current_tenant.id,
+  allowed_tenants: ["tenant_a", "tenant_b"]
+)
 ```
 
 ## Next Steps
