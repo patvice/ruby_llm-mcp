@@ -28,7 +28,7 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
 
   each_client_supporting(:sampling) do |config|
     describe "End-to-end cancellation with #{config[:name]}" do
-      let(:client) { RubyLLM::MCP::Client.new(**config[:options].merge(request_timeout: 30_000), start: false) }
+      let(:client) { RubyLLM::MCP::Client.new(**config[:options], request_timeout: 30_000, start: false) }
 
       after do
         client.stop if client.alive?
@@ -62,11 +62,9 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
 
         # Call the tool in a thread so we can cancel it
         tool_thread = Thread.new do
-          begin
-            tool.execute
-          rescue RubyLLM::MCP::Errors::TimeoutError
-            # Cancellation can race with response delivery under slower runtimes.
-          end
+          tool.execute
+        rescue RubyLLM::MCP::Errors::TimeoutError
+          # Cancellation can race with response delivery under slower runtimes.
         end
 
         # Wait for the sampling request to start
@@ -122,11 +120,9 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
         # Start multiple sampling requests
         threads = 3.times.map do
           Thread.new do
-            begin
-              tool.execute
-            rescue RubyLLM::MCP::Errors::TimeoutError
-              # Cancellation can race with response delivery under slower runtimes.
-            end
+            tool.execute
+          rescue RubyLLM::MCP::Errors::TimeoutError
+            # Cancellation can race with response delivery under slower runtimes.
           end
         end
 
