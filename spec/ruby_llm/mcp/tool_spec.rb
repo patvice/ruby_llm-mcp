@@ -602,7 +602,7 @@ RSpec.describe RubyLLM::MCP::Tool do
     end
 
     context "when output schema contains $schema property" do
-      it "strips $schema property to avoid json-schema gem network lookup" do
+      it "validates structured content when $schema is present" do
         tool_response = {
           "name" => "structured_tool",
           "description" => "A tool with structured output",
@@ -626,12 +626,6 @@ RSpec.describe RubyLLM::MCP::Tool do
                              })
 
         allow(mock_adapter).to receive(:execute_tool).and_return(mock_result)
-
-        # Expect JSON::Validator to be called with schema WITHOUT $schema property
-        expect(JSON::Validator).to receive(:validate).with(
-          hash_not_including("$schema"),
-          { "value" => "test" }
-        ).and_call_original
 
         tool = RubyLLM::MCP::Tool.new(mock_adapter, tool_response)
         result = tool.execute
@@ -769,7 +763,7 @@ RSpec.describe RubyLLM::MCP::Tool do
       end
     end
 
-    describe "validation using json-schema" do
+    describe "schema validation" do
       it "does not normalize valid schemas" do
         tool_response = {
           "name" => "valid_tool",
@@ -790,7 +784,7 @@ RSpec.describe RubyLLM::MCP::Tool do
         expect(tool.params_schema["properties"]["name"]["type"]).to eq("string")
       end
 
-      it "normalizes schemas that fail json-schema validation" do
+      it "normalizes schemas that fail validation" do
         # Create a schema that's structurally invalid (object without properties)
         tool_response = {
           "name" => "invalid_tool",

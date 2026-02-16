@@ -17,15 +17,22 @@ module RubyLLM
         METHOD_RESOURCES_READ = "resources/read"
         METHOD_RESOURCES_TEMPLATES_LIST = "resources/templates/list"
         METHOD_RESOURCES_SUBSCRIBE = "resources/subscribe"
+        METHOD_RESOURCES_UNSUBSCRIBE = "resources/unsubscribe"
         METHOD_PROMPTS_LIST = "prompts/list"
         METHOD_PROMPTS_GET = "prompts/get"
         METHOD_COMPLETION_COMPLETE = "completion/complete"
         METHOD_LOGGING_SET_LEVEL = "logging/setLevel"
+        METHOD_TASKS_LIST = "tasks/list"
+        METHOD_TASKS_GET = "tasks/get"
+        METHOD_TASKS_RESULT = "tasks/result"
+        METHOD_TASKS_CANCEL = "tasks/cancel"
 
         # Notification methods
         METHOD_NOTIFICATION_INITIALIZED = "notifications/initialized"
         METHOD_NOTIFICATION_CANCELLED = "notifications/cancelled"
         METHOD_NOTIFICATION_ROOTS_LIST_CHANGED = "notifications/roots/list_changed"
+        METHOD_NOTIFICATION_TASKS_STATUS = "notifications/tasks/status"
+        METHOD_NOTIFICATION_ELICITATION_COMPLETE = "notifications/elicitation/complete"
 
         # Reference types
         REF_TYPE_PROMPT = "ref/prompt"

@@ -5,7 +5,7 @@ module RubyLLM
     class Elicitation
       ACCEPT_ACTION = "accept"
       CANCEL_ACTION = "cancel"
-      REJECT_ACTION = "reject"
+      DECLINE_ACTION = "decline"
 
       class DeferredCancellation
         def initialize(id)
@@ -50,8 +50,8 @@ module RubyLLM
         @result.params["message"]
       end
 
-      def validate_response
-        JSON::Validator.validate(@requested_schema, @structured_response)
+      def response_valid?
+        SchemaValidator.valid?(@requested_schema, @structured_response)
       end
 
       # Complete async elicitation with response data
@@ -60,7 +60,7 @@ module RubyLLM
         return unless @deferred
 
         @structured_response = response_data
-        valid = validate_response
+        valid = response_valid?
 
         if valid
           @coordinator.elicitation_response(
@@ -155,7 +155,7 @@ module RubyLLM
         case result[:action]
         when :accept
           @structured_response = result[:response]
-          if validate_response
+          if response_valid?
             @coordinator.elicitation_response(
               id: @id,
               elicitation: { action: ACCEPT_ACTION, content: @structured_response }
@@ -169,7 +169,7 @@ module RubyLLM
         when :reject
           @coordinator.elicitation_response(
             id: @id,
-            elicitation: { action: REJECT_ACTION, content: nil }
+            elicitation: { action: DECLINE_ACTION, content: nil }
           )
         else # :cancel or unknown action -> cancel
           @coordinator.elicitation_response(
@@ -248,7 +248,7 @@ module RubyLLM
       # Handle boolean result from handler
       def handle_handler_boolean_result(result)
         if result
-          valid = validate_response
+          valid = response_valid?
           if valid
             @coordinator.elicitation_response(
               id: @id,
@@ -263,7 +263,7 @@ module RubyLLM
         else
           @coordinator.elicitation_response(
             id: @id,
-            elicitation: { action: REJECT_ACTION, content: nil }
+            elicitation: { action: DECLINE_ACTION, content: nil }
           )
         end
       end

@@ -10,7 +10,7 @@ module RubyLLM
         TOOL_CALL_CANCELLED_MESSAGE = "Tool call was cancelled by the client"
 
         attr_reader :name, :transport_type, :config, :capabilities, :protocol_version, :elicitation_callback,
-                    :sampling_callback, :human_in_the_loop_registry, :registry_owner_id
+                    :sampling_callback, :human_in_the_loop_registry, :registry_owner_id, :task_registry
 
         def initialize( # rubocop:disable Metrics/ParameterLists
           name:,
@@ -31,7 +31,8 @@ module RubyLLM
           @name = name
           @transport_type = transport_type
           @config = transport_config.merge(request_timeout: request_timeout || MCP.config.request_timeout)
-          @protocol_version = protocol_version || MCP.config.protocol_version || Native::Protocol.default_negotiated_version
+          @requested_protocol_version = protocol_version || MCP.config.protocol_version || Native::Protocol.latest_version
+          @protocol_version = @requested_protocol_version
 
           # Callbacks
           @human_in_the_loop_callback = human_in_the_loop_callback
@@ -46,6 +47,7 @@ module RubyLLM
 
           @transport = nil
           @capabilities = nil
+          @task_registry = Native::TaskRegistry.new
 
           # Track in-flight server-initiated requests for cancellation
           @in_flight_requests = {}
@@ -122,7 +124,8 @@ module RubyLLM
           @transport&.close
           @capabilities = nil
           @transport = nil
-          @protocol_version = Native::Protocol.default_negotiated_version
+          @task_registry = Native::TaskRegistry.new
+          @protocol_version = @requested_protocol_version || MCP.config.protocol_version || Native::Protocol.latest_version
           Handlers::HumanInTheLoopRegistry.release(@registry_owner_id)
           @human_in_the_loop_registry = Handlers::HumanInTheLoopRegistry.for_owner(@registry_owner_id)
         end
@@ -228,6 +231,11 @@ module RubyLLM
           request(body, wait_for_response: false)
         end
 
+        def resources_unsubscribe(uri:)
+          body = Native::Messages::Requests.resources_unsubscribe(uri: uri, tracking_progress: tracking_progress?)
+          request(body, wait_for_response: false)
+        end
+
         def prompt_list(cursor: nil)
           body = Native::Messages::Requests.prompt_list(cursor: cursor, tracking_progress: tracking_progress?)
           result = request(body)
@@ -263,8 +271,57 @@ module RubyLLM
           request(body)
         end
 
+        def tasks_list(cursor: nil)
+          body = Native::Messages::Requests.tasks_list(cursor: cursor, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.upsert_many(result.value["tasks"])
+
+          if result.next_cursor?
+            result.value["tasks"] + tasks_list(cursor: result.next_cursor)
+          else
+            result.value["tasks"] || []
+          end
+        end
+
+        def task_get(task_id:)
+          body = Native::Messages::Requests.task_get(task_id: task_id, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.upsert(result.value)
+          result
+        end
+
+        def task_result(task_id:)
+          body = Native::Messages::Requests.task_result(task_id: task_id, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.store_payload(task_id, result.value)
+          result
+        end
+
+        def task_cancel(task_id:)
+          body = Native::Messages::Requests.task_cancel(task_id: task_id, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.upsert(result.value)
+          result
+        end
+
+        def task_status_notification(task:)
+          task_registry.upsert(task)
+        end
+
         def set_progress_tracking(enabled:)
           @progress_tracking_enabled = enabled
+        end
+
+        def set_elicitation_enabled(enabled:)
+          @elicitation_enabled = enabled
         end
 
         ## Notifications
@@ -296,6 +353,11 @@ module RubyLLM
           request(body, wait_for_response: false)
         end
 
+        def result_response(id:, value:)
+          body = Native::Messages::Responses.result(id: id, value: value)
+          request(body, wait_for_response: false)
+        end
+
         def sampling_create_message_response(id:, model:, message:, **_options)
           body = Native::Messages::Responses.sampling_create_message(id: id, model: model, message: message)
           request(body, wait_for_response: false)
@@ -322,11 +384,24 @@ module RubyLLM
           end
 
           if MCP.config.sampling.enabled?
-            capabilities_hash[:sampling] = {}
+            sampling_capabilities = {}
+            sampling_capabilities[:tools] = {} if MCP.config.sampling.tools
+            sampling_capabilities[:context] = {} if MCP.config.sampling.context
+            capabilities_hash[:sampling] = sampling_capabilities
           end
 
           if @elicitation_enabled
-            capabilities_hash[:elicitation] = {}
+            elicitation_capabilities = {}
+            elicitation_capabilities[:form] = {} if MCP.config.elicitation.form
+            elicitation_capabilities[:url] = {} if MCP.config.elicitation.url
+            capabilities_hash[:elicitation] = elicitation_capabilities unless elicitation_capabilities.empty?
+          end
+
+          if MCP.config.respond_to?(:tasks) && MCP.config.tasks.enabled?
+            capabilities_hash[:tasks] = {
+              list: {},
+              cancel: {}
+            }
           end
 
           capabilities_hash

@@ -36,6 +36,14 @@ module RubyLLM
             }
           end
 
+          def result(id:, value:)
+            {
+              jsonrpc: JSONRPC_VERSION,
+              id: id,
+              result: value
+            }
+          end
+
           def sampling_create_message(id:, message:, model:)
             stop_reason = if message.respond_to?(:stop_reason) && message.stop_reason
                             snake_to_camel(message.stop_reason)
@@ -84,7 +92,7 @@ module RubyLLM
             if content.is_a?(RubyLLM::Content)
               if content.text.none? && content.attachments.any?
                 attachment = content.attachments.first
-                { type: attachment.type, data: attachment.content, mime_type: attachment.mime_type }
+                { type: attachment.type, data: attachment.content, mimeType: attachment.mime_type }
               else
                 { type: "text", text: content.text }
               end

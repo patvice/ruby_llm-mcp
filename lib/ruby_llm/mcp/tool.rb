@@ -75,7 +75,7 @@ module RubyLLM
         if result.value.key?("structuredContent") && !@output_schema.nil?
           clean_schema = @output_schema.except("$schema")
           structured_content = result.value["structuredContent"]
-          is_valid = JSON::Validator.validate(clean_schema, structured_content)
+          is_valid = SchemaValidator.valid?(clean_schema, structured_content)
           unless is_valid
             return { error: "Structured output is not valid: #{structured_content}" }
           end
@@ -225,14 +225,7 @@ module RubyLLM
           return false unless valid_schema?(value)
         end
 
-        begin
-          JSON::Validator.validate!(schema, {})
-          true
-        rescue JSON::Schema::SchemaError
-          false
-        rescue JSON::Schema::ValidationError
-          true
-        end
+        SchemaValidator.valid_schema?(schema)
       end
     end
   end

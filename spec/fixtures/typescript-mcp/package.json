@@ -15,9 +15,10 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.13.1",
+    "@cfworker/json-schema": "^4.1.1",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "agents": "^0.0.94",
     "express": "^5.1.0",
-    "zod": "^3.25.51"
+    "zod": "^3.25.76"
   }
 }

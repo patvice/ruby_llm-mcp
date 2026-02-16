@@ -13,7 +13,8 @@ module RubyLLM
         supports :tools, :prompts, :resources, :resource_templates,
                  :completions, :logging, :sampling, :roots,
                  :notifications, :progress_tracking, :human_in_the_loop,
-                 :elicitation, :subscriptions, :list_changed_notifications
+                 :elicitation, :subscriptions, :list_changed_notifications,
+                 :tasks
 
         supports_transport :stdio, :sse, :streamable, :streamable_http
 
@@ -50,10 +51,12 @@ module RubyLLM
                        :capabilities, :client_capabilities, :protocol_version,
                        :tool_list, :execute_tool,
                        :resource_list, :resource_read, :resource_template_list,
-                       :resources_subscribe,
+                       :resources_subscribe, :resources_unsubscribe,
                        :prompt_list, :execute_prompt,
+                       :tasks_list, :task_get, :task_result, :task_cancel, :task_status_notification,
                        :completion_resource, :completion_prompt,
                        :set_logging, :set_progress_tracking,
+                       :set_elicitation_enabled,
                        :initialize_notification, :cancelled_notification,
                        :roots_list_change_notification,
                        :ping_response, :roots_list_response,
@@ -123,6 +126,7 @@ module RubyLLM
             return nil unless client.elicitation_enabled?
 
             handler_or_block = client.on[:elicitation]
+            return false unless handler_or_block
 
             if Handlers.handler_class?(handler_or_block)
               handler_or_block.new(elicitation: elicitation, coordinator: @native_client).call

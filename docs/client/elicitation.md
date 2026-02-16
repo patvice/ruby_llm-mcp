@@ -31,9 +31,9 @@ When elicitation is enabled, MCP servers can send "elicitation" requests to your
 This is useful for servers that need user input or clarification during complex workflows.
 
 {: .new }
-Elicitation is a new feature in MCP Protocol 2025-06-18.
+Elicitation was introduced in MCP Protocol 2025-06-18.
 
-**Note:** Elicitation is only available for clients that support the `2025-06-18` protocol version.
+**Note:** Elicitation is available for clients using protocol version `2025-06-18` or newer.
 
 ## Basic Elicitation Configuration
 

@@ -15,6 +15,7 @@ module RubyLLM
       module Capabilities
         class CompletionNotAvailable < BaseError; end
         class ResourceSubscribeNotAvailable < BaseError; end
+        class TaskCancelNotAvailable < BaseError; end
       end
 
       class InvalidFormatError < BaseError; end

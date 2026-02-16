@@ -48,7 +48,7 @@ module RubyLLM
       end
 
       class Sampling
-        attr_accessor :enabled
+        attr_accessor :enabled, :tools, :context
         attr_writer :preferred_model, :handler
 
         def initialize
@@ -92,9 +92,36 @@ module RubyLLM
 
         def set_defaults
           @enabled = false
+          @tools = false
+          @context = true
           @preferred_model = nil
           @guard = nil
           @handler = nil
+        end
+      end
+
+      class Elicitation
+        attr_accessor :form, :url
+
+        def initialize
+          @form = true
+          @url = false
+        end
+
+        def enabled?
+          @form || @url
+        end
+      end
+
+      class Tasks
+        attr_accessor :enabled
+
+        def initialize
+          @enabled = false
+        end
+
+        def enabled?
+          @enabled
         end
       end
 
@@ -175,6 +202,8 @@ module RubyLLM
                     :log_level,
                     :roots,
                     :sampling,
+                    :elicitation,
+                    :tasks,
                     :max_connections,
                     :pool_timeout,
                     :protocol_version,
@@ -190,6 +219,8 @@ module RubyLLM
 
       def initialize
         @sampling = Sampling.new
+        @elicitation = Elicitation.new
+        @tasks = Tasks.new
         @adapter_config = AdapterConfig.new
         @oauth = OAuth.new
         set_defaults
@@ -319,6 +350,8 @@ module RubyLLM
 
         # Sampling configuration
         @sampling.reset!
+        @elicitation = Elicitation.new
+        @tasks = Tasks.new
 
         # Event handlers
         @on_progress = nil

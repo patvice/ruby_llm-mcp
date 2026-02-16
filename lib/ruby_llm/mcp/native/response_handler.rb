@@ -18,24 +18,9 @@ module RubyLLM
           begin
             # Execute in a separate thread that can be terminated on cancellation
             operation.execute do
-              if result.ping?
-                coordinator.ping_response(id: result.id)
-                true
-              elsif result.roots?
-                handle_roots_response(result)
-                true
-              elsif result.sampling?
-                handle_sampling_response(result)
-                true
-              elsif result.elicitation?
-                is_deferred = handle_elicitation_response(result)
-                true
-              else
-                handle_unknown_request(result)
-                RubyLLM::MCP.logger.error("MCP client was sent unknown method type and \
-                  could not respond: #{result.inspect}.")
-                false
-              end
+              handled, deferred = dispatch_request(result)
+              is_deferred = deferred
+              handled
             end
           rescue Errors::RequestCancelled => e
             RubyLLM::MCP.logger.info("Request #{result.id} was cancelled: #{e.message}")
@@ -50,6 +35,39 @@ module RubyLLM
         end
 
         private
+
+        def dispatch_request(result)
+          case result.method
+          when Native::Messages::METHOD_PING
+            coordinator.ping_response(id: result.id)
+            [true, false]
+          when "roots/list"
+            handle_roots_response(result)
+            [true, false]
+          when "sampling/createMessage"
+            handle_sampling_response(result)
+            [true, false]
+          when "elicitation/create"
+            [true, handle_elicitation_response(result)]
+          when Native::Messages::METHOD_TASKS_LIST
+            handle_tasks_list_response(result)
+            [true, false]
+          when Native::Messages::METHOD_TASKS_GET
+            handle_task_get_response(result)
+            [true, false]
+          when Native::Messages::METHOD_TASKS_RESULT
+            handle_task_result_response(result)
+            [true, false]
+          when Native::Messages::METHOD_TASKS_CANCEL
+            handle_task_cancel_response(result)
+            [true, false]
+          else
+            handle_unknown_request(result)
+            RubyLLM::MCP.logger.error("MCP client was sent unknown method type and \
+              could not respond: #{result.inspect}.")
+            [false, false]
+          end
+        end
 
         def handle_roots_response(result)
           RubyLLM::MCP.logger.info("Roots request: #{result.inspect}")
@@ -120,6 +138,81 @@ module RubyLLM
             message: "Method not found: #{result.method}",
             code: Native::JsonRpc::ErrorCodes::METHOD_NOT_FOUND
           )
+        end
+
+        def handle_tasks_list_response(result)
+          coordinator.result_response(
+            id: result.id,
+            value: { tasks: coordinator.task_registry.tasks }
+          )
+        end
+
+        def handle_task_get_response(result)
+          task_id = result.params["taskId"]
+          return error_invalid_task_id(result.id) if task_id.nil? || task_id.empty?
+
+          task = coordinator.task_registry.task(task_id)
+          if task.nil?
+            error_unknown_task(result.id, task_id)
+          else
+            coordinator.result_response(id: result.id, value: task)
+          end
+        end
+
+        def handle_task_result_response(result)
+          task_id = result.params["taskId"]
+          return error_invalid_task_id(result.id) if task_id.nil? || task_id.empty?
+
+          payload = coordinator.task_registry.payload(task_id)
+          if payload.nil?
+            error_unknown_task(result.id, task_id)
+          else
+            coordinator.result_response(id: result.id, value: payload)
+          end
+        end
+
+        def handle_task_cancel_response(result)
+          task_id = result.params["taskId"]
+          return error_invalid_task_id(result.id) if task_id.nil? || task_id.empty?
+
+          task = coordinator.task_registry.update_status(
+            task_id,
+            status: "cancelled",
+            status_message: "Cancelled by server request"
+          )
+
+          coordinator.result_response(
+            id: result.id,
+            value: task || build_missing_task(task_id, "cancelled", "Task not found; treated as cancelled")
+          )
+        end
+
+        def error_invalid_task_id(request_id)
+          coordinator.error_response(
+            id: request_id,
+            message: "Invalid task request: taskId is required",
+            code: Native::JsonRpc::ErrorCodes::INVALID_PARAMS
+          )
+        end
+
+        def error_unknown_task(request_id, task_id)
+          coordinator.error_response(
+            id: request_id,
+            message: "Task not found: #{task_id}",
+            code: Native::JsonRpc::ErrorCodes::INVALID_PARAMS
+          )
+        end
+
+        def build_missing_task(task_id, status, status_message)
+          timestamp = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+          {
+            "taskId" => task_id,
+            "status" => status,
+            "statusMessage" => status_message,
+            "createdAt" => timestamp,
+            "lastUpdatedAt" => timestamp,
+            "ttl" => 0
+          }
         end
       end
     end

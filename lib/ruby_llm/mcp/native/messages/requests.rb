@@ -116,6 +116,18 @@ module RubyLLM
             }
           end
 
+          def resources_unsubscribe(uri:, tracking_progress: false)
+            params = { uri: uri }
+            params = add_progress_token(params, tracking_progress: tracking_progress)
+
+            {
+              jsonrpc: JSONRPC_VERSION,
+              id: generate_id,
+              method: METHOD_RESOURCES_UNSUBSCRIBE,
+              params: params
+            }
+          end
+
           def prompt_list(cursor: nil, tracking_progress: false)
             params = {}
             params = add_cursor(params, cursor)
@@ -196,6 +208,55 @@ module RubyLLM
               jsonrpc: JSONRPC_VERSION,
               id: generate_id,
               method: METHOD_LOGGING_SET_LEVEL,
+              params: params
+            }
+          end
+
+          def tasks_list(cursor: nil, tracking_progress: false)
+            params = {}
+            params = add_cursor(params, cursor)
+            params = add_progress_token(params, tracking_progress: tracking_progress)
+
+            {
+              jsonrpc: JSONRPC_VERSION,
+              id: generate_id,
+              method: METHOD_TASKS_LIST,
+              params: params
+            }.tap { |body| body.delete(:params) if params.empty? }
+          end
+
+          def task_get(task_id:, tracking_progress: false)
+            params = { taskId: task_id }
+            params = add_progress_token(params, tracking_progress: tracking_progress)
+
+            {
+              jsonrpc: JSONRPC_VERSION,
+              id: generate_id,
+              method: METHOD_TASKS_GET,
+              params: params
+            }
+          end
+
+          def task_result(task_id:, tracking_progress: false)
+            params = { taskId: task_id }
+            params = add_progress_token(params, tracking_progress: tracking_progress)
+
+            {
+              jsonrpc: JSONRPC_VERSION,
+              id: generate_id,
+              method: METHOD_TASKS_RESULT,
+              params: params
+            }
+          end
+
+          def task_cancel(task_id:, tracking_progress: false)
+            params = { taskId: task_id }
+            params = add_progress_token(params, tracking_progress: tracking_progress)
+
+            {
+              jsonrpc: JSONRPC_VERSION,
+              id: generate_id,
+              method: METHOD_TASKS_CANCEL,
               params: params
             }
           end

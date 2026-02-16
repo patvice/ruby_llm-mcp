@@ -13,12 +13,13 @@ RSpec.describe RubyLLM::MCP::Native::Client do
     )
   end
 
-  def build_client(human_callback: nil)
+  def build_client(human_callback: nil, **options)
     described_class.new(
       name: "native-client-spec",
       transport_type: :stdio,
       transport_config: {},
-      human_in_the_loop_callback: human_callback
+      human_in_the_loop_callback: human_callback,
+      **options
     )
   end
 
@@ -97,6 +98,56 @@ RSpec.describe RubyLLM::MCP::Native::Client do
 
       expect(client.cancel_in_flight_request("req-1")).to eq(:already_completed)
       expect(client.cancel_in_flight_request("req-1")).to eq(:not_found)
+    end
+  end
+
+  describe "#client_capabilities" do
+    around do |example|
+      original_sampling_enabled = RubyLLM::MCP.config.sampling.enabled
+      original_sampling_tools = RubyLLM::MCP.config.sampling.tools
+      original_sampling_context = RubyLLM::MCP.config.sampling.context
+      original_tasks_enabled = RubyLLM::MCP.config.tasks.enabled
+      original_elicitation_form = RubyLLM::MCP.config.elicitation.form
+      original_elicitation_url = RubyLLM::MCP.config.elicitation.url
+
+      example.run
+    ensure
+      RubyLLM::MCP.config.sampling.enabled = original_sampling_enabled
+      RubyLLM::MCP.config.sampling.tools = original_sampling_tools
+      RubyLLM::MCP.config.sampling.context = original_sampling_context
+      RubyLLM::MCP.config.tasks.enabled = original_tasks_enabled
+      RubyLLM::MCP.config.elicitation.form = original_elicitation_form
+      RubyLLM::MCP.config.elicitation.url = original_elicitation_url
+    end
+
+    it "advertises sampling context by default and tools when configured" do
+      RubyLLM::MCP.config.sampling.enabled = true
+      RubyLLM::MCP.config.sampling.tools = true
+      RubyLLM::MCP.config.sampling.context = true
+
+      client = build_client
+      capabilities = client.client_capabilities
+
+      expect(capabilities[:sampling]).to eq({ tools: {}, context: {} })
+    end
+
+    it "advertises configured elicitation modes when elicitation is enabled" do
+      RubyLLM::MCP.config.elicitation.form = true
+      RubyLLM::MCP.config.elicitation.url = true
+
+      client = build_client(elicitation_enabled: true)
+      capabilities = client.client_capabilities
+
+      expect(capabilities[:elicitation]).to eq({ form: {}, url: {} })
+    end
+
+    it "advertises tasks list/cancel support without task-augmented request claims" do
+      RubyLLM::MCP.config.tasks.enabled = true
+
+      client = build_client
+      capabilities = client.client_capabilities
+
+      expect(capabilities[:tasks]).to eq({ list: {}, cancel: {} })
     end
   end
 end

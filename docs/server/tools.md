@@ -92,7 +92,7 @@ puts "File contents: #{result}"
 ### Structured Tool Output
 
 {: .new }
-Structured tool output is available in MCP Protocol 2025-06-18.
+Structured tool output was introduced in MCP Protocol 2025-06-18.
 
 Tools can now specify output schemas for structured responses, enabling type-safe tool interactions:
 
@@ -153,7 +153,7 @@ end
 #### Human-Friendly Display Names
 
 {: .new }
-Tools now support title fields for better user experience in MCP Protocol 2025-06-18:
+Tools now support title fields for better user experience in MCP Protocol 2025-06-18+:
 
 ```ruby
 tools = client.tools

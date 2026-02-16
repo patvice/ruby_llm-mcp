@@ -2,13 +2,13 @@
 layout: default
 title: Notifications
 parent: Server Interactions
-nav_order: 4
-description: "Handling MCP notifications - logging, progress updates, and resource changes"
+nav_order: 5
+description: "Handling MCP notifications - logging, progress updates, task status updates, and resource changes"
 ---
 
 # Notifications
 
-MCP notifications provide real-time updates from servers about ongoing operations, resource changes, and system events. This guide covers how to handle different types of notifications in your application.
+MCP notifications provide real-time updates from servers about ongoing operations, task lifecycles, resource changes, and system events. This guide covers how to handle different types of notifications in your application.
 
 ## Table of contents
 {: .no_toc .text-delta }
@@ -31,6 +31,10 @@ Progress notifications provide updates about the progress of long-running operat
 ### Resource Update Notifications
 
 Resource update notifications inform you when resources on the server have changed.
+
+### Task Status Notifications
+
+Task status notifications inform you when long-running tasks change state (for example `working` to `completed` or `failed`).
 
 ## Logging Notifications
 
@@ -201,6 +205,25 @@ tracker = ProgressTracker.new(client)
 tracker.setup_tracking(timeout: 300)
 ```
 
+## Task Status Notifications
+
+Task status notifications (`notifications/tasks/status`) are processed automatically by the client adapter. This keeps task state synchronized while you poll with task APIs. Task handling is experimental and may change in both the MCP spec and this gem implementation.
+
+```ruby
+# Start work that returns a task ID in tool output
+tool = client.tool("start_background_task")
+response = tool.execute(prompt: "Build a release summary")
+
+task_id = response.to_s[/task_id:(task-[0-9a-f-]+)/, 1]
+task = client.task_get(task_id)
+
+until task.completed? || task.failed? || task.cancelled?
+  sleep((task.poll_interval || 250) / 1000.0)
+  task = task.refresh
+  puts "#{task.task_id}: #{task.status}"
+end
+```
+
 ## Resource Update Notifications
 
 ### Basic Resource Updates
@@ -278,6 +301,7 @@ end
 
 ## Next Steps
 
+- **[Tasks]({% link server/tasks.md %})** - Manage long-running task lifecycles (experimental)
 - **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM
 - **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers
 - **[Rails Integration]({% link guides/rails-integration.md %})** - Complete Rails integration guide

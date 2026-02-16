@@ -221,7 +221,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
         # Test rejection of sensitive request
         result = tool.execute(request_type: "sensitive")
         expect(result).to be_a(RubyLLM::MCP::Content)
-        expect(result.to_s).to include("reject")
+        expect(result.to_s).to include("decline")
 
         # Test acceptance of optional request
         result = tool.execute(request_type: "optional")
@@ -305,7 +305,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
         "confidence" => 0.8
       }
 
-      expect(elicitation.validate_response).to be true
+      expect(elicitation.response_valid?).to be true
     end
 
     it "rejects invalid structured responses" do
@@ -314,7 +314,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
         "confidence" => 0.8
       }
 
-      expect(elicitation.validate_response).to be false
+      expect(elicitation.response_valid?).to be false
     end
 
     it "rejects responses with invalid enum values" do
@@ -324,7 +324,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
         "confidence" => 0.8
       }
 
-      expect(elicitation.validate_response).to be false
+      expect(elicitation.response_valid?).to be false
     end
 
     it "validates numeric constraints" do
@@ -334,7 +334,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
         "confidence" => 1.5
       }
 
-      expect(elicitation.validate_response).to be false
+      expect(elicitation.response_valid?).to be false
     end
   end
 
@@ -391,7 +391,7 @@ RSpec.describe RubyLLM::MCP::Elicitation do
       elicitation.structured_response = large_response
 
       # The validation method should handle this without errors
-      expect { elicitation.validate_response }.not_to raise_error
+      expect { elicitation.response_valid? }.not_to raise_error
     end
   end
 

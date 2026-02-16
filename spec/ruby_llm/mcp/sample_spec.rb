@@ -61,7 +61,20 @@ RSpec.describe RubyLLM::MCP::Sample do
 
       capabilities = client.client_capabilities
 
-      expect(capabilities[:sampling]).to eq({})
+      expect(capabilities[:sampling]).to eq({ context: {} })
+    end
+
+    it "advertises tools and context sampling capability flags when enabled" do
+      RubyLLM::MCP.configure do |config|
+        config.sampling.enabled = true
+        config.sampling.tools = true
+        config.sampling.context = true
+      end
+      client.start
+
+      capabilities = client.client_capabilities
+
+      expect(capabilities[:sampling]).to eq({ tools: {}, context: {} })
     end
 
     it "client is setup to not have sampling capabilities when sampling option is disabled" do

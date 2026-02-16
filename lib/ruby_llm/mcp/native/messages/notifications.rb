@@ -35,6 +35,24 @@ module RubyLLM
               method: METHOD_NOTIFICATION_ROOTS_LIST_CHANGED
             }
           end
+
+          def tasks_status(task:)
+            {
+              jsonrpc: JSONRPC_VERSION,
+              method: METHOD_NOTIFICATION_TASKS_STATUS,
+              params: task
+            }
+          end
+
+          def elicitation_complete(elicitation_id:)
+            {
+              jsonrpc: JSONRPC_VERSION,
+              method: METHOD_NOTIFICATION_ELICITATION_COMPLETE,
+              params: {
+                elicitationId: elicitation_id
+              }
+            }
+          end
         end
       end
     end
