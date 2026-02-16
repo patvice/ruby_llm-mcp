@@ -12,7 +12,7 @@ http_interactions:
         two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":["a","b"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -33,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:36:35 GMT
+      - Mon, 16 Feb 2026 17:24:54 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -43,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=689
+      - gfet4t7; dur=676
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -69,8 +69,8 @@ http_interactions:
                     "functionCall": {
                       "name": "add",
                       "args": {
-                        "a": 5,
-                        "b": 7
+                        "b": 7,
+                        "a": 5
                       }
                     }
                   }
@@ -78,7 +78,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.0002446057430158059
+              "avgLogprobs": -0.00017015715517724553
             }
           ],
           "usageMetadata": {
@@ -99,22 +99,22 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "A3cSae3vD-TvjrEPlqOI6A0"
+          "responseId": "5VKTaa2aKILPjrEPrLG--QM"
         }
-  recorded_at: Mon, 10 Nov 2025 23:36:35 GMT
+  recorded_at: Mon, 16 Feb 2026 17:24:54 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
       string: '{"contents":[{"role":"user","parts":[{"text":"Can you multiply 3 and
-        4, then add 5 and 7?"}]},{"role":"model","parts":[{"functionCall":{"name":"simple_multiply","args":{"x":3,"y":4}}},{"functionCall":{"name":"add","args":{"a":5,"b":7}}}]},{"role":"function","parts":[{"functionResponse":{"name":"simple_multiply","response":{"name":"simple_multiply","content":[{"text":"12"}]}}},{"functionResponse":{"name":"add","response":{"name":"add","content":[{"text":"12"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"simple_multiply","description":"Multiply
+        4, then add 5 and 7?"}]},{"role":"model","parts":[{"functionCall":{"name":"simple_multiply","args":{"x":3,"y":4}}},{"functionCall":{"name":"add","args":{"b":7,"a":5}}}]},{"role":"function","parts":[{"functionResponse":{"name":"simple_multiply","response":{"name":"simple_multiply","content":[{"text":"12"}]}}},{"functionResponse":{"name":"add","response":{"name":"add","content":[{"text":"12"}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"simple_multiply","description":"Multiply
         two numbers together","parameters":{"type":"OBJECT","properties":{"x":{"type":"NUMBER","description":"First
         number"},"y":{"type":"NUMBER","description":"Second number"}},"required":["x","y"]}},{"name":"add","description":"Addes
         two numbers together","parameters":{"type":"OBJECT","properties":{"a":{"type":"NUMBER"},"b":{"type":"NUMBER"}},"required":["a","b"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -135,7 +135,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:36:36 GMT
+      - Mon, 16 Feb 2026 17:24:54 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -145,7 +145,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=497
+      - gfet4t7; dur=438
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -159,19 +159,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The result of multiplying 3 and 4 is 12. The result of adding 5 and 7 is 12.\n"
+                    "text": "3 multiplied by 4 is 12, and 5 plus 7 is 12."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.047617624545919487
+              "avgLogprobs": -0.00039171675841013592
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 78,
-            "candidatesTokenCount": 29,
-            "totalTokenCount": 107,
+            "candidatesTokenCount": 21,
+            "totalTokenCount": 99,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -181,12 +181,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 29
+                "tokenCount": 21
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BHcSabvbBq3J-8YPnpXJ-Ao"
+          "responseId": "5lKTafGyGaDR-8YPi_Gl4AM"
         }
-  recorded_at: Mon, 10 Nov 2025 23:36:36 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:24:54 GMT
+recorded_with: VCR 6.4.0

@@ -10,7 +10,7 @@ http_interactions:
         respond based on the prompt provided."}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:38:27 GMT
+      - Mon, 16 Feb 2026 17:28:33 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,47 +39,46 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:38:27Z'
+      - '2026-02-16T17:28:32Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:38:27Z'
+      - '2026-02-16T17:28:33Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:38:26Z'
-      Retry-After:
-      - '35'
+      - '2026-02-16T17:28:32Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:38:27Z'
+      - '2026-02-16T17:28:32Z'
+      X-Robots-Tag:
+      - none
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
-      X-Envoy-Upstream-Service-Time:
-      - '1774'
-      Cf-Cache-Status:
-      - DYNAMIC
-      X-Robots-Tag:
-      - none
       Server:
       - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '2040'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01DNjtEgWKJe6b4i82U1mcL3","type":"message","role":"assistant","content":[{"type":"text","text":"Hello!
-        I''m doing well, thank you for asking. Hello back to you too! How are you
-        doing today?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":29,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":27,"service_tier":"standard"}}'
-  recorded_at: Mon, 10 Nov 2025 23:38:27 GMT
-recorded_with: VCR 6.3.1
+      string: !binary |-
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxUzlNc1ozVUx2RlM4dDFTSGlIZHRYeiIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlbGxvISBJJ20gZG9pbmcgd2VsbCwgdGhhbmsgeW91IGZvciBhc2tpbmcuIEl0J3MgbmljZSB0byBtZWV0IHlvdSFcblxuSGVsbG8gYmFjayEg8J+YilxuXG5Ib3cgYXJlIHlvdSBkb2luZyB0b2RheT8ifV0sInN0b3BfcmVhc29uIjoiZW5kX3R1cm4iLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjI5LCJjYWNoZV9jcmVhdGlvbl9pbnB1dF90b2tlbnMiOjAsImNhY2hlX3JlYWRfaW5wdXRfdG9rZW5zIjowLCJjYWNoZV9jcmVhdGlvbiI6eyJlcGhlbWVyYWxfNW1faW5wdXRfdG9rZW5zIjowLCJlcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zIjowfSwib3V0cHV0X3Rva2VucyI6MzYsInNlcnZpY2VfdGllciI6InN0YW5kYXJkIiwiaW5mZXJlbmNlX2dlbyI6Im5vdF9hdmFpbGFibGUifX0=
+  recorded_at: Mon, 16 Feb 2026 17:28:33 GMT
+recorded_with: VCR 6.4.0

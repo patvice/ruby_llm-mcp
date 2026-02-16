@@ -9,7 +9,7 @@ http_interactions:
         how are you?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:41:11 GMT
+      - Mon, 16 Feb 2026 17:31:23 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=586
+      - gfet4t7; dur=481
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -60,7 +60,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.048752468824386594
+              "avgLogprobs": -0.10287714004516602
             }
           ],
           "usageMetadata": {
@@ -81,7 +81,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "FngSaaqcIIia_uMPlrqU0AE"
+          "responseId": "a1STaZOVH9mo_uMPtoarwAs"
         }
-  recorded_at: Mon, 10 Nov 2025 23:41:11 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:31:23 GMT
+recorded_with: VCR 6.4.0

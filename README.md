@@ -74,7 +74,7 @@ The official Anthropic-maintained SDK:
 
 ```ruby
 # Add to Gemfile
-gem 'mcp', '~> 0.4'
+gem 'mcp', '~> 0.7'
 
 # Use in code
 client = RubyLLM::MCP.client(
@@ -85,7 +85,7 @@ client = RubyLLM::MCP.client(
 )
 ```
 
-**Features**: Core MCP features (tools, resources, prompts). No SSE, sampling, or advanced features.
+**Features**: Core MCP features (tools, resources, prompts, resource templates, logging). No sampling, roots, or other advanced client features.
 
 See the [Adapters Guide](https://rubyllm-mcp.com/guides/adapters.html) for detailed comparison.
 

@@ -10,7 +10,7 @@ http_interactions:
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}},"required":["name","value"],"additionalProperties":false}}},"required":["url","headers"],"additionalProperties":false}]}},"required":["website"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:35:02 GMT
+      - Mon, 16 Feb 2026 17:26:41 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2383'
+      - '501'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '2400'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -64,13 +64,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -79,9 +76,9 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVhU4GwF9FjOjRMY0JDGcHJVjkLu",
+          "id": "chatcmpl-D9wemd87uzcbFf8wIAqNb5FNlPOxI",
           "object": "chat.completion",
-          "created": 1762817700,
+          "created": 1771262800,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
@@ -91,7 +88,7 @@ http_interactions:
                 "content": null,
                 "tool_calls": [
                   {
-                    "id": "call_dUaDDOyO763NorKI5Rg5MoTo",
+                    "id": "call_y6BDmgFe3tbhCLI3YlFKi1Mp",
                     "type": "function",
                     "function": {
                       "name": "fetch_site",
@@ -122,23 +119,23 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:35:02 GMT
+  recorded_at: Mon, 16 Feb 2026 17:26:41 GMT
 - request:
     method: post
     uri: https://api.openai.com/v1/chat/completions
     body:
       encoding: UTF-8
       string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you fetch
-        the website https://www.example.com/ and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_dUaDDOyO763NorKI5Rg5MoTo","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"https://www.example.com/\"}"}}]},{"role":"tool","content":"Website
+        the website https://www.example.com/ and see if the site say what they do?"},{"role":"assistant","tool_calls":[{"id":"call_y6BDmgFe3tbhCLI3YlFKi1Mp","type":"function","function":{"name":"fetch_site","arguments":"{\"website\":\"https://www.example.com/\"}"}}]},{"role":"tool","content":"Website
         content from https://www.example.com/:\n\nExample Domain Example Domain This
         domain is for use in documentation examples without needing permission. Avoid
-        use in operations. Learn more","tool_call_id":"call_dUaDDOyO763NorKI5Rg5MoTo"}],"stream":false,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
+        use in operations. Learn more","tool_call_id":"call_y6BDmgFe3tbhCLI3YlFKi1Mp"}],"stream":false,"tools":[{"type":"function","function":{"name":"fetch_site","description":"Fetches
         website content and returns it as text","parameters":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}},"required":["name","value"],"additionalProperties":false}}},"required":["url","headers"],"additionalProperties":false}]}},"required":["website"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"}}}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -153,7 +150,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:35:04 GMT
+      - Mon, 16 Feb 2026 17:26:43 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -165,13 +162,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1753'
+      - '1700'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '1794'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -192,13 +189,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -207,16 +201,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVhW41fap66HeX17IVreckQ796Y7",
+          "id": "chatcmpl-D9wenAPugT06XCMs5FuTsFtTIXJZ2",
           "object": "chat.completion",
-          "created": 1762817702,
+          "created": 1771262801,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "The website https://www.example.com/ states that it is \"for use in documentation examples without needing permission.\" It advises to avoid using the domain in operations. It does not offer any services or describe products; its main purpose is to serve as a sample domain for documentation purposes.",
+                "content": "The website https://www.example.com/ states that it is an \"Example Domain.\" According to the site, this domain is for use in documentation examples and does not require permission for such use. It also advises against using the domain for operational purposes.\n\nIn short, the site exists for educational and demonstration purposes only, not for any business or service.",
                 "refusal": null,
                 "annotations": []
               },
@@ -226,8 +220,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 147,
-            "completion_tokens": 57,
-            "total_tokens": 204,
+            "completion_tokens": 71,
+            "total_tokens": 218,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -240,7 +234,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:35:04 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:26:43 GMT
+recorded_with: VCR 6.4.0

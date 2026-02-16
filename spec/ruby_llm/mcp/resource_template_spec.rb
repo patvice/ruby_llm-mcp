@@ -141,7 +141,7 @@ RSpec.describe RubyLLM::MCP::ResourceTemplate do
         else
           expect do
             template.complete("name", "A")
-          end.to raise_error(RubyLLM::MCP::Errors::CompletionNotAvailable)
+          end.to raise_error(RubyLLM::MCP::Errors::Capabilities::CompletionNotAvailable)
         end
       end
     end

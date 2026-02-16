@@ -1,0 +1,85 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-20250514","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you write me a beautiful poem about the current day? Make sure to include
+        the word ''poem'' in your response."}]},{"role":"user","content":[{"type":"text","text":"Please
+        provide the content from the prompt."}]}],"stream":false,"max_tokens":64000}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 16 Feb 2026 17:29:27 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '30000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2026-02-16T17:29:20Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2026-02-16T17:29:29Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2026-02-16T17:29:21Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '38000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2026-02-16T17:29:20Z'
+      X-Robots-Tag:
+      - none
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      Server:
+      - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '7594'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxV2NBRlZOR0MyZWpuRjlRd3VnaXVLYiIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIHBvZW0gYWJvdXQgdGhlIGN1cnJlbnQgZGF5OlxuXG4qKlRvZGF5J3MgQ2FudmFzKipcblxuTW9ybmluZyBsaWdodCBzcGlsbHMgdGhyb3VnaCB3aW50ZXIncyBicmVhdGgsXG5EZWNlbWJlciBob2xkcyB0aGUgd29ybGQgaW4gcGF1c2XigJRcbkJldHdlZW4gdGhlIHJ1c2ggb2Ygd2hhdCBoYXMgYmVlblxuQW5kIGRyZWFtcyB0aGF0IHdhaXQgYmVoaW5kIGNsb3NlZCBkb29ycy5cblxuVGhlIGNvZmZlZSBzdGVhbXMsIHRoZSBpbmJveCBmaWxscyxcbldoaWxlIHNvbWV3aGVyZSBjaGlsZHJlbiBsYXVnaCBhdCBwbGF5LFxuQW5kIGxvdmVycyB0ZXh0IHRoZWlyIHNlY3JldCBob3Blc1xuQWNyb3NzIHRoZSBvcmRpbmFyeSBkYXkuXG5cbkluIGJvYXJkcm9vbXMsIHBsYW5zIHVuZm9sZCBsaWtlIG1hcHMsXG5JbiBraXRjaGVucywgYnJlYWQgYmVnaW5zIHRvIHJpc2UsXG5BbmQgZXZlcnkgc291bCBjYXJyaWVzIGEgc3RvcnlcbkJlaGluZCBmYW1pbGlhciwgc2VhcmNoaW5nIGV5ZXMuXG5cblRoZSB0cmVlcyBzdGFuZCBiYXJlIGJ1dCBub3QgYmVyZWZ04oCUXG5UaGV5IGtub3cgdGhhdCBzZWFzb25zIGFsd2F5cyB0dXJuLFxuVGhhdCBldmVyeSBlbmRpbmcgaG9sZHMgYmVnaW5uaW5nLFxuVGhhdCBldmVyeSBoZWFydCBzdGlsbCBoYXMgbXVjaCB0byBsZWFybi5cblxuVGhpcyBwb2VtIGNhcHR1cmVzIGp1c3Qgb25lIHRocmVhZFxuRnJvbSBhbGwgdGhlIGxpdmVzIHRoYXQgaW50ZXJ3ZWF2ZVxuT24gdGhpcyBwYXJ0aWN1bGFyIERlY2VtYmVyIGRheSxcbldoZW4gZXZlcnlvbmUgc3RpbGwgZGFyZXMgdG8gYmVsaWV2ZS5cblxuLS0tXG5cblRoaXMgcG9lbSByZWZsZWN0cyB0aGUgcXVpZXQgYmVhdXR5IGFuZCBpbnRlcmNvbm5lY3RlZG5lc3Mgb2YgZGFpbHkgbGlmZSwgd2l0aCBpdHMgbWl4dHVyZSBvZiByb3V0aW5lIGFuZCBwb3NzaWJpbGl0eSB0aGF0IG1ha2VzIGVhY2ggZGF5IHVuaXF1ZSwgZXZlbiBpbiB0aGUgbWlkc3Qgb2Ygd2ludGVyJ3MgY29udGVtcGxhdGl2ZSBzZWFzb24uIn1dLCJzdG9wX3JlYXNvbiI6ImVuZF90dXJuIiwic3RvcF9zZXF1ZW5jZSI6bnVsbCwidXNhZ2UiOnsiaW5wdXRfdG9rZW5zIjo0MiwiY2FjaGVfY3JlYXRpb25faW5wdXRfdG9rZW5zIjowLCJjYWNoZV9yZWFkX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfY3JlYXRpb24iOnsiZXBoZW1lcmFsXzVtX2lucHV0X3Rva2VucyI6MCwiZXBoZW1lcmFsXzFoX2lucHV0X3Rva2VucyI6MH0sIm91dHB1dF90b2tlbnMiOjIyOSwic2VydmljZV90aWVyIjoic3RhbmRhcmQiLCJpbmZlcmVuY2VfZ2VvIjoibm90X2F2YWlsYWJsZSJ9fQ==
+  recorded_at: Mon, 16 Feb 2026 17:29:27 GMT
+recorded_with: VCR 6.4.0

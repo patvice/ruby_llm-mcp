@@ -35,7 +35,9 @@ module RubyLLM
             roots_callback: -> { client.roots.paths },
             logging_enabled: client.logging_handler_enabled?,
             logging_level: client.on_logging_level,
-            elicitation_enabled: client.elicitation_enabled?,
+            # Always advertise elicitation capability for native adapter clients.
+            # If no handler is set, requests are safely rejected by the callback path.
+            elicitation_enabled: true,
             progress_tracking_enabled: client.tracking_progress?,
             elicitation_callback: build_elicitation_callback(client),
             sampling_callback: build_sampling_callback(client),

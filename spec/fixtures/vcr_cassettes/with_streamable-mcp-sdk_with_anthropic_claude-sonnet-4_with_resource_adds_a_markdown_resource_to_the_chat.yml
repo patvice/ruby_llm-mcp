@@ -12,7 +12,7 @@ http_interactions:
         does the markdown file say?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -29,7 +29,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:36:12 GMT
+      - Mon, 16 Feb 2026 17:24:31 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -41,52 +41,52 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:36:10Z'
+      - '2026-02-16T17:24:29Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:36:13Z'
+      - '2026-02-16T17:24:31Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:36:10Z'
-      Retry-After:
-      - '51'
+      - '2026-02-16T17:24:29Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:36:10Z'
+      - '2026-02-16T17:24:29Z'
+      X-Robots-Tag:
+      - none
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
-      X-Envoy-Upstream-Service-Time:
-      - '3825'
-      Cf-Cache-Status:
-      - DYNAMIC
-      X-Robots-Tag:
-      - none
       Server:
       - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '2981'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01BLH2SfMKD3vVCx5Esh38cK","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        markdown file \"my.md\" contains the following content:\n\n# My Markdown File\n\nThis
-        is a markdown file that I want to be able to use as a resource\n\n## Section
-        1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another
-        section in my markdown file\n\n---\n\nThe file has:\n- A main heading \"My
-        Markdown File\"\n- An introductory sentence explaining it''s meant to be used
-        as a resource\n- Two sections (Section 1 and Section 2) with brief descriptions
-        of each section"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":122,"service_tier":"standard"}}'
-  recorded_at: Mon, 10 Nov 2025 23:36:12 GMT
-recorded_with: VCR 6.3.1
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01LqNgFw5C5AuvuA8zdjVCZ9","type":"message","role":"assistant","content":[{"type":"text","text":"The
+        markdown file says:\n\n# My Markdown File\n\nThis is a markdown file that
+        I want to be able to use as a resource\n\n## Section 1\n\nThis is a section
+        in my markdown file\n\n## Section 2\n\nThis is another section in my markdown
+        file\n\nThe file has a main title \"My Markdown File\" followed by an introductory
+        sentence explaining its purpose as a resource. It then contains two sections
+        - Section 1 and Section 2 - each with a brief descriptive sentence about being
+        sections in the markdown file."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":117,"service_tier":"standard","inference_geo":"not_available"}}'
+  recorded_at: Mon, 16 Feb 2026 17:24:31 GMT
+recorded_with: VCR 6.4.0

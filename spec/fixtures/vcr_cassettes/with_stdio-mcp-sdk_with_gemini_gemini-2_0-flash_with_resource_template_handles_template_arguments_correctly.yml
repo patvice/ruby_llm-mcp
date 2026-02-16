@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"greeting (greeting://Bob):
+        A greeting resource\n\nHello, Bob!"}]},{"role":"user","parts":[{"text":"Use
+        the greeting template to say hello to Bob"}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Mon, 16 Feb 2026 17:27:36 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=595
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "Okay, I understand. Using the \"greeting\" resource and the information provided, I will generate a greeting for Bob.\n\n**Hello, Bob!**\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.47017320990562439
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 23,
+            "candidatesTokenCount": 32,
+            "totalTokenCount": 55,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 23
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 32
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "h1OTabP7ONyM_PUP3-3HgAY"
+        }
+  recorded_at: Mon, 16 Feb 2026 17:27:36 GMT
+recorded_with: VCR 6.4.0

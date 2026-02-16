@@ -10,7 +10,7 @@ http_interactions:
         the greeting template to say hello to Bob"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:37:11 GMT
+      - Mon, 16 Feb 2026 17:27:11 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=594
+      - gfet4t7; dur=1148
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,19 +55,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, using the provided greeting resource:\n\n**Hello, Bob!**\n"
+                    "text": "Okay, I understand. You want me to use the provided information to generate a greeting for Bob.\n\nBased on:\n\n*   **greeting (greeting://Bob): A greeting resource** - This indicates that the resource identified by the URI `greeting://Bob` is a greeting specific to Bob.\n*   **Hello, Bob!** - This provides the actual greeting text.\n*   **Use the greeting template to say hello to Bob** - This explicitly asks me to utilize the given greeting.\n\nTherefore, here's the generated greeting:\n\n**Hello, Bob!**\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.40445190668106079
+              "avgLogprobs": -0.4919089953104655
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 23,
-            "candidatesTokenCount": 16,
-            "totalTokenCount": 39,
+            "candidatesTokenCount": 120,
+            "totalTokenCount": 143,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -77,12 +77,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 16
+                "tokenCount": 120
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "J3cSaeuLBKmq-8YPmMS-mAw"
+          "responseId": "blOTaZWGK7G8_uMPtOaugQU"
         }
-  recorded_at: Mon, 10 Nov 2025 23:37:11 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:27:11 GMT
+recorded_with: VCR 6.4.0

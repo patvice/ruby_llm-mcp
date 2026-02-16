@@ -9,7 +9,7 @@ http_interactions:
         a helpful assistant."},{"role":"user","content":"Hello, how are you?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -24,7 +24,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:41:20 GMT
+      - Mon, 16 Feb 2026 17:31:36 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -36,13 +36,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '353'
+      - '785'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '376'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -63,13 +63,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -78,16 +75,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVncQ2bqm00YOoow7wCG47RSZuNO",
+          "id": "chatcmpl-D9wjX0lluj7VynArOn8RqIgBdv3u9",
           "object": "chat.completion",
-          "created": 1762818080,
+          "created": 1771263095,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Hello! I'm just a program, but I'm here and ready to help you. How can I assist you today?",
+                "content": "Hello! I'm just a computer program, so I don't have feelings, but I'm ready to help you with whatever you need. How can I assist you today?",
                 "refusal": null,
                 "annotations": []
               },
@@ -97,8 +94,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 23,
-            "completion_tokens": 23,
-            "total_tokens": 46,
+            "completion_tokens": 32,
+            "total_tokens": 55,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -111,7 +108,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_8b22347a3e"
         }
-  recorded_at: Mon, 10 Nov 2025 23:41:20 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:31:36 GMT
+recorded_with: VCR 6.4.0

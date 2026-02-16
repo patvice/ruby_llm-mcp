@@ -1,0 +1,80 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you write
+        me a beautiful poem about the current day? Make sure to include the word ''poem''
+        in your response."}],"stream":false}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.1
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 16 Feb 2026 17:29:48 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '3389'
+      Openai-Project:
+      - proj_70GvpxWwXEXq1CaJmiZwOaVX
+      Openai-Version:
+      - '2020-10-01'
+      Server:
+      - cloudflare
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29970'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 60ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      X-Openai-Proxy-Wasm:
+      - v0.1
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1EOXdobFl6U3EyRVpiMzhtSWxmYWlUVVVMZW9rWCIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc3MTI2Mjk4NSwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJBIHBvZW0gYXdha2VucyB3aXRoIHRoZSBtb3JuaW5nIGxpZ2h0LCAgXG5TcGlsbGluZyBnb2xkIGFjcm9zcyB0aGUgZXZlcnlkYXnigJQgIFxuU3VucmlzZSBwYWludGluZyBwcm9taXNlcyBpbiBzb2Z0IGRlbGlnaHQgIFxuT24gcm9vZnRvcHMsIGxlYXZlcywgYW5kIGNoaWxkcmVuIGF0IHRoZWlyIHBsYXkuXG5cblRvZGF5J3MgYSBjYW52YXMsIGJsYW5rIGFuZCBldmVyIG5ldywgIFxuV2l0aCBsYXVnaHRlciB0aHJlYWRlZCB0aHJvdWdoIHRoZSBidXN0bGluZyBhaXI7ICBcbkEgcGF0Y2h3b3JrIHNreSBvZiBzdGVhZGZhc3Qgc3VtbWVyIGJsdWUsICBcbkFuZCBob3BlIHVuZm9sZGluZyBnZW50bGUgZXZlcnl3aGVyZS5cblxuVGhpcyBwb2VtIGxpdmVzIGluIHZvaWNlcyB3YXJtIGFuZCBicmlnaHQsICBcbkluIGZvb3RzdGVwcyBlY2hvaW5nIHRoZSB3YWtpbmcgc3RyZWV0LCAgXG5JbiBmbGVldGluZyBjbG91ZHMsIGluIGJpcmRz4oCZIHVuaHVycmllZCBmbGlnaHQgIFxuQW5kIG1vbWVudHMgd2hlcmUgdGhlIG9yZGluYXJ5IGZlZWxzIHN3ZWV0LlxuXG5MZXQgdGhpcyBsaXZpbmcgcG9lbSBvZiBub3cgcmVtYWlu4oCUICBcbkEgbWVtb3J5IGNyYWRsZWQsIHNpbXBsZSBhbmQgdW5mZWlnbmVkLiIsCiAgICAgICAgInJlZnVzYWwiOiBudWxsLAogICAgICAgICJhbm5vdGF0aW9ucyI6IFtdCiAgICAgIH0sCiAgICAgICJsb2dwcm9icyI6IG51bGwsCiAgICAgICJmaW5pc2hfcmVhc29uIjogInN0b3AiCiAgICB9CiAgXSwKICAidXNhZ2UiOiB7CiAgICAicHJvbXB0X3Rva2VucyI6IDMzLAogICAgImNvbXBsZXRpb25fdG9rZW5zIjogMTMzLAogICAgInRvdGFsX3Rva2VucyI6IDE2NiwKICAgICJwcm9tcHRfdG9rZW5zX2RldGFpbHMiOiB7CiAgICAgICJjYWNoZWRfdG9rZW5zIjogMCwKICAgICAgImF1ZGlvX3Rva2VucyI6IDAKICAgIH0sCiAgICAiY29tcGxldGlvbl90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgInJlYXNvbmluZ190b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMCwKICAgICAgImFjY2VwdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMCwKICAgICAgInJlamVjdGVkX3ByZWRpY3Rpb25fdG9rZW5zIjogMAogICAgfQogIH0sCiAgInNlcnZpY2VfdGllciI6ICJkZWZhdWx0IiwKICAic3lzdGVtX2ZpbmdlcnByaW50IjogImZwXzhiMjIzNDdhM2UiCn0K
+  recorded_at: Mon, 16 Feb 2026 17:29:48 GMT
+recorded_with: VCR 6.4.0

@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:36:32 GMT
+      - Mon, 16 Feb 2026 17:24:50 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=2683
+      - gfet4t7; dur=2368
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -55,38 +55,38 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have access to a vast amount of information. My knowledge is based on:\n\n*   **A massive dataset of text and code:** I was trained on a huge dataset of text and code, which includes books, articles, websites, and other forms of written and visual information. This allows me to understand and generate human-like text on a wide variety of topics.\n\n*   **Image recognition and understanding:** As demonstrated in the previous response, I can process and understand images, identifying objects and describing their content.\n\n*   **Natural language processing (NLP):** I can understand and respond to natural language, which allows me to have conversations, answer questions, and perform tasks based on text input.\n\n*   **Machine learning capabilities:** I am constantly learning and improving my abilities through machine learning.\n\n**However, it's important to note that I don't have access to:**\n\n*   **Real-time information:** My knowledge is based on the data I was trained on, so I don't have access to live information like current news, stock prices, or real-time social media updates.\n\n*   **Personal information:** I don't have access to your personal information unless you explicitly share it with me.\n\n*   **External websites or APIs:** I can't directly access or interact with websites or external APIs.\n\nIn summary, I am a powerful language model that can provide information, generate text, and understand images based on the vast amount of data I was trained on. However, my knowledge is limited to the data I was trained on, and I don't have access to real-time information or external resources."
+                    "text": "As a large language model, I have access to a vast amount of information and computational resources. Here's a breakdown of what I can do:\n\n*   **Vast Knowledge Base:** I have been trained on a massive dataset of text and code, which gives me knowledge about a wide range of topics.\n*   **Natural Language Processing (NLP) Capabilities:** I can understand and generate human language, translate languages, summarize text, answer questions, and more.\n*   **Code Generation:** I can generate code in various programming languages.\n*   **Image Analysis (Limited):** While I cannot directly \"see\" images like a human, I can process image descriptions provided to me. In this case, you gave me the description \"A picture of a dog\" so I am able to confirm it.\n*   **Mathematical Calculations:** I can perform mathematical calculations.\n*   **Access to Real-time Information (Indirect):** I can access information from the web through search, though I do not have real-time browsing capabilities like a web browser.\n\nI can utilize these resources to provide informative and comprehensive responses to a wide range of questions and prompts."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.36959199708471607
+              "avgLogprobs": -0.43926041096324203
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 275,
-            "candidatesTokenCount": 339,
-            "totalTokenCount": 614,
+            "candidatesTokenCount": 239,
+            "totalTokenCount": 514,
             "promptTokensDetails": [
-              {
-                "modality": "IMAGE",
-                "tokenCount": 258
-              },
               {
                 "modality": "TEXT",
                 "tokenCount": 17
+              },
+              {
+                "modality": "IMAGE",
+                "tokenCount": 258
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 339
+                "tokenCount": 239
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "_XYSaY_-J67tjrEPr7CiqQE"
+          "responseId": "4FKTaaDWAdbv-8YPqr7GuA0"
         }
-  recorded_at: Mon, 10 Nov 2025 23:36:32 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:24:50 GMT
+recorded_with: VCR 6.4.0

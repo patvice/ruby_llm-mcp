@@ -12,7 +12,7 @@ http_interactions:
         does the markdown file say?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -33,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:33:08 GMT
+      - Mon, 16 Feb 2026 17:23:19 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -43,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1218
+      - gfet4t7; dur=1123
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -57,19 +57,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The markdown file `my.md` contains the following text:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nWhen rendered, it will appear as a document with a main title \"My Markdown File\", followed by a paragraph, and then two sections titled \"Section 1\" and \"Section 2\" respectively, each with a descriptive paragraph.\n"
+                    "text": "The markdown file `my.md` contains the following text:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nWhen rendered, it would display as:\n\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.1637938246767745
+              "avgLogprobs": -0.046528320759534836
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 65,
-            "candidatesTokenCount": 117,
-            "totalTokenCount": 182,
+            "candidatesTokenCount": 128,
+            "totalTokenCount": 193,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -79,12 +79,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 117
+                "tokenCount": 128
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "M3YSaa2PNJiM_PUP39KjqQM"
+          "responseId": "hlKTabfzDci9jrEPsNWW4QM"
         }
-  recorded_at: Mon, 10 Nov 2025 23:33:08 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:23:19 GMT
+recorded_with: VCR 6.4.0

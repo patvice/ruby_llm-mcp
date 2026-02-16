@@ -18,7 +18,11 @@ end
 require "bundler/setup"
 require "ruby_llm"
 require "ruby_llm/mcp"
-require "mcp" if RUBY_VERSION >= "3.2.0"
+begin
+  require "mcp" if RUBY_VERSION >= "3.1.0"
+rescue LoadError
+  # MCP SDK specs are skipped when the gem is not installed.
+end
 
 require_relative "support/client_runner"
 require_relative "support/client_sync_helpers"
@@ -107,9 +111,9 @@ FILESYSTEM_CLIENT = {
 #    - Transports: stdio, sse, streamable, streamable_http
 #
 # 2. MCPSdkAdapter - Wrapper around the official MCP SDK gem
-#    - Supports: tools, prompts, resources, resource_templates (basic features only)
+#    - Supports: tools, prompts, resources, resource_templates, logging (basic features)
 #    - Transports: stdio, http, streamable, streamable_http
-#    - Requires: gem 'mcp', '~> 0.4' (optional - tests will skip if not installed)
+#    - Requires: gem 'mcp', '~> 0.7' (optional - tests will skip if not installed)
 #
 # Testing DSL:
 #   Use `each_client` to run tests on all available adapters
@@ -201,7 +205,7 @@ mcp_sdk_clients = [
   }
 ].freeze
 
-CLIENT_OPTIONS = if RUBY_VERSION >= "3.2.0"
+CLIENT_OPTIONS = if RUBY_VERSION >= "3.1.0" && ClientRunner.mcp_sdk_available?
                    native_clients + mcp_sdk_clients
                  else
                    native_clients

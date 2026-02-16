@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:31:50 GMT
+      - Mon, 16 Feb 2026 17:22:11 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '9308'
+      - '9488'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '9330'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -70,13 +70,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -85,16 +82,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVeHLmhu3ScbhIKgkVCfZ5hE1XEK",
+          "id": "chatcmpl-D9waH4nfhsUc6Qlspc5egzxjDHLBx",
           "object": "chat.completion",
-          "created": 1762817501,
+          "created": 1771262521,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "I have access to multiple resources and capabilities to help answer your questions and assist you, including:\n\n### 1. **Extensive Knowledge Base**\n- My knowledge is based on a wide range of sources up to June 2024. This includes textbooks, articles, websites, research papers, and more.\n\n### 2. **Image Analysis**\n- I can analyze and describe images, objects, and simple scenes.\n- I can extract text from images (OCR).\n- I can identify some basic elements, but I **cannot recognize or identify real people**.\n\n### 3. **Text Generation & Summarization**\n- I can summarize articles, books, and essays.\n- I can generate creative content like stories, poems, scripts, and more.\n\n### 4. **Math & Science**\n- I can solve mathematical problems, explain scientific concepts, and help with data analysis.\n\n### 5. **Programming Help**\n- I can write, debug, and explain code in multiple languages such as Python, JavaScript, Java, C++, etc.\n- I can explain algorithms, data structures, and programming concepts.\n\n### 6. **Language Translation**\n- I am capable of translating text between many languages.\n\n### 7. **Research Assistance**\n- I can help you brainstorm, organize research, find trustworthy sources, and generate citations (but I cannot access real-time web data or paywalled content).\n\n### 8. **Learning Support**\n- I can help with understanding concepts, creating study plans, and providing practice quizzes.\n\n### 9. **Conversational Abilities**\n- I can engage in general conversation, answer trivia, and provide advice (within my safety and ethical boundaries).\n\n---\n\n**Limitations:**\n- I cannot browse the internet in real time or access live data.\n- I do not have access to your personal files or any external databases.\n- I do not have sensory perception (hearing, touch, etc.) beyond image/text input.\n\n---\n\nIf you have a specific task or question, let me know how I can help!",
+                "content": "I have access to the following resources:\n\n### 1. **Knowledge Database**\n- My responses are based on a vast amount of training data, which covers information up to my knowledge cutoff date (either **October 2023** or **June 2024**, depending on which model you are using).\n\n### 2. **Image Analysis**\n- I can analyze and describe images you upload, including objects, animals, text (OCR), and some visual content.\n- I cannot recognize or identify real people in images.\n\n### 3. **Text-Based Assistance**\n- I can help write, edit, analyze, and summarize text.\n- I can help with coding, problem-solving, creative writing, research summaries, and more.\n\n### 4. **Formatting and Documents**\n- I can help create tables, plans, outlines, and formatted documents in markdown, plain text, or LaTeX.\n\n### 5. **General Knowledge & Education**\n- I can explain concepts, provide definitions, and help with topics in science, math, history, technology, health (within limits), and many other areas.\n\n---\n**Important Limitations:**\n- I don't have real-time access to the internet or live data.\n- I can't view or interact with external websites directly.\n- I can't execute code, but I can help you write it.\n- For personal data, medical, legal, or financial advice, always consult a professional.\n\nIf you're looking for specific types of resources (like books, websites, or tools), let me know what you need!",
                 "refusal": null,
                 "annotations": []
               },
@@ -104,8 +101,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 282,
-            "completion_tokens": 413,
-            "total_tokens": 695,
+            "completion_tokens": 310,
+            "total_tokens": 592,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -118,7 +115,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:31:50 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:22:11 GMT
+recorded_with: VCR 6.4.0

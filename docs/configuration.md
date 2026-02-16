@@ -106,8 +106,8 @@ end
 
 **`:mcp_sdk`**
 - Official Anthropic-maintained SDK
-- Core features only (tools, resources, prompts)
-- Limited transport support (stdio, HTTP - no SSE)
+- Core features (tools, resources, prompts, resource templates, logging)
+- Limited advanced support (no sampling, roots, or other client-side advanced features)
 
 See the [Adapters Guide]({% link guides/adapters.md %}) for detailed feature comparison and usage examples.
 
@@ -179,13 +179,10 @@ config: {
 
 Best for web-based MCP servers using Server-Sent Events:
 
-{: .warning }
-> SSE transport is only supported with `adapter: :ruby_llm`. The `:mcp_sdk` adapter does not support SSE.
-
 ```ruby
 client = RubyLLM::MCP.client(
   name: "web-server",
-  adapter: :ruby_llm,  # Required for SSE
+  adapter: :ruby_llm,  # Optional; :mcp_sdk also supports SSE
   transport_type: :sse,
   config: {
     url: "https://api.example.com/mcp/sse",  # Required: SSE endpoint

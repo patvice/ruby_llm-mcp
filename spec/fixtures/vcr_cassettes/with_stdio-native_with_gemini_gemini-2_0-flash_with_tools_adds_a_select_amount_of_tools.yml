@@ -11,7 +11,7 @@ http_interactions:
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":["latitude","longitude"]}},"required":["geocode"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:31:15 GMT
+      - Mon, 16 Feb 2026 17:21:27 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=561
+      - gfet4t7; dur=569
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -70,7 +70,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.00012130688198588111
+              "avgLogprobs": -0.00014854228886013681
             }
           ],
           "usageMetadata": {
@@ -91,9 +91,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "wnUSaZWrLaSojrEPieGUqQw"
+          "responseId": "F1KTadz7EdWu_uMPnfPb8AQ"
         }
-  recorded_at: Mon, 10 Nov 2025 23:31:15 GMT
+  recorded_at: Mon, 16 Feb 2026 17:21:27 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -107,7 +107,7 @@ http_interactions:
         the weather from a list of locations","parameters":{"type":"OBJECT","properties":{"geocode":{"type":"OBJECT","properties":{"latitude":{"type":"NUMBER"},"longitude":{"type":"NUMBER"}},"required":["latitude","longitude"]}},"required":["geocode"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -128,7 +128,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:31:15 GMT
+      - Mon, 16 Feb 2026 17:21:28 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -138,7 +138,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=570
+      - gfet4t7; dur=582
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -158,7 +158,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.00099698189072884038
+              "avgLogprobs": -0.0034745937356582056
             }
           ],
           "usageMetadata": {
@@ -179,7 +179,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "w3USabeXF43tjrEP2eSV0QY"
+          "responseId": "GFKTaYq7Buau_uMPm62xmA8"
         }
-  recorded_at: Mon, 10 Nov 2025 23:31:15 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:21:28 GMT
+recorded_with: VCR 6.4.0

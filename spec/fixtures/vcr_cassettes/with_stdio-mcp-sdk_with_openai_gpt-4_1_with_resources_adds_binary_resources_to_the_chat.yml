@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:35:20 GMT
+      - Mon, 16 Feb 2026 17:26:56 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '9275'
+      - '9262'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '9298'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -70,13 +70,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -85,16 +82,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVhfHeHtlc7fGRgZpaPpfvy0qbcP",
+          "id": "chatcmpl-D9wet6d4DmG7byQWSsOuleGYgtEQQ",
           "object": "chat.completion",
-          "created": 1762817711,
+          "created": 1771262807,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "I have access to a wide range of resources and capabilities, including:\n\n### General Knowledge\n- **Comprehensive information** up to my latest update (June 2024).\n- **Encyclopedic facts**, historical events, scientific data, and more.\n- **Textual analysis** and explanations in multiple subjects and fields.\n\n### Language and Writing\n- **Drafting, editing,** and **proofreading** text.\n- **Summarizing** and **rewriting** content.\n- **Translating** languages.\n- **Generating creative content** (stories, poems, etc.).\n\n### Coding and Technical Help\n- **Programming support** in various languages (Python, JavaScript, etc.).\n- **Debugging** and **explaining code**.\n- **Algorithm and data structure help**.\n\n### Image Capabilities\n- **Analyzing and describing images** you upload.\n- **Object recognition** and **basic visual explanations**.\n- **Extracting text from images** (OCR).\n\n### Learning and Study Support\n- **Explaining concepts** at different levels (beginner to advanced).\n- **Creating practice questions**, quizzes, and study guides.\n\n### Practical Assistance\n- **Planning** (schedules, itineraries, study plans).\n- **Providing recipes, instructions, DIY guides**.\n\n### Limitations\n- **No real-time internet access** to fetch up-to-the-minute information.\n- **Cannot access paid or proprietary databases**.\n- **Cannot directly access private information or accounts**.\n\nIf you have any specific task or need to know if I can help with something, just let me know!",
+                "content": "I have access to the following resources and capabilities:\n\n1. **Extensive Knowledge Base**: I have information up to June 2024 (primary knowledge cutoff) and general knowledge up to October 2023, covering a wide range of topics including science, technology, arts, history, and more.\n\n2. **Internet Access**: I do **not** have real-time internet access, so I cannot browse the web, stream live data, or access new web pages or databases after my knowledge cutoffs.\n\n3. **Image Analysis**: I can analyze, describe, and interpret images that you upload. This includes identifying objects, providing descriptions, extracting text (OCR), and more.\n\n4. **Document Analysis**: I can read and interpret documents, PDFs, images containing text, tables, diagrams, and more.\n\n5. **Code Generation and Analysis**: I can write, debug, explain, and analyze code in many programming languages.\n\n6. **Writing and Editing**: I can help draft, proofread, rewrite, and improve all kinds of written material, from essays and reports to emails and creative writing.\n\n7. **Conversation and Q&A**: I can answer questions, explain concepts, and hold conversations on almost any topic.\n\n8. **Problem Solving and Math**: I can solve math problems, explain steps, and help with logical reasoning tasks.\n\n9. **Simulations and Roleplay**: I can simulate personas, play games, and help with brainstorming or creative tasks.\n\n10. **Data Analysis**: I can interpret and analyze various forms of data, including charts and graphs in image form.\n\nIf you'd like to know more about any specific capability or need help with a particular type of resource, just let me know!",
                 "refusal": null,
                 "annotations": []
               },
@@ -104,8 +101,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 282,
-            "completion_tokens": 326,
-            "total_tokens": 608,
+            "completion_tokens": 354,
+            "total_tokens": 636,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -118,7 +115,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:35:20 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:26:56 GMT
+recorded_with: VCR 6.4.0
