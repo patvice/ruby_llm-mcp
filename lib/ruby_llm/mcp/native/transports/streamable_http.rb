@@ -366,6 +366,8 @@ module RubyLLM
               handle_success_response(response, request_id, original_message)
             when 202
               handle_accepted_response(original_message)
+            when 204
+              handle_no_content_response(request_id)
             when 404
               handle_session_expired
             when 401
@@ -423,6 +425,15 @@ module RubyLLM
               start_sse_stream
             end
             nil
+          end
+
+          def handle_no_content_response(request_id)
+            return nil unless request_id
+
+            raise Errors::TransportError.new(
+              code: 204,
+              message: "HTTP 204 No Content received for request expecting a JSON-RPC response"
+            )
           end
 
           def handle_client_error(response)
