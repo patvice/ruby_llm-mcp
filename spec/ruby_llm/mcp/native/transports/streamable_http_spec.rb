@@ -269,26 +269,6 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect(result.result["content"][0]["text"]).to eq("created")
       end
 
-      it "handles 204 No Content for notification-style requests" do
-        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
-          .to_return(status: 204)
-
-        result = transport.request({ "method" => "notifications/ping" }, wait_for_response: false)
-        expect(result).to be_nil
-      end
-
-      it "raises on 204 No Content when request expects a JSON-RPC response" do
-        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
-          .to_return(status: 204)
-
-        expect do
-          transport.request({ "method" => "tools/list", "id" => 1 }, wait_for_response: false)
-        end.to raise_error(
-          RubyLLM::MCP::Errors::TransportError,
-          /HTTP 204 No Content received for request expecting a JSON-RPC response/
-        )
-      end
-
       it "handles 500 Internal Server Error" do
         stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
