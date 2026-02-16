@@ -18,7 +18,11 @@ end
 require "bundler/setup"
 require "ruby_llm"
 require "ruby_llm/mcp"
-require "mcp" if RUBY_VERSION >= "3.1.0"
+begin
+  require "mcp" if RUBY_VERSION >= "3.1.0"
+rescue LoadError
+  # MCP SDK specs are skipped when the gem is not installed.
+end
 
 require_relative "support/client_runner"
 require_relative "support/client_sync_helpers"
@@ -201,7 +205,7 @@ mcp_sdk_clients = [
   }
 ].freeze
 
-CLIENT_OPTIONS = if RUBY_VERSION >= "3.1.0"
+CLIENT_OPTIONS = if RUBY_VERSION >= "3.1.0" && ClientRunner.mcp_sdk_available?
                    native_clients + mcp_sdk_clients
                  else
                    native_clients

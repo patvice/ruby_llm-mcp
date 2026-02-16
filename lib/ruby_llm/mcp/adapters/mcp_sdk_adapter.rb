@@ -354,7 +354,7 @@ module RubyLLM
         end
 
         def transform_prompt_result(result)
-          if result.is_a?(Hash) && result.key?("result")
+          if result.is_a?(Hash) && (result.key?("result") || result.key?("error"))
             Result.new(result)
           else
             Result.new({

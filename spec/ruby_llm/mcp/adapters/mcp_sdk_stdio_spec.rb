@@ -94,6 +94,14 @@ RSpec.describe RubyLLM::MCP::Adapters::MCPSdkAdapter do # rubocop:disable RSpec/
       expect(messages.first).to be_a(RubyLLM::Message)
       expect(messages.first.content).to include("Hello")
     end
+
+    it "surfaces prompt argument errors as MCP response errors" do
+      prompt = client.prompt("specific_language_greeting")
+
+      expect do
+        prompt.fetch({})
+      end.to raise_error(RubyLLM::MCP::Errors::ResponseError, /Invalid arguments/)
+    end
   end
 
   describe "resource templates" do
