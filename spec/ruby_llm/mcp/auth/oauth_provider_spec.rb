@@ -50,7 +50,7 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
     end
 
     it "configures HTTPX with request_timeout" do
-      session = double("HTTPX::Session")
+      session = instance_double(HTTPX::Session)
       allow(HTTPX).to receive(:plugin).with(:follow_redirects).and_return(session)
       allow(session).to receive(:with).and_return(session)
 
