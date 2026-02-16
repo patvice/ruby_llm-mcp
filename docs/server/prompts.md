@@ -210,7 +210,7 @@ end
 ### Context in Completion Requests
 
 {: .new }
-Context in completion requests is available in MCP Protocol 2025-06-18.
+Context in completion requests was introduced in MCP Protocol 2025-06-18.
 
 Completion requests now support context for previously-resolved variables, enabling more intelligent and context-aware suggestions:
 

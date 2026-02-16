@@ -25,6 +25,10 @@ module RubyLLM
           process_progress_message(notification)
         when "notifications/cancelled"
           process_cancelled_notification(notification)
+        when "notifications/tasks/status"
+          process_task_status_notification(notification)
+        when "notifications/elicitation/complete"
+          process_elicitation_complete_notification(notification)
         else
           process_unknown_notification(notification)
         end
@@ -99,6 +103,19 @@ module RubyLLM
       def process_unknown_notification(notification)
         message = "Unknown notification type: #{notification.type} params: #{notification.params.to_h}"
         RubyLLM::MCP.logger.error(message)
+      end
+
+      def process_task_status_notification(notification)
+        return unless client.adapter.respond_to?(:task_status_notification)
+
+        client.adapter.task_status_notification(task: notification.params)
+      end
+
+      def process_elicitation_complete_notification(notification)
+        elicitation_id = notification.params["elicitationId"]
+        return if elicitation_id.nil?
+
+        Handlers::ElicitationRegistry.remove(elicitation_id)
       end
     end
   end

@@ -72,7 +72,7 @@ RSpec.describe "Elicitation Handler Integration" do # rubocop:disable RSpec/Desc
 
       expect(coordinator).to receive(:elicitation_response).with(
         hash_including(
-          elicitation: hash_including(action: "reject")
+          elicitation: hash_including(action: "decline")
         )
       )
 

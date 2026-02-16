@@ -44,6 +44,22 @@ module RubyLLM
       def logging?
         !@capabilities["logging"].nil?
       end
+
+      def tasks?
+        !@capabilities["tasks"].nil?
+      end
+
+      def tasks_list?
+        !@capabilities.dig("tasks", "list").nil?
+      end
+
+      def tasks_cancel?
+        !@capabilities.dig("tasks", "cancel").nil?
+      end
+
+      def task_augmented_tool_call?
+        !@capabilities.dig("tasks", "requests", "tools", "call").nil?
+      end
     end
   end
 end

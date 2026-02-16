@@ -14,11 +14,12 @@ Server interactions encompass all the capabilities that MCP servers provide to e
 
 ## Overview
 
-MCP servers offer four main types of interactions:
+MCP servers offer five main types of interactions:
 
 - **[Tools]({% link server/tools.md %})** - Server-side operations that can be executed by LLMs
 - **[Resources]({% link server/resources.md %})** - Static and dynamic data that can be included in conversations
 - **[Prompts]({% link server/prompts.md %})** - Pre-defined prompts with arguments for consistent interactions
+- **[Tasks]({% link server/tasks.md %})** - Pollable background work with lifecycle state and cancellation (experimental)
 - **[Notifications]({% link server/notifications.md %})** - Real-time updates from servers about ongoing operations
 
 ## Table of contents
@@ -40,6 +41,10 @@ Access structured data from files, databases, or dynamic sources. Resources can 
 
 Use pre-defined prompts with arguments to ensure consistent interactions across your application. Prompts help standardize common queries and maintain formatting consistency.
 
+### Tasks
+
+Track and manage long-running server operations with task lifecycle endpoints (`tasks/list`, `tasks/get`, `tasks/result`, `tasks/cancel`). This surface is experimental and may change in both the MCP spec and this gem implementation.
+
 ### Notifications
 
 Handle real-time updates from servers including logging messages, progress tracking, and resource change notifications during long-running operations.
@@ -51,6 +56,7 @@ Explore each server interaction type to understand how to leverage MCP server ca
 - **[Tools]({% link server/tools.md %})** - Execute server-side operations
 - **[Resources]({% link server/resources.md %})** - Access and include data in conversations
 - **[Prompts]({% link server/prompts.md %})** - Use predefined prompts with arguments
+- **[Tasks]({% link server/tasks.md %})** - Poll and manage long-running background operations (experimental)
 - **[Notifications]({% link server/notifications.md %})** - Handle real-time server updates
 
 ## Next Steps

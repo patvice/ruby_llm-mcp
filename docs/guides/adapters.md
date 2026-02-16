@@ -45,6 +45,7 @@ The default, full-featured adapter that implements the complete MCP protocol wit
 
 **Key Features:**
 - ✅ Complete MCP protocol implementation with advanced features (sampling, roots, progress tracking, elicitation)
+- ✅ Experimental task lifecycle support (`tasks/list`, `tasks/get`, `tasks/result`, `tasks/cancel`)
 - ✅ All transport types supported (stdio, SSE, streamable HTTP)
 - ✅ **Custom transport support** - Register and use your own transport implementations
 - ✅ Ruby 2.7+ compatible
@@ -89,7 +90,10 @@ Wraps the official MCP SDK maintained by Anthropic.
 | Progress Tracking | ✅ | ❌ |
 | Human-in-the-Loop | ✅ | ❌ |
 | Elicitation | ✅ | ❌ |
+| Tasks | ✅ | ❌ |
 | Resource Subscriptions | ✅ | ❌ |
+
+Task support in the `:ruby_llm` adapter is experimental and subject to change in both the MCP spec and this gem implementation.
 
 ## Transport Compatibility
 
@@ -170,7 +174,7 @@ client = RubyLLM::MCP.client(
 #### OAuth Authentication
 
 {: .new }
-OAuth authentication is available in MCP Protocol 2025-06-18 for Streamable HTTP transport.
+OAuth authentication was introduced in MCP Protocol 2025-06-18 for Streamable HTTP transport.
 
 For servers requiring OAuth authentication:
 

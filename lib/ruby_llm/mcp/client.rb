@@ -143,6 +143,20 @@ module RubyLLM
         @resources[name]
       end
 
+      def unsubscribe_from_resource(resource_or_uri) # rubocop:disable Naming/PredicateMethod
+        require_feature!(:subscriptions)
+
+        uri = if resource_or_uri.respond_to?(:uri)
+                resource_or_uri.uri
+              else
+                resource_or_uri.to_s
+              end
+        @adapter.resources_unsubscribe(uri: uri)
+        resource = @resources.values.find { |existing| existing.uri == uri }
+        resource&.instance_variable_set(:@subscribed, false)
+        true
+      end
+
       def reset_resources!
         @resources = {}
       end
@@ -189,6 +203,36 @@ module RubyLLM
 
       def reset_prompts!
         @prompts = {}
+      end
+
+      def tasks_list
+        require_feature!(:tasks)
+        return [] unless capabilities.tasks? && capabilities.tasks_list?
+
+        @adapter.tasks_list.map { |task| MCP::Task.new(@adapter, task) }
+      end
+
+      def task_get(task_id)
+        require_feature!(:tasks)
+        result = @adapter.task_get(task_id: task_id)
+        MCP::Task.new(@adapter, result.value)
+      end
+
+      def task_result(task_id)
+        require_feature!(:tasks)
+        result = @adapter.task_result(task_id: task_id)
+        result.value
+      end
+
+      def task_cancel(task_id)
+        require_feature!(:tasks)
+        unless capabilities.tasks_cancel?
+          message = "Task cancellation is not available for this MCP server"
+          raise Errors::Capabilities::TaskCancelNotAvailable.new(message: message)
+        end
+
+        result = @adapter.task_cancel(task_id: task_id)
+        MCP::Task.new(@adapter, result.value)
       end
 
       def tracking_progress?

@@ -251,6 +251,24 @@ RSpec.describe RubyLLM::MCP::Client do
     end
   end
 
+  each_client_supporting(:tasks) do |_config|
+    describe "tasks capability gating" do
+      it "returns an empty list when tasks/list capability is unavailable" do
+        allow(client.capabilities).to receive_messages(tasks?: true, tasks_list?: false)
+
+        expect(client.tasks_list).to eq([])
+      end
+
+      it "raises a capability error when tasks/cancel capability is unavailable" do
+        allow(client.capabilities).to receive(:tasks_cancel?).and_return(false)
+
+        expect do
+          client.task_cancel("task-123")
+        end.to raise_error(RubyLLM::MCP::Errors::Capabilities::TaskCancelNotAvailable)
+      end
+    end
+  end
+
   # Reset tests - only run on native adapter (uses internal native_client accessor)
   each_client(adapter: :ruby_llm) do |_config|
     describe "reset_resource_templates!" do

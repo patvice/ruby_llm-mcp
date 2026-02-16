@@ -1,276 +1,120 @@
-<img src="/docs/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM" height="120" width="250">
+<div align="center">
+  <img src="/docs/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM::MCP" height="120" width="250">
 
-**Aiming to make using MCPs with RubyLLM and Ruby as easy as possible.**
+  <strong>MCP made simple for RubyLLM.</strong>
 
-This project is a Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), designed to work seamlessly with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources and prompts as part of LLM conversations.
-
-For a more detailed guide, see the [RubyLLM::MCP docs](https://rubyllm-mcp.com/).
-
-Currently full support for MCP protocol version up to `2025-06-18`.
-
-<div class="badge-container">
-  <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
-  <a href="https://rubygems.org/gems/ruby_llm-mcp"><img alt="Gem Downloads" src="https://img.shields.io/gem/dt/ruby_llm-mcp"></a>
+  <p>
+    <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
+    <a href="https://rubygems.org/gems/ruby_llm-mcp"><img alt="Gem Downloads" src="https://img.shields.io/gem/dt/ruby_llm-mcp"></a>
+  </p>
 </div>
 
-## RubyLLM::MCP Features
+`ruby_llm-mcp` connects Ruby applications to [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) servers and integrates them directly with [RubyLLM](https://github.com/crmne/ruby_llm).
 
-- 🎛️ **Dual SDK Support** _(v0.8+)_: Choose between native full-featured implementation or official MCP SDK
-- 🔌 **Multiple Transport Types**: Streamable HTTP, STDIO, and SSE transports
-- 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
-- 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
-- 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
-- 🎨 **Client Features**: Support for sampling, roots, progress tracking, human-in-the-loop, and elicitation
-- 🔧 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
-- 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously for different servers and purposes
-- 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
+## Simple Configuration
 
-## Installation
+```ruby
+require 'ruby_llm/mcp'
 
-```bash
-bundle add ruby_llm-mcp
+RubyLLM.configure do |config|
+  config.openai_api_key = ENV.fetch('OPENAI_API_KEY')
+end
+
+RubyLLM::MCP.configure do |config|
+  config.request_timeout = 8_000
+  config.protocol_version = '2025-11-25'
+end
+
+client = RubyLLM::MCP.client(
+  name: 'filesystem',
+  transport_type: :stdio,
+  config: {
+    command: 'npx',
+    args: ['@modelcontextprotocol/server-filesystem', Dir.pwd]
+  }
+)
 ```
 
-or add this line to your application's Gemfile:
+## Core Use Cases
+
+### Tools
+
+```ruby
+chat = RubyLLM.chat(model: 'gpt-4o-mini')
+chat.with_tools(*client.tools)
+
+puts chat.ask('List the Ruby files in this project and summarize what you find.')
+```
+
+### Resources
+
+```ruby
+resource = client.resource('project_readme')
+
+chat = RubyLLM.chat(model: 'gpt-4o-mini')
+chat.with_resource(resource)
+
+puts chat.ask('Summarize this project in 5 bullets.')
+```
+
+### Prompts
+
+```ruby
+prompt = client.prompt('code_review')
+chat = RubyLLM.chat(model: 'gpt-4o-mini')
+
+response = chat.ask_prompt(prompt, arguments: {
+  language: 'ruby',
+  focus: 'security'
+})
+
+puts response
+```
+
+## Support At A Glance
+
+- **Native MCP client implementation (`:ruby_llm`)** with full protocol support through `2025-11-25`
+- **Official MCP SDK adapter support (`:mcp_sdk`)** via the `mcp` gem for teams that prefer SDK-backed integration
+- **OAuth implementation** for authenticated streamable HTTP MCP servers
+- **Transports:** `stdio`, `sse`, `streamable` / `streamable_http`
+- **Core server features:** tools, resources, resource templates, prompts, notifications
+- **Advanced client features:** sampling, roots, progress tracking, human-in-the-loop, elicitation
+- **Task lifecycle APIs** (`tasks/list`, `tasks/get`, `tasks/result`, `tasks/cancel`) are experimental
+
+> [!WARNING]
+> MCP task support is experimental and subject to change in both the MCP spec and this gem's implementation.
+
+## Install
+
+Add to your Gemfile:
 
 ```ruby
 gem 'ruby_llm-mcp'
 ```
 
-And then execute:
+Optional (for `:mcp_sdk` adapter):
+
+```ruby
+gem 'mcp', '~> 0.4'
+```
+
+Then run:
 
 ```bash
 bundle install
 ```
 
-Or install it yourself as:
+## Setup
 
-```bash
-gem install ruby_llm-mcp
-```
+1. Set your RubyLLM provider credentials (for example `OPENAI_API_KEY`).
+2. Start or access an MCP server.
+3. Create a `RubyLLM::MCP.client` and attach its tools/resources/prompts to chat flows.
 
-## Choosing an Adapter
-
-Starting with version 0.8.0, RubyLLM MCP supports multiple SDK adapters:
-
-### RubyLLM Adapter (Default)
-
-The native implementation with full MCP protocol support:
-
-```ruby
-client = RubyLLM::MCP.client(
-  name: "server",
-  adapter: :ruby_llm,  # Default, can be omitted
-  transport_type: :stdio,
-  config: { command: "mcp-server" }
-)
-```
-
-**Features**: All MCP features including SSE transport, sampling, roots, progress tracking, etc.
-
-### MCP SDK Adapter
-
-The official Anthropic-maintained SDK:
-
-```ruby
-# Add to Gemfile
-gem 'mcp', '~> 0.4'
-
-# Use in code
-client = RubyLLM::MCP.client(
-  name: "server",
-  adapter: :mcp_sdk,
-  transport_type: :stdio,
-  config: { command: "mcp-server" }
-)
-```
-
-**Features**: Core MCP features (tools, resources, prompts). No SSE, sampling, or advanced features.
-
-See the [Adapters Guide](https://rubyllm-mcp.com/guides/adapters.html) for detailed comparison.
-
-## Usage
-
-### Basic Setup
-
-First, configure your RubyLLM client and create an MCP connection:
-
-```ruby
-require 'ruby_llm/mcp'
-
-# Configure RubyLLM
-RubyLLM.configure do |config|
-  config.openai_api_key = "your-api-key"
-end
-
-# Connect to an MCP server via SSE
-client = RubyLLM::MCP.client(
-  name: "my-mcp-server",
-  transport_type: :sse,
-  config: {
-    url: "http://localhost:9292/mcp/sse"
-  }
-)
-
-# Or connect via stdio
-client = RubyLLM::MCP.client(
-  name: "my-mcp-server",
-  transport_type: :stdio,
-  config: {
-    command: "node",
-    args: ["path/to/mcp-server.js"],
-    env: { "NODE_ENV" => "production" }
-  }
-)
-
-# Or connect via streamable HTTP
-client = RubyLLM::MCP.client(
-  name: "my-mcp-server",
-  transport_type: :streamable,
-  config: {
-    url: "http://localhost:8080/mcp",
-    headers: { "Authorization" => "Bearer your-token" }
-  }
-)
-```
-
-### Using MCP Tools with RubyLLM
-
-```ruby
-# Get available tools from the MCP server
-tools = client.tools
-puts "Available tools:"
-tools.each do |tool|
-  puts "- #{tool.name}: #{tool.description}"
-end
-
-# Create a chat session with MCP tools
-chat = RubyLLM.chat(model: "gpt-4")
-chat.with_tools(*client.tools)
-
-# Ask a question that will use the MCP tools
-response = chat.ask("Can you help me search for recent files in my project?")
-puts response
-```
-
-### Manual Tool Execution
-
-You can also execute MCP tools directly:
-
-```ruby
-# Tools Execution
-tool = client.tool("search_files")
-
-# Execute a specific tool
-result = tool.execute(
-  name: "search_files",
-  parameters: {
-    query: "*.rb",
-    directory: "/path/to/search"
-  }
-)
-
-puts result
-```
-
-### Working with Resources
-
-MCP servers can provide access to resources - structured data that can be included in conversations. Resources come in two types: normal resources and resource templates.
-
-#### Normal Resources
-
-```ruby
-# Get available resources from the MCP server
-resources = client.resources
-puts "Available resources:"
-resources.each do |resource|
-  puts "- #{resource.name}: #{resource.description}"
-end
-
-# Access a specific resource by name
-file_resource = client.resource("project_readme")
-content = file_resource.content
-puts "Resource content: #{content}"
-
-# Include a resource in a chat conversation for reference with an LLM
-chat = RubyLLM.chat(model: "gpt-4")
-chat.with_resource(file_resource)
-
-# Or add a resource directly to the conversation
-file_resource.include(chat)
-
-response = chat.ask("Can you summarize this README file?")
-puts response
-```
-
-#### Resource Templates
-
-Resource templates are parameterized resources that can be dynamically configured:
-
-```ruby
-# Get available resource templates
-templates = client.resource_templates
-log_template = client.resource_template("application_logs")
-
-# Use a template with parameters
-chat = RubyLLM.chat(model: "gpt-4")
-chat.with_resource_template(log_template, arguments: {
-  date: "2024-01-15",
-  level: "error"
-})
-
-response = chat.ask("What errors occurred on this date?")
-puts response
-
-# You can also get templated content directly
-content = log_template.to_content(arguments: {
-  date: "2024-01-15",
-  level: "error"
-})
-puts content
-```
-
-### Working with Prompts
-
-MCP servers can provide predefined prompts that can be used in conversations:
-
-```ruby
-# Get available prompts from the MCP server
-prompts = client.prompts
-puts "Available prompts:"
-prompts.each do |prompt|
-  puts "- #{prompt.name}: #{prompt.description}"
-  prompt.arguments.each do |arg|
-    puts "  - #{arg.name}: #{arg.description} (required: #{arg.required})"
-  end
-end
-
-# Use a prompt in a conversation
-greeting_prompt = client.prompt("daily_greeting")
-chat = RubyLLM.chat(model: "gpt-4")
-
-# Method 1: Ask prompt directly
-response = chat.ask_prompt(greeting_prompt, arguments: { name: "Alice", time: "morning" })
-puts response
-
-# Method 2: Add prompt to chat and then ask
-chat.with_prompt(greeting_prompt, arguments: { name: "Alice", time: "morning" })
-response = chat.ask("Continue with the greeting")
-```
-
-## Development
-
-After checking out the repo, run `bundle` to install dependencies. Then, run `bundle exec rake` to run the tests. Tests currently use `bun` to run test MCP servers You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-There are also examples you you can run to verify the gem is working as expected.
-
-```bash
-bundle exec ruby examples/tools/local_mcp.rb
-```
+Full docs: [rubyllm-mcp.com](https://rubyllm-mcp.com)
 
 ## Contributing
 
-We welcome contributions! Bug reports and pull requests are welcome on GitHub at https://github.com/patvice/ruby_llm-mcp.
+Bug reports and pull requests are welcome on [GitHub](https://github.com/patvice/ruby_llm-mcp).
 
 ## License
 

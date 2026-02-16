@@ -14,7 +14,7 @@ permalink: /
 
 A Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) that seamlessly integrates with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources, and prompts as part of LLM conversations.
 
-Currently full support for MCP protocol version up to `2025-06-18`.
+Currently full support for MCP protocol version up to `2025-11-25`.
 
 <div class="badge-container">
   <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
@@ -31,7 +31,8 @@ Currently full support for MCP protocol version up to `2025-06-18`.
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
-- 🎨 **Client Features**: Support for sampling, roots, progress tracking, and human-in-the-loop
+- 🎨 **Client Features**: Support for sampling, roots, progress tracking, human-in-the-loop, and elicitation
+- 🧵 **Task Lifecycle APIs (Experimental)**: Support task polling and cancellation with task status updates (subject to change in both the MCP spec and this gem)
 - 🔧 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
@@ -158,7 +159,8 @@ Real-time updates from MCP servers including logging, progress, and resource cha
 1. **[Working with Tools]({% link server/tools.md %})** - Execute server-side operations
 2. **[Using Resources]({% link server/resources.md %})** - Include data in conversations
 3. **[Prompts]({% link server/prompts.md %})** - Use predefined prompts with arguments
-4. **[Notifications]({% link server/notifications.md %})** - Handle real-time updates
+4. **[Tasks]({% link server/tasks.md %})** - Poll and manage long-running background work (experimental)
+5. **[Notifications]({% link server/notifications.md %})** - Handle real-time updates
 
 ## Client Interactions
 

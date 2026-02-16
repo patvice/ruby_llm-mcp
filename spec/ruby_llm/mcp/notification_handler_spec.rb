@@ -58,6 +58,49 @@ RSpec.describe RubyLLM::MCP::NotificationHandler do
     end
   end
 
+  describe "notifications/tasks/status" do
+    it "forwards task status updates to the adapter when supported" do
+      adapter = instance_double(RubyLLM::MCP::Adapters::RubyLLMAdapter)
+      allow(client).to receive(:adapter).and_return(adapter)
+      allow(adapter).to receive(:task_status_notification)
+
+      notification = RubyLLM::MCP::Notification.new(
+        {
+          "method" => "notifications/tasks/status",
+          "params" => {
+            "taskId" => "task-123",
+            "status" => "working"
+          }
+        }
+      )
+
+      notification_handler.execute(notification)
+
+      expect(adapter).to have_received(:task_status_notification).with(
+        task: hash_including("taskId" => "task-123", "status" => "working")
+      )
+    end
+  end
+
+  describe "notifications/elicitation/complete" do
+    it "removes the pending elicitation from registry" do
+      allow(RubyLLM::MCP::Handlers::ElicitationRegistry).to receive(:remove)
+
+      notification = RubyLLM::MCP::Notification.new(
+        {
+          "method" => "notifications/elicitation/complete",
+          "params" => {
+            "elicitationId" => "elicitation-123"
+          }
+        }
+      )
+
+      notification_handler.execute(notification)
+
+      expect(RubyLLM::MCP::Handlers::ElicitationRegistry).to have_received(:remove).with("elicitation-123")
+    end
+  end
+
   it "calling an unknown notification will log an error and do nothing else" do
     logger = FakeLogger.new
     RubyLLM::MCP.configure do |config|

@@ -68,7 +68,7 @@ RubyLLM::MCP.configure do |config|
     sample.message.include?("Hello")
   end
 
-  # Configure elicitation support (2025-06-18 protocol)
+  # Configure elicitation support (2025-06-18+ protocols)
   config.on_elicitation do |elicitation|
     # Handle elicitation requests from MCP servers
     # Return structured response and true to accept
@@ -76,6 +76,9 @@ RubyLLM::MCP.configure do |config|
     elicitation.structured_response = { "response": "handled" }
     true
   end
+
+  # Enable task request capability advertisement (2025-11-25+)
+  config.tasks.enabled = true
 end
 ```
 
@@ -380,6 +383,22 @@ end
 client.on_elicitation(InteractiveElicitationHandler, ui: MyUI.new)
 ```
 
+## Tasks Configuration
+
+Enable task capability advertisement for servers using protocol `2025-11-25+`:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  # Disabled by default
+  config.tasks.enabled = true
+end
+```
+
+When enabled, the client advertises support for task lifecycle endpoints (`tasks/list`, `tasks/cancel`) in `client_capabilities`.
+
+{: .warning }
+Tasks are currently experimental and subject to change in both the MCP spec and RubyLLM MCP's implementation.
+
 ### OAuth Authentication
 
 Configure OAuth for Streamable HTTP transport:
@@ -404,18 +423,13 @@ client = RubyLLM::MCP.client(
 
 You can configure which MCP protocol version the client should use when connecting to servers. This is useful for testing newer protocol features or ensuring compatibility with specific server versions.
 
-### Setting Protocol Version in Transport Config
+### Setting Protocol Version
 
 ```ruby
-# Force client to use a specific protocol version
-client = RubyLLM::MCP::Client.new(
-  name: "my-server",
-  transport_type: :stdio,
-  config: {
-    command: ["node", "server.js"],
-    protocol_version: "2025-06-18"  # Override default version
-  }
-)
+# Force all MCP clients to use a specific protocol version
+RubyLLM::MCP.configure do |config|
+  config.protocol_version = "2025-11-25"
+end
 ```
 
 ### Available Protocol Versions
@@ -425,7 +439,7 @@ The RubyLLM MCP client supports multiple protocol versions. You can access these
 ```ruby
 # Latest supported protocol version
 puts RubyLLM::MCP::Native::Protocol.latest_version
-# => "2025-06-18"
+# => "2025-11-25"
 
 # Default version used for negotiation
 puts RubyLLM::MCP::Native::Protocol.default_negotiated_version
@@ -433,10 +447,10 @@ puts RubyLLM::MCP::Native::Protocol.default_negotiated_version
 
 # All supported versions
 puts RubyLLM::MCP::Native::Protocol.supported_versions
-# => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
+# => ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
 
 # Check if a version is supported
-RubyLLM::MCP::Native::Protocol.supported_version?("2025-06-18")
+RubyLLM::MCP::Native::Protocol.supported_version?("2025-11-25")
 # => true
 ```
 
@@ -444,8 +458,9 @@ RubyLLM::MCP::Native::Protocol.supported_version?("2025-06-18")
 
 Different protocol versions support different features:
 
-- **2025-06-18** (Latest): Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
-- **2025-03-26** (Default): Tool calling, resources, prompts, completions, notifications
+- **2025-11-25** (Latest): Adds experimental task lifecycle support (`tasks/list`, `tasks/get`, `tasks/result`, `tasks/cancel`) and task status notifications, while keeping 2025-06-18 features
+- **2025-06-18**: Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
+- **2025-03-26** (Default negotiated baseline): Tool calling, resources, prompts, completions, notifications
 - **2024-11-05**: Basic tool and resource support
 - **2024-10-07**: Initial MCP implementation
 
