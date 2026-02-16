@@ -71,6 +71,7 @@ module RubyLLM
             @sse_timeout = sse_timeout
             @headers = headers || {}
             @session_id = session_id
+            @sse_fallback_supported = true
 
             @version = version
             @protocol_version = nil
@@ -87,7 +88,7 @@ module RubyLLM
                                     end
 
             @oauth_provider = oauth_provider
-            @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
+            @rate_limiter = Support::RateLimit.new(**rate_limit) if rate_limit
 
             @id_counter = 0
             @id_mutex = Mutex.new
@@ -183,7 +184,7 @@ module RubyLLM
 
               handle_httpx_error_response!(response, context: { location: "terminating session" })
 
-              unless [200, 405].include?(response.status)
+              unless [200, 204, 404, 405].include?(response.status)
                 reason_phrase = response.respond_to?(:reason_phrase) ? response.reason_phrase : nil
                 raise Errors::TransportError.new(
                   code: response.status,
@@ -387,7 +388,7 @@ module RubyLLM
             content_type = response.respond_to?(:headers) ? response.headers["content-type"] : nil
 
             if content_type&.include?("text/event-stream")
-              start_sse_stream
+              start_sse_stream if sse_fallback_available?
               nil
             elsif content_type&.include?("application/json")
               response_body = response.respond_to?(:body) ? response.body.to_s : "{}"
@@ -418,7 +419,7 @@ module RubyLLM
 
           def handle_accepted_response(original_message)
             # 202 Accepted - start SSE stream if this was an initialization
-            if original_message.is_a?(Hash) && original_message["method"] == "initialize"
+            if original_message.is_a?(Hash) && original_message["method"] == "initialize" && sse_fallback_available?
               start_sse_stream
             end
             nil
@@ -565,6 +566,7 @@ module RubyLLM
 
           def start_sse_stream(options = StartSSEOptions.new)
             return unless running?
+            return unless sse_fallback_available?
 
             @sse_mutex.synchronize do
               return if @sse_thread&.alive?
@@ -596,8 +598,12 @@ module RubyLLM
               case response.status
               when 200
                 RubyLLM::MCP.logger.debug "SSE stream established"
-              when 405, 401
+              when 405
                 RubyLLM::MCP.logger.info "Server does not support SSE streaming"
+                disable_sse_fallback!
+                nil
+              when 401
+                RubyLLM::MCP.logger.info "SSE stream unauthorized (401); keeping fallback enabled"
                 nil
               when 409
                 RubyLLM::MCP.logger.debug "SSE stream already exists for this session"
@@ -629,6 +635,18 @@ module RubyLLM
               end
 
               raise e
+            end
+          end
+
+          def disable_sse_fallback!
+            @state_mutex.synchronize do
+              @sse_fallback_supported = false
+            end
+          end
+
+          def sse_fallback_available?
+            @state_mutex.synchronize do
+              @sse_fallback_supported
             end
           end
 
