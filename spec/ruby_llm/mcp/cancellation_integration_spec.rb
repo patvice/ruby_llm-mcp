@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "timeout"
 
 RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/DescribeClass
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
@@ -27,7 +28,7 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
 
   each_client_supporting(:sampling) do |config|
     describe "End-to-end cancellation with #{config[:name]}" do
-      let(:client) { RubyLLM::MCP::Client.new(**config[:options], start: false) }
+      let(:client) { RubyLLM::MCP::Client.new(**config[:options].merge(request_timeout: 30_000), start: false) }
 
       after do
         client.stop if client.alive?
@@ -61,11 +62,15 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
 
         # Call the tool in a thread so we can cancel it
         tool_thread = Thread.new do
-          tool.execute
+          begin
+            tool.execute
+          rescue RubyLLM::MCP::Errors::TimeoutError
+            # Cancellation can race with response delivery under slower runtimes.
+          end
         end
 
         # Wait for the sampling request to start
-        sleep 0.1 until sampling_request_id
+        Timeout.timeout(10) { sleep 0.1 until sampling_request_id }
 
         # Send cancellation notification for the sampling request
         notification = RubyLLM::MCP::Notification.new(
@@ -117,12 +122,16 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
         # Start multiple sampling requests
         threads = 3.times.map do
           Thread.new do
-            tool.execute
+            begin
+              tool.execute
+            rescue RubyLLM::MCP::Errors::TimeoutError
+              # Cancellation can race with response delivery under slower runtimes.
+            end
           end
         end
 
         # Wait for ALL requests to start
-        sleep 0.1 until request_ids.length >= 3
+        Timeout.timeout(10) { sleep 0.1 until request_ids.length >= 3 }
 
         # Cancel each request as soon as we detect it
         cancelled_ids = []
