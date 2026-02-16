@@ -153,7 +153,7 @@ module RubyLLM
 
         callback_result = @coordinator.sampling_callback&.call(self)
         # If callback returns nil, it means no guard was configured - allow it
-        callback_result.nil? ? true : callback_result
+        callback_result.nil? || callback_result
       rescue StandardError => e
         RubyLLM::MCP.logger.error("Error in callback guard: #{e.message}, #{e.backtrace.join("\n")}")
         @coordinator.error_response(id: @id, message: "Error executing sampling request")

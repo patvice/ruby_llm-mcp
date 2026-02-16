@@ -228,7 +228,7 @@ module RubyLLM
         @on_progress
       end
 
-      def on_human_in_the_loop(handler_class = nil, **options, &block)
+      def on_human_in_the_loop(handler_class = nil, **options)
         if block_given?
           raise ArgumentError, "Block-based human-in-the-loop callbacks are no longer supported. Use a handler class."
         end

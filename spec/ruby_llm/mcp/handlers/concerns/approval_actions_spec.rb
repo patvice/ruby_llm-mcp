@@ -151,6 +151,3 @@ RSpec.describe RubyLLM::MCP::Handlers::Concerns::ApprovalActions do
     end
   end
 end
-
-
-

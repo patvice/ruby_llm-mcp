@@ -12,7 +12,7 @@ module RubyLLM
           @id = id
         end
 
-        def cancel
+        def cancel # rubocop:disable Naming/PredicateMethod
           Handlers::ElicitationRegistry.cancel(@id, reason: "Cancelled by server")
           true
         end

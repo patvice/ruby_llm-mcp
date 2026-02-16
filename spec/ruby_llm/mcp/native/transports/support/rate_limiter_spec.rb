@@ -192,7 +192,3 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Support::RateLimiter do
     end
   end
 end
-
-
-
-

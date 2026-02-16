@@ -209,7 +209,7 @@ module RubyLLM
         @on.key?(:human_in_the_loop) && !@on[:human_in_the_loop].nil?
       end
 
-      def on_human_in_the_loop(handler_class = nil, **options, &block)
+      def on_human_in_the_loop(handler_class = nil, **options)
         require_feature!(:human_in_the_loop)
 
         if block_given?

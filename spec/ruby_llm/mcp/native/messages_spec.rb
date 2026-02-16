@@ -454,7 +454,7 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
       end
     end
 
-    describe ".sampling_create_message" do
+    describe ".sampling_create_message stop_reason normalization" do
       it "maps snake_case stop reasons to MCP camelCase values" do
         message = double(
           "Message",
@@ -542,7 +542,6 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
     end
 
     describe ".sampling_create_message" do
-      # rubocop:disable RSpec/VerifiedDoubles
       let(:mock_content) do
         double("Content", text: "Hello, world!")
       end

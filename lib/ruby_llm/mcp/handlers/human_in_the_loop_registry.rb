@@ -166,7 +166,7 @@ module RubyLLM
           approval
         end
 
-        def approve(id)
+        def approve(id) # rubocop:disable Naming/PredicateMethod
           approval = remove(id)
           unless approval && approval[:promise]
             RubyLLM::MCP.logger.warn("Attempted to approve unknown approval #{id}")
@@ -178,7 +178,7 @@ module RubyLLM
           true
         end
 
-        def deny(id, reason: "Denied")
+        def deny(id, reason: "Denied") # rubocop:disable Naming/PredicateMethod
           approval = remove(id)
           unless approval && approval[:promise]
             RubyLLM::MCP.logger.warn("Attempted to deny unknown approval #{id}")
@@ -227,6 +227,7 @@ module RubyLLM
             loop do
               expired_ids = wait_for_expired_ids
               break if expired_ids.nil?
+
               expired_ids.each { |id| handle_timeout(id) }
             end
           end

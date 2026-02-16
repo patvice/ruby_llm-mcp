@@ -448,8 +448,6 @@ module RubyLLM
             raw_outcome
           when true
             :cancelled
-          when false, nil
-            :failed
           else
             :failed
           end

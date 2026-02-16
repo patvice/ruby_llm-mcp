@@ -63,6 +63,7 @@ module RubyLLM
 
           @mutex.synchronize do
             return nil if %i[cancelled cancelling].include?(@state)
+
             @state = :running
           end
 
