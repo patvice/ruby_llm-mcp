@@ -320,6 +320,10 @@ module RubyLLM
           @progress_tracking_enabled = enabled
         end
 
+        def set_elicitation_enabled(enabled:)
+          @elicitation_enabled = enabled
+        end
+
         ## Notifications
         #
         def initialize_notification

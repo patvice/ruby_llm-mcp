@@ -38,8 +38,8 @@ Gem::Specification.new do |spec|
 
   # Runtime dependencies
   spec.add_dependency "httpx", "~> 1.4"
-  spec.add_dependency "json_schemer", "~> 2.4"
   spec.add_dependency "json-schema", "~> 5.0"
+  spec.add_dependency "json_schemer", "~> 2.4"
   spec.add_dependency "ruby_llm", "~> 1.9"
   spec.add_dependency "zeitwerk", "~> 2"
 

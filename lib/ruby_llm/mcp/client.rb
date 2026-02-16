@@ -48,6 +48,7 @@ module RubyLLM
         setup_roots if @adapter.supports?(:roots)
         setup_sampling if @adapter.supports?(:sampling)
         setup_event_handlers
+        sync_elicitation_handler_state
 
         @adapter.start if start
       end
@@ -323,6 +324,10 @@ module RubyLLM
       end
 
       def elicitation_enabled?
+        @adapter_type == :ruby_llm && MCP.config.elicitation.enabled?
+      end
+
+      def elicitation_callback_enabled?
         @on.key?(:elicitation) && !@on[:elicitation].nil?
       end
 
@@ -352,6 +357,8 @@ module RubyLLM
           # Clear handler when called without arguments
           @on[:elicitation] = nil
         end
+
+        sync_elicitation_handler_state
 
         self
       end
@@ -487,6 +494,12 @@ module RubyLLM
         if @adapter.supports?(:elicitation)
           @on[:elicitation] = MCP.config.on_elicitation
         end
+      end
+
+      def sync_elicitation_handler_state
+        return unless @adapter.supports?(:elicitation)
+
+        @adapter.set_elicitation_enabled(enabled: elicitation_enabled?)
       end
 
       # Get or create OAuth storage shared with transport

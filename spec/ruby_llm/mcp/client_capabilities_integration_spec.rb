@@ -59,4 +59,27 @@ RSpec.describe "Client Capabilities Integration" do # rubocop:disable RSpec/Desc
       expect(capabilities.dig("sampling", "tools")).to eq({})
     end
   end
+
+  each_client_supporting(:elicitation) do |config|
+    let(:client) { RubyLLM::MCP::Client.new(**config[:options], start: false) }
+
+    it "advertises elicitation form/url when handler is configured before start" do
+      RubyLLM::MCP.configure do |config|
+        config.elicitation.form = true
+        config.elicitation.url = true
+      end
+
+      client.on_elicitation do |elicitation|
+        elicitation.structured_response = { "confirmed" => true }
+        true
+      end
+
+      client.start
+      tool = wait_for_tool(client, "client-capabilities")
+      capabilities = parse_capabilities_from_tool_response(tool.execute)
+
+      expect(capabilities.dig("elicitation", "form")).to eq({})
+      expect(capabilities.dig("elicitation", "url")).to eq({})
+    end
+  end
 end

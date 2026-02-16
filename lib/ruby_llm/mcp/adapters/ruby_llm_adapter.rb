@@ -54,6 +54,7 @@ module RubyLLM
                        :tasks_list, :task_get, :task_result, :task_cancel, :task_status_notification,
                        :completion_resource, :completion_prompt,
                        :set_logging, :set_progress_tracking,
+                       :set_elicitation_enabled,
                        :initialize_notification, :cancelled_notification,
                        :roots_list_change_notification,
                        :ping_response, :roots_list_response,
@@ -123,6 +124,7 @@ module RubyLLM
             return nil unless client.elicitation_enabled?
 
             handler_or_block = client.on[:elicitation]
+            return false unless handler_or_block
 
             if Handlers.handler_class?(handler_or_block)
               handler_or_block.new(elicitation: elicitation, coordinator: @native_client).call
