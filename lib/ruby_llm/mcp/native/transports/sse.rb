@@ -279,6 +279,7 @@ module RubyLLM
                 with_timeout(@request_timeout / 1000) do
                   endpoint = response_queue.pop
                   raise endpoint if endpoint.is_a?(StandardError)
+
                   set_message_endpoint(endpoint)
                 end
               rescue Errors::TimeoutError => e
