@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Getting Started Guide
-nav_title: Getting Started
 parent: Getting Started
 nav_order: 1
 description: "Getting started with RubyLLM MCP - installation, setup, and basic usage"

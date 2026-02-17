@@ -25,7 +25,8 @@ module RubyLLM
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :title, :description, :adapter, :annotations, :tool_response, :with_prefix, :output_schema, :apps_metadata
+      attr_reader :name, :title, :description, :adapter, :annotations, :tool_response, :with_prefix, :output_schema,
+                  :apps_metadata
 
       def initialize(adapter, tool_response, with_prefix: false)
         super()

@@ -3,7 +3,8 @@
 require "test_helper"
 
 class McpItemsFlowTest < ActionDispatch::IntegrationTest
-  FakeClient = Struct.new(:items_response, :embed_response, :created_response, :completed_response, :error, keyword_init: true) do
+  FakeClient = Struct.new(:items_response, :embed_response, :created_response, :completed_response, :error,
+                          keyword_init: true) do
     def list_items(include_completed: true)
       raise(error) if error
 
