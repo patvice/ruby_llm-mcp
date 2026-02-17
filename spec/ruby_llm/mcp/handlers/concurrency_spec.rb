@@ -251,7 +251,7 @@ RSpec.describe "Handler Concurrency" do # rubocop:disable RSpec/DescribeClass
       promise = RubyLLM::MCP::Handlers::Promise.new
 
       # Start multiple threads waiting on promise
-      results = []
+      results = Queue.new
       threads = 5.times.map do
         Thread.new do
           results << promise.wait(timeout: 1)
@@ -266,7 +266,8 @@ RSpec.describe "Handler Concurrency" do # rubocop:disable RSpec/DescribeClass
 
       threads.each(&:join)
 
-      expect(results).to all(eq("resolved"))
+      collected_results = 5.times.map { results.pop }
+      expect(collected_results).to all(eq("resolved"))
     end
 
     it "handles concurrent resolve attempts (only first succeeds)" do

@@ -12,7 +12,7 @@ group :development do
   # Development dependencies
   gem "activesupport"
   gem "bundler", ">= 2.0"
-  gem "debug"
+  gem "debug", platforms: :mri
   gem "dotenv", ">= 3.0"
   gem "json_schemer"
   gem "rake", ">= 13.0"
