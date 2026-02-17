@@ -1,0 +1,11 @@
+mcp_servers:
+  mcp_app:
+    transport_type: stdio
+    command: npm
+    args:
+      - "--prefix"
+      - "<%= Rails.root.join('../test_server') %>"
+      - run
+      - start:stdio
+      - --silent
+    env: {}

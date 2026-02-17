@@ -12,3 +12,17 @@
   gap: 0.5em;
   margin: 1em 0;
 }
+
+/* Place external nav links (Github) above Home in the sidebar. */
+.site-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add a divider between Github and Home. */
+.site-nav > ul.nav-list:nth-of-type(2) {
+  order: -1;
+  border-bottom: 1px solid rgba(120, 130, 150, 0.35);
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.4rem;
+}

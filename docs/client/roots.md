@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Roots
-parent: Client Interactions
+parent: Client
 nav_order: 8
 description: "MCP roots - provide filesystem access to servers for enhanced capabilities"
 ---

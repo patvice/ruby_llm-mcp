@@ -11,7 +11,7 @@ module RubyLLM
                   :on_logging_level
       attr_accessor :linked_resources
 
-      def initialize(name:, transport_type:, sdk: nil, adapter: nil, start: true, # rubocop:disable Metrics/ParameterLists
+      def initialize(name:, transport_type:, sdk: nil, adapter: nil, start: true, # rubocop:disable Metrics/ParameterLists, Metrics/MethodLength
                      request_timeout: MCP.config.request_timeout, config: {})
         @name = name
         @transport_type = transport_type.to_sym
@@ -24,7 +24,19 @@ module RubyLLM
         )
 
         @with_prefix = config.delete(:with_prefix) || false
-        @config = config.merge(request_timeout: request_timeout)
+        @resolved_protocol_version = config[:protocol_version] ||
+                                     config["protocol_version"] ||
+                                     MCP.config.protocol_version
+        @resolved_extensions = Extensions::Registry.merge(
+          MCP.config.extensions.to_h,
+          config[:extensions] || config["extensions"]
+        )
+
+        @config = config.merge(
+          request_timeout: request_timeout,
+          protocol_version: @resolved_protocol_version,
+          extensions: @resolved_extensions
+        )
         @request_timeout = request_timeout
 
         # Store OAuth config for later use

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Notifications
-parent: Server Interactions
+parent: Server
 nav_order: 4
 description: "Handling MCP notifications - logging, progress updates, and resource changes"
 ---

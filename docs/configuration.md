@@ -1,7 +1,8 @@
 ---
 layout: default
 title: Configuration
-nav_order: 2
+parent: Getting Started
+nav_order: 3
 description: "Advanced configuration options for RubyLLM MCP clients and transports"
 ---
 
@@ -386,21 +387,53 @@ client = RubyLLM::MCP.client(
 
 ## Protocol Version Configuration
 
-You can configure which MCP protocol version the client should use when connecting to servers. This is useful for testing newer protocol features or ensuring compatibility with specific server versions.
+RubyLLM MCP supports stable-by-default protocol behavior with opt-in draft track support.
 
-### Setting Protocol Version in Transport Config
+### Protocol Track
 
 ```ruby
-# Force client to use a specific protocol version
+RubyLLM::MCP.configure do |config|
+  config.protocol_track = :stable  # default
+end
+```
+
+Use draft track:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.protocol_track = :draft
+end
+```
+
+### Explicit Protocol Version Override
+
+You can still force a specific protocol version globally:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.protocol_version = "2025-03-26"
+end
+```
+
+### Per-Client Override
+
+Per-client protocol version has the highest precedence:
+
+```ruby
 client = RubyLLM::MCP::Client.new(
   name: "my-server",
   transport_type: :stdio,
   config: {
     command: ["node", "server.js"],
-    protocol_version: "2025-06-18"  # Override default version
+    protocol_version: "2026-01-26"  # Highest precedence
   }
 )
 ```
+
+Precedence order:
+1. Per-client `config[:protocol_version]`
+2. Global explicit `config.protocol_version`
+3. `config.protocol_track` derived default
 
 ### Available Protocol Versions
 
@@ -411,13 +444,17 @@ The RubyLLM MCP client supports multiple protocol versions. You can access these
 puts RubyLLM::MCP::Native::Protocol.latest_version
 # => "2025-06-18"
 
+# Draft protocol version (opt-in)
+puts RubyLLM::MCP::Native::Protocol.draft_version
+# => "2026-01-26"
+
 # Default version used for negotiation
 puts RubyLLM::MCP::Native::Protocol.default_negotiated_version
 # => "2025-03-26"
 
 # All supported versions
 puts RubyLLM::MCP::Native::Protocol.supported_versions
-# => ["2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
+# => ["2026-01-26", "2025-06-18", "2025-03-26", "2024-11-05", "2024-10-07"]
 
 # Check if a version is supported
 RubyLLM::MCP::Native::Protocol.supported_version?("2025-06-18")
@@ -428,10 +465,60 @@ RubyLLM::MCP::Native::Protocol.supported_version?("2025-06-18")
 
 Different protocol versions support different features:
 
+- **2026-01-26** (Draft, opt-in): Draft extension negotiation path
 - **2025-06-18** (Latest): Structured tool output, OAuth authentication, elicitation support, resource links, enhanced metadata
 - **2025-03-26** (Default): Tool calling, resources, prompts, completions, notifications
 - **2024-11-05**: Basic tool and resource support
 - **2024-10-07**: Initial MCP implementation
+
+### Extension Registry Configuration
+
+Configure extensions globally:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.extensions.register(
+    "io.modelcontextprotocol/ui",
+    "mimeTypes" => ["text/html;profile=mcp-app"]
+  )
+end
+```
+
+Convenience helper for MCP Apps / UI extension:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.extensions.enable_apps(
+    "mimeTypes" => ["text/html;profile=mcp-app"]
+  )
+end
+```
+
+Per-client extensions are merged over global config:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "server",
+  adapter: :ruby_llm,
+  transport_type: :streamable,
+  config: {
+    url: "https://example.com/mcp",
+    extensions: {
+      "io.modelcontextprotocol/apps" => { # alias is accepted inbound
+        "mimeTypes" => ["text/html;profile=mcp-app", "text/html"]
+      }
+    }
+  }
+)
+```
+
+Notes:
+- Outbound extension advertisement uses canonical ID `io.modelcontextprotocol/ui`
+- Alias `io.modelcontextprotocol/apps` is accepted for inbound capability reads and config merge
+- Extension advertisement is supported on stable `2025-06-18+` and draft protocol versions
+- `:mcp_sdk` accepts extension config in passive mode (no capability advertisement, one warning per process when configured)
+
+For architecture and MCP Apps metadata details, see **[Client Extensions]({% link extensions/index.md %})** and **[MCP Apps]({% link extensions/mcp-apps.md %})**.
 
 ### Enhanced Metadata Support
 

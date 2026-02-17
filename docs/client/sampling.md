@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Sampling
-parent: Client Interactions
+parent: Client
 nav_order: 7
 description: "MCP sampling - allow servers to use your LLM for their own requests"
 ---

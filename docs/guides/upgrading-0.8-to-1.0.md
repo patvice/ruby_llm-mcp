@@ -1,9 +1,10 @@
 ---
 layout: default
 title: Upgrading from 0.8 to 1.0
-parent: Guides
+parent: Advanced
 nav_order: 12
 description: "Quick guide for upgrading from RubyLLM MCP 0.8 to 1.0"
+nav_exclude: true
 ---
 
 # Upgrading from 0.8 to 1.0
@@ -69,7 +70,7 @@ RubyLLM::MCP::Native::Transport.register_transport(:custom, CustomTransport)
 
 - **[Adapters & Transports]({% link guides/adapters.md %})** - Comprehensive guide
 - **[OAuth 2.1 Support]({% link guides/oauth.md %})** - Production-ready OAuth
-- **[Getting Started]({% link guides/getting-started.md %})** - Quick start guide
+- **[Getting Started]({% link getting-started/getting-started.md %})** - Quick start guide
 
 ---
 

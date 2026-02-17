@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Elicitation
-parent: Client Interactions
+parent: Client
 nav_order: 9
 description: "MCP elicitation - allow servers to request additional structured information from users"
 ---

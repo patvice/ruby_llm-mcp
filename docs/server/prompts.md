@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Prompts
-parent: Server Interactions
+parent: Server
 nav_order: 3
 description: "Working with MCP prompts - predefined prompts with arguments for consistent interactions"
 ---

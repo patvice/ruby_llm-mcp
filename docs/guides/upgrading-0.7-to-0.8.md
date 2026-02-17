@@ -1,9 +1,10 @@
 ---
 layout: default
 title: Upgrading from 0.8 to 0.9
-parent: Guides
+parent: Advanced
 nav_order: 11
 description: "Guide for upgrading from RubyLLM MCP 0.8 to 0.9 with breaking changes and migration steps"
+nav_exclude: true
 ---
 
 # Upgrading from 0.7 to 0.8

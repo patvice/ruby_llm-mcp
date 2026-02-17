@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cat > "$ROOT_DIR/test_server/data/items.json" <<'JSON'
+{
+  "nextId": 1,
+  "items": []
+}
+JSON
+
+echo "Reset test server data at $ROOT_DIR/test_server/data/items.json"

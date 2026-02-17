@@ -1,16 +1,17 @@
 ---
 layout: default
-title: Server Interactions
-nav_order: 4
+title: Server
+parent: Core Features
+nav_order: 1
 description: "Understanding and working with MCP server capabilities"
 has_children: true
 permalink: /server/
 ---
 
-# Server Interactions
+# Server
 {: .no_toc }
 
-Server interactions encompass all the capabilities that MCP servers provide to enhance your applications. These are the features that servers expose to clients, enabling rich functionality through tools, resources, prompts, and real-time notifications.
+Server capabilities encompass all the features MCP servers provide to enhance your applications through tools, resources, prompts, and real-time notifications.
 
 ## Overview
 
@@ -57,6 +58,6 @@ Explore each server interaction type to understand how to leverage MCP server ca
 
 Once you understand server interactions, explore:
 
-- **[Client Interactions]({% link client/index.md %})** - Client-side features like sampling and roots
+- **[Client]({% link client/index.md %})** - Client-side features like sampling and roots
 - **[Configuration]({% link configuration.md %})** - Advanced client configuration options
 - **[Rails Integration]({% link guides/rails-integration.md %})** - Using MCP with Rails applications

@@ -27,6 +27,12 @@ module RubyLLM
           super
 
           @mcp_client = nil
+<<<<<<< Updated upstream
+=======
+          @notification_handler = NotificationHandler.new(client)
+
+          warn_passive_extension_support! if configured_extensions?
+>>>>>>> Stashed changes
         end
 
         def start
@@ -70,6 +76,18 @@ module RubyLLM
 
         def client_capabilities
           {} # Official SDK handles this internally
+        end
+
+        def supports_extension_negotiation?
+          false
+        end
+
+        def extension_mode
+          :passive
+        end
+
+        def build_client_extensions_capabilities(protocol_version:) # rubocop:disable Lint/UnusedMethodArgument
+          {}
         end
 
         def tool_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
@@ -217,8 +235,15 @@ module RubyLLM
           {
             "name" => tool.name,
             "description" => tool.description,
+<<<<<<< Updated upstream
             "inputSchema" => tool.input_schema
           }
+=======
+            "inputSchema" => tool.input_schema,
+            "outputSchema" => tool.output_schema,
+            "_meta" => extract_tool_meta(tool)
+          }.compact
+>>>>>>> Stashed changes
         end
 
         def transform_resource(resource)
@@ -286,6 +311,50 @@ module RubyLLM
             "blob" => result["blob"]
           }
         end
+<<<<<<< Updated upstream
+=======
+
+        def transform_prompt_result(result)
+          if result.is_a?(Hash) && (result.key?("result") || result.key?("error"))
+            Result.new(result)
+          else
+            Result.new({
+                         "result" => result || {}
+                       })
+          end
+        end
+
+        def configured_extensions?
+          !Extensions::Registry.normalize_map(@config[:extensions]).empty?
+        end
+
+        def warn_passive_extension_support!
+          self.class.warn_passive_extension_support_once
+        end
+
+        def extract_tool_meta(tool)
+          return tool["_meta"] if tool.respond_to?(:[]) && tool["_meta"]
+          return tool.meta if tool.respond_to?(:meta)
+          return tool.instance_variable_get(:@meta) if tool.instance_variable_defined?(:@meta)
+
+          nil
+        end
+
+        class << self
+          def warn_passive_extension_support_once
+            @extensions_warning_mutex ||= Mutex.new
+
+            @extensions_warning_mutex.synchronize do
+              return if @extensions_warning_emitted
+
+              RubyLLM::MCP.logger.warn(
+                "MCP SDK adapter extension configuration is passive: extensions are accepted but not advertised."
+              )
+              @extensions_warning_emitted = true
+            end
+          end
+        end
+>>>>>>> Stashed changes
       end
     end
   end

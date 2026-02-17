@@ -1,12 +1,12 @@
 ---
 layout: default
-title: OAuth 2.1 Authentication
-parent: Guides
-nav_order: 5
+title: OAuth
+parent: Advanced
+nav_order: 2
 description: "Complete OAuth 2.1 implementation with PKCE, dynamic registration, and automatic token refresh"
 ---
 
-# OAuth 2.1 Authentication
+# OAuth
 {: .no_toc }
 
 {: .label .label-green }
@@ -734,7 +734,7 @@ config: {
 
 - [Rails OAuth Integration]({% link guides/rails-oauth.md %}) - Multi-user setup
 - [Rails Integration]({% link guides/rails-integration.md %}) - Basic Rails setup
-- [Transports]({% link guides/transports.md %}) - Transport configuration
+- [Adapters & Transports]({% link guides/adapters.md %}) - Transport configuration
 
 ---
 

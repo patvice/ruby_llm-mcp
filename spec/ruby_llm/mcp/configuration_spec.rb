@@ -13,7 +13,9 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.request_timeout).to eq(8000)
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
+      expect(config.protocol_track).to eq(:stable)
       expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol.latest_version)
+      expect(config.extensions.empty?).to be(true)
     end
 
     it "sets debug log level when RUBYLLM_MCP_DEBUG environment variable is set" do
@@ -57,6 +59,11 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.protocol_version).to eq("2024-11-05")
     end
 
+    it "allows reading and writing protocol_track" do
+      config.protocol_track = :draft
+      expect(config.protocol_track).to eq(:draft)
+    end
+
     it "allows writing logger" do
       custom_logger = Logger.new($stdout)
       config.logger = custom_logger
@@ -80,7 +87,9 @@ RSpec.describe RubyLLM::MCP::Configuration do
       expect(config.request_timeout).to eq(8000)
       expect(config.log_file).to eq($stdout)
       expect(config.log_level).to eq(Logger::INFO)
+      expect(config.protocol_track).to eq(:stable)
       expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol.latest_version)
+      expect(config.extensions).to be_empty
     end
 
     it "resets logger to nil so it gets recreated" do
@@ -289,6 +298,37 @@ RSpec.describe RubyLLM::MCP::Configuration do
       discoverer = provider.instance_variable_get(:@discoverer)
       discoverer.discover("https://example.com")
       expect(discovery_stub).to have_been_requested
+    end
+  end
+
+  describe "protocol track behavior" do
+    let(:config) { RubyLLM::MCP::Configuration.new }
+
+    it "uses latest stable when protocol_track is stable" do
+      config.protocol_track = :stable
+      config.protocol_version = nil
+
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol.latest_version)
+    end
+
+    it "uses draft protocol when protocol_track is draft and no explicit version is set" do
+      config.protocol_track = :draft
+      config.protocol_version = nil
+
+      expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol.draft_version)
+    end
+
+    it "prioritizes explicit protocol_version over protocol_track" do
+      config.protocol_track = :draft
+      config.protocol_version = "2025-03-26"
+
+      expect(config.protocol_version).to eq("2025-03-26")
+    end
+
+    it "rejects invalid protocol track values" do
+      expect do
+        config.protocol_track = :preview
+      end.to raise_error(ArgumentError, /Invalid protocol track/)
     end
   end
 end

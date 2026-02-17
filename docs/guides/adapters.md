@@ -1,9 +1,10 @@
 ---
 layout: default
 title: Adapters & Transports
-parent: Guides
+parent: Advanced
 nav_order: 4
 description: "Understanding MCP adapters, transports, and building custom transport implementations"
+nav_exclude: true
 ---
 
 # Adapters & Transports
@@ -45,6 +46,8 @@ The default, full-featured adapter that implements the complete MCP protocol wit
 
 **Key Features:**
 - ✅ Complete MCP protocol implementation with advanced features (sampling, roots, progress tracking, elicitation)
+- ✅ Full extension negotiation (`capabilities.extensions`) on stable `2025-06-18+` and draft protocols
+- ✅ MCP Apps metadata parsing APIs (`apps_metadata` on tools/resources/resource templates)
 - ✅ All transport types supported (stdio, SSE, streamable HTTP)
 - ✅ **Custom transport support** - Register and use your own transport implementations
 - ✅ Ruby 2.7+ compatible
@@ -61,7 +64,13 @@ Wraps the official MCP SDK maintained by Anthropic.
 
 **Key Features:**
 - ✅ Official Anthropic-maintained implementation
+<<<<<<< Updated upstream
 - ✅ Core MCP features (tools, resources, prompts)
+=======
+- ✅ Core MCP features (tools, resources, prompts, resource templates, logging)
+- ✅ MCP Apps metadata parsing APIs (`apps_metadata`) via `_meta` passthrough
+- ⚠️ Passive extension mode: accepts extension config but does not advertise `capabilities.extensions`
+>>>>>>> Stashed changes
 - ✅ Basic transports (stdio, HTTP) with custom wrapper support
 - ⚠️ No custom transport registration - requires Ruby 3.2+
 
@@ -82,7 +91,13 @@ Wraps the official MCP SDK maintained by Anthropic.
 | SSE | ✅ | ✅ |
 | **Advanced Features** |
 | Completions | ✅ | ❌ |
+<<<<<<< Updated upstream
 | Logging | ✅ | ❌ |
+=======
+| Logging | ✅ | ✅ |
+| Extensions negotiation | ✅ Full | ⚠️ Passive (no advertise) |
+| Apps metadata parsing | ✅ | ✅ |
+>>>>>>> Stashed changes
 | Sampling | ✅ | ❌ |
 | Roots | ✅ | ❌ |
 | Notifications | ✅ | ❌ |
@@ -102,6 +117,15 @@ Custom transports are implemented by the adapter and are not part of the officia
 | `:streamable` | ✅ | Custom |
 | `:streamable_http` | ✅ | Custom |
 | `:sse` | ✅ | Custom |
+
+## Extension Modes
+
+Both adapters accept the same extension configuration surface (`config.extensions` globally and `config[:extensions]` per client), but they behave differently:
+
+| Adapter | `extension_mode` | Behavior |
+|---------|------------------|----------|
+| `:ruby_llm` | `:full` | Builds and advertises `capabilities.extensions` for stable `2025-06-18+` and draft protocol sessions |
+| `:mcp_sdk` | `:passive` | Accepts config, does not advertise extension capabilities, emits one warning per process when configured |
 
 ---
 
@@ -543,8 +567,8 @@ If you encounter issues with the `:mcp_sdk` adapter:
 ## Next Steps
 
 - **[Configuration]({% link configuration.md %})** - Detailed configuration options
-- **[Getting Started]({% link guides/getting-started.md %})** - Quick start guide
+- **[Getting Started]({% link getting-started/getting-started.md %})** - Quick start guide
 - **[Tools]({% link server/tools.md %})** - Working with MCP tools
 - **[Resources]({% link server/resources.md %})** - Managing resources
 - **[Notifications]({% link server/notifications.md %})** - Handling real-time updates
-- **[Upgrading from 0.8 to 1.0]({% link guides/upgrading-0.8-to-1.0.md %})** - Migration guide
+- **[Upgrading]({% link guides/upgrading.md %})** - Unified migration guide

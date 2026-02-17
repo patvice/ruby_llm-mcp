@@ -6,7 +6,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 
 For a more detailed guide, see the [RubyLLM::MCP docs](https://rubyllm-mcp.com/).
 
-Currently full support for MCP protocol version up to `2025-06-18`.
+Stable MCP support is enabled by default (`2025-06-18`), with opt-in draft protocol track support (`2026-01-26`).
 
 <div class="badge-container">
   <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
@@ -21,6 +21,8 @@ Currently full support for MCP protocol version up to `2025-06-18`.
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
 - 🎨 **Client Features**: Support for sampling, roots, progress tracking, human-in-the-loop, and elicitation
+- 🧪 **Protocol Track Control**: Stable-by-default with opt-in draft protocol behavior
+- 🧩 **Extensions & MCP Apps**: Global + per-client extension configuration with canonical MCP UI/MCP Apps extension support
 - 🔧 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously for different servers and purposes
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
@@ -88,6 +90,67 @@ client = RubyLLM::MCP.client(
 **Features**: Core MCP features (tools, resources, prompts). No SSE, sampling, or advanced features.
 
 See the [Adapters Guide](https://rubyllm-mcp.com/guides/adapters.html) for detailed comparison.
+
+## Draft Protocol Track
+
+RubyLLM MCP defaults to the stable track:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.protocol_track = :stable  # default
+end
+```
+
+Enable draft behavior globally:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.protocol_track = :draft
+end
+```
+
+Protocol version precedence is:
+1. Per-client `config[:protocol_version]`
+2. Global `config.protocol_version` (explicit override)
+3. `config.protocol_track` derived default
+
+## Extensions & MCP Apps
+
+RubyLLM MCP supports extension negotiation so clients can advertise optional capabilities (including MCP Apps / UI capabilities).
+
+Register extensions globally:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.extensions.enable_apps(
+    "mimeTypes" => ["text/html;profile=mcp-app"]
+  )
+end
+```
+
+Override per client:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "server",
+  adapter: :ruby_llm,
+  transport_type: :streamable,
+  config: {
+    url: "https://example.com/mcp",
+    protocol_version: "2026-01-26",
+    extensions: {
+      "io.modelcontextprotocol/ui" => {}
+    }
+  }
+)
+```
+
+Extension behavior:
+- Outbound extension advertisement uses canonical ID `io.modelcontextprotocol/ui`
+- Inbound capability parsing accepts alias `io.modelcontextprotocol/apps`
+- `enable_apps` is a convenience helper for MCP Apps/UI extension registration
+- `:ruby_llm` adapter provides full extension negotiation
+- `:mcp_sdk` adapter accepts the same config surface in passive mode and warns once per process
 
 ## Usage
 
@@ -266,6 +329,16 @@ There are also examples you you can run to verify the gem is working as expected
 
 ```bash
 bundle exec ruby examples/tools/local_mcp.rb
+```
+
+Rails + TypeScript MCP app example:
+
+```bash
+cd examples/mcp_app
+./bin/setup
+./bin/reset-data
+cd rails_app
+bin/rails server
 ```
 
 ## Contributing

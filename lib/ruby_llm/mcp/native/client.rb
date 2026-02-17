@@ -23,13 +23,17 @@ module RubyLLM
           progress_tracking_enabled: false,
           sampling_callback: nil,
           notification_callback: nil,
+          extensions_capabilities: nil,
           protocol_version: nil,
           request_timeout: nil
         )
           @name = name
           @transport_type = transport_type
           @config = transport_config.merge(request_timeout: request_timeout || MCP.config.request_timeout)
-          @protocol_version = protocol_version || MCP.config.protocol_version || Native::Protocol.default_negotiated_version
+          @requested_protocol_version = protocol_version || MCP.config.protocol_version ||
+                                        Native::Protocol.default_negotiated_version
+          @protocol_version = @requested_protocol_version
+          @extensions_capabilities = extensions_capabilities || {}
 
           # Callbacks
           @human_in_the_loop_callback = human_in_the_loop_callback
@@ -116,7 +120,7 @@ module RubyLLM
           @transport&.close
           @capabilities = nil
           @transport = nil
-          @protocol_version = Native::Protocol.default_negotiated_version
+          @protocol_version = @requested_protocol_version
         end
 
         def restart!
@@ -326,6 +330,10 @@ module RubyLLM
 
           if @elicitation_enabled
             capabilities_hash[:elicitation] = {}
+          end
+
+          if @extensions_capabilities.any? && Native::Protocol.extensions_supported?(@protocol_version)
+            capabilities_hash[:extensions] = @extensions_capabilities
           end
 
           capabilities_hash
