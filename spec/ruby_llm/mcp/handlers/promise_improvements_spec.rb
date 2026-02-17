@@ -44,13 +44,14 @@ RSpec.describe "Promise Improvements" do # rubocop:disable RSpec/DescribeClass
       promise = RubyLLM::MCP::Handlers::Promise.new
       results = []
       start_times = []
+      lock = Mutex.new
 
       # Start 10 threads waiting
       threads = 10.times.map do
         Thread.new do
-          start_times << Time.now
+          lock.synchronize { start_times << Time.now }
           result = promise.wait(timeout: 1)
-          results << result
+          lock.synchronize { results << result }
         end
       end
 

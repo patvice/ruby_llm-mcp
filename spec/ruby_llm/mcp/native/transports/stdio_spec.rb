@@ -185,6 +185,15 @@ RSpec.describe RubyLLM::MCP::Native::Transports::Stdio do
         end
       end
 
+      it "raises TransportError when transport is not connected" do
+        request_body = { "method" => "test", "id" => "test-not-connected" }
+        mock_transport.instance_variable_set(:@stdin, nil)
+
+        expect { mock_transport.request(request_body) }.to raise_error(RubyLLM::MCP::Errors::TransportError) do |error|
+          expect(error.message).to include("Transport is not connected")
+        end
+      end
+
       it "raises ArgumentError when request_id is nil with wait_for_response" do
         request_body = { "method" => "test" }
 

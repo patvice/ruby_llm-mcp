@@ -109,17 +109,19 @@ module RubyLLM
               condition.wait(mutex, timeout) unless result[:completed]
             end
 
-            unless result[:completed]
+            snapshot = mutex.synchronize { result.dup }
+
+            unless snapshot[:completed]
               raise Errors::TimeoutError.new(message: "OAuth authorization timed out after #{timeout} seconds")
             end
 
-            if result[:error]
-              raise Errors::TransportError.new(message: "OAuth authorization failed: #{result[:error]}")
+            if snapshot[:error]
+              raise Errors::TransportError.new(message: "OAuth authorization failed: #{snapshot[:error]}")
             end
 
             # 6. Complete OAuth flow
             @logger.debug("Completing OAuth authorization flow")
-            token = @oauth_provider.complete_authorization_flow(result[:code], result[:state])
+            token = @oauth_provider.complete_authorization_flow(snapshot[:code], snapshot[:state])
 
             @logger.info("\nAuthentication successful!")
             token

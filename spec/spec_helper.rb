@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require "debug"
+begin
+  require "debug"
+rescue LoadError
+  # debug is optional (e.g., JRuby in CI).
+end
 require "dotenv"
 require "simplecov"
 require "vcr"
