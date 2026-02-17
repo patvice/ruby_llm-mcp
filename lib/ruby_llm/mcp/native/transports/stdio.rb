@@ -99,11 +99,19 @@ module RubyLLM
           def send_request(body, request_id)
             body = JSON.generate(body)
             RubyLLM::MCP.logger.debug "Sending Request: #{body}"
-            @stdin.puts(body)
-            @stdin.flush
+            stdin = @state_mutex.synchronize { @stdin }
+            unless stdin
+              raise RubyLLM::MCP::Errors::TransportError.new(message: "Transport is not connected")
+            end
+
+            stdin.puts(body)
+            stdin.flush
           rescue IOError, Errno::EPIPE => e
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
             raise RubyLLM::MCP::Errors::TransportError.new(message: e.message, error: e)
+          rescue RubyLLM::MCP::Errors::TransportError => e
+            @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
+            raise e
           end
 
           def wait_for_request_response(request_id, response_queue)

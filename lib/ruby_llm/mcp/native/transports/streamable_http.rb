@@ -769,6 +769,7 @@ module RubyLLM
             return unless raw_event[:data]
             return unless running?
 
+            event_data = nil
             begin
               event_data = parse_and_validate_sse_event(raw_event[:data])
               return unless event_data
@@ -810,10 +811,18 @@ module RubyLLM
             rescue StandardError => e
               RubyLLM::MCP.logger.error "Error processing SSE event: #{e.message}"
               @on_error_callback&.call(e)
-              raise Errors::TransportError.new(
-                message: "Error processing SSE event: #{e.message}",
-                error: e
-              )
+
+              request_id = event_data.is_a?(Hash) ? event_data["id"]&.to_s : nil
+              if request_id
+                transport_error = Errors::TransportError.new(
+                  message: "Error processing SSE event: #{e.message}",
+                  error: e
+                )
+                @pending_mutex.synchronize do
+                  response_queue = @pending_requests.delete(request_id)
+                  response_queue&.push(transport_error)
+                end
+              end
             end
           end
 
