@@ -206,22 +206,24 @@ module RubyLLM
                     :tasks,
                     :max_connections,
                     :pool_timeout,
-                    :protocol_version,
                     :config_path,
                     :launch_control,
                     :on_logging_level,
                     :adapter_config,
                     :oauth
 
-      attr_writer :logger, :mcp_configuration
+      attr_reader :extensions, :protocol_track
+      attr_writer :logger, :mcp_configuration, :protocol_version
 
       REQUEST_TIMEOUT_DEFAULT = 8000
+      VALID_PROTOCOL_TRACKS = %i[stable draft].freeze
 
       def initialize
         @sampling = Sampling.new
         @elicitation = Elicitation.new
         @tasks = Tasks.new
         @adapter_config = AdapterConfig.new
+        @extensions = Extensions::Configuration.new
         @oauth = OAuth.new
         set_defaults
       end
@@ -278,6 +280,26 @@ module RubyLLM
       def on_elicitation(&block)
         @on_elicitation = block if block_given?
         @on_elicitation
+      end
+
+      def protocol_track=(value)
+        track = value.to_sym
+        unless VALID_PROTOCOL_TRACKS.include?(track)
+          raise ArgumentError,
+                "Invalid protocol track '#{value}'. Valid options: #{VALID_PROTOCOL_TRACKS.join(', ')}"
+        end
+
+        @protocol_track = track
+      end
+
+      # Returns the effective protocol version:
+      # explicit protocol_version > protocol_track-derived default.
+      def protocol_version
+        return @protocol_version unless @protocol_version.nil?
+
+        return Native::Protocol.draft_version if @protocol_track == :draft
+
+        Native::Protocol.latest_version
       end
 
       def inspect
@@ -343,7 +365,11 @@ module RubyLLM
         @roots = []
 
         # Protocol configuration
-        @protocol_version = Native::Protocol.latest_version
+        @protocol_track = :stable
+        @protocol_version = nil
+
+        # Extensions configuration
+        @extensions.reset!
 
         # OAuth configuration
         @oauth = OAuth.new

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "MCP App Example" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="MCP App Example">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <script>
+      tailwind = {
+        config: {
+          theme: {
+            extend: {
+              fontFamily: {
+                display: ['"Space Grotesk"', "sans-serif"],
+                mono: ['"IBM Plex Mono"', "monospace"]
+              },
+              colors: {
+                slate: {
+                  950: "#0a0f17"
+                },
+                signal: {
+                  400: "#f59e0b"
+                }
+              },
+              keyframes: {
+                rise: {
+                  "0%": { opacity: "0", transform: "translateY(10px)" },
+                  "100%": { opacity: "1", transform: "translateY(0)" }
+                }
+              },
+              animation: {
+                rise: "rise 420ms ease-out both"
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-950 text-slate-100 antialiased">
+    <%= yield %>
+  </body>
+</html>

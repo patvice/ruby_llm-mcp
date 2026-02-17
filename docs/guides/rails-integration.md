@@ -1,8 +1,8 @@
 ---
 layout: default
 title: Rails Integration
-parent: Guides
-nav_order: 6
+parent: Advanced
+nav_order: 1
 description: "Complete Rails integration with generators, configuration, and automatic client management"
 ---
 
@@ -117,7 +117,7 @@ end # Clients are automatically stopped and cleaned up here
 - **Production-ready**: Perfect for background jobs and API endpoints
 
 {: .note }
-**Version 0.7 and Earlier**: Used `launch_control` setting for automatic/manual modes. This has been removed in 0.8 in favor of explicit connection blocks. See [Upgrading from 0.7 to 0.8]({% link guides/upgrading-0.7-to-0.8.md %}) for migration details.
+**Version 0.7 and Earlier**: Used `launch_control` setting for automatic/manual modes. This has been removed in 0.8 in favor of explicit connection blocks. See [Upgrading]({% link guides/upgrading.md %}) for migration details.
 
 ## Examples
 

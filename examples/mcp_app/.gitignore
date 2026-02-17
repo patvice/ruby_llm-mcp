@@ -1,0 +1,8 @@
+rails_app/log/
+rails_app/tmp/
+rails_app/storage/
+rails_app/db/*.sqlite3
+rails_app/.bundle/
+rails_app/vendor/bundle/
+
+test_server/node_modules/

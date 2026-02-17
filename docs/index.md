@@ -1,8 +1,8 @@
 ---
 layout: default
 title: Home
-nav_order: 1
-description: "MCP made simple for RubyLLM."
+nav_exclude: true
+description: "RubyLLM::MCP is a full-featured Ruby Client for the Model Context Protocol (MCP)."
 permalink: /
 ---
 
@@ -11,162 +11,242 @@ permalink: /
   <iframe src="https://ghbtns.com/github-btn.html?user=patvice&repo=ruby_llm-mcp&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub" style="vertical-align: middle; display: inline-block;"></iframe>
 </div>
 
-**MCP made simple for RubyLLM.**
 
-`ruby_llm-mcp` connects Ruby applications to [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) servers and integrates them directly with [RubyLLM](https://github.com/crmne/ruby_llm).
+A Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) that seamlessly integrates with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources, and prompts as part of LLM conversations.
+
+Stable MCP support is enabled by default (`2025-06-18`), with opt-in draft protocol track support (`2026-01-26`).
 
 <div class="badge-container">
   <a href="https://badge.fury.io/rb/ruby_llm-mcp"><img src="https://badge.fury.io/rb/ruby_llm-mcp.svg" alt="Gem Version" /></a>
   <a href="https://rubygems.org/gems/ruby_llm-mcp"><img alt="Gem Downloads" src="https://img.shields.io/gem/dt/ruby_llm-mcp"></a>
 </div>
 
-[Getting Started]({% link guides/getting-started.md %}){: .btn } [GitHub](https://github.com/patvice/ruby_llm-mcp){: .btn .btn-green }
+[Getting Started]({% link getting-started/getting-started.md %}){: .btn } [GitHub](https://github.com/patvice/ruby_llm-mcp){: .btn .btn-green }
 
-## Simple Configuration
+
+## Key Features
+
+- 🎛️ **Dual SDK Support**: Choose between native full-featured implementation or official MCP SDK {: .label .label-green } 1.0
+- 🔌 **Multiple Transport Types**: Streamable HTTP, STDIO, and SSE transports
+- 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
+- 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
+- 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
+- 🎨 **Client Features**: Support for sampling, roots, progress tracking, and human-in-the-loop
+- 🧪 **Protocol Track Control**: Stable-by-default with opt-in draft protocol behavior
+- 🧩 **Extensions & MCP Apps**: Global + per-client extension configuration with canonical MCP UI/MCP Apps extension support
+- 🔧 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
+- 🔄 **Multiple Client Management**: Create and manage multiple MCP clients simultaneously
+- 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
+- 🚀 **Rails Integration**: Built-in Rails support with generators and configuration
+
+## Draft Protocol Track
+
+RubyLLM MCP defaults to the stable track:
 
 ```ruby
-require 'ruby_llm/mcp'
-
-RubyLLM.configure do |config|
-  config.openai_api_key = ENV.fetch('OPENAI_API_KEY')
-end
-
 RubyLLM::MCP.configure do |config|
-  config.request_timeout = 8_000
+  config.protocol_track = :stable  # default
 end
+```
 
+Enable draft behavior globally:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.protocol_track = :draft
+end
+```
+
+Protocol version precedence is:
+1. Per-client `config[:protocol_version]`
+2. Global `config.protocol_version` (explicit override)
+3. `config.protocol_track` derived default
+
+## Extensions & MCP Apps
+
+RubyLLM MCP supports extension negotiation so clients can advertise optional capabilities (including MCP Apps / UI capabilities).
+
+See:
+- **[Client Extensions]({% link extensions/index.md %})**
+- **[MCP Apps]({% link extensions/mcp-apps.md %})**
+- **[MCP Apps]({% link guides/mcp-apps.md %})**
+
+Register extensions globally:
+
+```ruby
+RubyLLM::MCP.configure do |config|
+  config.extensions.enable_apps(
+    "mimeTypes" => ["text/html;profile=mcp-app"]
+  )
+end
+```
+
+Override per client:
+
+```ruby
 client = RubyLLM::MCP.client(
-  name: 'filesystem',
-  transport_type: :stdio,
-  config: {
-    command: 'npx',
-    args: ['@modelcontextprotocol/server-filesystem', Dir.pwd]
-  }
-)
-```
-
-## Core Use Cases
-
-```ruby
-# Use MCP tools in a chat
-chat = RubyLLM.chat(model: 'gpt-4o-mini')
-chat.with_tools(*client.tools)
-
-puts chat.ask('List the Ruby files in this project and summarize what you find.')
-```
-
-```ruby
-# Add a server resource to chat context
-resource = client.resource('project_readme')
-
-chat = RubyLLM.chat(model: 'gpt-4o-mini')
-chat.with_resource(resource)
-
-puts chat.ask('Summarize this project in 5 bullets.')
-```
-
-```ruby
-# Execute a predefined MCP prompt with arguments
-prompt = client.prompt('code_review')
-chat = RubyLLM.chat(model: 'gpt-4o-mini')
-
-response = chat.ask_prompt(prompt, arguments: {
-  language: 'ruby',
-  focus: 'security'
-})
-
-puts response
-```
-
-```ruby
-# Authenticate to a protected MCP server with browser OAuth
-client = RubyLLM::MCP.client(
-  name: 'oauth-server',
+  name: "server",
+  adapter: :ruby_llm,
   transport_type: :streamable,
-  start: false,
   config: {
-    url: 'https://mcp.example.com/mcp',
-    oauth: { scope: 'mcp:read mcp:write' }
+    url: "https://example.com/mcp",
+    protocol_version: "2026-01-26",
+    extensions: {
+      "io.modelcontextprotocol/ui" => {}
+    }
   }
 )
-
-client.oauth(type: :browser).authenticate
-client.start
 ```
 
-```ruby
-# Poll a long-running MCP task and fetch its final result
-task = client.task_get('task-123')
+Extension behavior:
+- Outbound extension advertisement uses canonical ID `io.modelcontextprotocol/ui`
+- Inbound capability parsing accepts alias `io.modelcontextprotocol/apps`
+- `enable_apps` is a convenience helper for MCP Apps/UI extension registration
+- `:ruby_llm` adapter provides full extension negotiation
+- `:mcp_sdk` adapter accepts the same config surface in passive mode and warns once per process
 
-until task.completed? || task.failed? || task.cancelled?
-  sleep((task.poll_interval || 250) / 1000.0)
-  task = task.refresh
-end
+## Installation
 
-if task.completed?
-  payload = client.task_result(task.task_id)
-  puts payload.dig('content', 0, 'text')
-else
-  puts "Task ended with status: #{task.status}"
-end
+```bash
+bundle add ruby_llm-mcp
 ```
 
-## Support At A Glance
-
-- **Native MCP client implementation (`:ruby_llm`)** with full protocol support through `2025-11-25`
-- **Official MCP SDK adapter support (`:mcp_sdk`)** via the `mcp` gem for teams that prefer SDK-backed integration
-- **OAuth implementation** for authenticated streamable HTTP MCP servers
-- **Transports:** `stdio`, `sse`, `streamable` / `streamable_http`
-- **Core server features:** tools, resources, resource templates, prompts, notifications
-- **Advanced client features:** sampling, roots, progress tracking, human-in-the-loop, elicitation
-- **Task lifecycle APIs** (`tasks/list`, `tasks/get`, `tasks/result`, `tasks/cancel`) are experimental
-
-{: .warning }
-MCP task support is experimental and subject to change in both the MCP spec and this gem's implementation.
-
-## Install
-
-Add to your Gemfile:
+Or add to your Gemfile:
 
 ```ruby
 gem 'ruby_llm-mcp'
 ```
 
-Optional (for `:mcp_sdk` adapter):
+## Quick Start
 
 ```ruby
-gem 'mcp', '~> 0.7'
+require 'ruby_llm/mcp'
+
+# Configure RubyLLM
+RubyLLM.configure do |config|
+  config.openai_api_key = "your-api-key"
+end
+
+# Connect to an MCP server
+client = RubyLLM::MCP.client(
+  name: "filesystem",
+  transport_type: :stdio,
+  config: {
+    command: "bunx",
+    args: [
+      "@modelcontextprotocol/server-filesystem",
+      File.expand_path("..", __dir__)
+    ]
+  }
+)
+
+# Use MCP tools in a chat
+chat = RubyLLM.chat(model: "gpt-4")
+chat.with_tools(*client.tools)
+
+response = chat.ask("Can you help me search for files in my project?")
+puts response
 ```
 
-Then run:
+## Transport Types
 
-```bash
-bundle install
+### STDIO Transport
+
+Best for local MCP servers or command-line tools:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "local-server",
+  transport_type: :stdio,
+  config: {
+    command: "python",
+    args: ["-m", "my_mcp_server"],
+    env: { "DEBUG" => "1" }
+  }
+)
 ```
 
-## Setup
+### Streamable HTTP Transport
 
-1. Set your RubyLLM provider credentials (for example `OPENAI_API_KEY`).
-2. Start or access an MCP server.
-3. Create a `RubyLLM::MCP.client` and attach its tools/resources/prompts to chat flows.
+Best for HTTP-based MCP servers that support streaming:
 
-## Documentation
+```ruby
+client = RubyLLM::MCP.client(
+  name: "streaming-server",
+  transport_type: :streamable,
+  config: {
+    url: "https://your-mcp-server.com/mcp",
+    headers: { "Authorization" => "Bearer your-token" }
+  }
+)
+```
 
-1. **[Getting Started]({% link guides/getting-started.md %})** - Get up and running quickly
+### SSE Transport
+
+Best for web-based MCP servers:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "web-server",
+  transport_type: :sse,
+  config: {
+    url: "https://your-mcp-server.com/mcp/sse",
+    headers: { "Authorization" => "Bearer your-token" }
+  }
+)
+```
+
+## Core Concepts
+
+### Tools
+
+MCP tools are automatically converted into RubyLLM-compatible tools, enabling LLMs to execute server-side operations.
+
+### Resources
+
+Static or dynamic data that can be included in conversations - from files to API responses.
+
+### Prompts
+
+Pre-defined prompts with arguments for consistent interactions across your application.
+
+### Notifications
+
+Real-time updates from MCP servers including logging, progress, and resource changes.
+
+## Getting Started
+
+1. **[Getting Started]({% link getting-started/getting-started.md %})** - Get up and running quickly
 2. **[Configuration]({% link configuration.md %})** - Configure clients and transports
 3. **[Adapters & Transports]({% link guides/adapters.md %})** - Choose adapters and configure transports
-4. **[Server: Tools]({% link server/tools.md %})** - Execute server-side operations
-5. **[Server: Resources]({% link server/resources.md %})** - Include data in conversations
-6. **[Server: Prompts]({% link server/prompts.md %})** - Use predefined prompts with arguments
-7. **[Server: Tasks]({% link server/tasks.md %})** - Poll and manage long-running background work (experimental)
-8. **[Server: Notifications]({% link server/notifications.md %})** - Handle real-time updates
-9. **[Client: Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM
-10. **[Client: Roots]({% link client/roots.md %})** - Provide filesystem access to servers
-11. **[Client: Elicitation]({% link client/elicitation.md %})** - Handle user input during conversations
+4. **[Rails Integration]({% link guides/rails-integration.md %})** - Use with Rails applications
+
+## Server
+
+1. **[Working with Tools]({% link server/tools.md %})** - Execute server-side operations
+2. **[Using Resources]({% link server/resources.md %})** - Include data in conversations
+3. **[Prompts]({% link server/prompts.md %})** - Use predefined prompts with arguments
+4. **[Notifications]({% link server/notifications.md %})** - Handle real-time updates
+
+## Client
+
+1. **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM
+2. **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers
+3. **[Elicitation]({% link client/elicitation.md %})** - Handle user input during conversations
+4. **[Extensions]({% link extensions/index.md %})** - Configure extension negotiation and MCP Apps capabilities
+
+## Examples
+
+Complete examples are available in the [`examples/`](https://github.com/patvice/ruby_llm-mcp/tree/main/examples) directory:
+
+- **Local MCP Server**: Complete stdio transport example
+- **SSE with GPT**: Server-sent events with OpenAI
+- **Resource Management**: List and use resources
+- **Prompt Integration**: Use prompts with streamable transport
 
 ## Contributing
 
-Bug reports and pull requests are welcome on [GitHub](https://github.com/patvice/ruby_llm-mcp).
+We welcome contributions! Bug reports and pull requests are welcome on [GitHub](https://github.com/patvice/ruby_llm-mcp).
 
 ## License
 

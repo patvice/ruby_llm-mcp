@@ -1,8 +1,7 @@
 ---
 layout: default
-title: Basics
-parent: Guides
-nav_order: 1
+title: Getting Started (Legacy Path)
+nav_exclude: true
 description: "Getting started with RubyLLM MCP - installation, setup, and basic usage"
 ---
 

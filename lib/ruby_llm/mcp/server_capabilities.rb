@@ -60,6 +60,31 @@ module RubyLLM
       def task_augmented_tool_call?
         !@capabilities.dig("tasks", "requests", "tools", "call").nil?
       end
+
+      def extensions
+        value = @capabilities["extensions"]
+        value.is_a?(Hash) ? value : {}
+      end
+
+      def extension?(id)
+        !extension_capability(id).nil?
+      end
+
+      def extension_capability(id)
+        canonical_id = Extensions::Registry.canonicalize_id(id)
+        return nil if canonical_id.nil?
+
+        normalized_extensions[canonical_id]
+      end
+
+      private
+
+      def normalized_extensions
+        extensions.each_with_object({}) do |(id, value), acc|
+          canonical_id = Extensions::Registry.canonicalize_id(id) || id
+          acc[canonical_id] = value
+        end
+      end
     end
   end
 end

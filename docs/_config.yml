@@ -21,7 +21,7 @@ sass:
 
 # Just the Docs settings
 
-logo: "/assets/images/rubyllm-mcp-logo-text.svg"
+logo: "/assets/images/favicon/favicon.svg"
 favicon_ico: "/assets/images/favicon/favicon.ico"
 favicon_png: "/assets/images/favicon/favicon-96x96.png"
 favicon_svg: "/assets/images/favicon/favicon.svg"
@@ -47,10 +47,18 @@ footer_content: "Copyright &copy; 2025 <a href='https://patrickvice.com'>Patrick
 nav_enabled: true
 
 nav_external_links:
+  - title: Home
+    url: /
+    hide_icon: true
+    opens_in_new_tab: false
   - title: Github
     url: https://github.com/patvice/ruby_llm-mcp
-    hide_icon: false # set to true to hide the external link icon - defaults to false
-    opens_in_new_tab: false # set to true to open this link in a new tab - defaults to false
+    hide_icon: false
+    opens_in_new_tab: false
+  - title: Changelog
+    url: https://github.com/patvice/ruby_llm-mcp/releases
+    hide_icon: false
+    opens_in_new_tab: false
 
 # Make Anchor links show on hover
 heading_anchors: true

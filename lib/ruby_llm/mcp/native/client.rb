@@ -25,6 +25,7 @@ module RubyLLM
           progress_tracking_enabled: false,
           sampling_callback: nil,
           notification_callback: nil,
+          extensions_capabilities: nil,
           protocol_version: nil,
           request_timeout: nil
         )
@@ -33,6 +34,7 @@ module RubyLLM
           @config = transport_config.merge(request_timeout: request_timeout || MCP.config.request_timeout)
           @requested_protocol_version = protocol_version || MCP.config.protocol_version || Native::Protocol.latest_version
           @protocol_version = @requested_protocol_version
+          @extensions_capabilities = extensions_capabilities || {}
 
           # Callbacks
           @human_in_the_loop_callback = human_in_the_loop_callback
@@ -402,6 +404,10 @@ module RubyLLM
               list: {},
               cancel: {}
             }
+          end
+
+          if @extensions_capabilities.any? && Native::Protocol.extensions_supported?(@protocol_version)
+            capabilities_hash[:extensions] = @extensions_capabilities
           end
 
           capabilities_hash

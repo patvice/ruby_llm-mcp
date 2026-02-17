@@ -1,0 +1,88 @@
+<script>
+(function() {
+  var STORAGE_KEY = 'rubyllm-docs-theme';
+
+  function getSavedTheme() {
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveTheme(theme) {
+    try {
+      localStorage.setItem(STORAGE_KEY, theme);
+    } catch (e) {}
+  }
+
+  function preferredTheme() {
+    var saved = getSavedTheme();
+    if (saved === 'dark' || saved === 'light') return saved;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+
+  function syncToggle(theme) {
+    var toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    var dark = theme === 'dark';
+    toggle.setAttribute('aria-checked', dark ? 'true' : 'false');
+    toggle.classList.toggle('is-dark', dark);
+  }
+
+  function applyTheme(theme) {
+    if (!window.jtd || typeof window.jtd.setTheme !== 'function') return;
+    window.jtd.setTheme(theme);
+    syncToggle(theme);
+  }
+
+  function applyPreferredTheme() {
+    applyTheme(preferredTheme());
+  }
+
+  function onToggleClick() {
+    var current = (window.jtd && typeof window.jtd.getTheme === 'function') ? window.jtd.getTheme() : preferredTheme();
+    var next = current === 'dark' ? 'light' : 'dark';
+    saveTheme(next);
+    applyTheme(next);
+  }
+
+  function bindToggle() {
+    var toggle = document.getElementById('theme-toggle');
+    if (!toggle || toggle.dataset.bound === 'true') return;
+    toggle.dataset.bound = 'true';
+    toggle.addEventListener('click', onToggleClick);
+    toggle.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onToggleClick();
+      }
+    });
+  }
+
+  function initTheme() {
+    applyPreferredTheme();
+    bindToggle();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme, { once: true });
+  } else {
+    initTheme();
+  }
+
+  if (window.matchMedia) {
+    var media = window.matchMedia('(prefers-color-scheme: dark)');
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', function() {
+        if (!getSavedTheme()) applyPreferredTheme();
+      });
+    } else if (typeof media.addListener === 'function') {
+      media.addListener(function() {
+        if (!getSavedTheme()) applyPreferredTheme();
+      });
+    }
+  }
+})();
+</script>

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Tools
-parent: Server Interactions
+parent: Server
 nav_order: 1
 description: "Working with MCP tools - discovery, execution, human-in-the-loop, and streaming"
 ---

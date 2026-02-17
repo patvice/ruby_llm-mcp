@@ -3,7 +3,7 @@
 module RubyLLM
   module MCP
     class Resource
-      attr_reader :uri, :name, :description, :mime_type, :adapter, :subscribed
+      attr_reader :uri, :name, :description, :mime_type, :adapter, :subscribed, :apps_metadata
 
       def initialize(adapter, resource)
         @adapter = adapter
@@ -11,6 +11,7 @@ module RubyLLM
         @name = resource["name"]
         @description = resource["description"]
         @mime_type = resource["mimeType"]
+        @apps_metadata = Extensions::Apps::ResourceMetadata.new(resource[Extensions::Apps::Constants::META_KEY])
         if resource.key?("content_response")
           @content_response = resource["content_response"]
           @content = @content_response["text"] || @content_response["blob"]

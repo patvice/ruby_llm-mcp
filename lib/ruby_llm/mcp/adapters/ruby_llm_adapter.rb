@@ -25,6 +25,8 @@ module RubyLLM
           super
 
           request_timeout = config.delete(:request_timeout)
+          protocol_version = @config[:protocol_version]
+          extensions_capabilities = build_client_extensions_capabilities(protocol_version: protocol_version)
           transport_config = prepare_transport_config(config, transport_type)
 
           @native_client = Native::Client.new(
@@ -42,7 +44,9 @@ module RubyLLM
             progress_tracking_enabled: client.tracking_progress?,
             elicitation_callback: build_elicitation_callback(client),
             sampling_callback: build_sampling_callback(client),
-            notification_callback: ->(notification) { NotificationHandler.new(client).execute(notification) }
+            notification_callback: ->(notification) { NotificationHandler.new(client).execute(notification) },
+            protocol_version: @config[:protocol_version],
+            extensions_capabilities: extensions_capabilities
           )
         end
 
@@ -65,6 +69,20 @@ module RubyLLM
                        :register_in_flight_request, :unregister_in_flight_request,
                        :cancel_in_flight_request
 
+        def supports_extension_negotiation?
+          true
+        end
+
+        def extension_mode
+          :full
+        end
+
+        def build_client_extensions_capabilities(protocol_version:)
+          return {} unless Native::Protocol.extensions_supported?(protocol_version)
+
+          Extensions::Registry.normalize_map(@config[:extensions]).transform_values { |value| value || {} }
+        end
+
         def register_resource(resource)
           client.linked_resources << resource
           client.resources[resource.name] = resource
@@ -74,6 +92,10 @@ module RubyLLM
 
         def prepare_transport_config(config, transport_type)
           transport_config = config.dup
+          transport_config.delete(:protocol_version)
+          transport_config.delete("protocol_version")
+          transport_config.delete(:extensions)
+          transport_config.delete("extensions")
 
           if %i[sse streamable streamable_http].include?(transport_type)
             oauth_provider = Auth::TransportOauthHelper.create_oauth_provider(transport_config) if Auth::TransportOauthHelper.oauth_config_present?(transport_config)

@@ -5,7 +5,7 @@ require "httpx"
 module RubyLLM
   module MCP
     class ResourceTemplate
-      attr_reader :uri, :name, :description, :mime_type, :adapter, :template
+      attr_reader :uri, :name, :description, :mime_type, :adapter, :template, :apps_metadata
 
       def initialize(adapter, resource)
         @adapter = adapter
@@ -13,6 +13,7 @@ module RubyLLM
         @name = resource["name"]
         @description = resource["description"]
         @mime_type = resource["mimeType"]
+        @apps_metadata = Extensions::Apps::ResourceMetadata.new(resource[Extensions::Apps::Constants::META_KEY])
       end
 
       def fetch_resource(arguments: {})
