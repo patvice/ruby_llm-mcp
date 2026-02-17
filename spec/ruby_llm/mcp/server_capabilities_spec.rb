@@ -286,6 +286,56 @@ RSpec.describe RubyLLM::MCP::ServerCapabilities do
     end
   end
 
+  describe "#tasks?" do
+    it "returns true when tasks capability is present" do
+      capabilities = described_class.new("tasks" => {})
+      expect(capabilities.tasks?).to be(true)
+    end
+
+    it "returns false when tasks capability is missing" do
+      capabilities = described_class.new({})
+      expect(capabilities.tasks?).to be(false)
+    end
+  end
+
+  describe "#tasks_list?" do
+    it "returns true when tasks list capability is present" do
+      capabilities = described_class.new("tasks" => { "list" => {} })
+      expect(capabilities.tasks_list?).to be(true)
+    end
+
+    it "returns false when tasks list capability is missing" do
+      capabilities = described_class.new("tasks" => {})
+      expect(capabilities.tasks_list?).to be(false)
+    end
+  end
+
+  describe "#tasks_cancel?" do
+    it "returns true when tasks cancel capability is present" do
+      capabilities = described_class.new("tasks" => { "cancel" => {} })
+      expect(capabilities.tasks_cancel?).to be(true)
+    end
+
+    it "returns false when tasks cancel capability is missing" do
+      capabilities = described_class.new("tasks" => {})
+      expect(capabilities.tasks_cancel?).to be(false)
+    end
+  end
+
+  describe "#task_augmented_tool_call?" do
+    it "returns true when task-augmented tool calls are supported" do
+      capabilities = described_class.new(
+        "tasks" => { "requests" => { "tools" => { "call" => {} } } }
+      )
+      expect(capabilities.task_augmented_tool_call?).to be(true)
+    end
+
+    it "returns false when task-augmented tool calls are missing" do
+      capabilities = described_class.new("tasks" => { "requests" => {} })
+      expect(capabilities.task_augmented_tool_call?).to be(false)
+    end
+  end
+
   describe "extensions APIs" do
     let(:canonical_id) { RubyLLM::MCP::Extensions::Constants::UI_EXTENSION_ID }
     let(:alias_id) { RubyLLM::MCP::Extensions::Constants::APPS_EXTENSION_ALIAS }

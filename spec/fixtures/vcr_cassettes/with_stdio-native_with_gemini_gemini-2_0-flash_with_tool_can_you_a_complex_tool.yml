@@ -10,7 +10,7 @@ http_interactions:
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"type":"STRING"}},"required":["website"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -31,7 +31,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:31:17 GMT
+      - Mon, 16 Feb 2026 17:21:30 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -41,7 +41,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=573
+      - gfet4t7; dur=617
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -66,7 +66,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -2.7977439458481967e-06
+              "avgLogprobs": -5.0783467789491015e-06
             }
           ],
           "usageMetadata": {
@@ -87,9 +87,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "xXUSaZ6DFZaA-8YPw6OUgAo"
+          "responseId": "GlKTafqVDpG6_uMPr9SqqQs"
         }
-  recorded_at: Mon, 10 Nov 2025 23:31:17 GMT
+  recorded_at: Mon, 16 Feb 2026 17:21:30 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -103,7 +103,7 @@ http_interactions:
         website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"type":"STRING"}},"required":["website"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -124,7 +124,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:31:18 GMT
+      - Mon, 16 Feb 2026 17:21:31 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -134,7 +134,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=560
+      - gfet4t7; dur=692
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -148,13 +148,13 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The website example.com is a domain used for documentation examples. It does not specify what \"they\" do.\n"
+                    "text": "The website example.com says that it is for use in documentation examples without needing permission and to avoid use in operations."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.18179478247960409
+              "avgLogprobs": -0.023872554302215576
             }
           ],
           "usageMetadata": {
@@ -175,7 +175,7 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "xnUSaaU_3fGOsQ-Jn42ZBg"
+          "responseId": "GlKTaY6MOPTT_uMPt-WZuAw"
         }
-  recorded_at: Mon, 10 Nov 2025 23:31:18 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:21:31 GMT
+recorded_with: VCR 6.4.0

@@ -17,7 +17,7 @@ http_interactions:
         information do you have from the provided resources?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -38,7 +38,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:36:29 GMT
+      - Mon, 16 Feb 2026 17:24:47 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -48,7 +48,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1448
+      - gfet4t7; dur=2664
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,19 +62,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Okay, here's a summary of the information I have from the files you provided:\n\n*   **plain_text.txt:**\n    *   Contains the string \"Plan text information\"\n\n*   **test.txt:**\n    *   Contains the string \"Hello, this is a test file!\"\n    *   Contains the string \"This content will be served by the MCP resource.\"\n    *   Contains the string \"You can modify this file and it will be cached for 5 minutes.\"\n\n*   **second_file.txt:**\n    *   Contains the string \"This is the second file that I want to be able to use as a resource\"\n\n*   **my.md:**\n    *   Is a Markdown file.\n    *   Contains a level 1 heading: \"My Markdown File\"\n    *   Contains level 2 headings: \"Section 1\" and \"Section 2\"\n    *   Contains text under each heading.\n"
+                    "text": "Based on the provided resources, here's what I can tell you:\n\n*   **plain_text.txt**: This is described as \"A plain text file\".  Its content is not directly provided.\n*   **Plan text informationtest.txt**: This is described as \"A text file\". It contains the following content:\n\n    ```\n    Hello, this is a test file!\n    This content will be served by the MCP resource.\n    You can modify this file and it will be cached for 5 minutes.\n    ```\n\n*   **second_file.txt**: This is described as \"A second text file\". It contains the following content:\n\n    ```\n    This is the second file that I want to be able to use as a resource\n    ```\n\n*   **my.md**: This is described as \"A markdown file\". It contains the following content:\n\n    ```markdown\n    # My Markdown File\n\n    This is a markdown file that I want to be able to use as a resource\n\n    ## Section 1\n\n    This is a section in my markdown file\n\n    ## Section 2\n\n    This is another section in my markdown file\n    ```\n\nIn summary, you have provided four files: two plain text files (one with its content omitted), one text file and one markdown file with their contents described, and the markdown file formatted with headings and sections. The text files are intended to be used as resources, potentially served by an MCP resource, with one of them being cached for 5 minutes.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.1125950417867521
+              "avgLogprobs": -0.27149183905161572
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 154,
-            "candidatesTokenCount": 205,
-            "totalTokenCount": 359,
+            "candidatesTokenCount": 323,
+            "totalTokenCount": 477,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -84,12 +84,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 205
+                "tokenCount": 323
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "_HYSabD5Bc6RjrEPkbGJiAc"
+          "responseId": "3VKTaZDQD7L5jrEP2PXs4A8"
         }
-  recorded_at: Mon, 10 Nov 2025 23:36:29 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:24:47 GMT
+recorded_with: VCR 6.4.0

@@ -25,6 +25,10 @@ module RubyLLM
           process_progress_message(notification)
         when "notifications/cancelled"
           process_cancelled_notification(notification)
+        when "notifications/tasks/status"
+          process_task_status_notification(notification)
+        when "notifications/elicitation/complete"
+          process_elicitation_complete_notification(notification)
         else
           process_unknown_notification(notification)
         end
@@ -82,18 +86,36 @@ module RubyLLM
           "Received cancellation for request #{request_id}: #{reason}"
         )
 
-        success = client.cancel_in_flight_request(request_id)
+        outcome = client.cancel_in_flight_request(request_id)
 
-        unless success
-          RubyLLM::MCP.logger.debug(
-            "Request #{request_id} was not found or already completed"
-          )
+        case outcome
+        when :cancelled, :already_cancelled, :already_completed
+          RubyLLM::MCP.logger.debug("Cancellation outcome for #{request_id}: #{outcome}")
+        when :not_found
+          RubyLLM::MCP.logger.debug("Request #{request_id} was not found or already completed")
+        when :not_cancellable
+          RubyLLM::MCP.logger.warn("Request #{request_id} is not cancellable")
+        else
+          RubyLLM::MCP.logger.warn("Cancellation for #{request_id} returned unexpected outcome: #{outcome.inspect}")
         end
       end
 
       def process_unknown_notification(notification)
         message = "Unknown notification type: #{notification.type} params: #{notification.params.to_h}"
         RubyLLM::MCP.logger.error(message)
+      end
+
+      def process_task_status_notification(notification)
+        return unless client.adapter.respond_to?(:task_status_notification)
+
+        client.adapter.task_status_notification(task: notification.params)
+      end
+
+      def process_elicitation_complete_notification(notification)
+        elicitation_id = notification.params["elicitationId"]
+        return if elicitation_id.nil?
+
+        Handlers::ElicitationRegistry.remove(elicitation_id)
       end
     end
   end

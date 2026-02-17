@@ -35,10 +35,10 @@ Version 1.0 maintains full backward compatibility with 0.8.x. All existing code 
 gem 'ruby_llm-mcp', '~> 1.0'
 ```
 
-Optional - for MCP SDK adapter (requires Ruby 3.2+):
+Optional - for MCP SDK adapter (requires Ruby 3.1+):
 
 ```ruby
-gem 'mcp', '~> 0.4'
+gem 'mcp', '~> 0.7'
 ```
 
 Then run:

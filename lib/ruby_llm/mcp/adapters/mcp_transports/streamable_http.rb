@@ -7,9 +7,13 @@ module RubyLLM::MCP::Adapters::MCPTransports
     attr_reader :native_transport
 
     def initialize(url:, headers: {}, version: :http2, request_timeout: 10_000, # rubocop:disable Metrics/ParameterLists
-                   reconnection: {}, oauth_provider: nil, rate_limit: nil, session_id: nil)
+                   reconnection: {}, oauth_provider: nil, rate_limit: nil, session_id: nil,
+                   protocol_version: RubyLLM::MCP.config.protocol_version, notification_callback: nil)
       # Create a minimal coordinator-like object for the native transport
-      @coordinator = CoordinatorStub.new
+      @coordinator = CoordinatorStub.new(
+        protocol_version: protocol_version,
+        notification_callback: notification_callback
+      )
       @initialized = false
 
       @native_transport = RubyLLM::MCP::Native::Transports::StreamableHTTP.new(

@@ -172,6 +172,37 @@ RSpec.describe RubyLLM::MCP::Client do
     end
   end
 
+  each_client_supporting(:human_in_the_loop) do |_config|
+    describe "on_human_in_the_loop" do
+      after do
+        client.on_human_in_the_loop
+      end
+
+      it "requires handler classes and rejects legacy block callbacks" do
+        expect do
+          client.on_human_in_the_loop do |_name, _params|
+            true
+          end
+        end.to raise_error(ArgumentError, /Block-based human-in-the-loop callbacks are no longer supported/)
+      end
+
+      it "stores handler class configuration with options" do
+        handler_class = Class.new(RubyLLM::MCP::Handlers::HumanInTheLoopHandler) do
+          option :safe_tools, default: []
+
+          def execute
+            options[:safe_tools].include?(tool_name) ? approve : deny("not safe")
+          end
+        end
+
+        client.on_human_in_the_loop(handler_class, safe_tools: ["add"])
+        config = client.on[:human_in_the_loop]
+        expect(config[:class]).to eq(handler_class)
+        expect(config[:options]).to eq({ safe_tools: ["add"] })
+      end
+    end
+  end
+
   # Resource template capability tests - only run on adapters that support resource_templates
   each_client_supporting(:resource_templates) do |_config|
     describe "resource_templates" do
@@ -216,6 +247,24 @@ RSpec.describe RubyLLM::MCP::Client do
       it "returns specific prompt by name if available" do
         prompt = client.prompt("nonexistent")
         expect(prompt).to be_nil
+      end
+    end
+  end
+
+  each_client_supporting(:tasks) do |_config|
+    describe "tasks capability gating" do
+      it "returns an empty list when tasks/list capability is unavailable" do
+        allow(client.capabilities).to receive_messages(tasks?: true, tasks_list?: false)
+
+        expect(client.tasks_list).to eq([])
+      end
+
+      it "raises a capability error when tasks/cancel capability is unavailable" do
+        allow(client.capabilities).to receive(:tasks_cancel?).and_return(false)
+
+        expect do
+          client.task_cancel("task-123")
+        end.to raise_error(RubyLLM::MCP::Errors::Capabilities::TaskCancelNotAvailable)
       end
     end
   end

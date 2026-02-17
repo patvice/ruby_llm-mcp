@@ -10,7 +10,7 @@ http_interactions:
         image do you have?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:34:31 GMT
+      - Mon, 16 Feb 2026 17:26:12 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,52 +39,52 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:34:28Z'
+      - '2026-02-16T17:26:08Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:34:32Z'
+      - '2026-02-16T17:26:12Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:34:28Z'
-      Retry-After:
-      - '32'
+      - '2026-02-16T17:26:08Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:34:28Z'
+      - '2026-02-16T17:26:08Z'
+      X-Robots-Tag:
+      - none
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
-      X-Envoy-Upstream-Service-Time:
-      - '4238'
-      Cf-Cache-Status:
-      - DYNAMIC
-      X-Robots-Tag:
-      - none
       Server:
       - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '4532'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01E6pSuYwfx45EFuZhhxx3wD","type":"message","role":"assistant","content":[{"type":"text","text":"I
-        can see an image of an adorable golden retriever puppy. The puppy appears
-        to be very young, with fluffy, light-colored fur that''s characteristic of
-        golden retriever puppies. The puppy has its mouth open in what looks like
-        a happy, playful expression - almost like it''s yawning or barking with joy.
-        The image is taken against a white background, and the puppy is standing and
-        facing toward the camera. It''s a very cute and endearing photo that captures
-        the playful, innocent nature of a young golden retriever."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":121,"service_tier":"standard"}}'
-  recorded_at: Mon, 10 Nov 2025 23:34:31 GMT
-recorded_with: VCR 6.3.1
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01Pjt8LwsYpTy5xUjyNJd7Qd","type":"message","role":"assistant","content":[{"type":"text","text":"I
+        can see an image of an adorable golden retriever puppy. The puppy has light
+        cream or pale golden colored fur and appears to be very young. It''s captured
+        mid-yawn or bark with its mouth wide open, showing its pink tongue and the
+        inside of its mouth. The puppy is standing and photographed against a plain
+        white background, giving it a clean, studio-portrait look. Its ears are still
+        floppy and soft-looking as typical of young puppies, and it has that characteristic
+        fluffy puppy coat. The image captures a very cute and expressive moment!"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":158,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":126,"service_tier":"standard","inference_geo":"not_available"}}'
+  recorded_at: Mon, 16 Feb 2026 17:26:12 GMT
+recorded_with: VCR 6.4.0

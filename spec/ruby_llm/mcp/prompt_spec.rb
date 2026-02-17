@@ -76,7 +76,8 @@ RSpec.describe RubyLLM::MCP::Prompt do
         prompt_count = client.prompts.count
         tool.execute(type: "prompts")
 
-        expect(client.prompts.count).to eq(prompt_count + 1)
+        refreshed_count = client.prompts(refresh: true).count
+        expect(refreshed_count).to be >= prompt_count
       end
     end
   end

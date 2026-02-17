@@ -252,6 +252,23 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect(result).to be_nil
       end
 
+      it "handles 201 Created as a successful JSON response" do
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+          .to_return(
+            status: 201,
+            headers: { "Content-Type" => "application/json" },
+            body: {
+              "jsonrpc" => "2.0",
+              "id" => 1,
+              "result" => { "content" => [{ "type" => "text", "text" => "created" }] }
+            }.to_json
+          )
+
+        result = transport.request({ "method" => "initialize", "id" => 1 }, wait_for_response: false)
+        expect(result).to be_a(RubyLLM::MCP::Result)
+        expect(result.result["content"][0]["text"]).to eq("created")
+      end
+
       it "handles 500 Internal Server Error" do
         stub_request(:post, TestServerManager::HTTP_SERVER_URL)
           .to_return(
@@ -540,7 +557,6 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
       end
 
       context "when client doesn't have close method" do
-        # rubocop:disable RSpec/VerifiedDoubles
         let(:mock_client) { double("client_without_close") }
         # rubocop:enable RSpec/VerifiedDoubles
 
@@ -1977,7 +1993,7 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     it "initializes rate limiter when rate_limit option provided" do
       rate_limiter = transport_with_rate_limit.instance_variable_get(:@rate_limiter)
 
-      expect(rate_limiter).to be_a(RubyLLM::MCP::Native::Transports::Support::RateLimit)
+      expect(rate_limiter).to be_a(RubyLLM::MCP::Native::Transports::Support::RateLimiter)
     end
 
     it "does not initialize rate limiter when rate_limit option not provided" do

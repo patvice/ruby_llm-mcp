@@ -8,6 +8,7 @@ import { setupTools } from "./tools/index.js";
 import { setupResources } from "./resources/index.js";
 import { setupPrompts } from "./prompts/index.js";
 import { registerLogging } from "./logging.js";
+import { registerTaskProtocolHandlers } from "./tasks/protocol.js";
 
 // Check for silent flag
 const isSilent =
@@ -213,7 +214,16 @@ function createServer(): McpServer {
         resources: {
           subscribe: true,
         },
-      },
+        tasks: {
+          list: {},
+          cancel: {},
+          requests: {
+            tools: {
+              call: {},
+            },
+          },
+        },
+      } as any,
     }
   );
 
@@ -222,6 +232,7 @@ function createServer(): McpServer {
   setupResources(server);
   setupPrompts(server);
   registerLogging(server);
+  registerTaskProtocolHandlers(server);
 
   return server;
 }

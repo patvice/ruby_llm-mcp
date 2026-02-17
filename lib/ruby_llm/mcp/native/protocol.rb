@@ -6,12 +6,14 @@ module RubyLLM
       module Protocol
         module_function
 
-        LATEST_PROTOCOL_VERSION = "2025-06-18"
+        LATEST_PROTOCOL_VERSION = "2025-11-25"
+        EXTENSIONS_PROTOCOL_VERSION = "2025-06-18"
         DRAFT_PROTOCOL_VERSION = "2026-01-26"
         DEFAULT_NEGOTIATED_PROTOCOL_VERSION = "2025-03-26"
         SUPPORTED_PROTOCOL_VERSIONS = [
           DRAFT_PROTOCOL_VERSION,
           LATEST_PROTOCOL_VERSION,
+          EXTENSIONS_PROTOCOL_VERSION,
           "2025-03-26",
           "2024-11-05",
           "2024-10-07"
@@ -68,7 +70,7 @@ module RubyLLM
           normalized = version.to_s
           return true if normalized.start_with?("DRAFT-")
 
-          comparison = compare_date_versions(normalized, LATEST_PROTOCOL_VERSION)
+          comparison = compare_date_versions(normalized, EXTENSIONS_PROTOCOL_VERSION)
           !comparison.nil? && comparison >= 0
         end
       end

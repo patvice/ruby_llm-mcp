@@ -9,7 +9,7 @@ http_interactions:
         for ruby channel and let me know what they say?"}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":["channel"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -30,7 +30,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:34:40 GMT
+      - Mon, 16 Feb 2026 17:26:19 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +40,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=507
+      - gfet4t7; dur=472
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -65,7 +65,7 @@ http_interactions:
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.002228514850139618
+              "avgLogprobs": -0.002986709773540497
             }
           ],
           "usageMetadata": {
@@ -86,9 +86,9 @@ http_interactions:
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "j3YSaYj9Op-8_uMP69vkiAs"
+          "responseId": "O1OTafuVDvje_uMPopaM-QI"
         }
-  recorded_at: Mon, 10 Nov 2025 23:34:40 GMT
+  recorded_at: Mon, 16 Feb 2026 17:26:19 GMT
 - request:
     method: post
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
@@ -100,7 +100,7 @@ http_interactions:
         community."}]}}}]}],"generationConfig":{},"tools":[{"functionDeclarations":[{"name":"list_messages","description":"","parameters":{"type":"OBJECT","properties":{"channel":{"type":"STRING"}},"required":["channel"]}}]}]}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -121,7 +121,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:34:41 GMT
+      - Mon, 16 Feb 2026 17:26:20 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -131,7 +131,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=596
+      - gfet4t7; dur=590
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -145,19 +145,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The ruby channel has one message that says: Ruby is a great language for web development. It's easy to learn and has a large community.\n"
+                    "text": "The ruby channel has one message that says: Ruby is a great language for web development. It's easy to learn and has a large community."
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.00523299555624685
+              "avgLogprobs": -0.03177537520726522
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 57,
-            "candidatesTokenCount": 31,
-            "totalTokenCount": 88,
+            "candidatesTokenCount": 30,
+            "totalTokenCount": 87,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -167,12 +167,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 31
+                "tokenCount": 30
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "kHYSabSjJKu__uMP0Kb0qA4"
+          "responseId": "O1OTafT8L4yS_uMP3ovvwAQ"
         }
-  recorded_at: Mon, 10 Nov 2025 23:34:41 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:26:20 GMT
+recorded_with: VCR 6.4.0

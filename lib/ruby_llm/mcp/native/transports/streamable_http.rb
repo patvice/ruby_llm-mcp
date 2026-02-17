@@ -88,7 +88,7 @@ module RubyLLM
                                     end
 
             @oauth_provider = oauth_provider
-            @rate_limiter = Support::RateLimit.new(**rate_limit) if rate_limit
+            @rate_limiter = Support::RateLimiter.new(**rate_limit) if rate_limit
 
             @id_counter = 0
             @id_mutex = Mutex.new
@@ -362,7 +362,7 @@ module RubyLLM
             @session_id = session_id if session_id
 
             case response.status
-            when 200
+            when 200, 201
               handle_success_response(response, request_id, original_message)
             when 202
               handle_accepted_response(original_message)

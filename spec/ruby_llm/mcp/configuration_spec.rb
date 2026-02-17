@@ -31,7 +31,18 @@ RSpec.describe RubyLLM::MCP::Configuration do
       config = RubyLLM::MCP::Configuration.new
 
       expect(config.protocol_version).to eq(RubyLLM::MCP::Native::Protocol::LATEST_PROTOCOL_VERSION)
-      expect(config.protocol_version).to eq("2025-06-18")
+      expect(config.protocol_version).to eq("2025-11-25")
+    end
+
+    it "sets default sampling, elicitation, and tasks capability flags" do
+      config = RubyLLM::MCP::Configuration.new
+
+      expect(config.sampling.enabled).to be(false)
+      expect(config.sampling.tools).to be(false)
+      expect(config.sampling.context).to be(true)
+      expect(config.elicitation.form).to be(true)
+      expect(config.elicitation.url).to be(false)
+      expect(config.tasks.enabled).to be(false)
     end
   end
 

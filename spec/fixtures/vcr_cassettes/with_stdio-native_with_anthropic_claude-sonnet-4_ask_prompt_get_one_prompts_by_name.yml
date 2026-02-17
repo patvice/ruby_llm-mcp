@@ -10,7 +10,7 @@ http_interactions:
         the word ''poem'' in your response."}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:37:32 GMT
+      - Mon, 16 Feb 2026 17:27:46 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,46 +39,46 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:37:25Z'
+      - '2026-02-16T17:27:40Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:37:34Z'
+      - '2026-02-16T17:27:47Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:37:25Z'
-      Retry-After:
-      - '38'
+      - '2026-02-16T17:27:40Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:37:25Z'
+      - '2026-02-16T17:27:40Z'
+      X-Robots-Tag:
+      - none
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
-      X-Envoy-Upstream-Service-Time:
-      - '8491'
-      Cf-Cache-Status:
-      - DYNAMIC
-      X-Robots-Tag:
-      - none
       Server:
       - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '6531'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxSG5MZTNXNDhtd0R0VmVaV3NkOXltVCIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIHBvZW0gYWJvdXQgdGhpcyB2ZXJ5IGRheTpcblxuKipUb2RheSoqXG5cblRoZSBtb3JuaW5nIGxpZ2h0IHNwaWxscyBnb2xkZW4gdGhyb3VnaCBteSB3aW5kb3csXG5hbm90aGVyIERlY2VtYmVyIGRheSB1bmZ1cmxzIGl0cyBxdWlldCB3aW5ncy5cblNvbWV3aGVyZSwgY29mZmVlIHN0ZWFtcyBpbiBmYXZvcml0ZSBtdWdzLFxuYW5kIGJyZWF0aCBtYWtlcyBzbWFsbCBjbG91ZHMgaW4gd2ludGVyIGFpci5cblxuQ2hpbGRyZW4gcHJlc3Mgbm9zZXMgdG8gZnJvc3RlZCBnbGFzcyxcbndoaWxlIGRpc3RhbnQgZW5naW5lcyBodW0gdGhlaXIgc3RlYWR5IHNvbmdzLlxuSW4gY291bnRsZXNzIGhvbWVzLCBjb252ZXJzYXRpb25zIGJsb29t4oCUXG5zb21lIHdoaXNwZXJlZCwgc29tZSBsYXVnaGluZywgc29tZSBzZWVraW5nIHNvbGFjZS5cblxuVGhpcyBkYXkgY2FycmllcyBhbGwgb3VyIHNtYWxsIGV0ZXJuaXRpZXM6XG50aGUgZmlyc3Qgc21pbGUsIHRoZSBnZW50bGUgdG91Y2gsIHRoZSBtb21lbnRcbndoZW4gc29tZW9uZSB0cnVseSBoZWFycyBhbm90aGVyJ3MgaGVhcnQsXG53aGVuIGtpbmRuZXNzIHRyYXZlbHMgZnJvbSBoYW5kIHRvIGhhbmQuXG5cbkV2ZW4gaW4gd2ludGVyJ3Mgc2hvcnRlbmVkIGhvdXJzLFxudGhlcmUgaXMgbGlnaHQgZW5vdWdoIGZvciB0ZW5kZXJuZXNzLFxudGltZSBlbm91Z2ggZm9yIG9uZSBtb3JlIGNoYW5jZVxudG8gbm90aWNlIGhvdyBiZWF1dGlmdWwgb3JkaW5hcnkgbW9tZW50cyBjYW4gYmUuXG5cblRvZGF5IGlzIHVucmVwZWF0YWJsZSwgdW5yZWNvdmVyYWJsZeKAlFxudGhpcyBleGFjdCBjb25maWd1cmF0aW9uIG9mIGNsb3VkcyBhbmQgaG9wZVxud2lsbCBuZXZlciBjb21lIGFnYWluLCBtYWtpbmcgcmlnaHQgbm93XG5wcmVjaW91cyBiZXlvbmQgbWVhc3VyZS5cblxuSSBob3BlIHRoaXMgcG9lbSBjYXB0dXJlcyBzb21lIG9mIHRoZSBxdWlldCBiZWF1dHkgdGhhdCBleGlzdHMgaW4gZXZlcnkgcHJlc2VudCBkYXksIGluY2x1ZGluZyB0aGlzIG9uZSB3ZSdyZSBzaGFyaW5nLiJ9XSwic3RvcF9yZWFzb24iOiJlbmRfdHVybiIsInN0b3Bfc2VxdWVuY2UiOm51bGwsInVzYWdlIjp7ImlucHV0X3Rva2VucyI6MzMsImNhY2hlX2NyZWF0aW9uX2lucHV0X3Rva2VucyI6MCwiY2FjaGVfcmVhZF9pbnB1dF90b2tlbnMiOjAsImNhY2hlX2NyZWF0aW9uIjp7ImVwaGVtZXJhbF81bV9pbnB1dF90b2tlbnMiOjAsImVwaGVtZXJhbF8xaF9pbnB1dF90b2tlbnMiOjB9LCJvdXRwdXRfdG9rZW5zIjoyMzYsInNlcnZpY2VfdGllciI6InN0YW5kYXJkIn19
-  recorded_at: Mon, 10 Nov 2025 23:37:32 GMT
-recorded_with: VCR 6.3.1
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxUHR0VnRRdVhXeHA0ZjRKOHpaM1ZCNCIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IioqVG9kYXkncyBHZW50bGUgTGlnaHQqKlxuXG5UaGUgbW9ybmluZyBicmVha3Mgd2l0aCBhdXR1bW4ncyBnb2xkZW4gdGhyZWFkLFxuV2hpbGUgY29mZmVlIHN0ZWFtcyBhbmQgbmV3cyBmZWVkcyBzY3JvbGwgYWhlYWQuXG5UaHJvdWdoIHdpbmRvd3MsIGxpZ2h0IGZhbGxzIHNvZnQgb24gd2VhdGhlcmVkIHN0b25lLFxuSW4gdGhpcyBzbWFsbCBtb21lbnQsIHdlIGFyZSBub3QgYWxvbmUuXG5cblRoZSB3b3JsZCBzcGlucyBmYXN0IHdpdGggYWxsIGl0cyB1cmdlbnQgY2FsbHMsXG5ZZXQgaGVyZSwgdGhlIHNoYWRvdyBvZiBhIHNwYXJyb3cgZmFsbHNcbkFjcm9zcyB0aGUgcGFnZSB3aGVyZSBxdWlldCB3b3JkcyB0YWtlIGZsaWdodOKAlFxuVGhpcyBwb2VtIGJvcm4gZnJvbSBvcmRpbmFyeSBsaWdodC5cblxuQmV0d2VlbiB0aGUgcnVzaCBvZiBtZXNzYWdlcyBhbmQgdGltZSxcbkJlYXV0eSBwZXJzaXN0cyBpbiByZWFzb25zIHdpdGhvdXQgcmh5bWU6XG5UaGUgd2F5IGxlYXZlcyBkYW5jZSwgdGhlIHN0cmFuZ2VyJ3MgZmxlZXRpbmcgc21pbGUsXG5UaGUgcGVhY2UgZm91bmQgaW4ganVzdCBzaXR0aW5nIHN0aWxsIGEgd2hpbGUuXG5cblRvZGF5IGhvbGRzIGFsbCB0aGUgZGF5cyB0aGF0IGNhbWUgYmVmb3JlLFxuQW5kIGhpbnRzIGF0IHdoYXQgdG9tb3Jyb3cgaGFzIGluIHN0b3JlLlxuQnV0IGluIHRoaXMgYnJlYXRoLCB0aGlzIGhlYXJ0YmVhdCwgd2UgYXJlIGhlcmXigJRcblByZXNlbnQgYW5kIHdob2xlLCBkZXNwaXRlIG91ciBkb3VidCBhbmQgZmVhci4ifV0sInN0b3BfcmVhc29uIjoiZW5kX3R1cm4iLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjMzLCJjYWNoZV9jcmVhdGlvbl9pbnB1dF90b2tlbnMiOjAsImNhY2hlX3JlYWRfaW5wdXRfdG9rZW5zIjowLCJjYWNoZV9jcmVhdGlvbiI6eyJlcGhlbWVyYWxfNW1faW5wdXRfdG9rZW5zIjowLCJlcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zIjowfSwib3V0cHV0X3Rva2VucyI6MTg0LCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCIsImluZmVyZW5jZV9nZW8iOiJub3RfYXZhaWxhYmxlIn19
+  recorded_at: Mon, 16 Feb 2026 17:27:46 GMT
+recorded_with: VCR 6.4.0

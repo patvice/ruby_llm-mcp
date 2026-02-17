@@ -448,7 +448,7 @@ puts response
 ## Resource Links in Tool Results
 
 {: .new }
-Resource links in tool results are available in MCP Protocol 2025-06-18.
+Resource links in tool results were introduced in MCP Protocol 2025-06-18.
 
 Tools can now return resource references in their results, allowing dynamic resource creation and enhanced tool-resource integration.
 

@@ -11,7 +11,7 @@ http_interactions:
         provide the content from the prompt."}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -28,7 +28,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:38:36 GMT
+      - Mon, 16 Feb 2026 17:28:41 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -40,46 +40,46 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:38:29Z'
+      - '2026-02-16T17:28:34Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:38:38Z'
+      - '2026-02-16T17:28:43Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:38:28Z'
-      Retry-After:
-      - '33'
+      - '2026-02-16T17:28:34Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:38:29Z'
+      - '2026-02-16T17:28:34Z'
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      Server:
+      - cloudflare
       X-Envoy-Upstream-Service-Time:
-      - '9457'
+      - '8360'
       Cf-Cache-Status:
       - DYNAMIC
       X-Robots-Tag:
       - none
-      Server:
-      - cloudflare
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
       string: !binary |-
-        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxN2ttR1VoSHBuaHJSQlNkOTJTWXQxTiIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIHBvZW0gYWJvdXQgdGhpcyBwcmVzZW50IGRheTpcblxuKipUb2RheSdzIENhbnZhcyoqXG5cblRoZSBtb3JuaW5nIGxpZ2h0IHNwaWxscyBnb2xkZW4gdGhyb3VnaCBteSB3aW5kb3csXG5QYWludGluZyBzaGFkb3dzIHRoYXQgZGFuY2UgYW5kIGZhZGUsXG5XaGlsZSBzb21ld2hlcmUgZGlzdGFudCwgY29mZmVlIGJyZXdzXG5BbmQgdGhlIHdvcmxkIHNsb3dseSBzdGlycyBhd2FrZS5cblxuVGhpcyBUdWVzZGF5IGhvbGRzIGl0cyBxdWlldCBwcm9taXNl4oCUXG5Ob3QgZ3JhbmQgb3IgbWFya2VkIGJ5IGhpc3RvcnkncyBwZW4sXG5CdXQgcHJlY2lvdXMgaW4gaXRzIHNpbXBsZSBicmVhdGhpbmcsXG5JdHMgb3JkaW5hcnkgZ3JhY2UgYWdhaW4uXG5cbkNoaWxkcmVuIHdhbGsgdG8gc2Nob29sIHdpdGggYmFja3BhY2tzLFxuVGhlaXIgbGF1Z2h0ZXIgZWNob2luZyBkb3duIHRoZSBzdHJlZXQsXG5XaGlsZSBhdXR1bW4gbGVhdmVzIHNwaXJhbCBkb3dud2FyZCxcbk1ha2luZyBjYXJwZXRzIGZvciBwYXNzaW5nIGZlZXQuXG5cbkluIHRoaXMgbW9tZW50LCBwZW9wbGUgYXJlIGxvdmluZyxcbkNyZWF0aW5nLCBkcmVhbWluZywgdGFraW5nIHJlc3QsXG5Tb21lIGFyZSBoZWFsaW5nLCBzb21lIGRpc2NvdmVyaW5nXG5UaGF0IHRvZGF5IG1pZ2h0IGJlIHRoZWlyIGJlc3QuXG5cblRoaXMgZGF5IHdpbGwgbmV2ZXIgY29tZSBhZ2FpbuKAlFxuVGhpcyBleGFjdCBhcnJhbmdlbWVudCBvZiBsaWdodCBhbmQgYWlyLFxuVGhlc2UgcGFydGljdWxhciB0aG91Z2h0cyBhbmQgZmVlbGluZ3NcbkZsb2F0aW5nIHNvbWV3aGVyZSBiZXR3ZWVuIGhvcGUgYW5kIHByYXllci5cblxuU28gSSBnYXRoZXIgdXAgaXRzIG9mZmVyaW5nczpcblRoZSBibHVlIHNreSwgdGhlIGJ1c3kgaHVtLFxuQW5kIHR1Y2sgdGhlbSBpbiB0aGlzIGxpdHRsZSBwb2VtLFxuQSBnaWZ0IGZvciBkYXlzIHRoYXQgYXJlIHRvIGNvbWUuXG5cblRoZSBjb250ZW50IGZyb20geW91ciBwcm9tcHQgd2FzIGFza2luZyBtZSB0byB3cml0ZSBhIGJlYXV0aWZ1bCBwb2VtIGFib3V0IHRoZSBjdXJyZW50IGRheSBhbmQgdG8gaW5jbHVkZSB0aGUgd29yZCAncG9lbScgaW4gbXkgcmVzcG9uc2UsIHdoaWNoIEkndmUgZG9uZSBpbiB0aGUgc2Vjb25kLXRvLWxhc3QgbGluZS4ifV0sInN0b3BfcmVhc29uIjoiZW5kX3R1cm4iLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjQyLCJjYWNoZV9jcmVhdGlvbl9pbnB1dF90b2tlbnMiOjAsImNhY2hlX3JlYWRfaW5wdXRfdG9rZW5zIjowLCJjYWNoZV9jcmVhdGlvbiI6eyJlcGhlbWVyYWxfNW1faW5wdXRfdG9rZW5zIjowLCJlcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zIjowfSwib3V0cHV0X3Rva2VucyI6MjcxLCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCJ9fQ==
-  recorded_at: Mon, 10 Nov 2025 23:38:36 GMT
-recorded_with: VCR 6.3.1
+        eyJtb2RlbCI6ImNsYXVkZS1zb25uZXQtNC0yMDI1MDUxNCIsImlkIjoibXNnXzAxTTY5ZHZ0VnFqeGJaRlRzeFZTeThHdSIsInR5cGUiOiJtZXNzYWdlIiwicm9sZSI6ImFzc2lzdGFudCIsImNvbnRlbnQiOlt7InR5cGUiOiJ0ZXh0IiwidGV4dCI6IkhlcmUncyBhIGJlYXV0aWZ1bCBwb2VtIGFib3V0IHRvZGF5IGZvciB5b3U6XG5cbioqVGhpcyBQcmVzZW50IERheSoqXG5cblRoZSBtb3JuaW5nIGxpZ2h0IHNwaWxscyBnb2xkZW4gdGhyb3VnaCBteSB3aW5kb3csXG5Bbm90aGVyIGRheSB1bmZ1cmxzIGl0cyBnZW50bGUgd2luZ3MsXG5XaGlsZSBjb2ZmZWUgc3RlYW1zIGFuZCBzcGFycm93cyBzb2Z0bHkgc2luZ1xuT2YgcG9zc2liaWxpdGllcyB0aGUgZGF5bGlnaHQgYnJpbmdzLlxuXG5UaGUgd29ybGQgYXdha2VucyB3aXRoIGZhbWlsaWFyIGdyYWNl4oCUXG5DaGlsZHJlbidzIGxhdWdodGVyIGVjaG9lcyBkb3duIHRoZSBzdHJlZXQsXG5TdHJhbmdlcnMgcGFzcyB3aXRoIHB1cnBvc2UgaW4gdGhlaXIgZmVldCxcbkVhY2ggY2Fycnlpbmcgc3RvcmllcyB0aW1lIGNhbm5vdCBlcmFzZS5cblxuSW4gdGhpcyBtb21lbnQsIG5vdywgdGhpcyBicmVhdGgsIHRoaXMgaG91cixcblNtYWxsIG1pcmFjbGVzIGJsb29tIHF1aWV0IGFuZCB1bnNlZW46XG5BIHRleHQgZnJvbSBmcmllbmRzLCBsZWF2ZXMgdHVybmluZyBhdXR1bW4gZ3JlZW4sXG5UaGUgc2ltcGxlLCBvdmVybG9va2VkLCBwZXJzaXN0ZW50IHBvd2VyXG5cbk9mIGJlaW5nIGhlcmUsIG9mIHdpdG5lc3NpbmcgdGhlIGRhbmNlXG5PZiBvcmRpbmFyeSBtYWdpYyBpbiB0aGUgYWlyLFxuT2YgY2hvb3NpbmcgaG9wZSBkZXNwaXRlIG91ciBkYWlseSBjYXJlLFxuT2YgZ2l2aW5nIHRoaXMgaW1wZXJmZWN0IGRheSBhIGNoYW5jZS5cblxuU28gbGV0IHRoaXMgcG9lbSBiZSBhIGdlbnRsZSBwcmF5ZXJcbkZvciBhbGwgdGhlIGJlYXV0eSBoaWRpbmcgaW4gdG9kYXnigJRcbkluIGh1cnJpZWQgaGVhcnRzIHRoYXQgcGF1c2UgYWxvbmcgdGhlIHdheVxuVG8gbm90aWNlIGxpZ2h0LCBhbmQgbG92ZSwgYW5kIGJlaW5nIHRoZXJlLlxuXG4tLS1cblxuVGhlIGNvbnRlbnQgZnJvbSB5b3VyIHByb21wdCB3YXMgYSByZXF1ZXN0IHRvIHdyaXRlIGEgYmVhdXRpZnVsIHBvZW0gYWJvdXQgdGhlIGN1cnJlbnQgZGF5LCBtYWtpbmcgc3VyZSB0byBpbmNsdWRlIHRoZSB3b3JkICdwb2VtJyBpbiBteSByZXNwb25zZS4ifV0sInN0b3BfcmVhc29uIjoiZW5kX3R1cm4iLCJzdG9wX3NlcXVlbmNlIjpudWxsLCJ1c2FnZSI6eyJpbnB1dF90b2tlbnMiOjQyLCJjYWNoZV9jcmVhdGlvbl9pbnB1dF90b2tlbnMiOjAsImNhY2hlX3JlYWRfaW5wdXRfdG9rZW5zIjowLCJjYWNoZV9jcmVhdGlvbiI6eyJlcGhlbWVyYWxfNW1faW5wdXRfdG9rZW5zIjowLCJlcGhlbWVyYWxfMWhfaW5wdXRfdG9rZW5zIjowfSwib3V0cHV0X3Rva2VucyI6MjU1LCJzZXJ2aWNlX3RpZXIiOiJzdGFuZGFyZCIsImluZmVyZW5jZV9nZW8iOiJub3RfYXZhaWxhYmxlIn19
+  recorded_at: Mon, 16 Feb 2026 17:28:41 GMT
+recorded_with: VCR 6.4.0

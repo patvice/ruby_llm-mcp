@@ -60,6 +60,7 @@ module RubyLLM
         setup_roots if @adapter.supports?(:roots)
         setup_sampling if @adapter.supports?(:sampling)
         setup_event_handlers
+        sync_elicitation_handler_state
 
         @adapter.start if start
       end
@@ -155,6 +156,20 @@ module RubyLLM
         @resources[name]
       end
 
+      def unsubscribe_from_resource(resource_or_uri) # rubocop:disable Naming/PredicateMethod
+        require_feature!(:subscriptions)
+
+        uri = if resource_or_uri.respond_to?(:uri)
+                resource_or_uri.uri
+              else
+                resource_or_uri.to_s
+              end
+        @adapter.resources_unsubscribe(uri: uri)
+        resource = @resources.values.find { |existing| existing.uri == uri }
+        resource&.instance_variable_set(:@subscribed, false)
+        true
+      end
+
       def reset_resources!
         @resources = {}
       end
@@ -203,6 +218,36 @@ module RubyLLM
         @prompts = {}
       end
 
+      def tasks_list
+        require_feature!(:tasks)
+        return [] unless capabilities.tasks? && capabilities.tasks_list?
+
+        @adapter.tasks_list.map { |task| MCP::Task.new(@adapter, task) }
+      end
+
+      def task_get(task_id)
+        require_feature!(:tasks)
+        result = @adapter.task_get(task_id: task_id)
+        MCP::Task.new(@adapter, result.value)
+      end
+
+      def task_result(task_id)
+        require_feature!(:tasks)
+        result = @adapter.task_result(task_id: task_id)
+        result.value
+      end
+
+      def task_cancel(task_id)
+        require_feature!(:tasks)
+        unless capabilities.tasks_cancel?
+          message = "Task cancellation is not available for this MCP server"
+          raise Errors::Capabilities::TaskCancelNotAvailable.new(message: message)
+        end
+
+        result = @adapter.task_cancel(task_id: task_id)
+        MCP::Task.new(@adapter, result.value)
+      end
+
       def tracking_progress?
         @on.key?(:progress) && !@on[:progress].nil?
       end
@@ -221,9 +266,23 @@ module RubyLLM
         @on.key?(:human_in_the_loop) && !@on[:human_in_the_loop].nil?
       end
 
-      def on_human_in_the_loop(&block)
+      def on_human_in_the_loop(handler_class = nil, **options)
         require_feature!(:human_in_the_loop)
-        @on[:human_in_the_loop] = block
+
+        if block_given?
+          raise ArgumentError, "Block-based human-in-the-loop callbacks are no longer supported. Use a handler class."
+        end
+
+        if handler_class
+          # Validate handler class
+          validate_handler_class!(handler_class, :execute)
+
+          @on[:human_in_the_loop] = { class: handler_class, options: options }
+        else
+          # Clear handler when called without arguments
+          @on[:human_in_the_loop] = nil
+        end
+
         self
       end
 
@@ -250,19 +309,69 @@ module RubyLLM
         @on.key?(:sampling) && !@on[:sampling].nil?
       end
 
-      def on_sampling(&block)
+      def on_sampling(handler_class = nil, **options, &block)
         require_feature!(:sampling)
-        @on[:sampling] = block
+
+        if handler_class
+          # Validate handler class
+          validate_handler_class!(handler_class, :execute)
+
+          # Handler class provided
+          @on[:sampling] = if options.any?
+                             lambda do |sample|
+                               handler_class.new(sample: sample, coordinator: @adapter.native_client, **options).call
+                             end
+                           else
+                             handler_class
+                           end
+        elsif block_given?
+          # Block provided (backward compatible)
+          @on[:sampling] = block
+        else
+          # Clear handler when called without arguments
+          @on[:sampling] = nil
+        end
+
         self
       end
 
       def elicitation_enabled?
+        @adapter_type == :ruby_llm && MCP.config.elicitation.enabled?
+      end
+
+      def elicitation_callback_enabled?
         @on.key?(:elicitation) && !@on[:elicitation].nil?
       end
 
-      def on_elicitation(&block)
+      def on_elicitation(handler_class = nil, **options, &block)
         require_feature!(:elicitation)
-        @on[:elicitation] = block
+
+        if handler_class
+          # Validate handler class
+          validate_handler_class!(handler_class, :execute)
+
+          # Handler class provided
+          @on[:elicitation] = if options.any?
+                                lambda do |elicitation|
+                                  handler_class.new(
+                                    elicitation: elicitation,
+                                    coordinator: @adapter.native_client,
+                                    **options
+                                  ).call
+                                end
+                              else
+                                handler_class
+                              end
+        elsif block_given?
+          # Block provided (backward compatible)
+          @on[:elicitation] = block
+        else
+          # Clear handler when called without arguments
+          @on[:elicitation] = nil
+        end
+
+        sync_elicitation_handler_state
+
         self
       end
 
@@ -399,6 +508,12 @@ module RubyLLM
         end
       end
 
+      def sync_elicitation_handler_state
+        return unless @adapter.supports?(:elicitation)
+
+        @adapter.set_elicitation_enabled(enabled: elicitation_enabled?)
+      end
+
       # Get or create OAuth storage shared with transport
       def oauth_storage
         # Try to get storage from transport's OAuth provider
@@ -407,6 +522,20 @@ module RubyLLM
 
         # Create new storage shared with client
         @oauth_storage ||= Auth::MemoryStorage.new
+      end
+
+      # Validate that a handler class has required methods
+      # @param handler_class [Class] the handler class to validate
+      # @param required_method [Symbol] the method that must be defined
+      # @raise [ArgumentError] if validation fails
+      def validate_handler_class!(handler_class, required_method)
+        unless Handlers.handler_class?(handler_class)
+          raise ArgumentError, "Handler must be a class, got #{handler_class.class}"
+        end
+
+        unless handler_class.method_defined?(required_method)
+          raise ArgumentError, "Handler class #{handler_class} must define ##{required_method} method"
+        end
       end
     end
   end

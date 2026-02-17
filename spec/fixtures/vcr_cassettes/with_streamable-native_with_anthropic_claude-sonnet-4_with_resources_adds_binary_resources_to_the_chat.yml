@@ -10,7 +10,7 @@ http_interactions:
         resources do you have access to?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -27,7 +27,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:32:34 GMT
+      - Mon, 16 Feb 2026 17:22:51 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -39,58 +39,57 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:32:29Z'
+      - '2026-02-16T17:22:47Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:32:36Z'
+      - '2026-02-16T17:22:53Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:32:28Z'
-      Retry-After:
-      - '32'
+      - '2026-02-16T17:22:47Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:32:29Z'
+      - '2026-02-16T17:22:47Z'
+      X-Robots-Tag:
+      - none
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
-      X-Envoy-Upstream-Service-Time:
-      - '7165'
-      Cf-Cache-Status:
-      - DYNAMIC
-      X-Robots-Tag:
-      - none
       Server:
       - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '5671'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01QJDb8LziTVJhuRLSCpAjAp","type":"message","role":"assistant","content":[{"type":"text","text":"I
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01M834CPreg6nSRWq4ia7e8D","type":"message","role":"assistant","content":[{"type":"text","text":"I
         can see and analyze images that you share with me, like the adorable puppy
-        photo you just sent! \n\nHere are the main resources I have access to:\n\n**What
-        I can do:**\n- View and analyze images, photos, documents, and other visual
-        content you share\n- Read and process text in various formats\n- Engage in
-        conversations and answer questions on a wide range of topics\n- Help with
-        writing, analysis, math, coding, creative tasks, and problem-solving\n- Provide
-        information based on my training data (up to early 2024)\n\n**What I cannot
-        do:**\n- Browse the internet or access real-time information\n- Remember conversations
-        after they end\n- Access external databases, APIs, or live data sources\n-
-        Generate, create, edit, or produce images\n- Access your device''s files,
-        camera, or other hardware\n- Make phone calls, send emails, or interact with
-        other services\n\nIs there something specific you''d like help with regarding
-        that cute puppy picture or anything else?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":218,"service_tier":"standard"}}'
-  recorded_at: Mon, 10 Nov 2025 23:32:34 GMT
-recorded_with: VCR 6.3.1
+        photo you just sent! \n\nHere are the main resources I have access to:\n\n**Visual
+        capabilities:**\n- I can view and analyze images (photos, diagrams, screenshots,
+        etc.)\n- Describe what I see in detail\n- Answer questions about visual content\n-
+        Help with image-related tasks\n\n**Text-based resources:**\n- My training
+        knowledge (up to early 2024)\n- Ability to help with writing, analysis, math,
+        coding, research, and many other text-based tasks\n- Multiple languages\n\n**What
+        I don''t have access to:**\n- The internet or real-time information\n- Ability
+        to browse websites or access external databases\n- Audio or video files\n-
+        Ability to generate, create, edit or manipulate images\n- Memory of previous
+        conversations once they end\n\nIs there something specific you''d like help
+        with regarding the puppy image or anything else?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":160,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":211,"service_tier":"standard","inference_geo":"not_available"}}'
+  recorded_at: Mon, 16 Feb 2026 17:22:51 GMT
+recorded_with: VCR 6.4.0

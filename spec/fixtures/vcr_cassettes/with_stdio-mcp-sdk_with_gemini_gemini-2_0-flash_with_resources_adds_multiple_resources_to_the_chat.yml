@@ -17,7 +17,7 @@ http_interactions:
         information do you have from the provided resources?"}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -38,7 +38,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:34:44 GMT
+      - Mon, 16 Feb 2026 17:26:24 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -48,7 +48,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=2010
+      - gfet4t7; dur=2512
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -62,19 +62,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "I have information about four files:\n\n*   **plain_text.txt:** Contains the text \"A plain text file\\n\\nPlan text information\".\n*   **test.txt:** Contains the text \"Hello, this is a test file!\\nThis content will be served by the MCP resource.\\nYou can modify this file and it will be cached for 5 minutes.\"\n*   **second_file.txt:** Contains the text \"This is the second file that I want to be able to use as a resource\".\n*   **my.md:** A Markdown file containing headings, sections and text. The content indicates it's intended for use as a resource.  Specifically, it contains a main heading \"My Markdown File\", two level 2 headings \"Section 1\" and \"Section 2\" and accompanying text under each heading.\n"
+                    "text": "The provided text lists the following files and their basic content:\n\n*   **plain\\_text.txt:** A plain text file (content not provided)\n*   **Plan text informationtest.txt:** A text file with the following content:\n    *   \"Hello, this is a test file!\"\n    *   \"This content will be served by the MCP resource.\"\n    *   \"You can modify this file and it will be cached for 5 minutes.\"\n*   **second\\_file.txt:** A second text file with the following content:\n    *   \"This is the second file that I want to be able to use as a resource\"\n*   **my.md:** A markdown file with the following content:\n    *   \"# My Markdown File\"\n    *   \"This is a markdown file that I want to be able to use as a resource\"\n    *   \"## Section 1\"\n    *   \"This is a section in my markdown file\"\n    *   \"## Section 2\"\n    *   \"This is another section in my markdown file\"\n\nIn summary, there are four files intended to be served as resources: `plain_text.txt`, `Plan text informationtest.txt`, `second_file.txt`, and `my.md`.  `Plan text informationtest.txt` will be cached for 5 minutes. `my.md` is a markdown file containing headings and text. The other files are plain text, but only the contents for `Plan text informationtest.txt` and `second_file.txt` and `my.md` are available.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.24168020919714561
+              "avgLogprobs": -0.17595808216602127
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 154,
-            "candidatesTokenCount": 179,
-            "totalTokenCount": 333,
+            "candidatesTokenCount": 346,
+            "totalTokenCount": 500,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -84,12 +84,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 179
+                "tokenCount": 346
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "knYSaYS3L7yN_PUPksiq-QM"
+          "responseId": "PlOTafKSBPje_uMPq5aM-QI"
         }
-  recorded_at: Mon, 10 Nov 2025 23:34:44 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:26:24 GMT
+recorded_with: VCR 6.4.0

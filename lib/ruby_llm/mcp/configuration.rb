@@ -48,8 +48,8 @@ module RubyLLM
       end
 
       class Sampling
-        attr_accessor :enabled
-        attr_writer :preferred_model
+        attr_accessor :enabled, :tools, :context
+        attr_writer :preferred_model, :handler
 
         def initialize
           set_defaults
@@ -69,6 +69,21 @@ module RubyLLM
           @preferred_model
         end
 
+        # Set or get the handler (class or block)
+        # @param handler_class [Class, nil] handler class
+        # @param options [Hash] options to pass to handler
+        # @return [Object] the current handler
+        def handler(handler_class = nil, **options)
+          if handler_class
+            @handler = if options.any?
+                         { class: handler_class, options: options }
+                       else
+                         handler_class
+                       end
+          end
+          @handler
+        end
+
         def enabled?
           @enabled
         end
@@ -77,8 +92,36 @@ module RubyLLM
 
         def set_defaults
           @enabled = false
+          @tools = false
+          @context = true
           @preferred_model = nil
           @guard = nil
+          @handler = nil
+        end
+      end
+
+      class Elicitation
+        attr_accessor :form, :url
+
+        def initialize
+          @form = true
+          @url = false
+        end
+
+        def enabled?
+          @form || @url
+        end
+      end
+
+      class Tasks
+        attr_accessor :enabled
+
+        def initialize
+          @enabled = false
+        end
+
+        def enabled?
+          @enabled
         end
       end
 
@@ -159,6 +202,8 @@ module RubyLLM
                     :log_level,
                     :roots,
                     :sampling,
+                    :elicitation,
+                    :tasks,
                     :max_connections,
                     :pool_timeout,
                     :config_path,
@@ -175,6 +220,8 @@ module RubyLLM
 
       def initialize
         @sampling = Sampling.new
+        @elicitation = Elicitation.new
+        @tasks = Tasks.new
         @adapter_config = AdapterConfig.new
         @extensions = Extensions::Configuration.new
         @oauth = OAuth.new
@@ -214,8 +261,14 @@ module RubyLLM
         @on_progress
       end
 
-      def on_human_in_the_loop(&block)
-        @on_human_in_the_loop = block if block_given?
+      def on_human_in_the_loop(handler_class = nil, **options)
+        if block_given?
+          raise ArgumentError, "Block-based human-in-the-loop callbacks are no longer supported. Use a handler class."
+        end
+
+        if handler_class
+          @on_human_in_the_loop = { class: handler_class, options: options }
+        end
         @on_human_in_the_loop
       end
 
@@ -323,6 +376,8 @@ module RubyLLM
 
         # Sampling configuration
         @sampling.reset!
+        @elicitation = Elicitation.new
+        @tasks = Tasks.new
 
         # Event handlers
         @on_progress = nil

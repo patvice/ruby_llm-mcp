@@ -44,6 +44,16 @@ module RubyLLM
         end
       end
 
+      def unsubscribe!
+        if @adapter.capabilities.resource_subscribe?
+          @adapter.resources_unsubscribe(uri: @uri)
+          @subscribed = false
+        else
+          message = "Resource unsubscribe is not available for this MCP server"
+          raise Errors::Capabilities::ResourceSubscribeNotAvailable.new(message: message)
+        end
+      end
+
       def reset_content!
         @content = nil
         @content_response = nil

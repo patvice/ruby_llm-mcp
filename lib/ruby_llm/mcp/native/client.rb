@@ -7,8 +7,10 @@ module RubyLLM
       # This is the core protocol implementation that handles all MCP operations
       # It's self-contained and could potentially be extracted as a separate gem
       class Client
+        TOOL_CALL_CANCELLED_MESSAGE = "Tool call was cancelled by the client"
+
         attr_reader :name, :transport_type, :config, :capabilities, :protocol_version, :elicitation_callback,
-                    :sampling_callback
+                    :sampling_callback, :human_in_the_loop_registry, :registry_owner_id, :task_registry
 
         def initialize( # rubocop:disable Metrics/ParameterLists
           name:,
@@ -30,8 +32,7 @@ module RubyLLM
           @name = name
           @transport_type = transport_type
           @config = transport_config.merge(request_timeout: request_timeout || MCP.config.request_timeout)
-          @requested_protocol_version = protocol_version || MCP.config.protocol_version ||
-                                        Native::Protocol.default_negotiated_version
+          @requested_protocol_version = protocol_version || MCP.config.protocol_version || Native::Protocol.latest_version
           @protocol_version = @requested_protocol_version
           @extensions_capabilities = extensions_capabilities || {}
 
@@ -48,10 +49,15 @@ module RubyLLM
 
           @transport = nil
           @capabilities = nil
+          @task_registry = Native::TaskRegistry.new
 
           # Track in-flight server-initiated requests for cancellation
           @in_flight_requests = {}
           @in_flight_mutex = Mutex.new
+
+          # Human-in-the-loop approvals are scoped per client lifecycle.
+          @registry_owner_id = "native-client-#{SecureRandom.uuid}"
+          @human_in_the_loop_registry = Handlers::HumanInTheLoopRegistry.for_owner(@registry_owner_id)
         end
 
         def request(body, **options)
@@ -120,7 +126,10 @@ module RubyLLM
           @transport&.close
           @capabilities = nil
           @transport = nil
-          @protocol_version = @requested_protocol_version
+          @task_registry = Native::TaskRegistry.new
+          @protocol_version = @requested_protocol_version || MCP.config.protocol_version || Native::Protocol.latest_version
+          Handlers::HumanInTheLoopRegistry.release(@registry_owner_id)
+          @human_in_the_loop_registry = Handlers::HumanInTheLoopRegistry.for_owner(@registry_owner_id)
         end
 
         def restart!
@@ -179,16 +188,9 @@ module RubyLLM
         end
 
         def execute_tool(name:, parameters:)
-          if @human_in_the_loop_callback && !@human_in_the_loop_callback.call(name, parameters)
-            result = Result.new(
-              {
-                "result" => {
-                  "isError" => true,
-                  "content" => [{ "type" => "text", "text" => "Tool call was cancelled by the client" }]
-                }
-              }
-            )
-            return result
+          if @human_in_the_loop_callback
+            approved = evaluate_tool_approval(name: name, parameters: parameters)
+            return create_cancelled_result unless approved
           end
 
           body = Native::Messages::Requests.tool_call(name: name, parameters: parameters,
@@ -231,6 +233,11 @@ module RubyLLM
           request(body, wait_for_response: false)
         end
 
+        def resources_unsubscribe(uri:)
+          body = Native::Messages::Requests.resources_unsubscribe(uri: uri, tracking_progress: tracking_progress?)
+          request(body, wait_for_response: false)
+        end
+
         def prompt_list(cursor: nil)
           body = Native::Messages::Requests.prompt_list(cursor: cursor, tracking_progress: tracking_progress?)
           result = request(body)
@@ -266,8 +273,57 @@ module RubyLLM
           request(body)
         end
 
+        def tasks_list(cursor: nil)
+          body = Native::Messages::Requests.tasks_list(cursor: cursor, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.upsert_many(result.value["tasks"])
+
+          if result.next_cursor?
+            result.value["tasks"] + tasks_list(cursor: result.next_cursor)
+          else
+            result.value["tasks"] || []
+          end
+        end
+
+        def task_get(task_id:)
+          body = Native::Messages::Requests.task_get(task_id: task_id, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.upsert(result.value)
+          result
+        end
+
+        def task_result(task_id:)
+          body = Native::Messages::Requests.task_result(task_id: task_id, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.store_payload(task_id, result.value)
+          result
+        end
+
+        def task_cancel(task_id:)
+          body = Native::Messages::Requests.task_cancel(task_id: task_id, tracking_progress: tracking_progress?)
+          result = request(body)
+          result.raise_error! if result.error?
+
+          task_registry.upsert(result.value)
+          result
+        end
+
+        def task_status_notification(task:)
+          task_registry.upsert(task)
+        end
+
         def set_progress_tracking(enabled:)
           @progress_tracking_enabled = enabled
+        end
+
+        def set_elicitation_enabled(enabled:)
+          @elicitation_enabled = enabled
         end
 
         ## Notifications
@@ -299,6 +355,11 @@ module RubyLLM
           request(body, wait_for_response: false)
         end
 
+        def result_response(id:, value:)
+          body = Native::Messages::Responses.result(id: id, value: value)
+          request(body, wait_for_response: false)
+        end
+
         def sampling_create_message_response(id:, model:, message:, **_options)
           body = Native::Messages::Responses.sampling_create_message(id: id, model: model, message: message)
           request(body, wait_for_response: false)
@@ -325,11 +386,24 @@ module RubyLLM
           end
 
           if MCP.config.sampling.enabled?
-            capabilities_hash[:sampling] = {}
+            sampling_capabilities = {}
+            sampling_capabilities[:tools] = {} if MCP.config.sampling.tools
+            sampling_capabilities[:context] = {} if MCP.config.sampling.context
+            capabilities_hash[:sampling] = sampling_capabilities
           end
 
           if @elicitation_enabled
-            capabilities_hash[:elicitation] = {}
+            elicitation_capabilities = {}
+            elicitation_capabilities[:form] = {} if MCP.config.elicitation.form
+            elicitation_capabilities[:url] = {} if MCP.config.elicitation.url
+            capabilities_hash[:elicitation] = elicitation_capabilities unless elicitation_capabilities.empty?
+          end
+
+          if MCP.config.respond_to?(:tasks) && MCP.config.tasks.enabled?
+            capabilities_hash[:tasks] = {
+              list: {},
+              cancel: {}
+            }
           end
 
           if @extensions_capabilities.any? && Native::Protocol.extensions_supported?(@protocol_version)
@@ -374,20 +448,102 @@ module RubyLLM
 
         # Cancel an in-flight server-initiated request
         # @param request_id [String] The ID of the request to cancel
-        # @return [Boolean] true if the request was found and cancelled, false otherwise
-        def cancel_in_flight_request(request_id) # rubocop:disable Naming/PredicateMethod
+        # @return [Symbol] cancellation outcome
+        #   :cancelled, :already_cancelled, :already_completed, :not_found, :not_cancellable, :failed
+        def cancel_in_flight_request(request_id)
           operation = nil
           @in_flight_mutex.synchronize do
             operation = @in_flight_requests[request_id.to_s]
           end
 
-          if operation.respond_to?(:cancel)
-            operation.cancel
-            true
-          else
-            RubyLLM::MCP.logger.warn("Request #{request_id} cannot be cancelled or was already completed")
-            false
+          unless operation
+            RubyLLM::MCP.logger.debug("Request #{request_id} was not found for cancellation")
+            return :not_found
           end
+
+          unless operation.respond_to?(:cancel)
+            RubyLLM::MCP.logger.warn("Request #{request_id} cannot be cancelled or was already completed")
+            return :not_cancellable
+          end
+
+          outcome = normalize_cancellation_outcome(operation.cancel)
+          if %i[cancelled already_cancelled already_completed].include?(outcome)
+            unregister_in_flight_request(request_id)
+          end
+
+          outcome
+        end
+
+        private
+
+        def evaluate_tool_approval(name:, parameters:)
+          decision = @human_in_the_loop_callback.call(name, parameters)
+          unless decision.is_a?(Handlers::ApprovalDecision)
+            RubyLLM::MCP.logger.error(
+              "Human-in-the-loop callback must return ApprovalDecision, got #{decision.class}"
+            )
+            return false
+          end
+
+          return true if decision.approved?
+          return false if decision.denied?
+          return wait_for_deferred_approval(decision) if decision.deferred?
+
+          RubyLLM::MCP.logger.error(
+            "Human-in-the-loop callback returned unknown decision status '#{decision.status.inspect}'"
+          )
+          false
+        rescue Errors::InvalidApprovalDecision => e
+          RubyLLM::MCP.logger.error("Invalid approval decision: #{e.message}")
+          false
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Error evaluating tool approval: #{e.message}")
+          false
+        end
+
+        def wait_for_deferred_approval(decision)
+          unless decision.promise
+            RubyLLM::MCP.logger.error("Deferred approval #{decision.approval_id} missing promise")
+            return false
+          end
+
+          approved = decision.promise.wait(timeout: decision.timeout)
+          approved == true
+        rescue Timeout::Error
+          RubyLLM::MCP.logger.warn(
+            "Deferred approval #{decision.approval_id} timed out after #{decision.timeout} seconds"
+          )
+          human_in_the_loop_registry.deny(
+            decision.approval_id,
+            reason: "Timed out waiting for approval"
+          )
+          false
+        rescue StandardError => e
+          RubyLLM::MCP.logger.error("Deferred approval #{decision.approval_id} failed: #{e.message}")
+          false
+        end
+
+        def normalize_cancellation_outcome(raw_outcome)
+          case raw_outcome
+          when Symbol
+            raw_outcome
+          when true
+            :cancelled
+          else
+            :failed
+          end
+        end
+
+        # Create a result for cancelled tool execution
+        def create_cancelled_result
+          Result.new(
+            {
+              "result" => {
+                "isError" => true,
+                "content" => [{ "type" => "text", "text" => TOOL_CALL_CANCELLED_MESSAGE }]
+              }
+            }
+          )
         end
       end
     end

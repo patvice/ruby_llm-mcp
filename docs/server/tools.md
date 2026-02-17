@@ -92,7 +92,7 @@ puts "File contents: #{result}"
 ### Structured Tool Output
 
 {: .new }
-Structured tool output is available in MCP Protocol 2025-06-18.
+Structured tool output was introduced in MCP Protocol 2025-06-18.
 
 Tools can now specify output schemas for structured responses, enabling type-safe tool interactions:
 
@@ -153,7 +153,7 @@ end
 #### Human-Friendly Display Names
 
 {: .new }
-Tools now support title fields for better user experience in MCP Protocol 2025-06-18:
+Tools now support title fields for better user experience in MCP Protocol 2025-06-18+:
 
 ```ruby
 tools = client.tools
@@ -208,58 +208,164 @@ Control tool execution with human approval:
 
 ### Basic Human-in-the-Loop
 
+Human-in-the-loop approvals are configured with handler classes:
+
 ```ruby
-# Set up human approval for all tools
-client.on_human_in_the_loop do |name, params|
-  puts "Tool: #{name}"
-  puts "Parameters: #{params}"
-  print "Allow execution? (y/n): "
-  gets.chomp.downcase == 'y'
+class BasicApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  def execute
+    if tool_name == "delete_file"
+      deny("Deletion requires explicit approval")
+    else
+      approve
+    end
+  end
 end
 
-# Execute tool (will prompt for approval)
-result = client.execute_tool(
-  name: "delete_file",
-  parameters: { path: "important.txt" }
+client.on_human_in_the_loop(BasicApprovalHandler)
+```
+
+Block-based human-in-the-loop callbacks are no longer supported.
+
+### Handler Classes
+
+{: .label .label-green }
+1.0+
+
+Handler classes provide a powerful, testable way to handle approvals with async support.
+
+#### Basic Handler Class
+
+```ruby
+class SafeToolHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  option :safe_tools, default: ["read_file", "list_files"]
+
+  def execute
+    if options[:safe_tools].include?(tool_name)
+      approve
+    else
+      deny("Tool '#{tool_name}' requires explicit approval")
+    end
+  end
+end
+
+# Use globally
+RubyLLM::MCP.configure do |config|
+  config.on_human_in_the_loop SafeToolHandler
+end
+
+# Or per-client
+client.on_human_in_the_loop(SafeToolHandler, safe_tools: ["read_file", "list_files"])
+```
+
+#### Handler with Guards
+
+```ruby
+class ParameterValidationHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  guard :check_parameters
+  guard :check_path_safety
+
+  def execute
+    # Logic here only runs if guards pass
+    approve
+  end
+
+  private
+
+  def check_parameters
+    return true unless parameters[:path]
+    return true unless parameters[:path].include?("..")
+
+    "Path traversal detected"
+  end
+
+  def check_path_safety
+    return true unless parameters[:path]
+    return true unless parameters[:path].start_with?("/etc")
+
+    "Access to system directories denied"
+  end
+end
+```
+
+#### Async Approval via Websocket
+
+Perfect for requiring real user approval via UI:
+
+```ruby
+class WebsocketApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  async_execution timeout: 300 # 5 minutes
+
+  option :websocket_service, required: true
+  option :user_id, required: true
+
+  def execute
+    # Send approval request to user's browser/app
+    options[:websocket_service].broadcast(
+      "approvals_#{options[:user_id]}",
+      {
+        type: "approval_request",
+        id: approval_id,
+        tool: tool_name,
+        parameters: parameters
+      }
+    )
+
+    # Return deferred decision - approval happens later via registry
+    defer
+  end
+end
+
+# Configure handler
+client.on_human_in_the_loop(
+  WebsocketApprovalHandler,
+  websocket_service: ActionCable.server,
+  user_id: current_user.id
+)
+
+# When user approves/denies via websocket:
+class ApprovalsChannel < ApplicationCable::Channel
+  def approve(data)
+    RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.approve(
+      data["approval_id"]
+    )
+  end
+
+  def deny(data)
+    RubyLLM::MCP::Handlers::HumanInTheLoopRegistry.deny(
+      data["approval_id"],
+      reason: data["reason"]
+    )
+  end
+end
+```
+
+If no approval/denial arrives before timeout, the deferred approval is denied automatically and tool execution is cancelled.
+
+#### Reusable Policy Handler
+
+```ruby
+class PolicyApprovalHandler < RubyLLM::MCP::Handlers::HumanInTheLoopHandler
+  option :safe_tools, default: []
+
+  def execute
+    options[:safe_tools].include?(tool_name) ? approve : deny("Tool requires approval")
+  end
+end
+
+client.on_human_in_the_loop(
+  PolicyApprovalHandler,
+  safe_tools: ["read_file", "list_files"]
 )
 ```
 
-### Conditional Human-in-the-Loop
+#### Return Contract
+
+Human-in-the-loop handlers return structured decisions:
 
 ```ruby
-# Only require approval for dangerous operations
-client.on_human_in_the_loop do |name, params|
-  dangerous_tools = ["delete_file", "modify_file", "execute_command"]
-
-  if dangerous_tools.include?(name)
-    puts "⚠️  Dangerous operation requested!"
-    puts "Tool: #{name}"
-    puts "Parameters: #{params}"
-    print "Allow execution? (y/n): "
-    gets.chomp.downcase == 'y'
-  else
-    true  # Allow safe operations automatically
-  end
-end
-```
-
-### Programmatic Guards
-
-Use logic to determine approval:
-
-```ruby
-client.on_human_in_the_loop do |name, params|
-  case name
-  when "delete_file"
-    # Don't allow deletion of important files
-    !params[:path].include?("important")
-  when "api_call"
-    # Only allow API calls to trusted domains
-    params[:url].start_with?("https://api.trusted.com")
-  else
-    true
-  end
-end
+approve                              # => { status: :approved }
+deny("Too dangerous")                # => { status: :denied, reason: "Too dangerous" }
+defer(timeout: 300)                  # => { status: :deferred, timeout: 300 }
 ```
 
 ## Streaming Responses

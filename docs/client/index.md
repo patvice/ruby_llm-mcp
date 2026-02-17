@@ -17,6 +17,7 @@ Client capabilities cover the features your MCP client provides to servers and m
 MCP clients offer several key capabilities:
 
 - **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM for their own requests
+- **[Elicitation]({% link client/elicitation.md %})** - Handle structured follow-up questions from servers
 - **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers within specified directories
 - **[Extensions]({% link extensions/index.md %})** - Advertise optional client capabilities such as MCP Apps
 
@@ -25,6 +26,10 @@ MCP clients offer several key capabilities:
 ### Sampling
 
 Enable MCP servers to offload LLM requests to your client rather than making them directly. This allows servers to use your LLM connections and configurations while maintaining their own logic and workflows.
+
+### Elicitation
+
+Handle server-initiated requests for additional structured input. This is useful for interactive workflows where the server needs clarifications, confirmations, or schema-validated user data.
 
 ### Roots
 
@@ -43,6 +48,7 @@ Advertise optional protocol capabilities and parse extension metadata consistent
 Explore each client interaction type to understand how to configure and use client-side features:
 
 - **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM
+- **[Elicitation]({% link client/elicitation.md %})** - Handle structured user input requests
 - **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers
 - **[Extensions]({% link extensions/index.md %})** - Configure and negotiate extension capabilities
 

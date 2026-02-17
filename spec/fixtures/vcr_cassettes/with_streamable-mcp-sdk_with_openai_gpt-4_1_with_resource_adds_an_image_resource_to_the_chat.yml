@@ -10,7 +10,7 @@ http_interactions:
         image do you have?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -25,7 +25,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:37:02 GMT
+      - Mon, 16 Feb 2026 17:25:26 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -37,13 +37,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '1772'
+      - '1457'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '1809'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Input-Images:
       - '50000'
       X-Ratelimit-Limit-Requests:
@@ -70,13 +70,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -85,16 +82,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVjQzhuIgAxyeEKTUyLs3QsYhjsc",
+          "id": "chatcmpl-D9wdY8BNCQC42RCxadqW4eXm9Z9b8",
           "object": "chat.completion",
-          "created": 1762817820,
+          "created": 1771262724,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "You uploaded an image of a dog. The dog appears to be a light-colored (possibly Golden Retriever) puppy with its mouth open, possibly yawning or \"smiling.\" The background is plain white, making the dog the main focus of the image.",
+                "content": "The image you provided is of a light-colored (possibly golden or cream) puppy standing on a white background. The puppy has its mouth open, which looks like it might be yawning or playfully barking. It appears happy and lively!",
                 "refusal": null,
                 "annotations": []
               },
@@ -104,8 +101,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 280,
-            "completion_tokens": 51,
-            "total_tokens": 331,
+            "completion_tokens": 48,
+            "total_tokens": 328,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -118,7 +115,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_f8bea53fbd"
         }
-  recorded_at: Mon, 10 Nov 2025 23:37:02 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:25:26 GMT
+recorded_with: VCR 6.4.0

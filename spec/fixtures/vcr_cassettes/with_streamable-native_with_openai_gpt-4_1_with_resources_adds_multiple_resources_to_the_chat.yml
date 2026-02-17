@@ -17,7 +17,7 @@ http_interactions:
         information do you have from the provided resources?"}],"stream":false}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       Authorization:
       - Bearer <OPENAI_API_KEY>
       Content-Type:
@@ -32,7 +32,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:33:23 GMT
+      - Mon, 16 Feb 2026 17:23:32 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -44,13 +44,13 @@ http_interactions:
       Openai-Organization:
       - "<OPENAI_ORGANIZATION>"
       Openai-Processing-Ms:
-      - '2872'
+      - '2078'
       Openai-Project:
       - proj_70GvpxWwXEXq1CaJmiZwOaVX
       Openai-Version:
       - '2020-10-01'
-      X-Envoy-Upstream-Service-Time:
-      - '2887'
+      Server:
+      - cloudflare
       X-Ratelimit-Limit-Requests:
       - '500'
       X-Ratelimit-Limit-Tokens:
@@ -71,13 +71,10 @@ http_interactions:
       - DYNAMIC
       Set-Cookie:
       - "<COOKIE>"
-      - "<COOKIE>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - cloudflare
       Cf-Ray:
       - "<CF_RAY>"
       Alt-Svc:
@@ -86,16 +83,16 @@ http_interactions:
       encoding: ASCII-8BIT
       string: |
         {
-          "id": "chatcmpl-CaVfs9JLM7VDVbFDAHy9RJiQjzV00",
+          "id": "chatcmpl-D9wbijS7GUYoX8bZnDf9LpauBAkB6",
           "object": "chat.completion",
-          "created": 1762817600,
+          "created": 1771262610,
           "model": "gpt-4.1-2025-04-14",
           "choices": [
             {
               "index": 0,
               "message": {
                 "role": "assistant",
-                "content": "Here is the information I have from the provided resources:\n\n---\n\n### plain_text.txt\n- **Description:** A plain text file.\n- **Content:** \"Plan text information\"\n\n---\n\n### test.txt\n- **Description:** A text file.\n- **Content:**\n  ```\n  Hello, this is a test file!\n  This content will be served by the MCP resource.\n  You can modify this file and it will be cached for 5 minutes.\n  ```\n\n---\n\n### second_file.txt\n- **Description:** A second text file.\n- **Content:**\n  ```\n  This is the second file that I want to be able to use as a resource\n  ```\n\n---\n\n### my.md\n- **Description:** A markdown file.\n- **Content:**  \n  ```\n  # My Markdown File\n\n  This is a markdown file that I want to be able to use as a resource\n\n  ## Section 1\n\n  This is a section in my markdown file\n\n  ## Section 2\n\n  This is another section in my markdown file\n  ```\n\n---\n\nIf you need information or details from any specific file or want to use them in a particular way, let me know!",
+                "content": "Here is the information I have from the provided resources:\n\n---\n\n**1. plain_text.txt**\n> A plain text file  \n> Plan text information\n\n---\n\n**2. test.txt**\n> Hello, this is a test file!  \n> This content will be served by the MCP resource.  \n> You can modify this file and it will be cached for 5 minutes.\n\n---\n\n**3. second_file.txt**\n> This is the second file that I want to be able to use as a resource\n\n---\n\n**4. my.md**\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\n---\n\nLet me know if you would like to see the contents of any file in detail or if you need more information!",
                 "refusal": null,
                 "annotations": []
               },
@@ -105,8 +102,8 @@ http_interactions:
           ],
           "usage": {
             "prompt_tokens": 168,
-            "completion_tokens": 241,
-            "total_tokens": 409,
+            "completion_tokens": 187,
+            "total_tokens": 355,
             "prompt_tokens_details": {
               "cached_tokens": 0,
               "audio_tokens": 0
@@ -119,7 +116,7 @@ http_interactions:
             }
           },
           "service_tier": "default",
-          "system_fingerprint": "fp_d38c7f4fa7"
+          "system_fingerprint": "fp_d94679e635"
         }
-  recorded_at: Mon, 10 Nov 2025 23:33:23 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:23:32 GMT
+recorded_with: VCR 6.4.0

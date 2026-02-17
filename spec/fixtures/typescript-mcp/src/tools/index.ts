@@ -7,6 +7,7 @@ import { setupNotificationTools } from "./notifications.js";
 import { setupClientInteractionTools } from "./client-interaction.js";
 import { setupProtocol2025Features } from "./protocol-2025-06-18.js";
 import { setupElicitationTools } from "./elicitation.js";
+import { setupTaskTools } from "./tasks.js";
 
 export function setupTools(server: McpServer) {
   // Setup different categories of tools
@@ -18,4 +19,5 @@ export function setupTools(server: McpServer) {
   setupClientInteractionTools(server);
   setupProtocol2025Features(server);
   setupElicitationTools(server);
+  setupTaskTools(server);
 }

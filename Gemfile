@@ -5,8 +5,8 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
-  if RUBY_VERSION >= "3.2.0"
-    gem "mcp", "~> 0.4"
+  if RUBY_VERSION >= "3.1.0"
+    gem "mcp", "~> 0.7"
   end
 
   # Development dependencies
@@ -19,9 +19,9 @@ group :development do
   gem "rdoc", "~> 6.15"
   gem "reline"
   gem "rspec", "~> 3.12"
-  gem "rubocop", ">= 1.76"
-  gem "rubocop-rake", ">= 0.7"
-  gem "rubocop-rspec", ">= 3.6"
+  gem "rubocop", "~> 1.84.2"
+  gem "rubocop-rake", "~> 0.7.1"
+  gem "rubocop-rspec", "~> 3.9.0"
   gem "simplecov"
   gem "vcr"
   gem "webmock", "~> 3.25"

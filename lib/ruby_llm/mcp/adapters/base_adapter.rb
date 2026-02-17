@@ -137,6 +137,30 @@ module RubyLLM
           raise_unsupported_feature(:subscriptions)
         end
 
+        def resources_unsubscribe(uri:) # rubocop:disable Lint/UnusedMethodArgument
+          raise_unsupported_feature(:subscriptions)
+        end
+
+        def tasks_list(cursor: nil) # rubocop:disable Lint/UnusedMethodArgument
+          raise_unsupported_feature(:tasks)
+        end
+
+        def task_get(task_id:) # rubocop:disable Lint/UnusedMethodArgument
+          raise_unsupported_feature(:tasks)
+        end
+
+        def task_result(task_id:) # rubocop:disable Lint/UnusedMethodArgument
+          raise_unsupported_feature(:tasks)
+        end
+
+        def task_cancel(task_id:) # rubocop:disable Lint/UnusedMethodArgument
+          raise_unsupported_feature(:tasks)
+        end
+
+        def task_status_notification(task:) # rubocop:disable Lint/UnusedMethodArgument
+          raise_unsupported_feature(:tasks)
+        end
+
         def initialize_notification
           raise_unsupported_feature(:notifications)
         end

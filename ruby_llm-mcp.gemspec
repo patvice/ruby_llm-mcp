@@ -39,10 +39,11 @@ Gem::Specification.new do |spec|
   # Runtime dependencies
   spec.add_dependency "httpx", "~> 1.4"
   spec.add_dependency "json-schema", "~> 5.0"
+  spec.add_dependency "json_schemer", "~> 2.4"
   spec.add_dependency "ruby_llm", "~> 1.9"
   spec.add_dependency "zeitwerk", "~> 2"
 
   # Optional dependency for mcp_sdk adapter
   # Users who want to use adapter: :mcp_sdk should add to their Gemfile:
-  #   gem 'mcp', '~> 0.4'
+  #   gem 'mcp', '~> 0.7'
 end

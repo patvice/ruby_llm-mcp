@@ -4,7 +4,7 @@ require "spec_helper"
 require "json_schemer"
 
 RSpec.describe RubyLLM::MCP::Native::Messages do
-  let(:schema_path) { File.join(__dir__, "../../../fixtures/mcp_definition/2025-06-18-schema.json") }
+  let(:schema_path) { File.join(__dir__, "../../../fixtures/mcp_definition/2025-11-25-schema.json") }
   let(:schema_json) { JSON.parse(File.read(schema_path)) }
   let(:schemer) { JSONSchemer.schema(schema_json) }
 
@@ -12,7 +12,7 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
   let(:mock_client) do
     instance_double(
       RubyLLM::MCP::Native::Client,
-      protocol_version: "2025-06-18",
+      protocol_version: "2025-11-25",
       client_capabilities: { roots: { listChanged: true } },
       tracking_progress?: false
     )
@@ -21,7 +21,7 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
   let(:mock_client_with_progress) do
     instance_double(
       RubyLLM::MCP::Native::Client,
-      protocol_version: "2025-06-18",
+      protocol_version: "2025-11-25",
       client_capabilities: { roots: { listChanged: true } },
       tracking_progress?: true
     )
@@ -37,6 +37,11 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
       expect(described_class::METHOD_PING).to eq("ping")
       expect(described_class::METHOD_TOOLS_LIST).to eq("tools/list")
       expect(described_class::METHOD_TOOLS_CALL).to eq("tools/call")
+      expect(described_class::METHOD_TASKS_LIST).to eq("tasks/list")
+      expect(described_class::METHOD_TASKS_GET).to eq("tasks/get")
+      expect(described_class::METHOD_TASKS_RESULT).to eq("tasks/result")
+      expect(described_class::METHOD_TASKS_CANCEL).to eq("tasks/cancel")
+      expect(described_class::METHOD_NOTIFICATION_ELICITATION_COMPLETE).to eq("notifications/elicitation/complete")
     end
   end
 
@@ -94,7 +99,7 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
     describe ".initialize" do
       let(:body) do
         described_class::Requests.initialize(
-          protocol_version: "2025-06-18",
+          protocol_version: "2025-11-25",
           capabilities: { roots: { listChanged: true } }
         )
       end
@@ -104,7 +109,7 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
         expect(body[:id]).to be_a(String)
         expect(body[:method]).to eq("initialize")
         expect(body[:params]).to be_a(Hash)
-        expect(body[:params][:protocolVersion]).to eq("2025-06-18")
+        expect(body[:params][:protocolVersion]).to eq("2025-11-25")
         expect(body[:params][:capabilities]).to be_a(Hash)
         expect(body[:params][:clientInfo]).to be_a(Hash)
       end
@@ -245,6 +250,23 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
       end
     end
 
+    describe ".resources_unsubscribe" do
+      let(:body) { described_class::Requests.resources_unsubscribe(uri: "file:///test.txt") }
+
+      it "creates a valid resources unsubscribe request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("resources/unsubscribe")
+        expect(body[:params][:uri]).to eq("file:///test.txt")
+      end
+
+      it "validates against UnsubscribeRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
     describe ".prompt_list" do
       let(:body) { described_class::Requests.prompt_list }
 
@@ -359,6 +381,73 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
         expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
       end
     end
+
+    describe ".tasks_list" do
+      let(:body) { described_class::Requests.tasks_list }
+
+      it "creates a valid tasks list request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("tasks/list")
+      end
+
+      it "validates against ListTasksRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".task_get" do
+      let(:body) { described_class::Requests.task_get(task_id: "task-123") }
+
+      it "creates a valid task get request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("tasks/get")
+        expect(body[:params][:taskId]).to eq("task-123")
+      end
+
+      it "validates against GetTaskRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".task_result" do
+      let(:body) { described_class::Requests.task_result(task_id: "task-123") }
+
+      it "creates a valid task result request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("tasks/result")
+        expect(body[:params][:taskId]).to eq("task-123")
+      end
+
+      it "validates against GetTaskPayloadRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".task_cancel" do
+      let(:body) { described_class::Requests.task_cancel(task_id: "task-123") }
+
+      it "creates a valid task cancel request" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_a(String)
+        expect(body[:method]).to eq("tasks/cancel")
+        expect(body[:params][:taskId]).to eq("task-123")
+      end
+
+      it "validates against CancelTaskRequest schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
   end
 
   describe "Notifications" do
@@ -411,6 +500,44 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
         expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
       end
     end
+
+    describe ".tasks_status" do
+      let(:task) do
+        timestamp = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+        {
+          taskId: "task-123",
+          status: "working",
+          createdAt: timestamp,
+          lastUpdatedAt: timestamp,
+          ttl: 60_000
+        }
+      end
+      let(:body) { described_class::Notifications.tasks_status(task: task) }
+
+      it "creates a valid task status notification" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_nil
+        expect(body[:method]).to eq("notifications/tasks/status")
+        expect(body[:params][:taskId]).to eq("task-123")
+      end
+
+      it "validates against TaskStatusNotification schema" do
+        body_json = JSON.parse(body.to_json)
+        errors = schemer.validate(body_json).to_a
+        expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".elicitation_complete" do
+      let(:body) { described_class::Notifications.elicitation_complete(elicitation_id: "elicitation-123") }
+
+      it "creates a valid elicitation complete notification" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to be_nil
+        expect(body[:method]).to eq("notifications/elicitation/complete")
+        expect(body[:params][:elicitationId]).to eq("elicitation-123")
+      end
+    end
   end
 
   describe "Responses" do
@@ -454,6 +581,42 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
       end
     end
 
+    describe ".sampling_create_message stop_reason normalization" do
+      it "maps snake_case stop reasons to MCP camelCase values" do
+        message = double(
+          "Message",
+          role: "assistant",
+          content: "Done",
+          stop_reason: "max_tokens"
+        )
+
+        body = described_class::Responses.sampling_create_message(
+          id: "req-123",
+          model: "gpt-4o",
+          message: message
+        )
+
+        expect(body[:result][:stopReason]).to eq("maxTokens")
+      end
+
+      it "defaults stop reason to endTurn when message does not provide one" do
+        message = double(
+          "Message",
+          role: "assistant",
+          content: "Done",
+          stop_reason: nil
+        )
+
+        body = described_class::Responses.sampling_create_message(
+          id: "req-123",
+          model: "gpt-4o",
+          message: message
+        )
+
+        expect(body[:result][:stopReason]).to eq("endTurn")
+      end
+    end
+
     describe ".error" do
       let(:body) { described_class::Responses.error(id: "req-123", message: "Test error", code: -32_000) }
 
@@ -468,6 +631,16 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
         body_json = JSON.parse(body.to_json)
         errors = schemer.validate(body_json).to_a
         expect(errors).to be_empty, "Schema validation errors: #{errors.map(&:to_h)}"
+      end
+    end
+
+    describe ".result" do
+      let(:body) { described_class::Responses.result(id: "req-123", value: { "tasks" => [] }) }
+
+      it "creates a valid generic result response" do
+        expect(body[:jsonrpc]).to eq("2.0")
+        expect(body[:id]).to eq("req-123")
+        expect(body[:result]).to eq({ "tasks" => [] })
       end
     end
 
@@ -506,7 +679,6 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
     end
 
     describe ".sampling_create_message" do
-      # rubocop:disable RSpec/VerifiedDoubles
       let(:mock_content) do
         double("Content", text: "Hello, world!")
       end
@@ -675,7 +847,7 @@ RSpec.describe RubyLLM::MCP::Native::Messages do
       uuid_pattern = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/
 
       [
-        described_class::Requests.initialize(protocol_version: "2025-06-18", capabilities: {}),
+        described_class::Requests.initialize(protocol_version: "2025-11-25", capabilities: {}),
         described_class::Requests.ping,
         described_class::Requests.tool_list,
         described_class::Requests.resource_list

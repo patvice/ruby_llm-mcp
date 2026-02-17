@@ -12,7 +12,7 @@ http_interactions:
         does the markdown file say?"}]}],"stream":false,"max_tokens":64000}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Api-Key:
       - "<ANTHROPIC_API_KEY>"
       Anthropic-Version:
@@ -29,7 +29,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 10 Nov 2025 23:31:03 GMT
+      - Mon, 16 Feb 2026 17:21:17 GMT
       Content-Type:
       - application/json
       Transfer-Encoding:
@@ -41,52 +41,53 @@ http_interactions:
       Anthropic-Ratelimit-Input-Tokens-Remaining:
       - '30000'
       Anthropic-Ratelimit-Input-Tokens-Reset:
-      - '2025-11-10T23:31:01Z'
+      - '2026-02-16T17:21:15Z'
       Anthropic-Ratelimit-Output-Tokens-Limit:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Remaining:
       - '8000'
       Anthropic-Ratelimit-Output-Tokens-Reset:
-      - '2025-11-10T23:31:04Z'
+      - '2026-02-16T17:21:18Z'
       Anthropic-Ratelimit-Requests-Limit:
       - '50'
       Anthropic-Ratelimit-Requests-Remaining:
       - '49'
       Anthropic-Ratelimit-Requests-Reset:
-      - '2025-11-10T23:31:00Z'
-      Retry-After:
-      - '62'
+      - '2026-02-16T17:21:15Z'
       Anthropic-Ratelimit-Tokens-Limit:
       - '38000'
       Anthropic-Ratelimit-Tokens-Remaining:
       - '38000'
       Anthropic-Ratelimit-Tokens-Reset:
-      - '2025-11-10T23:31:01Z'
+      - '2026-02-16T17:21:15Z'
+      X-Robots-Tag:
+      - none
       Request-Id:
       - "<REQUEST_ID>"
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
       Anthropic-Organization-Id:
       - e1031ea3-bbf0-4676-9f23-42dec1e708ae
-      X-Envoy-Upstream-Service-Time:
-      - '3551'
-      Cf-Cache-Status:
-      - DYNAMIC
-      X-Robots-Tag:
-      - none
       Server:
       - cloudflare
+      X-Envoy-Upstream-Service-Time:
+      - '3326'
+      Content-Security-Policy:
+      - default-src 'none'; frame-ancestors 'none'
+      Cf-Cache-Status:
+      - DYNAMIC
       Cf-Ray:
       - "<CF_RAY>"
     body:
       encoding: ASCII-8BIT
-      string: '{"model":"claude-sonnet-4-20250514","id":"msg_01GVWz1MA6yiFStNK8ULHeCA","type":"message","role":"assistant","content":[{"type":"text","text":"The
-        markdown file is titled \"My Markdown File\" and contains the following content:\n\n-
-        **Title**: \"My Markdown File\"\n- **Introduction**: \"This is a markdown
-        file that I want to be able to use as a resource\"\n- **Section 1**: Contains
-        the text \"This is a section in my markdown file\"\n- **Section 2**: Contains
-        the text \"This is another section in my markdown file\"\n\nIt''s a simple
-        markdown document with a main heading, an introductory statement, and two
-        sections with basic descriptive text in each."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":123,"service_tier":"standard"}}'
-  recorded_at: Mon, 10 Nov 2025 23:31:03 GMT
-recorded_with: VCR 6.3.1
+      string: '{"model":"claude-sonnet-4-20250514","id":"msg_011V28HC1SowtHh7zMe2ow2h","type":"message","role":"assistant","content":[{"type":"text","text":"Based
+        on the markdown file you provided, here''s what it contains:\n\n**Title:**
+        \"My Markdown File\"\n\n**Content:** The file describes itself as \"a markdown
+        file that I want to be able to use as a resource\"\n\n**Structure:** It has
+        two main sections:\n- **Section 1:** Contains the text \"This is a section
+        in my markdown file\"\n- **Section 2:** Contains the text \"This is another
+        section in my markdown file\"\n\nThe file appears to be a basic template or
+        example markdown document with a simple hierarchical structure using headers
+        and descriptive placeholder text for each section."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":73,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":132,"service_tier":"standard","inference_geo":"not_available"}}'
+  recorded_at: Mon, 16 Feb 2026 17:21:17 GMT
+recorded_with: VCR 6.4.0

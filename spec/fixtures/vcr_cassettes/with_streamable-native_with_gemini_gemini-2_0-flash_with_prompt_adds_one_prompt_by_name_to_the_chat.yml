@@ -11,7 +11,7 @@ http_interactions:
         from the prompt."}]}],"generationConfig":{}}'
     headers:
       User-Agent:
-      - Faraday v2.14.0
+      - Faraday v2.14.1
       X-Goog-Api-Key:
       - "<GEMINI_API_KEY>"
       Content-Type:
@@ -32,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Mon, 10 Nov 2025 23:38:49 GMT
+      - Mon, 16 Feb 2026 17:28:53 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -42,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=1961
+      - gfet4t7; dur=2110
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -56,19 +56,19 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "The sun, a painter, splashed the dawn in rose,\nAnd chased the lingering shadows from their hold.\nA robin's song, a story nature knows,\nUnfurled upon the air, a tale of gold.\n\nThe busy world awakens, stretches slow,\nThen gathers speed, a river finding course.\nA gentle breeze, a whisper soft and low,\nReminds us beauty lies within its source.\n\nThe coffee steams, a comforting embrace,\nAnd worries fade with every fragrant sip.\nA smile exchanged, a kindness leaves its trace,\nA moment cherished from the soul's deep grip.\n\nThe day unfolds, a tapestry of light,\nOf tasks and dreams, of laughter and of tears.\nA chance to choose the path, to make things right,\nTo conquer doubts and overcome all fears.\n\nAnd in this quiet space, I write this **poem**,\nA simple ode to ordinary grace.\nTo find the magic blooming in my home,\nAnd beauty shining in this time and place.\n"
+                    "text": "Here's a poem capturing the beauty of the current day:\n\nA canvas new, the morning light unfolds,\nAcross the dew-kissed fields, a story told.\nThe sun, a painter, with a golden hue,\nAwakens dreams, and makes the world anew.\n\nA gentle breeze, a whisper through the trees,\nCarries the scent of blossoms on its ease.\nThe birdsong bright, a symphony so clear,\nWashing away the shadows, calming fear.\n\nA simple day, a moment to embrace,\nThe quiet joy in this familiar space.\nTo find the beauty in the ordinary things,\nThe silent peace the present moment brings.\n\nThis fleeting day, a jewel to behold,\nMore precious than the silver or the gold.\nAnd in my heart, a quiet thank you lies,\nFor this sweet glimpse beneath these azure skies.\n\nThis humble **poem**, a tribute I impart,\nTo the beating pulse within this day's warm heart.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.66180084798937644
+              "avgLogprobs": -0.61754732865553641
             }
           ],
           "usageMetadata": {
             "promptTokenCount": 33,
-            "candidatesTokenCount": 214,
-            "totalTokenCount": 247,
+            "candidatesTokenCount": 208,
+            "totalTokenCount": 241,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
@@ -78,12 +78,12 @@ http_interactions:
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 214
+                "tokenCount": 208
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "h3cSaZO1LLm-_uMPjczS8AY"
+          "responseId": "01OTaanUEbG8_uMPvZzigQs"
         }
-  recorded_at: Mon, 10 Nov 2025 23:38:49 GMT
-recorded_with: VCR 6.3.1
+  recorded_at: Mon, 16 Feb 2026 17:28:53 GMT
+recorded_with: VCR 6.4.0
