@@ -228,6 +228,15 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
 
         expect(tcp_server).to have_received(:close)
       end
+
+      it "shuts down callback server before token exchange" do
+        expect(oauth_provider).to receive(:start_authorization_flow).ordered.and_return(auth_url)
+        expect(tcp_server).to receive(:close).ordered
+        expect(oauth_provider).to receive(:complete_authorization_flow).ordered.with("test_code", "test_state")
+                                                                       .and_return(token)
+
+        browser_oauth.authenticate(auto_open_browser: false)
+      end
     end
 
     context "when errors occur" do
@@ -1220,6 +1229,7 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
 
         expect(oauth_provider).to have_received(:handle_authentication_challenge).with(
           www_authenticate: 'Bearer scope="test"',
+          resource_metadata: nil,
           resource_metadata_url: "https://example.com/meta",
           requested_scope: "custom:scope"
         )

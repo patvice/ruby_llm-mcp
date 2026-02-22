@@ -446,7 +446,7 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
 
       before do
         storage.set_token(server_url, expired_token)
-        allow(provider).to receive(:refresh_token).with(expired_token).and_return(new_token)
+        allow(provider).to receive(:refresh_token).with(expired_token, resource_metadata: nil).and_return(new_token)
       end
 
       it "refreshes token and returns true" do
@@ -495,7 +495,29 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
       it "passes requested scope to client credentials flow" do
         provider.handle_authentication_challenge(requested_scope: "custom:scope")
 
-        expect(provider).to have_received(:client_credentials_flow).with(scope: "custom:scope")
+        expect(provider).to have_received(:client_credentials_flow).with(
+          scope: "custom:scope",
+          resource_metadata: nil
+        )
+      end
+
+      it "uses scope parsed from WWW-Authenticate when explicit scope is not provided" do
+        provider.handle_authentication_challenge(www_authenticate: 'Bearer scope="parsed:scope"')
+
+        expect(provider).to have_received(:client_credentials_flow).with(
+          scope: "parsed:scope",
+          resource_metadata: nil
+        )
+      end
+
+      it "uses resource_metadata parsed from WWW-Authenticate when explicit metadata is not provided" do
+        metadata_url = "https://example.com/.well-known/oauth-protected-resource"
+        provider.handle_authentication_challenge(www_authenticate: %(Bearer resource_metadata="#{metadata_url}"))
+
+        expect(provider).to have_received(:client_credentials_flow).with(
+          scope: nil,
+          resource_metadata: metadata_url
+        )
       end
     end
 
@@ -551,6 +573,48 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
 
         expect(logger).to have_received(:debug).with(/Resource metadata URL:/)
       end
+
+      it "passes resource metadata URL hint into token refresh discovery" do
+        expired_token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "expired_token",
+          refresh_token: "refresh_token_123",
+          expires_in: 1
+        )
+        expired_token.instance_variable_set(:@expires_at, Time.now - 3600)
+        storage.set_token(server_url, expired_token)
+        allow(provider).to receive(:refresh_token).and_return(nil)
+
+        expect do
+          provider.handle_authentication_challenge(resource_metadata_url: metadata_url)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError)
+
+        expect(provider).to have_received(:refresh_token).with(
+          expired_token,
+          resource_metadata: metadata_url
+        )
+      end
+
+      it "uses resource_metadata parsed from WWW-Authenticate when explicit metadata URL is absent" do
+        expired_token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "expired_token",
+          refresh_token: "refresh_token_123",
+          expires_in: 1
+        )
+        expired_token.instance_variable_set(:@expires_at, Time.now - 3600)
+        storage.set_token(server_url, expired_token)
+        allow(provider).to receive(:refresh_token).and_return(nil)
+
+        expect do
+          provider.handle_authentication_challenge(
+            www_authenticate: %(Bearer resource_metadata="#{metadata_url}")
+          )
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError)
+
+        expect(provider).to have_received(:refresh_token).with(
+          expired_token,
+          resource_metadata: metadata_url
+        )
+      end
     end
   end
 
@@ -569,10 +633,19 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
       expect(result[:scope]).to eq("mcp:read mcp:write")
     end
 
-    it "parses resource_metadata_url from header" do
+    it "parses resource_metadata from header" do
+      header = 'Bearer resource_metadata="https://example.com/.well-known/oauth"'
+      result = provider.parse_www_authenticate(header)
+
+      expect(result[:resource_metadata]).to eq("https://example.com/.well-known/oauth")
+      expect(result[:resource_metadata_url]).to eq("https://example.com/.well-known/oauth")
+    end
+
+    it "parses legacy resource_metadata_url from header" do
       header = 'Bearer resource_metadata_url="https://example.com/.well-known/oauth"'
       result = provider.parse_www_authenticate(header)
 
+      expect(result[:resource_metadata]).to eq("https://example.com/.well-known/oauth")
       expect(result[:resource_metadata_url]).to eq("https://example.com/.well-known/oauth")
     end
 
@@ -584,11 +657,12 @@ RSpec.describe RubyLLM::MCP::Auth::OAuthProvider do # rubocop:disable RSpec/Spec
     end
 
     it "parses all parameters together" do
-      header = 'Bearer realm="example", scope="mcp:read", resource_metadata_url="https://example.com/meta"'
+      header = 'Bearer realm="example", scope="mcp:read", resource_metadata="https://example.com/meta"'
       result = provider.parse_www_authenticate(header)
 
       expect(result[:realm]).to eq("example")
       expect(result[:scope]).to eq("mcp:read")
+      expect(result[:resource_metadata]).to eq("https://example.com/meta")
       expect(result[:resource_metadata_url]).to eq("https://example.com/meta")
     end
 

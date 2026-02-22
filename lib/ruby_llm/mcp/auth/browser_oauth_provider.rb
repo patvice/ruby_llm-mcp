@@ -119,6 +119,11 @@ module RubyLLM
               raise Errors::TransportError.new(message: "OAuth authorization failed: #{snapshot[:error]}")
             end
 
+            # Stop callback server before token exchange to avoid cross-thread races
+            # (observed under JRuby when background callback logging overlaps main-thread mocks).
+            server&.shutdown
+            server = nil
+
             # 6. Complete OAuth flow
             @logger.debug("Completing OAuth authorization flow")
             token = @oauth_provider.complete_authorization_flow(snapshot[:code], snapshot[:state])
@@ -159,16 +164,19 @@ module RubyLLM
 
         # Handle authentication challenge with browser-based auth
         # @param www_authenticate [String, nil] WWW-Authenticate header value
-        # @param resource_metadata_url [String, nil] Resource metadata URL from response
+        # @param resource_metadata [String, nil] Resource metadata URL from response/challenge
+        # @param resource_metadata_url [String, nil] Legacy alias for resource_metadata
         # @param requested_scope [String, nil] Scope from WWW-Authenticate challenge
         # @return [Boolean] true if authentication was completed successfully
-        def handle_authentication_challenge(www_authenticate: nil, resource_metadata_url: nil, requested_scope: nil)
+        def handle_authentication_challenge(www_authenticate: nil, resource_metadata: nil, resource_metadata_url: nil,
+                                            requested_scope: nil)
           @logger.debug("BrowserOAuthProvider handling authentication challenge")
 
           # Try standard provider's automatic handling first (token refresh, client credentials)
           begin
             return @oauth_provider.handle_authentication_challenge(
               www_authenticate: www_authenticate,
+              resource_metadata: resource_metadata,
               resource_metadata_url: resource_metadata_url,
               requested_scope: requested_scope
             )

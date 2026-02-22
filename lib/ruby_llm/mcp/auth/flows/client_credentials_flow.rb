@@ -21,12 +21,13 @@ module RubyLLM
           # @param server_url [String] MCP server URL
           # @param redirect_uri [String] redirect URI (used for registration only)
           # @param scope [String, nil] requested scope
+          # @param resource_metadata [String, nil] explicit resource metadata URL hint
           # @return [Token] access token
-          def execute(server_url, redirect_uri, scope)
+          def execute(server_url, redirect_uri, scope, resource_metadata: nil)
             logger.debug("Starting OAuth client credentials flow")
 
             # 1. Discover authorization server
-            server_metadata = discoverer.discover(server_url)
+            server_metadata = discoverer.discover(server_url, resource_metadata_url: resource_metadata)
             raise Errors::TransportError.new(message: "OAuth server discovery failed") unless server_metadata
 
             # 2. Register client (or get cached client) with client credentials grant

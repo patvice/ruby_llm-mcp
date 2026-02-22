@@ -52,7 +52,7 @@ RSpec.describe RubyLLM::MCP::Auth::Flows::AuthorizationCodeFlow do
 
   describe "#start" do
     before do
-      allow(discoverer).to receive(:discover).with(server_url).and_return(server_metadata)
+      allow(discoverer).to receive(:discover).and_return(server_metadata)
       allow(client_registrar).to receive(:get_or_register).and_return(client_info)
       allow(session_manager).to receive(:create_session).and_return({ pkce: pkce, state: state })
     end
@@ -69,7 +69,7 @@ RSpec.describe RubyLLM::MCP::Auth::Flows::AuthorizationCodeFlow do
     it "discovers authorization server" do
       flow.start(server_url, redirect_uri, scope)
 
-      expect(discoverer).to have_received(:discover).with(server_url)
+      expect(discoverer).to have_received(:discover).with(server_url, resource_metadata_url: nil)
     end
 
     it "registers or retrieves client" do
@@ -130,6 +130,44 @@ RSpec.describe RubyLLM::MCP::Auth::Flows::AuthorizationCodeFlow do
           flow.start(server_url, redirect_uri, scope)
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /OAuth server discovery failed/)
       end
+    end
+
+    context "when server advertises PKCE methods without S256" do
+      let(:server_metadata) do
+        RubyLLM::MCP::Auth::ServerMetadata.new(
+          issuer: "https://mcp.example.com",
+          authorization_endpoint: "https://mcp.example.com/authorize",
+          token_endpoint: "https://mcp.example.com/token",
+          options: { code_challenge_methods_supported: ["plain"] }
+        )
+      end
+
+      it "raises an error" do
+        expect do
+          flow.start(server_url, redirect_uri, scope)
+        end.to raise_error(
+          RubyLLM::MCP::Errors::TransportError,
+          /does not support required PKCE method S256/
+        )
+      end
+
+      it "does not proceed to client registration" do
+        begin
+          flow.start(server_url, redirect_uri, scope)
+        rescue RubyLLM::MCP::Errors::TransportError
+          # expected
+        end
+
+        expect(client_registrar).not_to have_received(:get_or_register)
+      end
+    end
+
+    it "passes resource metadata hint to discovery when provided" do
+      hint = "https://example.com/.well-known/oauth-protected-resource"
+
+      flow.start(server_url, redirect_uri, scope, resource_metadata: hint)
+
+      expect(discoverer).to have_received(:discover).with(server_url, resource_metadata_url: hint)
     end
   end
 
