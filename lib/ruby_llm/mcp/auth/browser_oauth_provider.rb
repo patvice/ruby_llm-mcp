@@ -139,16 +139,11 @@ module RubyLLM
           server = start_callback_server(result, mutex, condition)
 
           begin
-            # 4. Open browser to authorization URL
-            if auto_open_browser
-              @opener.open_browser(auth_url)
-              @synchronized_logger.info("\nOpening browser for authorization...")
-              @synchronized_logger.info("If browser doesn't open automatically, visit this URL:")
-            else
-              @synchronized_logger.info("\nPlease visit this URL to authorize:")
-            end
-            @synchronized_logger.info(auth_url)
-            @synchronized_logger.info("\nWaiting for authorization...")
+            announce_authorization_flow(auth_url, auto_open_browser)
+
+            # Allow callback worker to begin processing only after setup logging/browser open
+            # to reduce cross-thread test-double races under JRuby.
+            server.start
 
             # 5. Wait for callback with timeout
             mutex.synchronize do
@@ -267,29 +262,13 @@ module RubyLLM
           server = @http_server.start_server
           @synchronized_logger.debug("Started callback server on http://127.0.0.1:#{@callback_port}#{@callback_path}")
 
-          running = true
-
-          # Start server in background thread
-          thread = Thread.new do
-            while running
-              begin
-                # Use wait_readable with timeout to allow checking running flag
-                next unless server.wait_readable(0.5)
-
-                client = server.accept
-                handle_http_request(client, result, mutex, condition)
-              rescue IOError, Errno::EBADF
-                # Server was closed, exit loop
-                break
-              rescue StandardError => e
-                mark_callback_failure(result, mutex, condition, e)
-                break
-              end
-            end
-          end
+          control = build_callback_thread_control
+          thread = build_callback_worker_thread(server, result, mutex, condition, control)
+          stop_proc = -> { stop_callback_worker(control) }
+          start_proc = -> { start_callback_worker(control) }
 
           # Return wrapper with shutdown method
-          Browser::CallbackServer.new(server, thread, -> { running = false })
+          Browser::CallbackServer.new(server, thread, stop_proc, start_proc)
         end
 
         # Handle incoming HTTP request on callback server
@@ -298,6 +277,8 @@ module RubyLLM
         # @param mutex [Mutex] synchronization mutex
         # @param condition [ConditionVariable] wait condition
         def handle_http_request(client, result, mutex, condition)
+          callback_result = nil
+
           @http_server.configure_client_socket(client)
 
           request_line = @http_server.read_request_line(client)
@@ -317,18 +298,17 @@ module RubyLLM
           # Parse and extract OAuth parameters
           params = @callback_handler.parse_callback_params(path, @http_server)
           oauth_params = @callback_handler.extract_oauth_params(params)
-
-          # Update result with OAuth parameters
-          @callback_handler.update_result_with_oauth_params(oauth_params, result, mutex, condition)
+          callback_result = build_callback_result(oauth_params)
 
           # Send response
-          if result[:error]
-            @http_server.send_http_response(client, 400, "text/html", @pages.error_page(result[:error]))
+          if callback_result[:error]
+            @http_server.send_http_response(client, 400, "text/html", @pages.error_page(callback_result[:error]))
           else
             @http_server.send_http_response(client, 200, "text/html", @pages.success_page)
           end
         ensure
           client&.close
+          apply_callback_result(callback_result, result, mutex, condition) if callback_result
         end
 
         # Wake the waiting authentication flow with a deterministic error when callback
@@ -341,8 +321,97 @@ module RubyLLM
             result[:completed] = true
             condition.signal
           end
+        end
 
-          @synchronized_logger.warn("OAuth callback worker failed: #{error.class}: #{error.message}")
+        def build_callback_result(oauth_params)
+          if oauth_params[:error]
+            { code: nil, state: nil, error: oauth_params[:error_description] || oauth_params[:error] }
+          elsif oauth_params[:code] && oauth_params[:state]
+            { code: oauth_params[:code], state: oauth_params[:state], error: nil }
+          else
+            { code: nil, state: nil, error: "Invalid callback: missing code or state parameter" }
+          end
+        end
+
+        def apply_callback_result(callback_result, result, mutex, condition)
+          mutex.synchronize do
+            return if result[:completed]
+
+            result[:code] = callback_result[:code]
+            result[:state] = callback_result[:state]
+            result[:error] = callback_result[:error]
+            result[:completed] = true
+            condition.signal
+          end
+        end
+
+        def announce_authorization_flow(auth_url, auto_open_browser)
+          if auto_open_browser
+            @opener.open_browser(auth_url)
+            @synchronized_logger.info("\nOpening browser for authorization...")
+            @synchronized_logger.info("If browser doesn't open automatically, visit this URL:")
+          else
+            @synchronized_logger.info("\nPlease visit this URL to authorize:")
+          end
+          @synchronized_logger.info(auth_url)
+          @synchronized_logger.info("\nWaiting for authorization...")
+        end
+
+        def build_callback_thread_control
+          {
+            mutex: Mutex.new,
+            condition: ConditionVariable.new,
+            running: true,
+            accepting: false
+          }
+        end
+
+        def build_callback_worker_thread(server, result, result_mutex, condition, control)
+          Thread.new do
+            wait_for_callback_worker_start(control)
+
+            while callback_worker_running?(control)
+              begin
+                # Use wait_readable with timeout to allow checking stop signal
+                next unless server.wait_readable(0.5)
+
+                client = server.accept
+                handle_http_request(client, result, result_mutex, condition)
+                break if result_mutex.synchronize { result[:completed] }
+              rescue IOError, Errno::EBADF
+                # Server was closed, exit loop
+                break
+              rescue StandardError => e
+                mark_callback_failure(result, result_mutex, condition, e)
+                break
+              end
+            end
+          end
+        end
+
+        def wait_for_callback_worker_start(control)
+          control[:mutex].synchronize do
+            control[:condition].wait(control[:mutex]) until control[:accepting] || !control[:running]
+          end
+        end
+
+        def callback_worker_running?(control)
+          control[:mutex].synchronize { control[:running] }
+        end
+
+        def start_callback_worker(control)
+          control[:mutex].synchronize do
+            control[:accepting] = true
+            control[:condition].signal
+          end
+        end
+
+        def stop_callback_worker(control)
+          control[:mutex].synchronize do
+            control[:running] = false
+            control[:accepting] = true
+            control[:condition].broadcast
+          end
         end
       end
     end
