@@ -120,7 +120,6 @@ module RubyLLM
             # Extract the request ID from the body (if present)
             request_id = body.is_a?(Hash) ? (body["id"] || body[:id]) : nil
 
-            # Register queue before send_http_request to avoid push-before-register races.
             response_queue = setup_response_queue(request_id, wait_for_response)
             result = send_http_request(body, request_id)
             return result if result.is_a?(RubyLLM::MCP::Result)
@@ -315,13 +314,6 @@ module RubyLLM
             json_body = JSON.generate(body)
             RubyLLM::MCP.logger.debug "Sending Request: #{json_body}"
 
-            # Use a background thread only when a queue is registered for this request.
-            # When wait_for_response: false no queue is registered, so we run synchronously to
-            # ensure errors and results propagate immediately back to the caller.
-            # When wait_for_response: true the queue exists, so we must be async: some servers
-            # (e.g. Notion) respond with an inline SSE stream that stays open indefinitely after
-            # delivering the result, and blocking the main thread inside post() would cause a
-            # TimeoutError before wait_for_response_with_timeout is ever reached.
             use_background = request_id && @pending_mutex.synchronize { @pending_requests.key?(request_id.to_s) }
 
             if use_background
@@ -337,9 +329,6 @@ module RubyLLM
               response = request_client.post(@url, json: body, headers: headers)
               handle_response(response, request_id, body)
             rescue Errors::BaseError => e
-              # Push all BaseError subclasses directly so wait_for_response_with_timeout
-              # re-raises them with their original type (e.g. SessionExpiredError, not
-              # a generic TransportError wrapper).
               @pending_mutex.synchronize do
                 queue = @pending_requests.delete(request_id.to_s)
                 queue&.push(e)
@@ -373,8 +362,6 @@ module RubyLLM
             client = client.on_response_body_chunk do |request, response, chunk|
               next unless running?
 
-              # Capture session ID from response headers before processing SSE events so that
-              # initialize_notification (sent after the initialize result is dequeued) includes it.
               if (session_id = response.headers["mcp-session-id"]) && !@session_id
                 @session_id = session_id
               end
@@ -383,7 +370,6 @@ module RubyLLM
               buffer << chunk
               process_sse_buffer_events(buffer, request_id&.to_s)
 
-              # Only close when wait_for_response registered a queue; fire-and-forget IDs shouldn't auto-close.
               if close_when_fulfilled && request_id
                 fulfilled = @pending_mutex.synchronize { !@pending_requests.key?(request_id.to_s) }
                 request.close if fulfilled
@@ -448,9 +434,6 @@ module RubyLLM
               result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
               if request_id
-                # Push to the queue rather than returning up the call stack: this method runs
-                # inside a background thread, so the return value is never observed by the
-                # caller. The main thread receives the result via wait_for_response_with_timeout.
                 @pending_mutex.synchronize do
                   queue = @pending_requests.delete(request_id.to_s)
                   queue&.push(result)
@@ -949,11 +932,8 @@ module RubyLLM
             timeout_seconds = @request_timeout / 1000.0
             deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout_seconds
 
-            # Poll non-blocking; Thread.join(timeout) can starve under HTTPX callbacks.
             loop do
               result = response_queue.pop(true)
-              # Background thread pushes exceptions directly into the queue to preserve their
-              # original type (e.g. SessionExpiredError). Re-raise any of them here.
               raise result if result.is_a?(Exception)
 
               return result
@@ -972,8 +952,6 @@ module RubyLLM
               sleep(0.05)
             end
           ensure
-            # Clean up the pending entry on any exit path not already handled above (e.g. when
-            # an exception escapes from pop itself rather than being pushed via the queue).
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
           end
 
