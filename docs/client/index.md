@@ -1,15 +1,16 @@
 ---
 layout: default
-title: Client Interactions
-nav_order: 5
+title: Client
+parent: Core Features
+nav_order: 2
 description: "Client-side features and capabilities for MCP integration"
 has_children: true
 permalink: /client/
 ---
 
-# Client Interactions
+# Client
 
-Client interactions cover the features and capabilities that your MCP client provides to servers and manages locally. These are client-side features that enhance the MCP experience by enabling advanced functionality like sampling, filesystem access, and custom transport implementations.
+Client capabilities cover the features your MCP client provides to servers and manages locally, including sampling, filesystem roots, and extension negotiation.
 
 ## Overview
 
@@ -18,6 +19,7 @@ MCP clients offer several key capabilities:
 - **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM for their own requests
 - **[Elicitation]({% link client/elicitation.md %})** - Handle structured follow-up questions from servers
 - **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers within specified directories
+- **[Extensions]({% link extensions/index.md %})** - Advertise optional client capabilities such as MCP Apps
 
 ## Client Capabilities
 
@@ -37,6 +39,10 @@ Provide controlled filesystem access to MCP servers, allowing them to understand
 
 Handle the communication protocol between your client and MCP servers. Use built-in transports or create custom implementations for specialized communication needs.
 
+### Extensions
+
+Advertise optional protocol capabilities and parse extension metadata consistently across tools, resources, and resource templates.
+
 ## Getting Started
 
 Explore each client interaction type to understand how to configure and use client-side features:
@@ -44,11 +50,13 @@ Explore each client interaction type to understand how to configure and use clie
 - **[Sampling]({% link client/sampling.md %})** - Allow servers to use your LLM
 - **[Elicitation]({% link client/elicitation.md %})** - Handle structured user input requests
 - **[Roots]({% link client/roots.md %})** - Provide filesystem access to servers
+- **[Extensions]({% link extensions/index.md %})** - Configure and negotiate extension capabilities
 
 ## Next Steps
 
 Once you understand client interactions, explore:
 
-- **[Server Interactions]({% link server/index.md %})** - Working with server capabilities
+- **[Server]({% link server/index.md %})** - Working with server capabilities
 - **[Configuration]({% link configuration.md %})** - Advanced client configuration options
+- **[MCP Apps]({% link guides/mcp-apps.md %})** - Build an MCP Apps flow with RubyLLM MCP
 - **[Rails Integration]({% link guides/rails-integration.md %})** - Using MCP with Rails applications

@@ -12,3 +12,203 @@
   gap: 0.5em;
   margin: 1em 0;
 }
+
+/* Sidebar brand row */
+.site-header .site-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.site-title .site-logo {
+  width: 2.15rem;
+  height: 2.15rem;
+  min-width: 2.15rem;
+  padding: 0.2rem;
+  border: 1px solid $border-color;
+  border-radius: 0.5rem;
+  background-color: $body-background-color;
+  margin-right: 0;
+}
+
+.site-title .site-title-text {
+  color: $body-heading-color;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+/* Place quick links (Home/GitHub/Changelog) above docs navigation */
+.site-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Baseline nav row sizing inspired by compact docs sidebars */
+.site-nav .nav-list .nav-list-item .nav-list-link {
+  display: block;
+  min-height: 2.2rem;
+  line-height: 1.5rem;
+  padding-top: 0.22rem;
+  padding-bottom: 0.22rem;
+  padding-right: 2rem;
+  padding-left: 1.05rem;
+  outline-offset: -1px;
+}
+
+.site-nav .nav-list {
+  padding-top: 0.25rem;
+}
+
+/* External quick links block styling + divider before categories */
+.site-nav > ul.nav-list:nth-of-type(2) {
+  order: -1;
+  border-bottom: 0;
+  margin-top: 0.45rem;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.site-nav > ul.nav-list:nth-of-type(2) .nav-list-link {
+  font-size: 0.875rem !important;
+  font-weight: 500;
+  line-height: 1.28;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  padding-left: 1.05rem;
+}
+
+.site-nav .nav-list-item.external {
+  padding-left: 1rem;
+}
+
+/* Top-level docs categories (Getting Started/Core Features/Advanced) */
+.site-nav > ul.nav-list:first-of-type > li.nav-list-item > .nav-list-link {
+  border-bottom: 1px solid $border-color;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  padding-top: 0.72rem;
+  padding-bottom: 0.5rem;
+  color: rgba($body-text-color, 0.68);
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default;
+}
+
+.site-nav > ul.nav-list:first-of-type > li.nav-list-item:first-child > .nav-list-link {
+  border-top: 0;
+  margin-top: 0;
+}
+
+/* Turn top-level sections into static labels rather than accordions */
+.site-nav > ul.nav-list:first-of-type > li.nav-list-item > .nav-list-expander {
+  display: none;
+}
+
+.site-nav > ul.nav-list:first-of-type > li.nav-list-item > ul.nav-list {
+  display: block;
+}
+
+.site-nav > ul.nav-list:first-of-type > li.nav-list-item > ul.nav-list > li.nav-list-item > .nav-list-link {
+  color: $link-color;
+  font-size: 0.875rem !important;
+  line-height: 1.28;
+  font-weight: 500;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media (min-width: 31.25rem) {
+  .site-nav > ul.nav-list:first-of-type > li.nav-list-item > .nav-list-link {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (min-width: 50rem) {
+  .site-nav {
+    padding-top: 0;
+  }
+
+  .site-nav > ul.nav-list:first-of-type > li.nav-list-item > .nav-list-link {
+    padding-right: 2rem;
+    padding-left: 2rem;
+    margin-top: 1rem;
+    text-align: start;
+  }
+
+  .site-nav .nav-list .nav-list-item .nav-list-link {
+    min-height: 2rem;
+    line-height: 1.5rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Theme switcher next to search */
+.header-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.header-theme-toggle .theme-icon {
+  color: $body-text-color;
+  font-size: 0.86rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 2.55rem;
+  height: 1.4rem;
+  border: 1px solid $border-color;
+  border-radius: 999px;
+  background: rgba($body-text-color, 0.16);
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.theme-toggle .theme-toggle-knob {
+  position: absolute;
+  top: 0.14rem;
+  left: 0.18rem;
+  width: 0.98rem;
+  height: 0.98rem;
+  border-radius: 999px;
+  background: $body-background-color;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: transform 160ms ease;
+}
+
+.theme-toggle.is-dark {
+  background: rgba($link-color, 0.28);
+  border-color: rgba($link-color, 0.45);
+}
+
+.theme-toggle.is-dark .theme-toggle-knob {
+  transform: translateX(1.1rem);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid $link-color;
+  outline-offset: 2px;
+}
+
+@media (max-width: 50rem) {
+  .header-theme-toggle {
+    margin-left: 0.6rem;
+  }
+
+  .site-nav > ul.nav-list:nth-of-type(2) .nav-list-link,
+  .site-nav > ul.nav-list:first-of-type > li.nav-list-item > ul.nav-list > li.nav-list-item > .nav-list-link {
+    font-size: 1.05rem;
+  }
+}

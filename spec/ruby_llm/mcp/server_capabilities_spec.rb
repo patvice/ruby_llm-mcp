@@ -336,6 +336,49 @@ RSpec.describe RubyLLM::MCP::ServerCapabilities do
     end
   end
 
+  describe "extensions APIs" do
+    let(:canonical_id) { RubyLLM::MCP::Extensions::Constants::UI_EXTENSION_ID }
+    let(:alias_id) { RubyLLM::MCP::Extensions::Constants::APPS_EXTENSION_ALIAS }
+
+    it "returns the raw extensions map when present" do
+      capabilities = described_class.new(
+        "extensions" => {
+          canonical_id => { "enabled" => true }
+        }
+      )
+
+      expect(capabilities.extensions).to eq(canonical_id => { "enabled" => true })
+    end
+
+    it "returns empty extensions map when absent" do
+      capabilities = described_class.new({})
+      expect(capabilities.extensions).to eq({})
+    end
+
+    it "resolves extension? for canonical and alias IDs" do
+      capabilities = described_class.new(
+        "extensions" => {
+          canonical_id => { "enabled" => true }
+        }
+      )
+
+      expect(capabilities.extension?(canonical_id)).to be(true)
+      expect(capabilities.extension?(alias_id)).to be(true)
+    end
+
+    it "resolves extension_capability for canonical and alias IDs" do
+      capabilities = described_class.new(
+        "extensions" => {
+          alias_id => { "ui" => { "resourceUri" => "ui://resource" } }
+        }
+      )
+
+      expected = { "ui" => { "resourceUri" => "ui://resource" } }
+      expect(capabilities.extension_capability(canonical_id)).to eq(expected)
+      expect(capabilities.extension_capability(alias_id)).to eq(expected)
+    end
+  end
+
   describe "integration scenarios" do
     context "with complex capabilities hash" do
       let(:complex_capabilities) do

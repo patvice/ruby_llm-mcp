@@ -25,7 +25,8 @@ module RubyLLM
     end
 
     class Tool < RubyLLM::Tool
-      attr_reader :name, :title, :description, :adapter, :annotations, :tool_response, :with_prefix, :output_schema
+      attr_reader :name, :title, :description, :adapter, :annotations, :tool_response, :with_prefix, :output_schema,
+                  :apps_metadata
 
       def initialize(adapter, tool_response, with_prefix: false)
         super()
@@ -40,6 +41,7 @@ module RubyLLM
         @output_schema = tool_response["outputSchema"]
 
         @annotations = tool_response["annotations"] ? Annotation.new(tool_response["annotations"]) : nil
+        @apps_metadata = Extensions::Apps::ToolMetadata.new(tool_response[Extensions::Apps::Constants::META_KEY])
 
         @normalized_input_schema = normalize_if_invalid(@input_schema)
       end

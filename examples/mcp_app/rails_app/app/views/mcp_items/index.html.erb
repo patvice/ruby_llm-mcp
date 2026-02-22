@@ -1,0 +1,156 @@
+<% content_for :title, "MCP App Example" %>
+<% content_for :head do %>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const iframe = document.getElementById("mcp-items-iframe");
+      if (!iframe) return;
+      const csrfToken = document.querySelector("meta[name='csrf-token']")?.content;
+      const pending = new Set();
+
+      window.addEventListener("message", function (event) {
+        if (event.source !== iframe.contentWindow) return;
+        const data = event.data || {};
+        if (data.action !== "toggle_item") return;
+        const id = Number(data.id);
+        if (!Number.isInteger(id) || id <= 0) return;
+        if (pending.has(id)) return;
+
+        pending.add(id);
+        fetch("/mcp_items/" + id + "/toggle", {
+          method: "PATCH",
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "X-CSRF-Token": csrfToken
+          }
+        })
+          .then((response) => response.json())
+          .then((payload) => {
+            if (!iframe.contentWindow) return;
+            if (payload.ok && payload.item) {
+              iframe.contentWindow.postMessage({ action: "toggle_item_result", item: payload.item }, "*");
+            } else {
+              iframe.contentWindow.postMessage({ action: "toggle_item_error", id: id, error: payload.error || "Toggle failed" }, "*");
+            }
+          })
+          .catch(() => {
+            if (iframe.contentWindow) {
+              iframe.contentWindow.postMessage({ action: "toggle_item_error", id: id, error: "Network error" }, "*");
+            }
+          })
+          .finally(() => {
+            pending.delete(id);
+          });
+      });
+    });
+  </script>
+<% end %>
+
+<main class="mx-auto min-h-screen w-full max-w-6xl px-4 py-10 sm:px-8">
+  <header class="animate-rise border-2 border-slate-300/20 bg-slate-900/70 p-6 backdrop-blur">
+    <p class="font-mono text-xs uppercase tracking-[0.2em] text-signal-400">MCP Integration Lab</p>
+    <h1 class="mt-3 font-display text-4xl leading-tight sm:text-5xl">Rails + MCP Apps</h1>
+    <p class="mt-3 max-w-3xl text-slate-300">
+      The items UI below is rendered by MCP and isolated in a sandboxed iframe.
+    </p>
+  </header>
+
+  <section class="mt-6 grid gap-6 lg:grid-cols-5">
+    <div class="lg:col-span-3">
+      <div class="animate-rise border-2 border-slate-300/20 bg-slate-900/70 p-5" style="animation-delay: 60ms;">
+        <h2 class="font-display text-2xl">Create Item</h2>
+        <p class="mt-1 text-sm text-slate-300">Tool call: <span class="font-mono text-signal-400">create_item</span></p>
+
+        <%= form_with url: mcp_items_path, method: :post, local: true, class: "mt-4" do |form| %>
+          <label for="description" class="font-mono text-xs uppercase tracking-[0.14em] text-slate-300">Description</label>
+          <div class="mt-2 flex flex-col gap-3 sm:flex-row">
+            <%= form.text_field :description,
+                id: "description",
+                placeholder: "Write docs",
+                required: true,
+                class: "w-full border-2 border-slate-300/20 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-100 outline-none transition focus:border-signal-400" %>
+            <%= form.submit "Create",
+                class: "border-2 border-signal-400 bg-signal-400/10 px-4 py-2 font-mono text-sm uppercase tracking-[0.12em] text-signal-400 transition hover:bg-signal-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal-400" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="animate-rise mt-4 border border-orange-400/60 bg-slate-900/70 p-3" style="animation-delay: 85ms;">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="font-display text-lg">MCP Toggle Buttons</h2>
+          <span class="border border-orange-400/60 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-orange-300">
+            MCP toggle_done
+          </span>
+        </div>
+
+        <% if @items.empty? %>
+          <p class="mt-2 border border-dashed border-orange-400/40 p-2 font-mono text-[11px] text-slate-300">No items available to toggle.</p>
+        <% else %>
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            <% @items.each do |item| %>
+              <%= button_to "#{item["done"] ? "On" : "Off"} ##{item["id"]} · #{item["description"]}",
+                  toggle_mcp_item_path(item["id"]),
+                  method: :patch,
+                  class: "border border-orange-400/70 bg-orange-400/10 px-2 py-1 font-mono text-[10px] text-orange-200 transition hover:bg-orange-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300 #{item["done"] ? "opacity-80" : ""}" %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <p class="mt-2 font-mono text-[10px] uppercase tracking-[0.1em] text-slate-400">
+          Completed: <%= @completed_items.length %> · Open: <%= @open_items.length %>
+        </p>
+      </div>
+
+      <div class="animate-rise mt-6 border-2 border-slate-300/20 bg-slate-900/70 p-5" style="animation-delay: 110ms;">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="font-display text-2xl">Items UI</h2>
+          <span class="border border-slate-300/20 px-2 py-1 font-mono text-xs uppercase tracking-[0.1em] text-slate-300">MCP render_items_embed</span>
+        </div>
+
+        <div class="relative mt-8 border-2 border-orange-400 bg-slate-950/40 px-5 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-7">
+          <span class="absolute -top-3 left-4 border-2 border-orange-400 bg-slate-950 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-orange-300">
+            from mcp iframe
+          </span>
+
+          <% if @mcp_items_iframe_html.present? %>
+            <iframe
+              id="mcp-items-iframe"
+              title="MCP items embed"
+              sandbox="allow-scripts"
+              class="h-[360px] w-full border border-orange-400/50 bg-slate-950"
+              srcdoc="<%= h(@mcp_items_iframe_html) %>">
+            </iframe>
+          <% else %>
+            <p class="border border-dashed border-orange-400/50 px-3 py-4 font-mono text-sm text-slate-300">MCP iframe content unavailable.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <aside class="space-y-6 lg:col-span-2">
+      <% flash.each do |kind, message| %>
+        <div class="animate-rise border-2 p-3 font-mono text-sm <%= kind.to_s == "alert" ? "border-rose-400/60 bg-rose-950/20 text-rose-100" : "border-emerald-400/60 bg-emerald-950/20 text-emerald-100" %>">
+          <strong class="uppercase tracking-[0.12em]"><%= kind %></strong>
+          <p class="mt-2"><%= message %></p>
+        </div>
+      <% end %>
+
+      <section class="animate-rise border-2 border-signal-400/70 bg-slate-900/70 p-4" style="animation-delay: 140ms;">
+        <h3 class="font-display text-xl">From MCP: render_items_embed</h3>
+        <p class="mt-1 font-mono text-xs uppercase tracking-[0.12em] text-slate-300">bordered raw payload</p>
+        <pre class="mt-3 overflow-auto border border-slate-300/20 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200"><%= JSON.pretty_generate(@mcp_list_payload) %></pre>
+      </section>
+
+      <section class="animate-rise border-2 border-signal-400/70 bg-slate-900/70 p-4" style="animation-delay: 170ms;">
+        <h3 class="font-display text-xl">From MCP: last mutation</h3>
+        <p class="mt-1 font-mono text-xs uppercase tracking-[0.12em] text-slate-300">create_item / mark_done</p>
+        <% if @mcp_last_action_payload.present? %>
+          <pre class="mt-3 overflow-auto border border-slate-300/20 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200"><%= JSON.pretty_generate(@mcp_last_action_payload) %></pre>
+        <% else %>
+          <p class="mt-3 border border-dashed border-slate-300/30 p-3 font-mono text-xs text-slate-300">No mutation payload captured yet.</p>
+        <% end %>
+      </section>
+    </aside>
+  </section>
+
+</main>

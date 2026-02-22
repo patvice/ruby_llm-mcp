@@ -1,9 +1,10 @@
 ---
 layout: default
 title: Upgrading from 0.6 to 0.7
-parent: Guides
+parent: Advanced
 nav_order: 10
 description: "Guide for upgrading from RubyLLM MCP 0.6 to 0.7"
+nav_exclude: true
 ---
 
 # Upgrading from 0.6 to 0.7

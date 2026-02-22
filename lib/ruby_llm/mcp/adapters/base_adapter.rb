@@ -42,6 +42,18 @@ module RubyLLM
           self.class.support?(feature)
         end
 
+        def supports_extension_negotiation?
+          false
+        end
+
+        def extension_mode
+          :none
+        end
+
+        def build_client_extensions_capabilities(protocol_version:) # rubocop:disable Lint/UnusedMethodArgument
+          {}
+        end
+
         def validate_transport!(transport_type)
           unless self.class.transport_supported?(transport_type)
             raise Errors::UnsupportedTransport.new(

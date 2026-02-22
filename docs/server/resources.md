@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Resources
-parent: Server Interactions
+parent: Server
 nav_order: 2
 description: "Working with MCP resources - static resources, resource templates, and content management"
 ---
