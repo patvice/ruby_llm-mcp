@@ -19,3 +19,8 @@ Gemfile.lock
 
 node_modules/
 .vcr_debug.log
+
+# AI specific files
+CLAUDE.md
+.claude
+AGENTS.md
