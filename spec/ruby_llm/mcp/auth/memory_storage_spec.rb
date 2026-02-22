@@ -78,4 +78,39 @@ RSpec.describe RubyLLM::MCP::Auth::MemoryStorage do
       expect(storage.get_state(server_url)).to be_nil
     end
   end
+
+  describe "thread safety" do
+    it "handles concurrent reads and writes without raising errors" do
+      errors = Queue.new
+
+      writers = Array.new(10) do |i|
+        Thread.new do
+          key = "#{server_url}/#{i}"
+          token = RubyLLM::MCP::Auth::Token.new(access_token: "token-#{i}")
+          storage.set_token(key, token)
+          storage.set_state(key, "state-#{i}")
+          storage.set_client_info(key, RubyLLM::MCP::Auth::ClientInfo.new(client_id: "client-#{i}"))
+        rescue StandardError => e
+          errors << e
+        end
+      end
+
+      readers = Array.new(10) do |i|
+        Thread.new do
+          key = "#{server_url}/#{i}"
+          50.times do
+            storage.get_token(key)
+            storage.get_state(key)
+            storage.get_client_info(key)
+          end
+        rescue StandardError => e
+          errors << e
+        end
+      end
+
+      (writers + readers).each(&:join)
+
+      expect(errors).to be_empty
+    end
+  end
 end

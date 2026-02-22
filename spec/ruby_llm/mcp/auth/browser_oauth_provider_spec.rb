@@ -266,6 +266,20 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /User denied/)
       end
 
+      it "raises TransportError when callback worker raises unexpectedly" do
+        client_socket = instance_double(TCPSocket)
+        allow(tcp_server).to receive_messages(wait_readable: true, accept: client_socket)
+        allow(client_socket).to receive(:setsockopt)
+        allow(client_socket).to receive(:gets).and_raise(StandardError.new("boom"))
+        allow(client_socket).to receive(:close)
+
+        expect(oauth_provider).not_to receive(:complete_authorization_flow)
+
+        expect do
+          browser_oauth.authenticate(auto_open_browser: false)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /callback processing failed: boom/)
+      end
+
       it "raises TransportError when port is already in use" do
         allow(TCPServer).to receive(:new).and_raise(Errno::EADDRINUSE)
 
