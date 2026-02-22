@@ -174,6 +174,97 @@ RSpec.describe RubyLLM::MCP::Auth::TokenManager do
         expect(options[:form][:scope]).to eq(scope)
       end
     end
+
+    context "when token endpoint returns OAuth error response" do
+      let(:oauth_error_response) do
+        {
+          "error" => "invalid_request",
+          "error_description" => "Missing required parameter: grant_type",
+          "error_uri" => "https://example.com/docs/oauth-errors#invalid_request"
+        }
+      end
+
+      before do
+        response = instance_double(HTTPX::Response, status: 400, body: oauth_error_response.to_json)
+        allow(http_client).to receive(:post).and_return(response)
+      end
+
+      it "raises TransportError with OAuth error details from RFC 6749 section 5.2 format" do
+        expect do
+          manager.exchange_client_credentials(server_metadata, client_info_with_secret, scope, server_url)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError) { |error|
+          expect(error.message).to include("OAuth error 'invalid_request'")
+          expect(error.message).to include("Missing required parameter: grant_type")
+          expect(error.code).to eq(400)
+          expect(error.error).to eq("invalid_request")
+        }
+      end
+    end
+
+    context "when token endpoint returns 401 invalid_client error response" do
+      let(:oauth_error_response) do
+        {
+          "error" => "invalid_client",
+          "error_description" => "Client authentication failed"
+        }
+      end
+
+      before do
+        response = instance_double(HTTPX::Response, status: 401, body: oauth_error_response.to_json)
+        allow(http_client).to receive(:post).and_return(response)
+      end
+
+      it "raises TransportError with RFC 6749 invalid_client semantics" do
+        expect do
+          manager.exchange_client_credentials(server_metadata, client_info_with_secret, scope, server_url)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError) { |error|
+          expect(error.message).to include("OAuth error 'invalid_client'")
+          expect(error.message).to include("Client authentication failed")
+          expect(error.code).to eq(401)
+          expect(error.error).to eq("invalid_client")
+        }
+      end
+    end
+
+    context "when token endpoint returns HTTP 200 with OAuth error payload" do
+      let(:oauth_error_response) do
+        {
+          "error" => "invalid_client",
+          "error_description" => "Client authentication failed."
+        }
+      end
+
+      before do
+        response = instance_double(HTTPX::Response, status: 200, body: oauth_error_response.to_json)
+        allow(http_client).to receive(:post).and_return(response)
+      end
+
+      it "raises TransportError instead of creating a token with missing access_token" do
+        expect do
+          manager.exchange_client_credentials(server_metadata, client_info_with_secret, scope, server_url)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /OAuth error 'invalid_client'/)
+      end
+    end
+
+    context "when token endpoint returns success status but no access token" do
+      let(:incomplete_response) do
+        {
+          "token_type" => "Bearer",
+          "expires_in" => 3600
+        }
+      end
+
+      before do
+        response = instance_double(HTTPX::Response, status: 200, body: incomplete_response.to_json)
+        allow(http_client).to receive(:post).and_return(response)
+      end
+
+      it "raises a clear TransportError for invalid token payload" do
+        expect do
+          manager.exchange_client_credentials(server_metadata, client_info_with_secret, scope, server_url)
+        end.to raise_error(RubyLLM::MCP::Errors::TransportError, /missing access_token/)
+      end
+    end
   end
 
   describe "#refresh_token" do
@@ -263,6 +354,52 @@ RSpec.describe RubyLLM::MCP::Auth::TokenManager do
 
         expect(result).to be_nil
         expect(logger).to have_received(:warn).with(/Invalid token refresh response/)
+      end
+    end
+
+    context "when refresh response contains OAuth error fields" do
+      let(:oauth_error_response) do
+        {
+          "error" => "invalid_grant",
+          "error_description" => "Refresh token is expired"
+        }
+      end
+
+      before do
+        response = instance_double(HTTPX::Response, status: 200, body: oauth_error_response.to_json)
+        allow(http_client).to receive(:post).and_return(response)
+      end
+
+      it "returns nil and logs warning" do
+        result = manager.refresh_token(server_metadata, client_info, token, server_url)
+
+        expect(result).to be_nil
+        expect(logger).to have_received(:warn).with(
+          /Token refresh failed: OAuth error 'invalid_grant'/
+        )
+      end
+    end
+
+    context "when refresh endpoint returns non-200 with OAuth error payload" do
+      let(:oauth_error_response) do
+        {
+          "error" => "invalid_grant",
+          "error_description" => "Refresh token is expired"
+        }
+      end
+
+      before do
+        response = instance_double(HTTPX::Response, status: 400, body: oauth_error_response.to_json)
+        allow(http_client).to receive(:post).and_return(response)
+      end
+
+      it "returns nil and logs OAuth error details" do
+        result = manager.refresh_token(server_metadata, client_info, token, server_url)
+
+        expect(result).to be_nil
+        expect(logger).to have_received(:warn).with(
+          /Token refresh failed: OAuth error 'invalid_grant': Refresh token is expired/
+        )
       end
     end
   end

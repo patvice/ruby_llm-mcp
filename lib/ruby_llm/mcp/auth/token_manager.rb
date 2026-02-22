@@ -71,9 +71,17 @@ module RubyLLM
 
           # Return nil on error responses
           return nil if response.is_a?(HTTPX::ErrorResponse)
-          return nil unless response.status == 200
+
+          if response.status != 200
+            oauth_error = extract_oauth_error(response.body.to_s)
+            raise_oauth_error!("Token refresh", oauth_error, response.status) if oauth_error
+            return nil
+          end
 
           parse_refresh_response(response, token)
+        rescue Errors::TransportError => e
+          logger.warn(e.message)
+          nil
         rescue JSON::ParserError => e
           logger.warn("Invalid token refresh response: #{e.message}")
           nil
@@ -194,6 +202,9 @@ module RubyLLM
             raise Errors::TransportError.new(message: "#{context} failed: #{error_message}")
           end
 
+          oauth_error = extract_oauth_error(response.body.to_s)
+          raise_oauth_error!(context, oauth_error, response.status) if oauth_error
+
           return if response.status == 200
 
           raise Errors::TransportError.new(
@@ -207,8 +218,18 @@ module RubyLLM
         # @return [Token] parsed token
         def parse_token_response(response)
           data = JSON.parse(response.body.to_s)
+          raise_oauth_error!("Token exchange", extract_oauth_error(data), response.status)
+
+          access_token = data["access_token"]
+          if access_token.nil? || access_token.empty?
+            raise Errors::TransportError.new(
+              message: "Token exchange failed: invalid token response (missing access_token)",
+              code: response.status
+            )
+          end
+
           Token.new(
-            access_token: data["access_token"],
+            access_token: access_token,
             token_type: data["token_type"] || "Bearer",
             expires_in: data["expires_in"],
             scope: data["scope"],
@@ -222,12 +243,62 @@ module RubyLLM
         # @return [Token] new token
         def parse_refresh_response(response, old_token)
           data = JSON.parse(response.body.to_s)
+          raise_oauth_error!("Token refresh", extract_oauth_error(data), response.status)
+
+          access_token = data["access_token"]
+          if access_token.nil? || access_token.empty?
+            raise Errors::TransportError.new(
+              message: "Token refresh failed: invalid token response (missing access_token)",
+              code: response.status
+            )
+          end
+
           Token.new(
-            access_token: data["access_token"],
+            access_token: access_token,
             token_type: data["token_type"] || "Bearer",
             expires_in: data["expires_in"],
             scope: data["scope"],
             refresh_token: data["refresh_token"] || old_token.refresh_token
+          )
+        end
+
+        # Extract OAuth error fields from JSON response data
+        # @param source [String, Hash] response body string or parsed JSON hash
+        # @return [Hash, nil] OAuth error fields or nil
+        def extract_oauth_error(source)
+          data = source.is_a?(Hash) ? source : JSON.parse(source)
+          error = data["error"] || data[:error]
+          return nil unless error
+
+          {
+            error: error,
+            error_description: data["error_description"] || data[:error_description],
+            error_uri: data["error_uri"] || data[:error_uri]
+          }
+        rescue JSON::ParserError
+          nil
+        end
+
+        # Raise TransportError for OAuth error responses
+        # @param context [String] context for the error
+        # @param oauth_error [Hash, nil] OAuth error fields
+        # @param status_code [Integer, nil] HTTP response status code
+        # @raise [Errors::TransportError] when oauth_error is present
+        def raise_oauth_error!(context, oauth_error, status_code)
+          return unless oauth_error
+
+          error = oauth_error[:error]
+          description = oauth_error[:error_description]
+          error_uri = oauth_error[:error_uri]
+
+          message = "#{context} failed: OAuth error '#{error}'"
+          message += ": #{description}" if description
+          message += " (#{error_uri})" if error_uri
+
+          raise Errors::TransportError.new(
+            message: message,
+            code: status_code,
+            error: error
           )
         end
       end
