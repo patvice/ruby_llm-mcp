@@ -7,6 +7,41 @@ module RubyLLM
       # Provides complete OAuth 2.1 flow with automatic browser opening and local callback server
       # Compatible API with OAuthProvider for seamless interchange
       class BrowserOAuthProvider
+        # Serializes logger calls so test doubles and non-thread-safe loggers remain safe
+        # when callback and main threads log at the same time.
+        class SynchronizedLogger
+          def initialize(logger)
+            @logger = logger
+            @mutex = Mutex.new
+          end
+
+          def debug(...)
+            synchronized_log(:debug, ...)
+          end
+
+          def info(...)
+            synchronized_log(:info, ...)
+          end
+
+          def warn(...)
+            synchronized_log(:warn, ...)
+          end
+
+          def error(...)
+            synchronized_log(:error, ...)
+          end
+
+          private
+
+          def synchronized_log(level, ...)
+            @mutex.synchronize do
+              return unless @logger.respond_to?(level)
+
+              @logger.public_send(level, ...)
+            end
+          end
+        end
+
         attr_reader :oauth_provider, :callback_port, :callback_path, :logger
         attr_accessor :server_url, :redirect_uri, :scope, :storage
 
@@ -30,6 +65,7 @@ module RubyLLM
         def initialize(server_url: nil, oauth_provider: nil, callback_port: 8080, callback_path: "/callback", # rubocop:disable Metrics/ParameterLists
                        logger: nil, storage: nil, redirect_uri: nil, scope: nil)
           @logger = logger || MCP.logger
+          @synchronized_logger = SynchronizedLogger.new(@logger)
           @callback_port = callback_port
           @callback_path = callback_path
 
@@ -54,7 +90,7 @@ module RubyLLM
               server_url: server_url,
               redirect_uri: redirect_uri,
               scope: scope,
-              logger: @logger,
+              logger: @synchronized_logger,
               storage: @storage
             )
           else
@@ -65,13 +101,13 @@ module RubyLLM
           validate_and_sync_redirect_uri!
 
           # Initialize browser helpers
-          @http_server = Browser::HttpServer.new(port: @callback_port, logger: @logger)
-          @callback_handler = Browser::CallbackHandler.new(callback_path: @callback_path, logger: @logger)
+          @http_server = Browser::HttpServer.new(port: @callback_port, logger: @synchronized_logger)
+          @callback_handler = Browser::CallbackHandler.new(callback_path: @callback_path, logger: @synchronized_logger)
           @pages = Browser::Pages.new(
             custom_success_page: MCP.config.oauth.browser_success_page,
             custom_error_page: MCP.config.oauth.browser_error_page
           )
-          @opener = Browser::Opener.new(logger: @logger)
+          @opener = Browser::Opener.new(logger: @synchronized_logger)
         end
 
         # Perform complete OAuth authentication flow with browser
@@ -82,7 +118,7 @@ module RubyLLM
         def authenticate(timeout: 300, auto_open_browser: true)
           # 1. Start authorization flow and get URL
           auth_url = @oauth_provider.start_authorization_flow
-          @logger.debug("Authorization URL: #{auth_url}")
+          @synchronized_logger.debug("Authorization URL: #{auth_url}")
 
           # 2. Create result container for thread coordination
           result = { code: nil, state: nil, error: nil, completed: false }
@@ -96,13 +132,13 @@ module RubyLLM
             # 4. Open browser to authorization URL
             if auto_open_browser
               @opener.open_browser(auth_url)
-              @logger.info("\nOpening browser for authorization...")
-              @logger.info("If browser doesn't open automatically, visit this URL:")
+              @synchronized_logger.info("\nOpening browser for authorization...")
+              @synchronized_logger.info("If browser doesn't open automatically, visit this URL:")
             else
-              @logger.info("\nPlease visit this URL to authorize:")
+              @synchronized_logger.info("\nPlease visit this URL to authorize:")
             end
-            @logger.info(auth_url)
-            @logger.info("\nWaiting for authorization...")
+            @synchronized_logger.info(auth_url)
+            @synchronized_logger.info("\nWaiting for authorization...")
 
             # 5. Wait for callback with timeout
             mutex.synchronize do
@@ -125,10 +161,10 @@ module RubyLLM
             server = nil
 
             # 6. Complete OAuth flow
-            @logger.debug("Completing OAuth authorization flow")
+            @synchronized_logger.debug("Completing OAuth authorization flow")
             token = @oauth_provider.complete_authorization_flow(snapshot[:code], snapshot[:state])
 
-            @logger.info("\nAuthentication successful!")
+            @synchronized_logger.info("\nAuthentication successful!")
             token
           ensure
             # Always shutdown the server
@@ -170,7 +206,7 @@ module RubyLLM
         # @return [Boolean] true if authentication was completed successfully
         def handle_authentication_challenge(www_authenticate: nil, resource_metadata: nil, resource_metadata_url: nil,
                                             requested_scope: nil)
-          @logger.debug("BrowserOAuthProvider handling authentication challenge")
+          @synchronized_logger.debug("BrowserOAuthProvider handling authentication challenge")
 
           # Try standard provider's automatic handling first (token refresh, client credentials)
           begin
@@ -182,7 +218,7 @@ module RubyLLM
             )
           rescue Errors::AuthenticationRequiredError
             # Standard provider couldn't handle it - need interactive auth
-            @logger.info("Automatic authentication failed, starting browser-based OAuth flow")
+            @synchronized_logger.info("Automatic authentication failed, starting browser-based OAuth flow")
           end
 
           # Perform full browser-based authentication
@@ -204,9 +240,9 @@ module RubyLLM
           expected_redirect_uri = "http://localhost:#{@callback_port}#{@callback_path}"
 
           if @oauth_provider.redirect_uri != expected_redirect_uri
-            @logger.warn("OAuth provider redirect_uri (#{@oauth_provider.redirect_uri}) " \
-                         "doesn't match callback server (#{expected_redirect_uri}). " \
-                         "Updating redirect_uri.")
+            @synchronized_logger.warn("OAuth provider redirect_uri (#{@oauth_provider.redirect_uri}) " \
+                                      "doesn't match callback server (#{expected_redirect_uri}). " \
+                                      "Updating redirect_uri.")
             @oauth_provider.redirect_uri = expected_redirect_uri
             @redirect_uri = expected_redirect_uri
           end
@@ -219,7 +255,7 @@ module RubyLLM
         # @return [Browser::CallbackServer] server wrapper
         def start_callback_server(result, mutex, condition)
           server = @http_server.start_server
-          @logger.debug("Started callback server on http://127.0.0.1:#{@callback_port}#{@callback_path}")
+          @synchronized_logger.debug("Started callback server on http://127.0.0.1:#{@callback_port}#{@callback_path}")
 
           running = true
 
@@ -236,7 +272,7 @@ module RubyLLM
                 # Server was closed, exit loop
                 break
               rescue StandardError => e
-                @logger.error("Error handling callback request: #{e.message}")
+                @synchronized_logger.error("Error handling callback request: #{e.message}")
               end
             end
           end
@@ -259,7 +295,7 @@ module RubyLLM
           method_name, path = @http_server.extract_request_parts(request_line)
           return unless method_name && path
 
-          @logger.debug("Received #{method_name} request: #{path}")
+          @synchronized_logger.debug("Received #{method_name} request: #{path}")
           @http_server.read_http_headers(client)
 
           # Validate callback path
