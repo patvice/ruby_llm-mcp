@@ -547,6 +547,25 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
       expect(headers["Authorization"]).to be_nil
     end
 
+    it "applies OAuth authorization header to SSE stream connection requests" do
+      token = RubyLLM::MCP::Auth::Token.new(
+        access_token: "stream_token",
+        expires_in: 3600
+      )
+      storage.set_token(server_url, token)
+
+      stream_plugin = instance_double(HTTPX::Session)
+      allow(HTTPX).to receive(:plugin).and_call_original
+      allow(HTTPX).to receive(:plugin).with(:stream).and_return(stream_plugin)
+      allow(stream_plugin).to receive(:with).and_return(stream_plugin)
+
+      transport_with_oauth.send(:create_sse_client)
+
+      expect(stream_plugin).to have_received(:with).with(
+        headers: hash_including("Authorization" => "Bearer stream_token")
+      )
+    end
+
     context "with authentication challenges" do
       let(:mock_response) { instance_double(HTTPX::Response) }
 
@@ -590,6 +609,30 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
         end.not_to raise_error
       end
 
+      it "handles 403 insufficient_scope during message POST" do
+        transport_with_oauth.instance_variable_set(:@messages_url, "http://localhost:3000/messages")
+        forbidden_response = instance_double(
+          HTTPX::Response,
+          headers: {
+            "www-authenticate" => 'Bearer error="insufficient_scope", scope="mcp:write"',
+            "mcp-resource-metadata-url" => "https://example.com/meta"
+          },
+          status: 403,
+          body: "forbidden"
+        )
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+        allow(transport_with_oauth).to receive(:send_request).and_return(nil)
+
+        expect do
+          transport_with_oauth.send(:handle_authorization_challenge, forbidden_response, { "method" => "test" }, 1)
+        end.not_to raise_error
+
+        expect(oauth_provider).to have_received(:handle_authentication_challenge).with(
+          hash_including(www_authenticate: /insufficient_scope/, resource_metadata: "https://example.com/meta")
+        )
+      end
+
       it "prevents infinite retry loop" do
         transport_with_oauth.instance_variable_set(:@messages_url, "http://localhost:3000/messages")
         transport_with_oauth.instance_variable_set(:@auth_retry_attempted, true)
@@ -617,6 +660,19 @@ RSpec.describe RubyLLM::MCP::Native::Transports::SSE do
         expect do
           transport_with_oauth.send(:handle_sse_authentication_challenge, mock_response)
         end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError)
+      end
+
+      it "routes SSE stream 403 with OAuth challenge through authentication handler" do
+        forbidden_response = instance_double(
+          HTTPX::Response,
+          status: 403,
+          headers: { "www-authenticate" => 'Bearer error="insufficient_scope", scope="mcp:write"' }
+        )
+        allow(transport_with_oauth).to receive(:handle_sse_authentication_challenge)
+
+        transport_with_oauth.send(:validate_sse_response!, forbidden_response)
+
+        expect(transport_with_oauth).to have_received(:handle_sse_authentication_challenge).with(forbidden_response)
       end
     end
   end

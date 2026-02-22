@@ -22,14 +22,17 @@ module RubyLLM
           # @param server_url [String] MCP server URL
           # @param redirect_uri [String] redirect URI for callback
           # @param scope [String, nil] requested scope
+          # @param resource_metadata [String, nil] explicit resource metadata URL hint
           # @param https_validator [Proc] callback to validate HTTPS usage
           # @return [String] authorization URL for user to visit
-          def start(server_url, redirect_uri, scope, https_validator: nil)
+          def start(server_url, redirect_uri, scope, resource_metadata: nil, https_validator: nil)
             logger.debug("Starting OAuth authorization flow for #{server_url}")
 
             # 1. Discover authorization server
-            server_metadata = discoverer.discover(server_url)
+            server_metadata = discoverer.discover(server_url, resource_metadata_url: resource_metadata)
             raise Errors::TransportError.new(message: "OAuth server discovery failed") unless server_metadata
+
+            validate_pkce_support!(server_metadata)
 
             # 2. Register client (or get cached client)
             client_info = client_registrar.get_or_register(
@@ -97,6 +100,20 @@ module RubyLLM
 
             logger.info("OAuth authorization completed successfully")
             token
+          end
+
+          private
+
+          # If the server advertises PKCE methods, S256 must be supported per MCP authorization requirements.
+          def validate_pkce_support!(server_metadata)
+            methods = server_metadata.code_challenge_methods_supported
+            normalized_methods = Array(methods)
+            return if normalized_methods.empty? || normalized_methods.include?("S256")
+
+            raise Errors::TransportError.new(
+              message: "Authorization server does not support required PKCE method S256 " \
+                       "(advertised: #{normalized_methods.join(', ')})"
+            )
           end
         end
       end

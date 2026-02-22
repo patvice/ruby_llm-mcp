@@ -4,34 +4,69 @@ require "spec_helper"
 
 RSpec.describe RubyLLM::MCP::Auth::UrlBuilder do
   describe ".build_discovery_url" do
-    it "builds authorization server discovery URL" do
+    it "builds first-priority authorization server discovery URL" do
       url = described_class.build_discovery_url("https://mcp.example.com/api", :authorization_server)
-      expect(url).to eq("https://mcp.example.com/.well-known/oauth-authorization-server")
+      expect(url).to eq("https://mcp.example.com/.well-known/oauth-authorization-server/api")
     end
 
-    it "builds protected resource discovery URL" do
+    it "builds first-priority protected resource discovery URL" do
       url = described_class.build_discovery_url("https://mcp.example.com/api", :protected_resource)
-      expect(url).to eq("https://mcp.example.com/.well-known/oauth-protected-resource")
+      expect(url).to eq("https://mcp.example.com/.well-known/oauth-protected-resource/api")
     end
 
     it "preserves non-default ports" do
       url = described_class.build_discovery_url("https://mcp.example.com:8443/api", :authorization_server)
-      expect(url).to eq("https://mcp.example.com:8443/.well-known/oauth-authorization-server")
+      expect(url).to eq("https://mcp.example.com:8443/.well-known/oauth-authorization-server/api")
     end
 
     it "removes default HTTPS port" do
       url = described_class.build_discovery_url("https://mcp.example.com:443/api", :authorization_server)
-      expect(url).to eq("https://mcp.example.com/.well-known/oauth-authorization-server")
+      expect(url).to eq("https://mcp.example.com/.well-known/oauth-authorization-server/api")
     end
 
     it "removes default HTTP port" do
       url = described_class.build_discovery_url("http://localhost:80/api", :authorization_server)
-      expect(url).to eq("http://localhost/.well-known/oauth-authorization-server")
+      expect(url).to eq("http://localhost/.well-known/oauth-authorization-server/api")
     end
 
-    it "strips path from server URL" do
+    it "includes full path for path insertion" do
       url = described_class.build_discovery_url("https://mcp.example.com/api/v1/mcp", :authorization_server)
+      expect(url).to eq("https://mcp.example.com/.well-known/oauth-authorization-server/api/v1/mcp")
+    end
+
+    it "uses root metadata URL when server URL has no path" do
+      url = described_class.build_discovery_url("https://mcp.example.com", :authorization_server)
       expect(url).to eq("https://mcp.example.com/.well-known/oauth-authorization-server")
+    end
+  end
+
+  describe ".build_discovery_urls" do
+    it "returns protected resource URLs in MCP-required order" do
+      urls = described_class.build_discovery_urls("https://mcp.example.com/public/mcp", :protected_resource)
+
+      expect(urls).to eq([
+                           "https://mcp.example.com/.well-known/oauth-protected-resource/public/mcp",
+                           "https://mcp.example.com/.well-known/oauth-protected-resource"
+                         ])
+    end
+
+    it "returns authorization server URLs in RFC 8414/OIDC order for issuer with path" do
+      urls = described_class.build_discovery_urls("https://auth.example.com/tenant1", :authorization_server)
+
+      expect(urls).to eq([
+                           "https://auth.example.com/.well-known/oauth-authorization-server/tenant1",
+                           "https://auth.example.com/.well-known/openid-configuration/tenant1",
+                           "https://auth.example.com/tenant1/.well-known/openid-configuration"
+                         ])
+    end
+
+    it "returns authorization server URLs in RFC 8414/OIDC order for issuer without path" do
+      urls = described_class.build_discovery_urls("https://auth.example.com", :authorization_server)
+
+      expect(urls).to eq([
+                           "https://auth.example.com/.well-known/oauth-authorization-server",
+                           "https://auth.example.com/.well-known/openid-configuration"
+                         ])
     end
   end
 

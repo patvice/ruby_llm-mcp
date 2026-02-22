@@ -1330,10 +1330,61 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
         expect(oauth_provider).to have_received(:handle_authentication_challenge)
       end
 
+      it "handles 403 insufficient_scope challenge and retries request" do
+        stub_request(:post, server_url)
+          .with(headers: { "Authorization" => "Bearer initial_token" })
+          .to_return(
+            status: 403,
+            headers: {
+              "WWW-Authenticate" => 'Bearer error="insufficient_scope", scope="mcp:write"',
+              "mcp-resource-metadata-url" => "https://example.com/.well-known/oauth"
+            }
+          )
+
+        new_token = RubyLLM::MCP::Auth::Token.new(
+          access_token: "scope_upgraded_token",
+          expires_in: 3600
+        )
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge) do
+          storage.set_token(server_url, new_token)
+          true
+        end
+
+        stub_request(:post, server_url)
+          .with(headers: { "Authorization" => "Bearer scope_upgraded_token" })
+          .to_return(
+            status: 200,
+            headers: { "Content-Type" => "application/json" },
+            body: '{"jsonrpc": "2.0", "id": 1, "result": {"content": [{"type": "text", "text": "success"}]}}'
+          )
+
+        result = transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+
+        expect(result).to be_a(RubyLLM::MCP::Result)
+        expect(oauth_provider).to have_received(:handle_authentication_challenge).with(
+          hash_including(www_authenticate: /insufficient_scope/, resource_metadata: "https://example.com/.well-known/oauth")
+        )
+      end
+
       it "prevents infinite retry loop on repeated 401" do
         # Both requests return 401
         stub_request(:post, server_url)
           .to_return(status: 401)
+
+        allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
+
+        expect do
+          transport_with_oauth.request({ "method" => "test", "id" => 1 }, wait_for_response: false)
+        end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /retry failed/)
+      end
+
+      it "prevents infinite retry loop on repeated 403 with challenge" do
+        stub_request(:post, server_url)
+          .to_return(
+            status: 403,
+            headers: { "WWW-Authenticate" => 'Bearer error="insufficient_scope", scope="mcp:write"' }
+          )
 
         allow(oauth_provider).to receive(:handle_authentication_challenge).and_return(true)
 

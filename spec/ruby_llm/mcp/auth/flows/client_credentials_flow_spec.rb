@@ -56,7 +56,7 @@ RSpec.describe RubyLLM::MCP::Auth::Flows::ClientCredentialsFlow do
 
   describe "#execute" do
     before do
-      allow(discoverer).to receive(:discover).with(server_url).and_return(server_metadata)
+      allow(discoverer).to receive(:discover).and_return(server_metadata)
       allow(client_registrar).to receive(:get_or_register).and_return(client_info)
       allow(token_manager).to receive(:exchange_client_credentials).and_return(token)
     end
@@ -70,7 +70,7 @@ RSpec.describe RubyLLM::MCP::Auth::Flows::ClientCredentialsFlow do
     it "discovers authorization server" do
       flow.execute(server_url, redirect_uri, scope)
 
-      expect(discoverer).to have_received(:discover).with(server_url)
+      expect(discoverer).to have_received(:discover).with(server_url, resource_metadata_url: nil)
     end
 
     it "registers client with client_credentials grant type" do
@@ -145,6 +145,14 @@ RSpec.describe RubyLLM::MCP::Auth::Flows::ClientCredentialsFlow do
           server_url
         )
       end
+    end
+
+    it "passes resource metadata hint to discovery when provided" do
+      hint = "https://example.com/.well-known/oauth-protected-resource"
+
+      flow.execute(server_url, redirect_uri, scope, resource_metadata: hint)
+
+      expect(discoverer).to have_received(:discover).with(server_url, resource_metadata_url: hint)
     end
   end
 end

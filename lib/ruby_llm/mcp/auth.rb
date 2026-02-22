@@ -211,7 +211,8 @@ module RubyLLM
       # OAuth Authorization Server Metadata (RFC 8414)
       class ServerMetadata
         attr_reader :issuer, :authorization_endpoint, :token_endpoint, :registration_endpoint,
-                    :scopes_supported, :response_types_supported, :grant_types_supported
+                    :scopes_supported, :response_types_supported, :grant_types_supported,
+                    :code_challenge_methods_supported
 
         def initialize(issuer:, authorization_endpoint:, token_endpoint:, options: {})
           @issuer = issuer
@@ -221,6 +222,8 @@ module RubyLLM
           @scopes_supported = options[:scopes_supported] || options["scopes_supported"]
           @response_types_supported = options[:response_types_supported] || options["response_types_supported"]
           @grant_types_supported = options[:grant_types_supported] || options["grant_types_supported"]
+          @code_challenge_methods_supported = options[:code_challenge_methods_supported] ||
+                                              options["code_challenge_methods_supported"]
         end
 
         # Check if dynamic client registration is supported
@@ -239,7 +242,8 @@ module RubyLLM
             registration_endpoint: @registration_endpoint,
             scopes_supported: @scopes_supported,
             response_types_supported: @response_types_supported,
-            grant_types_supported: @grant_types_supported
+            grant_types_supported: @grant_types_supported,
+            code_challenge_methods_supported: @code_challenge_methods_supported
           }.compact
         end
 
@@ -247,14 +251,20 @@ module RubyLLM
         # @param data [Hash] server metadata
         # @return [ServerMetadata] new instance
         def self.from_h(data)
+          options = {
+            registration_endpoint: data[:registration_endpoint] || data["registration_endpoint"],
+            scopes_supported: data[:scopes_supported] || data["scopes_supported"],
+            response_types_supported: data[:response_types_supported] || data["response_types_supported"],
+            grant_types_supported: data[:grant_types_supported] || data["grant_types_supported"],
+            code_challenge_methods_supported:
+              data[:code_challenge_methods_supported] || data["code_challenge_methods_supported"]
+          }.compact
+
           new(
             issuer: data[:issuer] || data["issuer"],
             authorization_endpoint: data[:authorization_endpoint] || data["authorization_endpoint"],
             token_endpoint: data[:token_endpoint] || data["token_endpoint"],
-            registration_endpoint: data[:registration_endpoint] || data["registration_endpoint"],
-            scopes_supported: data[:scopes_supported] || data["scopes_supported"],
-            response_types_supported: data[:response_types_supported] || data["response_types_supported"],
-            grant_types_supported: data[:grant_types_supported] || data["grant_types_supported"]
+            options: options
           )
         end
       end

@@ -114,21 +114,31 @@ module RubyLLM
         end
 
         # Start OAuth authorization flow (authorization code grant)
+        # @param resource_metadata [String, nil] explicit resource metadata URL hint
         # @return [String] authorization URL for user to visit
-        def start_authorization_flow
+        def start_authorization_flow(resource_metadata: nil)
+          hint = resource_metadata || @resource_metadata_hint
           @auth_code_flow.start(
             server_url,
             redirect_uri,
             scope,
+            resource_metadata: hint,
             https_validator: method(:validate_https_endpoint)
           )
         end
 
         # Perform client credentials flow (application authentication without user)
         # @param scope [String] optional scope override
+        # @param resource_metadata [String, nil] explicit resource metadata URL hint
         # @return [Token] access token
-        def client_credentials_flow(scope: nil)
-          @client_creds_flow.execute(server_url, redirect_uri, scope || self.scope)
+        def client_credentials_flow(scope: nil, resource_metadata: nil)
+          hint = resource_metadata || @resource_metadata_hint
+          @client_creds_flow.execute(
+            server_url,
+            redirect_uri,
+            scope || self.scope,
+            resource_metadata: hint
+          )
         end
 
         # Complete OAuth authorization flow after callback
@@ -153,35 +163,36 @@ module RubyLLM
         # Handle authentication challenge from server (401 response)
         # Attempts to refresh token or raises error if interactive auth required
         # @param www_authenticate [String, nil] WWW-Authenticate header value
-        # @param resource_metadata_url [String, nil] Resource metadata URL from response
+        # @param resource_metadata [String, nil] Resource metadata URL from response/challenge
+        # @param resource_metadata_url [String, nil] Legacy alias for resource_metadata
         # @param requested_scope [String, nil] Scope from WWW-Authenticate challenge
         # @return [Boolean] true if authentication was refreshed successfully
         # @raise [Errors::AuthenticationRequiredError] if interactive auth is required
-        def handle_authentication_challenge(www_authenticate: nil, resource_metadata_url: nil, requested_scope: nil)
+        def handle_authentication_challenge(www_authenticate: nil, resource_metadata: nil, resource_metadata_url: nil,
+                                            requested_scope: nil)
+          resolved_resource_metadata = resource_metadata || resource_metadata_url
           logger.debug("Handling authentication challenge")
           logger.debug("  WWW-Authenticate: #{www_authenticate}") if www_authenticate
-          logger.debug("  Resource metadata URL: #{resource_metadata_url}") if resource_metadata_url
+          logger.debug("  Resource metadata URL: #{resolved_resource_metadata}") if resolved_resource_metadata
           logger.debug("  Requested scope: #{requested_scope}") if requested_scope
 
-          # Parse WWW-Authenticate header if provided
-          final_requested_scope = requested_scope
-          if www_authenticate
-            challenge_info = parse_www_authenticate(www_authenticate)
-            final_requested_scope ||= challenge_info[:scope]
-            # NOTE: resource_metadata_url from challenge_info could be used for future discovery
-          end
+          final_requested_scope, final_resource_metadata = resolve_challenge_context(
+            www_authenticate,
+            resource_metadata,
+            resource_metadata_url,
+            requested_scope
+          )
 
-          # Update scope if server requested different scope
-          if final_requested_scope && final_requested_scope != scope
-            logger.debug("Updating scope from '#{scope}' to '#{final_requested_scope}'")
-            self.scope = final_requested_scope
-          end
+          # Persist discovery hint for browser-based fallback flows.
+          @resource_metadata_hint = final_resource_metadata if final_resource_metadata
+
+          update_scope_if_needed(final_requested_scope)
 
           # Try to refresh existing token
           token = storage.get_token(server_url)
           if token&.refresh_token
             logger.debug("Attempting token refresh with existing refresh token")
-            refreshed_token = refresh_token(token)
+            refreshed_token = refresh_token(token, resource_metadata: final_resource_metadata)
             return true if refreshed_token
           end
 
@@ -189,7 +200,10 @@ module RubyLLM
           if grant_type == :client_credentials
             logger.debug("Attempting client credentials flow")
             begin
-              new_token = client_credentials_flow(scope: requested_scope)
+              new_token = client_credentials_flow(
+                scope: final_requested_scope,
+                resource_metadata: final_resource_metadata
+              )
               return true if new_token
             rescue StandardError => e
               logger.warn("Client credentials flow failed: #{e.message}")
@@ -209,24 +223,23 @@ module RubyLLM
         def parse_www_authenticate(header)
           result = {}
 
-          # Example: Bearer realm="example", scope="mcp:read mcp:write", resource_metadata_url="https://..."
+          # Example: Bearer realm="example", scope="mcp:read mcp:write", resource_metadata="https://..."
           if header =~ /Bearer\s+(.+)/i
             params = ::Regexp.last_match(1)
+            parsed_params = {}
+            params.scan(/([a-zA-Z_][a-zA-Z0-9_-]*)="([^"]*)"/) do |key, value|
+              parsed_params[key.downcase] = value
+            end
 
             # Extract scope
-            if params =~ /scope="([^"]+)"/
-              result[:scope] = ::Regexp.last_match(1)
-            end
+            result[:scope] = parsed_params["scope"] if parsed_params["scope"]
 
-            # Extract resource metadata URL
-            if params =~ /resource_metadata_url="([^"]+)"/
-              result[:resource_metadata_url] = ::Regexp.last_match(1)
-            end
+            # Extract resource metadata URL (spec + legacy alias)
+            result[:resource_metadata] = parsed_params["resource_metadata"] || parsed_params["resource_metadata_url"]
+            result[:resource_metadata_url] = result[:resource_metadata] if result[:resource_metadata]
 
             # Extract realm
-            if params =~ /realm="([^"]+)"/
-              result[:realm] = ::Regexp.last_match(1)
-            end
+            result[:realm] = parsed_params["realm"] if parsed_params["realm"]
           end
 
           result
@@ -286,11 +299,13 @@ module RubyLLM
 
         # Refresh access token using refresh token
         # @param token [Token] current token with refresh_token
+        # @param resource_metadata [String, nil] explicit resource metadata URL hint
         # @return [Token, nil] new token or nil if refresh failed
-        def refresh_token(token)
+        def refresh_token(token, resource_metadata: nil)
           return nil unless token.refresh_token
 
-          server_metadata = @discoverer.discover(server_url)
+          hint = resource_metadata || @resource_metadata_hint
+          server_metadata = @discoverer.discover(server_url, resource_metadata_url: hint)
           client_info = storage.get_client_info(server_url)
           return nil unless server_metadata && client_info
 
@@ -298,6 +313,27 @@ module RubyLLM
           storage.set_token(server_url, new_token) if new_token
           logger.debug("Token refreshed successfully") if new_token
           new_token
+        end
+
+        # Resolve requested scope and resource metadata from inputs and WWW-Authenticate header.
+        # @return [Array(String, String)] [requested_scope, resource_metadata]
+        def resolve_challenge_context(www_authenticate, resource_metadata, resource_metadata_url, requested_scope)
+          final_resource_metadata = resource_metadata || resource_metadata_url
+          final_requested_scope = requested_scope
+          return [final_requested_scope, final_resource_metadata] unless www_authenticate
+
+          challenge_info = parse_www_authenticate(www_authenticate)
+          final_requested_scope ||= challenge_info[:scope]
+          final_resource_metadata ||= challenge_info[:resource_metadata]
+          [final_requested_scope, final_resource_metadata]
+        end
+
+        # Update provider scope only when a different challenge scope is provided.
+        def update_scope_if_needed(new_scope)
+          return unless new_scope && new_scope != scope
+
+          logger.debug("Updating scope from '#{scope}' to '#{new_scope}'")
+          self.scope = new_scope
         end
       end
     end
