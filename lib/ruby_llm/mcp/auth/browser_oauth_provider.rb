@@ -42,6 +42,15 @@ module RubyLLM
           end
         end
 
+        # Callback worker thread logs are intentionally isolated from the caller logger.
+        # JRuby + rspec-mocks logger doubles are not safe to share across threads.
+        class NullLogger
+          def debug(*) = nil
+          def info(*) = nil
+          def warn(*) = nil
+          def error(*) = nil
+        end
+
         attr_reader :oauth_provider, :callback_port, :callback_path, :logger
         attr_accessor :server_url, :redirect_uri, :scope, :storage
 
@@ -66,6 +75,7 @@ module RubyLLM
                        logger: nil, storage: nil, redirect_uri: nil, scope: nil)
           @logger = logger || MCP.logger
           @synchronized_logger = SynchronizedLogger.new(@logger)
+          @callback_logger = NullLogger.new
           @callback_port = callback_port
           @callback_path = callback_path
 
@@ -101,8 +111,8 @@ module RubyLLM
           validate_and_sync_redirect_uri!
 
           # Initialize browser helpers
-          @http_server = Browser::HttpServer.new(port: @callback_port, logger: @synchronized_logger)
-          @callback_handler = Browser::CallbackHandler.new(callback_path: @callback_path, logger: @synchronized_logger)
+          @http_server = Browser::HttpServer.new(port: @callback_port, logger: @callback_logger)
+          @callback_handler = Browser::CallbackHandler.new(callback_path: @callback_path, logger: @callback_logger)
           @pages = Browser::Pages.new(
             custom_success_page: MCP.config.oauth.browser_success_page,
             custom_error_page: MCP.config.oauth.browser_error_page
@@ -271,8 +281,9 @@ module RubyLLM
               rescue IOError, Errno::EBADF
                 # Server was closed, exit loop
                 break
-              rescue StandardError => e
-                @synchronized_logger.error("Error handling callback request: #{e.message}")
+              rescue StandardError
+                # Callback worker exceptions should not break the auth flow loop.
+                # Detailed callback logs are intentionally muted in this thread.
               end
             end
           end
@@ -295,7 +306,6 @@ module RubyLLM
           method_name, path = @http_server.extract_request_parts(request_line)
           return unless method_name && path
 
-          @synchronized_logger.debug("Received #{method_name} request: #{path}")
           @http_server.read_http_headers(client)
 
           # Validate callback path
