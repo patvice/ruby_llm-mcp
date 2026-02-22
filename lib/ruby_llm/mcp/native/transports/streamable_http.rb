@@ -119,10 +119,10 @@ module RubyLLM
 
             # Extract the request ID from the body (if present)
             request_id = body.is_a?(Hash) ? (body["id"] || body[:id]) : nil
-            is_initialization = body.is_a?(Hash) && (body["method"] == "initialize" || body[:method] == :initialize)
 
+            # Register queue before send_http_request to avoid push-before-register races.
             response_queue = setup_response_queue(request_id, wait_for_response)
-            result = send_http_request(body, request_id, is_initialization: is_initialization)
+            result = send_http_request(body, request_id)
             return result if result.is_a?(RubyLLM::MCP::Result)
 
             if wait_for_response && request_id
@@ -307,7 +307,7 @@ module RubyLLM
             response_queue
           end
 
-          def send_http_request(body, request_id, is_initialization: false)
+          def send_http_request(body, request_id)
             headers = build_common_headers
             headers["Content-Type"] = "application/json"
             headers["Accept"] = "application/json, text/event-stream"
@@ -315,33 +315,79 @@ module RubyLLM
             json_body = JSON.generate(body)
             RubyLLM::MCP.logger.debug "Sending Request: #{json_body}"
 
-            request_client = nil
-            begin
-              connection = if is_initialization
-                             @connection
-                           else
-                             request_client = create_connection_with_streaming_callbacks(request_id)
-                             request_client
-                           end
+            # Use a background thread only when a queue is registered for this request.
+            # When wait_for_response: false no queue is registered, so we run synchronously to
+            # ensure errors and results propagate immediately back to the caller.
+            # When wait_for_response: true the queue exists, so we must be async: some servers
+            # (e.g. Notion) respond with an inline SSE stream that stays open indefinitely after
+            # delivering the result, and blocking the main thread inside post() would cause a
+            # TimeoutError before wait_for_response_with_timeout is ever reached.
+            use_background = request_id && @pending_mutex.synchronize { @pending_requests.key?(request_id.to_s) }
 
-              response = connection.post(@url, json: body, headers: headers)
-              handle_response(response, request_id, body)
-            ensure
-              @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) } if request_id
-              close_client(request_client) if request_client && !is_initialization
+            if use_background
+              send_request_in_background(body, request_id, headers)
+            else
+              send_request_synchronously(body, request_id, headers)
             end
           end
 
-          def create_connection_with_streaming_callbacks(request_id)
+          def send_request_in_background(body, request_id, headers)
+            request_client = create_connection_with_streaming_callbacks(request_id, close_when_fulfilled: true)
+            Thread.new do
+              response = request_client.post(@url, json: body, headers: headers)
+              handle_response(response, request_id, body)
+            rescue Errors::BaseError => e
+              # Push all BaseError subclasses directly so wait_for_response_with_timeout
+              # re-raises them with their original type (e.g. SessionExpiredError, not
+              # a generic TransportError wrapper).
+              @pending_mutex.synchronize do
+                queue = @pending_requests.delete(request_id.to_s)
+                queue&.push(e)
+              end
+            rescue StandardError => e
+              RubyLLM::MCP.logger.error "Background request error: #{e.message}"
+              @pending_mutex.synchronize do
+                queue = @pending_requests.delete(request_id.to_s)
+                queue&.push(Errors::TransportError.new(message: e.message, code: nil))
+              end
+            ensure
+              close_client(request_client)
+            end
+            nil
+          end
+
+          def send_request_synchronously(body, request_id, headers)
+            request_client = create_connection_with_streaming_callbacks(request_id, close_when_fulfilled: false)
+            begin
+              response = request_client.post(@url, json: body, headers: headers)
+              handle_response(response, request_id, body)
+            ensure
+              close_client(request_client)
+            end
+          end
+
+          def create_connection_with_streaming_callbacks(request_id, close_when_fulfilled: false)
             buffer = +""
 
             client = Support::HTTPClient.connection.plugin(:callbacks)
-            client = client.on_response_body_chunk do |request, _response, chunk|
+            client = client.on_response_body_chunk do |request, response, chunk|
               next unless running?
+
+              # Capture session ID from response headers before processing SSE events so that
+              # initialize_notification (sent after the initialize result is dequeued) includes it.
+              if (session_id = response.headers["mcp-session-id"]) && !@session_id
+                @session_id = session_id
+              end
 
               RubyLLM::MCP.logger.debug "Received chunk: #{chunk.bytesize} bytes for #{request.uri}"
               buffer << chunk
               process_sse_buffer_events(buffer, request_id&.to_s)
+
+              # Only close when wait_for_response registered a queue; fire-and-forget IDs shouldn't auto-close.
+              if close_when_fulfilled && request_id
+                fulfilled = @pending_mutex.synchronize { !@pending_requests.key?(request_id.to_s) }
+                request.close if fulfilled
+              end
             end
             client = client.with(
               timeout: {
@@ -402,7 +448,13 @@ module RubyLLM
               result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
               if request_id
-                @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+                # Push to the queue rather than returning up the call stack: this method runs
+                # inside a background thread, so the return value is never observed by the
+                # caller. The main thread receives the result via wait_for_response_with_timeout.
+                @pending_mutex.synchronize do
+                  queue = @pending_requests.delete(request_id.to_s)
+                  queue&.push(result)
+                end
               end
 
               result
@@ -571,7 +623,7 @@ module RubyLLM
 
             if success
               RubyLLM::MCP.logger.info("Authentication challenge handled successfully, retrying request")
-              result = send_http_request(original_message, request_id, is_initialization: false)
+              result = send_http_request(original_message, request_id)
               @auth_retry_attempted = false
               return result
             end
@@ -894,21 +946,35 @@ module RubyLLM
           end
 
           def wait_for_response_with_timeout(request_id, response_queue)
-            result = with_timeout(@request_timeout / 1000, request_id: request_id) do
-              response_queue.pop
-            end
+            timeout_seconds = @request_timeout / 1000.0
+            deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout_seconds
 
-            # Check if we received a shutdown error sentinel
-            if result.is_a?(Errors::TransportError)
-              raise result
-            end
+            # Poll non-blocking; Thread.join(timeout) can starve under HTTPX callbacks.
+            loop do
+              result = response_queue.pop(true)
+              # Background thread pushes exceptions directly into the queue to preserve their
+              # original type (e.g. SessionExpiredError). Re-raise any of them here.
+              raise result if result.is_a?(Exception)
 
-            result
-          rescue RubyLLM::MCP::Errors::TimeoutError => e
-            log_message = "StreamableHTTP request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
-            RubyLLM::MCP.logger.error(log_message)
+              return result
+            rescue ThreadError
+              if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+                log_message =
+                  "StreamableHTTP request timeout (ID: #{request_id}) after #{@request_timeout / 1000} seconds"
+                RubyLLM::MCP.logger.error(log_message)
+                @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
+                raise Errors::TimeoutError.new(
+                  message: "Request timed out after #{@request_timeout / 1000} seconds",
+                  request_id: request_id
+                )
+              end
+
+              sleep(0.05)
+            end
+          ensure
+            # Clean up the pending entry on any exit path not already handled above (e.g. when
+            # an exception escapes from pop itself rather than being pushed via the queue).
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise e
           end
 
           def cleanup_sse_resources
