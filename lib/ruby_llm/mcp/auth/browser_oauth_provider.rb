@@ -281,9 +281,9 @@ module RubyLLM
               rescue IOError, Errno::EBADF
                 # Server was closed, exit loop
                 break
-              rescue StandardError
-                # Callback worker exceptions should not break the auth flow loop.
-                # Detailed callback logs are intentionally muted in this thread.
+              rescue StandardError => e
+                mark_callback_failure(result, mutex, condition, e)
+                break
               end
             end
           end
@@ -329,6 +329,20 @@ module RubyLLM
           end
         ensure
           client&.close
+        end
+
+        # Wake the waiting authentication flow with a deterministic error when callback
+        # processing fails in the worker thread.
+        def mark_callback_failure(result, mutex, condition, error)
+          mutex.synchronize do
+            return if result[:completed]
+
+            result[:error] = "OAuth callback processing failed: #{error.message}"
+            result[:completed] = true
+            condition.signal
+          end
+
+          @synchronized_logger.warn("OAuth callback worker failed: #{error.class}: #{error.message}")
         end
       end
     end
