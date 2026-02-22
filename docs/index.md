@@ -8,8 +8,11 @@ permalink: /
 
 <h1>
   <div class="logo-container">
-    <img src="/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM::MCP" height="120" width="250">
-    <iframe src="https://ghbtns.com/github-btn.html?user=patvice&repo=ruby_llm-mcp&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub" style="vertical-align: middle; display: inline-block;"></iframe>
+    <img class="home-logo home-logo-light" src="/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM::MCP" height="120" width="250">
+    <img class="home-logo home-logo-dark" src="/assets/images/rubyllm-mcp-logo-text-white.svg" alt="RubyLLM::MCP" height="120" width="250">
+    <a class="github-stars-badge" href="https://github.com/patvice/ruby_llm-mcp" aria-label="GitHub stars for patvice/ruby_llm-mcp">
+      <img src="https://img.shields.io/github/stars/patvice/ruby_llm-mcp?style=for-the-badge&logo=github&label=GitHub%20Stars&color=2F81F7" alt="GitHub stars">
+    </a>
   </div>
 </h1>
 
