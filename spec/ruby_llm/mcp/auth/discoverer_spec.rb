@@ -335,6 +335,47 @@ RSpec.describe RubyLLM::MCP::Auth::Discoverer do
       end
     end
 
+    context "when protected resource metadata uses origin resource and issuer differs only by trailing slash" do
+      let(:server_url) { "http://localhost:3011/mcp" }
+      let(:resource_metadata_url) { "http://localhost:3011/.well-known/oauth-protected-resource" }
+      let(:resource_response) do
+        {
+          "resource" => "http://localhost:3011/",
+          "authorization_servers" => ["https://accounts.google.com/"]
+        }
+      end
+      let(:metadata_response) do
+        {
+          "issuer" => "https://accounts.google.com",
+          "authorization_endpoint" => "https://accounts.google.com/o/oauth2/v2/auth",
+          "token_endpoint" => "https://oauth2.googleapis.com/token"
+        }
+      end
+
+      before do
+        allow(http_client).to receive(:get).and_return(httpx_error_response("Not found"))
+
+        resource_resp = instance_double(HTTPX::Response, status: 200, body: resource_response.to_json)
+        allow(http_client).to receive(:get)
+          .with(resource_metadata_url)
+          .and_return(resource_resp)
+
+        metadata_resp = instance_double(HTTPX::Response, status: 200, body: metadata_response.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://accounts.google.com/.well-known/oauth-authorization-server")
+          .and_return(metadata_resp)
+      end
+
+      it "accepts delegated resource prefix and normalized issuer identifiers" do
+        result = discoverer.discover(server_url, resource_metadata_url: resource_metadata_url)
+
+        expect(result).to be_a(RubyLLM::MCP::Auth::ServerMetadata)
+        expect(result.issuer).to eq("https://accounts.google.com")
+        expect(result.authorization_endpoint).to eq("https://accounts.google.com/o/oauth2/v2/auth")
+        expect(result.token_endpoint).to eq("https://oauth2.googleapis.com/token")
+      end
+    end
+
     context "when resource metadata provides multiple authorization servers" do
       let(:resource_response) do
         {

@@ -206,7 +206,7 @@ module RubyLLM
             )
           end
 
-          return if issuer == expected_issuer
+          return if issuer_identifiers_match?(issuer, expected_issuer)
           return warn_legacy_issuer_mismatch(expected_issuer, issuer, source_url) unless enforce_issuer_match
 
           raise Errors::TransportError.new(
@@ -242,12 +242,103 @@ module RubyLLM
             )
           end
 
-          return if resource == expected_resource
+          return if resource_identifiers_match?(resource, expected_resource)
 
           raise Errors::TransportError.new(
             message: "Resource metadata fetch failed: resource '#{resource}' did not match expected resource " \
                      "'#{expected_resource}' for #{source_url}"
           )
+        end
+
+        # Compare issuer identifiers allowing only normalization-equivalent
+        # differences (for example, trailing slash mismatches).
+        # @param issuer [String]
+        # @param expected_issuer [String]
+        # @return [Boolean]
+        def issuer_identifiers_match?(issuer, expected_issuer)
+          return true if issuer == expected_issuer
+
+          normalized_issuer = normalize_issuer_identifier(issuer)
+          normalized_expected = normalize_issuer_identifier(expected_issuer)
+          normalized_issuer && normalized_expected && normalized_issuer == normalized_expected
+        end
+
+        # Compare resource identifiers allowing the metadata "resource" to identify
+        # an enclosing protected resource (same origin + path-prefix semantics).
+        # @param resource [String]
+        # @param expected_resource [String]
+        # @return [Boolean]
+        def resource_identifiers_match?(resource, expected_resource)
+          return true if resource == expected_resource
+
+          resource_uri = parse_uri(resource)
+          expected_uri = parse_uri(expected_resource)
+          return false unless resource_uri && expected_uri
+          return false unless comparable_origin(resource_uri) == comparable_origin(expected_uri)
+          return false unless safe_for_prefix_comparison?(resource_uri, expected_uri)
+
+          resource_segments = path_segments(resource_uri.path)
+          expected_segments = path_segments(expected_uri.path)
+          return false if resource_segments.length > expected_segments.length
+
+          resource_segments == expected_segments.first(resource_segments.length)
+        end
+
+        # Normalize issuer for robust comparison.
+        # @param issuer [String]
+        # @return [String, nil]
+        def normalize_issuer_identifier(issuer)
+          uri = parse_uri(issuer)
+          return nil unless uri
+
+          path = uri.path.to_s
+          path = "/" if path.empty?
+          path = path.gsub(%r{/+\z}, "")
+          path = "/" if path.empty?
+
+          normalized = comparable_origin(uri)
+          return nil unless normalized
+
+          normalized += path unless path == "/"
+          normalized
+        end
+
+        # @param uri [URI]
+        # @return [String, nil]
+        def comparable_origin(uri)
+          scheme = uri.scheme&.downcase
+          host = uri.host&.downcase
+          return nil unless scheme && host
+
+          port = uri.port
+          default_port = (scheme == "http" && port == 80) || (scheme == "https" && port == 443)
+
+          origin = "#{scheme}://#{host}"
+          origin += ":#{port}" if port && !default_port
+          origin
+        end
+
+        # @param uri [URI]
+        # @param expected_uri [URI]
+        # @return [Boolean]
+        def safe_for_prefix_comparison?(uri, expected_uri)
+          [uri, expected_uri].all? do |candidate|
+            candidate.userinfo.nil? && candidate.query.nil? && candidate.fragment.nil?
+          end
+        end
+
+        # @param path [String, nil]
+        # @return [Array<String>]
+        def path_segments(path)
+          path.to_s.split("/").reject(&:empty?)
+        end
+
+        # @param value [String]
+        # @return [URI, nil]
+        def parse_uri(value)
+          URI.parse(value)
+        rescue URI::InvalidURIError
+          nil
         end
       end
     end
