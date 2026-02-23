@@ -5,7 +5,7 @@ module RubyLLM
     module Handlers
       # Represents an async response for deferred completion
       class AsyncResponse
-        attr_reader :elicitation_id, :state, :result, :error
+        attr_reader :elicitation_id
 
         VALID_STATES = %i[pending completed rejected cancelled timed_out].freeze
 
@@ -95,32 +95,44 @@ module RubyLLM
 
         # Check if operation is pending
         def pending?
-          @state == :pending
+          @mutex.synchronize { @state == :pending }
         end
 
         # Check if operation is completed
         def completed?
-          @state == :completed
+          @mutex.synchronize { @state == :completed }
         end
 
         # Check if operation is rejected
         def rejected?
-          @state == :rejected
+          @mutex.synchronize { @state == :rejected }
         end
 
         # Check if operation is cancelled
         def cancelled?
-          @state == :cancelled
+          @mutex.synchronize { @state == :cancelled }
         end
 
         # Check if operation timed out
         def timed_out?
-          @state == :timed_out
+          @mutex.synchronize { @state == :timed_out }
         end
 
         # Check if operation is finished (any terminal state)
         def finished?
           !pending?
+        end
+
+        def state
+          @mutex.synchronize { @state }
+        end
+
+        def result
+          @mutex.synchronize { @result }
+        end
+
+        def error
+          @mutex.synchronize { @error }
         end
 
         private
