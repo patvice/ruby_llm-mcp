@@ -405,6 +405,36 @@ RSpec.describe RubyLLM::MCP::Auth::Discoverer do
       end
     end
 
+    context "when protected resource discovery fails for a path-based MCP endpoint" do
+      let(:server_url) { "https://mcp.atlassian.com/v1/sse" }
+      let(:metadata_response) do
+        {
+          "issuer" => "https://cf.mcp.atlassian.com",
+          "authorization_endpoint" => "https://mcp.atlassian.com/v1/authorize",
+          "token_endpoint" => "https://cf.mcp.atlassian.com/v1/token"
+        }
+      end
+
+      before do
+        allow(http_client).to receive(:get).and_return(httpx_error_response("Not found"))
+
+        metadata_resp = instance_double(HTTPX::Response, status: 200, body: metadata_response.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://mcp.atlassian.com/.well-known/oauth-authorization-server")
+          .and_return(metadata_resp)
+      end
+
+      it "falls back to legacy base URL auth server discovery" do
+        result = discoverer.discover(server_url)
+
+        expect(result).to be_a(RubyLLM::MCP::Auth::ServerMetadata)
+        expect(result.issuer).to eq("https://cf.mcp.atlassian.com")
+        expect(result.authorization_endpoint).to eq("https://mcp.atlassian.com/v1/authorize")
+        expect(result.token_endpoint).to eq("https://cf.mcp.atlassian.com/v1/token")
+        expect(logger).to have_received(:info).with(/Legacy OAuth discovery issuer mismatch accepted/)
+      end
+    end
+
     context "when all discovery methods fail" do
       before do
         allow(http_client).to receive(:get).and_return(httpx_error_response("Connection failed"))

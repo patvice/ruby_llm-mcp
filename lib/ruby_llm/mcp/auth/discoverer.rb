@@ -29,6 +29,7 @@ module RubyLLM
           # then fall back to direct auth server metadata discovery for compatibility.
           server_metadata = try_protected_resource_discovery(server_url, resource_metadata_url: resource_metadata_url)
           server_metadata ||= try_authorization_server_discovery(server_url)
+          server_metadata ||= try_legacy_authorization_server_discovery(server_url)
           server_metadata ||= cached
           server_metadata ||= create_default_metadata(server_url)
 
@@ -48,6 +49,24 @@ module RubyLLM
             urls,
             context: "oauth-authorization-server discovery",
             expected_issuer: server_url
+          )
+        end
+
+        # Try legacy MCP direct auth server discovery (pre-2025-06)
+        # by treating the MCP server origin as the OAuth issuer.
+        # @param server_url [String] MCP server URL
+        # @return [ServerMetadata, nil] server metadata or nil
+        def try_legacy_authorization_server_discovery(server_url)
+          base_url = UrlBuilder.get_authorization_base_url(server_url)
+          return nil if base_url == server_url
+
+          logger.debug("Trying legacy oauth-authorization-server discovery with base URL: #{base_url}")
+          urls = UrlBuilder.build_discovery_urls(base_url, :authorization_server)
+          fetch_first_server_metadata(
+            urls,
+            context: "legacy oauth-authorization-server discovery",
+            expected_issuer: base_url,
+            enforce_issuer_match: false
           )
         end
 
@@ -114,12 +133,17 @@ module RubyLLM
         # Fetch OAuth server metadata
         # @param url [String] discovery URL
         # @return [ServerMetadata] server metadata
-        def fetch_server_metadata(url, expected_issuer:)
+        def fetch_server_metadata(url, expected_issuer:, enforce_issuer_match: true)
           logger.debug("Fetching server metadata from #{url}")
           response = http_client.get(url)
 
           data = HttpResponseHandler.handle_response(response, context: "Server metadata fetch")
-          validate_server_metadata!(data, expected_issuer: expected_issuer, source_url: url)
+          validate_server_metadata!(
+            data,
+            expected_issuer: expected_issuer,
+            source_url: url,
+            enforce_issuer_match: enforce_issuer_match
+          )
 
           ServerMetadata.new(
             issuer: data["issuer"],
@@ -155,10 +179,14 @@ module RubyLLM
         # @param urls [Array<String>] discovery URLs in priority order
         # @param context [String] log context
         # @return [ServerMetadata, nil] first metadata result or nil
-        def fetch_first_server_metadata(urls, context:, expected_issuer:)
+        def fetch_first_server_metadata(urls, context:, expected_issuer:, enforce_issuer_match: true)
           urls.each do |url|
             logger.debug("Trying #{context} URL: #{url}")
-            return fetch_server_metadata(url, expected_issuer: expected_issuer)
+            return fetch_server_metadata(
+              url,
+              expected_issuer: expected_issuer,
+              enforce_issuer_match: enforce_issuer_match
+            )
           rescue StandardError => e
             logger.debug("#{context} failed for #{url}: #{e.message}")
           end
@@ -170,7 +198,7 @@ module RubyLLM
         # @param expected_issuer [String] issuer identifier used to build discovery URLs
         # @param source_url [String] discovery URL used for fetching metadata
         # @raise [Errors::TransportError] when issuer is missing or mismatched
-        def validate_server_metadata!(data, expected_issuer:, source_url:)
+        def validate_server_metadata!(data, expected_issuer:, source_url:, enforce_issuer_match: true)
           issuer = data["issuer"]
           unless issuer.is_a?(String) && !issuer.empty?
             raise Errors::TransportError.new(
@@ -179,11 +207,26 @@ module RubyLLM
           end
 
           return if issuer == expected_issuer
+          return warn_legacy_issuer_mismatch(expected_issuer, issuer, source_url) unless enforce_issuer_match
 
           raise Errors::TransportError.new(
             message: "Server metadata fetch failed: issuer '#{issuer}' did not match expected issuer " \
                      "'#{expected_issuer}' for #{source_url}"
           )
+        end
+
+        # Legacy MCP compatibility can return metadata whose issuer differs from the
+        # MCP server origin. Accept it with warning so endpoint metadata still works.
+        # @param expected_issuer [String]
+        # @param issuer [String]
+        # @param source_url [String]
+        # @return [nil]
+        def warn_legacy_issuer_mismatch(expected_issuer, issuer, source_url)
+          logger.info(
+            "Legacy OAuth discovery issuer mismatch accepted: expected '#{expected_issuer}', got '#{issuer}' " \
+            "from #{source_url}"
+          )
+          nil
         end
 
         # Validate RFC 9728 resource matching rules before metadata is trusted.
