@@ -14,11 +14,11 @@ RubyLLM::MCP is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 
 Use MCP tools, resources, and prompts from your RubyLLM chats over `stdio`, streamable HTTP, or SSE.
 
-**Highlights:** **Tools**, **Resources**, **Prompts**, **MCP OAuth 2.1 auth support**, **Notification + response handlers**, **Rails OAuth setup**, **Browser OAuth for CLI**.
+**Protocol support:** Fully supports MCP spec `2025-06-18` (stable), with draft spec `2026-01-26` available.
 
 ## RubyLLM::MCP Out of the Box
 
-Our goal is to be able to plug MCP into Ruby apps as easily as possible.
+Our goal is to be able to plug MCP into Ruby/RubyLLM apps as easily as possible.
 
 RubyLLM::MCP gives you that:
 
