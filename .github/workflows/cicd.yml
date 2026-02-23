@@ -30,6 +30,9 @@ jobs:
         run: |
           bundle install
 
+      - name: Check Zeitwerk eager loading
+        run: bundle exec ruby -e "require 'ruby_llm/mcp'; Zeitwerk::Loader.eager_load_all"
+
       - name: Install Bun dependencies for test fixtures
         run: |
           cd spec/fixtures/typescript-mcp && bun install
