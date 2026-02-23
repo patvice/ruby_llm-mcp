@@ -54,7 +54,9 @@ module RubyLLM
         # Format token for Authorization header
         # @return [String] formatted as "Bearer {access_token}"
         def to_header
-          "#{@token_type} #{@access_token}"
+          token_type = @token_type.to_s.strip
+          token_type = "Bearer" if token_type.empty? || token_type.casecmp("bearer").zero?
+          "#{token_type} #{@access_token}"
         end
 
         # Serialize token to hash
