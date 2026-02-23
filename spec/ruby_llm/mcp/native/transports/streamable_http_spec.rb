@@ -2171,6 +2171,191 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     end
   end
 
+  describe "background thread routing for wait_for_response: true requests" do
+    before do
+      WebMock.enable!
+    end
+
+    after do
+      WebMock.reset!
+      WebMock.enable!
+    end
+
+    context "when queue is registered (wait_for_response: true)" do
+      it "delivers successful 200 JSON response via background thread queue" do
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+          .to_return(
+            status: 200,
+            headers: { "Content-Type" => "application/json" },
+            body: { "jsonrpc" => "2.0", "id" => 1, "result" => { "tools" => [] } }.to_json
+          )
+
+        result = transport.request({ "method" => "tools/list", "id" => 1 })
+
+        expect(result).to be_a(RubyLLM::MCP::Result)
+        expect(result.result["tools"]).to eq([])
+      end
+
+      it "preserves AuthenticationRequiredError type from background thread without wrapping" do
+        stub_request(:post, TestServerManager::HTTP_SERVER_URL)
+          .to_return(status: 401)
+
+        expect do
+          transport.request({ "method" => "tools/list", "id" => 2 })
+        end.to raise_error(
+          RubyLLM::MCP::Errors::AuthenticationRequiredError,
+          /no OAuth provider configured/
+        )
+      end
+    end
+  end
+
+  describe "inline SSE stream handling for POST responses" do
+    let(:request_id) { 1 }
+    let(:response_queue) { Queue.new }
+    let(:http_client) { RubyLLM::MCP::Native::Transports::Support::HTTPClient }
+    let(:fake_client_class) do
+      Class.new do
+        attr_reader :callback
+
+        def plugin(_)
+          self
+        end
+
+        def on_response_body_chunk(&block)
+          @callback = block
+          self
+        end
+
+        def with(*)
+          self
+        end
+      end
+    end
+    let(:fake_client) { fake_client_class.new }
+
+    before do
+      transport
+
+      allow(mock_coordinator).to receive(:process_result) { |result| result }
+      allow(http_client).to receive(:connection).and_return(fake_client)
+
+      transport.instance_variable_get(:@pending_mutex).synchronize do
+        transport.instance_variable_get(:@pending_requests)[request_id.to_s] = response_queue
+      end
+    end
+
+    after do
+      allow(http_client).to receive(:connection).and_call_original
+    end
+
+    it "pushes inline SSE result to queue and closes request when fulfilled" do
+      transport.send(:create_connection_with_streaming_callbacks, request_id, close_when_fulfilled: true)
+
+      request = instance_double(HTTPX::Request, uri: "http://example.test", close: nil)
+      response = instance_double(HTTPX::Response, headers: { "mcp-session-id" => "session-abc" })
+      payload = { "jsonrpc" => "2.0", "id" => request_id, "result" => { "ok" => true } }.to_json
+
+      expect(request).to receive(:close)
+
+      fake_client.callback.call(request, response, "data: #{payload}\n\n")
+
+      result = response_queue.pop(true)
+      expect(result).to be_a(RubyLLM::MCP::Result)
+      expect(result.result["ok"]).to be(true)
+      expect(transport.instance_variable_get(:@session_id)).to eq("session-abc")
+
+      pending_requests = transport.instance_variable_get(:@pending_requests)
+      expect(pending_requests).not_to have_key(request_id.to_s)
+    end
+
+    it "does not close request when close_when_fulfilled is false" do
+      transport.send(:create_connection_with_streaming_callbacks, request_id, close_when_fulfilled: false)
+
+      request = instance_double(HTTPX::Request, uri: "http://example.test", close: nil)
+      response = instance_double(HTTPX::Response, headers: {})
+      payload = { "jsonrpc" => "2.0", "id" => request_id, "result" => { "ok" => true } }.to_json
+
+      expect(request).not_to receive(:close)
+
+      fake_client.callback.call(request, response, "data: #{payload}\n\n")
+
+      result = response_queue.pop(true)
+      expect(result).to be_a(RubyLLM::MCP::Result)
+    end
+  end
+
+  describe "exception sentinel re-raising in wait_for_response_with_timeout" do
+    let(:request_id) { "sentinel-rethrow-test" }
+    let(:response_queue) { Queue.new }
+
+    before do
+      transport.instance_variable_get(:@pending_mutex).synchronize do
+        transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
+      end
+    end
+
+    it "re-raises SessionExpiredError pushed to queue by background thread" do
+      session_error = RubyLLM::MCP::Errors::SessionExpiredError.new(
+        message: "Session has expired"
+      )
+      response_queue.push(session_error)
+
+      expect do
+        transport.send(:wait_for_response_with_timeout, request_id, response_queue)
+      end.to raise_error(RubyLLM::MCP::Errors::SessionExpiredError, /Session has expired/)
+    end
+
+    it "re-raises AuthenticationRequiredError pushed to queue by background thread" do
+      auth_error = RubyLLM::MCP::Errors::AuthenticationRequiredError.new(
+        message: "Authentication required"
+      )
+      response_queue.push(auth_error)
+
+      expect do
+        transport.send(:wait_for_response_with_timeout, request_id, response_queue)
+      end.to raise_error(RubyLLM::MCP::Errors::AuthenticationRequiredError, /Authentication required/)
+    end
+
+    it "cleans up pending request via ensure block when exception sentinel is re-raised" do
+      session_error = RubyLLM::MCP::Errors::SessionExpiredError.new(message: "expired")
+      response_queue.push(session_error)
+
+      begin
+        transport.send(:wait_for_response_with_timeout, request_id, response_queue)
+      rescue RubyLLM::MCP::Errors::SessionExpiredError
+        nil
+      end
+
+      expect(transport.instance_variable_get(:@pending_requests)).not_to have_key(request_id)
+    end
+  end
+
+  describe "polling timeout loop in wait_for_response_with_timeout" do
+    it "times out and cleans up when queue remains empty" do
+      short_timeout_transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        request_timeout: 50,
+        coordinator: mock_coordinator,
+        options: {}
+      )
+
+      request_id = "polling-timeout"
+      response_queue = Queue.new
+
+      short_timeout_transport.instance_variable_get(:@pending_mutex).synchronize do
+        short_timeout_transport.instance_variable_get(:@pending_requests)[request_id] = response_queue
+      end
+
+      expect do
+        short_timeout_transport.send(:wait_for_response_with_timeout, request_id, response_queue)
+      end.to raise_error(RubyLLM::MCP::Errors::TimeoutError, /Request timed out/)
+
+      pending_requests = short_timeout_transport.instance_variable_get(:@pending_requests)
+      expect(pending_requests).not_to have_key(request_id)
+    end
+  end
+
   describe "204 No Content response handling for session termination" do
     before do
       WebMock.enable!
