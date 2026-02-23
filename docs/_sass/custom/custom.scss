@@ -5,6 +5,48 @@
   gap: 1em;
 }
 
+.logo-container .home-logo {
+  display: block;
+  width: 250px;
+  max-width: 100%;
+  height: auto;
+}
+
+.logo-container .home-logo-dark {
+  display: none;
+}
+
+html[data-rubyllm-theme="dark"] .logo-container .home-logo-light {
+  display: none;
+}
+
+html[data-rubyllm-theme="dark"] .logo-container .home-logo-dark {
+  display: block;
+}
+
+/* Fallback to OS preference only when explicit app theme is not set to light. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-rubyllm-theme="light"]) .logo-container .home-logo-light {
+    display: none;
+  }
+
+  html:not([data-rubyllm-theme="light"]) .logo-container .home-logo-dark {
+    display: block;
+  }
+}
+
+.logo-container .github-stars-badge {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.logo-container .github-stars-badge img {
+  display: block;
+  height: 30px;
+  width: auto;
+}
+
 .badge-container {
   display: flex;
   align-items: center;

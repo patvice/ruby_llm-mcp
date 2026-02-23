@@ -7,10 +7,16 @@ module RubyLLM
         # Callback server wrapper for clean shutdown
         # Manages server lifecycle and thread coordination
         class CallbackServer
-          def initialize(server, thread, stop_proc)
+          def initialize(server, thread, stop_proc, start_proc = nil)
             @server = server
             @thread = thread
             @stop_proc = stop_proc
+            @start_proc = start_proc || -> {}
+          end
+
+          # Start callback processing loop
+          def start
+            @start_proc.call
           end
 
           # Shutdown server and cleanup resources

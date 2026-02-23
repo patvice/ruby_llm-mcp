@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="docs/assets/images/rubyllm-mcp-logo-text.svg" alt="RubyLLM::MCP" height="120" width="250">
+<img src="docs/assets/images/rubyllm-mcp-logo-text.svg#gh-light-mode-only" alt="RubyLLM::MCP" height="120" width="250">
+<img src="docs/assets/images/rubyllm-mcp-logo-text-white.svg#gh-dark-mode-only" alt="RubyLLM::MCP" height="120" width="250">
 
 <strong>MCP for Ruby and RubyLLM, as easy as possible.</strong>
 

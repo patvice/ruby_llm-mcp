@@ -32,8 +32,10 @@
   }
 
   function applyTheme(theme) {
-    if (!window.jtd || typeof window.jtd.setTheme !== 'function') return;
-    window.jtd.setTheme(theme);
+    document.documentElement.setAttribute('data-rubyllm-theme', theme);
+    if (window.jtd && typeof window.jtd.setTheme === 'function') {
+      window.jtd.setTheme(theme);
+    }
     syncToggle(theme);
   }
 

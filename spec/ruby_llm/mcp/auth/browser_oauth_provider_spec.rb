@@ -278,6 +278,8 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
         expect do
           browser_oauth.authenticate(auto_open_browser: false)
         end.to raise_error(RubyLLM::MCP::Errors::TransportError, /callback processing failed: boom/)
+
+        expect(logger).to have_received(:warn).with(/OAuth callback worker failed: StandardError: boom/)
       end
 
       it "raises TransportError when port is already in use" do
@@ -363,6 +365,24 @@ RSpec.describe RubyLLM::MCP::Auth::BrowserOAuthProvider do # rubocop:disable RSp
           expect(response).to include("Content-Type: text/html")
           expect(response).to include("Authentication Successful")
         end
+      end
+
+      it "applies callback result even when socket close raises" do
+        allow(client_socket).to receive(:gets).and_return(
+          "GET /callback?code=test_code&state=test_state HTTP/1.1\r\n",
+          "\r\n"
+        )
+        allow(client_socket).to receive(:close).and_raise(IOError.new("close failed"))
+
+        expect do
+          browser_oauth.send(:handle_http_request, client_socket, result, mutex, condition)
+        end.not_to raise_error
+
+        expect(result[:code]).to eq("test_code")
+        expect(result[:state]).to eq("test_state")
+        expect(result[:completed]).to be true
+        expect(logger).to have_received(:debug)
+          .with(/Error closing OAuth callback client socket: IOError: close failed/)
       end
     end
 
