@@ -307,8 +307,8 @@ module RubyLLM
             @http_server.send_http_response(client, 200, "text/html", @pages.success_page)
           end
         ensure
-          client&.close
           apply_callback_result(callback_result, result, mutex, condition) if callback_result
+          close_callback_client(client)
         end
 
         # Wake the waiting authentication flow with a deterministic error when callback
@@ -321,6 +321,8 @@ module RubyLLM
             result[:completed] = true
             condition.signal
           end
+
+          @synchronized_logger.warn("OAuth callback worker failed: #{error.class}: #{error.message}")
         end
 
         def build_callback_result(oauth_params)
@@ -343,6 +345,12 @@ module RubyLLM
             result[:completed] = true
             condition.signal
           end
+        end
+
+        def close_callback_client(client)
+          client&.close
+        rescue IOError, SystemCallError => e
+          @synchronized_logger.debug("Error closing OAuth callback client socket: #{e.class}: #{e.message}")
         end
 
         def announce_authorization_flow(auth_url, auto_open_browser)
