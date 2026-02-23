@@ -5,8 +5,6 @@ module RubyLLM
     module Handlers
       # Promise implementation for async operations
       class Promise
-        attr_reader :state, :value, :reason
-
         # Initialize a new promise
         def initialize
           @state = :pending
@@ -120,17 +118,17 @@ module RubyLLM
 
         # Check if promise is pending
         def pending?
-          @state == :pending
+          @mutex.synchronize { @state == :pending }
         end
 
         # Check if promise is fulfilled
         def fulfilled?
-          @state == :fulfilled
+          @mutex.synchronize { @state == :fulfilled }
         end
 
         # Check if promise is rejected
         def rejected?
-          @state == :rejected
+          @mutex.synchronize { @state == :rejected }
         end
 
         # Check if promise is settled (fulfilled or rejected)
@@ -146,7 +144,7 @@ module RubyLLM
             # Wait until promise is settled
             if timeout
               deadline = Time.now + timeout
-              while pending?
+              while @state == :pending
                 remaining = deadline - Time.now
                 if remaining <= 0
                   raise Timeout::Error, "Promise timed out after #{timeout} seconds"
@@ -155,13 +153,25 @@ module RubyLLM
                 @condition.wait(@mutex, remaining)
               end
             else
-              @condition.wait(@mutex) while pending?
+              @condition.wait(@mutex) while @state == :pending
             end
 
             # Return value or raise error
-            return @value if fulfilled?
-            raise @reason if rejected?
+            return @value if @state == :fulfilled
+            raise @reason if @state == :rejected
           end
+        end
+
+        def state
+          @mutex.synchronize { @state }
+        end
+
+        def value
+          @mutex.synchronize { @value }
+        end
+
+        def reason
+          @mutex.synchronize { @reason }
         end
 
         private

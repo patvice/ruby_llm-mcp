@@ -22,6 +22,7 @@ module RubyLLM
                 result
               else
                 worker.kill # stop the thread (can still have some risk if shared resources)
+                worker.join(0.1)
                 raise RubyLLM::MCP::Errors::TimeoutError.new(
                   message: "Request timed out after #{seconds} seconds",
                   request_id: request_id
