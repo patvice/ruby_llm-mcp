@@ -88,3 +88,10 @@
   }
 })();
 </script>
+<script>
+  window.__rubyllmMcpMarkdownSourceBaseUrl = {{ site.markdown_source_base_url | default: "" | jsonify }};
+  window.__rubyllmMcpMarkdownPath = {{ page.path | default: "" | jsonify }};
+  window.__rubyllmDocsRepoNwo = {{ site.github.repository_nwo | default: "patvice/ruby_llm-mcp" | jsonify }};
+  window.__rubyllmDocsSourceBranch = {{ site.github.source.branch | default: "main" | jsonify }};
+</script>
+<script src="{{ '/assets/js/copy-markdown.js' | relative_url }}" defer></script>
