@@ -19,6 +19,9 @@ This section contains advanced implementation guidance.
 ## OAuth
 - **[OAuth]({% link guides/oauth.md %})** {: .label .label-green } 1.0 - OAuth 2.1 support with PKCE and browser authentication
 
+## Agent mode
+- **[Agents]({% link guides/agents.md %})** - MCP toolset DSL and `RubyLLM::MCP::Agents` integration
+
 ## Upgrading
 
 - **[Upgrading]({% link guides/upgrading.md %})** - Unified migration guide with sections for updates to 1.0, 0.8, and 0.7
