@@ -260,6 +260,69 @@ RSpec.describe RubyLLM::MCP do
     end
   end
 
+  describe "#toolset" do
+    let(:read_file) { instance_double(RubyLLM::MCP::Tool, name: "read_file") }
+    let(:delete_file) { instance_double(RubyLLM::MCP::Tool, name: "delete_file") }
+    let(:list_projects) { instance_double(RubyLLM::MCP::Tool, name: "list_projects") }
+    let(:filesystem_client) do
+      instance_double(RubyLLM::MCP::Client, name: "filesystem", tools: [read_file, delete_file])
+    end
+    let(:projects_client) { instance_double(RubyLLM::MCP::Client, name: "projects", tools: [list_projects]) }
+    let(:clients) do
+      {
+        "filesystem" => filesystem_client,
+        "projects" => projects_client
+      }
+    end
+
+    before do
+      RubyLLM::MCP.instance_variable_set(:@toolsets, nil)
+    end
+
+    after do
+      RubyLLM::MCP.instance_variable_set(:@toolsets, nil)
+    end
+
+    it "raises when both options and a block are provided" do
+      expect do
+        RubyLLM::MCP.toolset(:support, clients: [:filesystem]) do |toolset|
+          toolset.include_tools("read_file")
+        end
+      end.to raise_error(ArgumentError, /Provide either configuration options or a block, not both/)
+    end
+
+    it "supports string keys and alias option names" do
+      toolset = RubyLLM::MCP.toolset(
+        "support",
+        {
+          "clients" => ["filesystem"],
+          "client_names" => ["projects"],
+          "include_tools" => ["read_file"],
+          "include" => ["list_projects"],
+          "exclude_tools" => ["delete_file"],
+          "exclude" => ["list_projects"]
+        }
+      )
+
+      tool_names = toolset.tools(clients: clients).map(&:name)
+      expect(tool_names).to eq(["read_file"])
+    end
+
+    it "resets filters when aliases are passed empty arrays" do
+      RubyLLM::MCP.toolset(
+        :support,
+        clients: ["filesystem"],
+        include_tools: ["read_file"],
+        exclude_tools: ["delete_file"]
+      )
+
+      RubyLLM::MCP.toolset(:support, clients: [], include: [], exclude: [])
+
+      tool_names = RubyLLM::MCP.toolset(:support).tools(clients: clients).map(&:name)
+      expect(tool_names).to contain_exactly("read_file", "delete_file", "list_projects")
+    end
+  end
+
   describe "#configure" do
     it "yields the configuration object" do
       config = instance_double(RubyLLM::MCP::Configuration)

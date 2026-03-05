@@ -26,6 +26,12 @@ module RubyLLM
   module MCP
     module_function
 
+    TOOLSET_OPTION_MAPPINGS = {
+      from_clients: %i[clients client_names],
+      include_tools: %i[include_tools include],
+      exclude_tools: %i[exclude_tools exclude]
+    }.freeze
+
     def clients(config = RubyLLM::MCP.config.mcp_configuration)
       if @clients.nil?
         @clients = {}
@@ -70,12 +76,36 @@ module RubyLLM
     end
 
     def tools(blacklist: [], whitelist: [])
-      tools = @clients.values.map(&:tools)
-                      .flatten
-                      .reject { |tool| blacklist.include?(tool.name) }
+      tools = clients.values.map(&:tools)
+                     .flatten
+                     .reject { |tool| blacklist.include?(tool.name) }
 
       tools = tools.select { |tool| whitelist.include?(tool.name) } if whitelist.any?
       tools.uniq(&:name)
+    end
+
+    def toolset(name, options = nil)
+      toolset_name = name.to_sym
+      @toolsets ||= {}
+      configured_toolset = (@toolsets[toolset_name] ||= Toolset.new(name: toolset_name))
+
+      if block_given?
+        unless options.nil?
+          raise ArgumentError, "Provide either configuration options or a block, not both"
+        end
+
+        yield configured_toolset
+        return configured_toolset
+      end
+
+      return configured_toolset unless options
+
+      apply_toolset_options(configured_toolset, options)
+    end
+
+    def toolsets
+      configured_toolsets = @toolsets || {}
+      configured_toolsets.dup
     end
 
     def mcp_configurations
@@ -98,6 +128,20 @@ module RubyLLM
     def logger
       config.logger
     end
+
+    def apply_toolset_options(toolset, options)
+      config = options.dup.transform_keys(&:to_sym)
+
+      TOOLSET_OPTION_MAPPINGS.each do |method_name, keys|
+        next unless keys.any? { |key| config[key] }
+
+        values = keys.flat_map { |key| Array(config[key]) }
+        toolset.public_send(method_name, *values)
+      end
+
+      toolset
+    end
+    private_class_method :apply_toolset_options
   end
 end
 
