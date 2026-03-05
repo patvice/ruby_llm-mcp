@@ -6,7 +6,7 @@ module RubyLLM
       # Wraps server-initiated requests to support cancellation.
       # The operation tracks terminal state so cancellation outcomes are explicit.
       class CancellableOperation
-        attr_reader :request_id, :thread, :state
+        attr_reader :request_id
 
         def initialize(request_id)
           @request_id = request_id
@@ -61,22 +61,21 @@ module RubyLLM
         def execute(&)
           return nil if cancelled?
 
-          @mutex.synchronize do
+          worker = @mutex.synchronize do
             return nil if %i[cancelled cancelling].include?(@state)
 
             @state = :running
-          end
-
-          @thread = Thread.new do
-            Thread.current.abort_on_exception = false
-            begin
-              @result = yield
-            rescue Errors::RequestCancelled, StandardError => e
-              @error = e
+            @thread = Thread.new do
+              Thread.current.abort_on_exception = false
+              begin
+                @result = yield
+              rescue Errors::RequestCancelled, StandardError => e
+                @error = e
+              end
             end
           end
 
-          @thread.join
+          worker.join
           raise @error if @error && !@error.is_a?(Errors::RequestCancelled)
 
           @result
@@ -87,6 +86,14 @@ module RubyLLM
             end
             @thread = nil
           end
+        end
+
+        def state
+          @mutex.synchronize { @state }
+        end
+
+        def thread
+          @mutex.synchronize { @thread }
         end
       end
     end

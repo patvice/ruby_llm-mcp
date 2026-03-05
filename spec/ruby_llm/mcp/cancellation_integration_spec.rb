@@ -43,15 +43,15 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
         end
 
         # Track if sampling was actually cancelled (shouldn't complete)
-        sampling_completed = false
-        sampling_request_id = nil
+        sampling_completed = Queue.new
+        sampling_request_ids = Queue.new
 
         # Set up a sampling callback that would take time if not cancelled
         client.on_sampling do |sample|
-          sampling_request_id = sample.to_h[:id]
+          sampling_request_ids << sample.to_h[:id]
           # This should be interrupted by cancellation
           sleep 1.0
-          sampling_completed = true
+          sampling_completed << true
           true
         end
 
@@ -63,12 +63,12 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
         # Call the tool in a thread so we can cancel it
         tool_thread = Thread.new do
           tool.execute
-        rescue RubyLLM::MCP::Errors::TimeoutError
+        rescue RubyLLM::MCP::Errors::TimeoutError, RubyLLM::MCP::Errors::TransportError
           # Cancellation can race with response delivery under slower runtimes.
         end
 
         # Wait for the sampling request to start
-        Timeout.timeout(10) { sleep 0.1 until sampling_request_id }
+        sampling_request_id = Timeout.timeout(10) { sampling_request_ids.pop }
 
         # Send cancellation notification for the sampling request
         notification = RubyLLM::MCP::Notification.new(
@@ -88,7 +88,7 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
         sleep 0.2
 
         # Verify our sampling callback never completed
-        expect(sampling_completed).to be false
+        expect(sampling_completed).to be_empty
 
         # Clean up
         tool_thread.kill if tool_thread.alive?
@@ -104,7 +104,7 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
           config.sampling.preferred_model = "gpt-4o"
         end
 
-        request_ids = []
+        request_ids = Queue.new
 
         client.on_sampling do |sample|
           request_ids << sample.to_h[:id]
@@ -121,17 +121,21 @@ RSpec.describe "Cancellation Integration", :vcr do # rubocop:disable RSpec/Descr
         threads = 3.times.map do
           Thread.new do
             tool.execute
-          rescue RubyLLM::MCP::Errors::TimeoutError
+          rescue RubyLLM::MCP::Errors::TimeoutError, RubyLLM::MCP::Errors::TransportError
             # Cancellation can race with response delivery under slower runtimes.
           end
         end
 
         # Wait for ALL requests to start
-        Timeout.timeout(10) { sleep 0.1 until request_ids.length >= 3 }
+        started_request_ids = Timeout.timeout(10) do
+          ids = []
+          ids << request_ids.pop until ids.length >= 3
+          ids
+        end
 
         # Cancel each request as soon as we detect it
         cancelled_ids = []
-        request_ids.each do |request_id|
+        started_request_ids.each do |request_id|
           notification = RubyLLM::MCP::Notification.new(
             {
               "method" => "notifications/cancelled",
