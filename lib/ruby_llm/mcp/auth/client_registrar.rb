@@ -123,7 +123,8 @@ module RubyLLM
         def parse_registered_metadata(data, redirect_uri)
           ClientMetadata.new(
             redirect_uris: data["redirect_uris"] || [redirect_uri],
-            token_endpoint_auth_method: data["token_endpoint_auth_method"] || "none",
+            token_endpoint_auth_method: data["token_endpoint_auth_method"] ||
+                                      (data["client_secret"] ? "client_secret_post" : "none"),
             grant_types: data["grant_types"] || %w[authorization_code refresh_token],
             response_types: data["response_types"] || ["code"],
             scope: data["scope"],

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "base64"
+
 module RubyLLM
   module MCP
     module Auth
@@ -26,8 +28,8 @@ module RubyLLM
           registered_redirect_uri = client_info.metadata.redirect_uris.first
           params = build_auth_code_params(client_info, code, pkce, registered_redirect_uri, server_url)
 
-          response = post_token_exchange(server_metadata, params)
-          response = retry_if_redirect_mismatch(response, server_metadata, params, registered_redirect_uri)
+          response = post_token_exchange(server_metadata, params, client_info)
+          response = retry_if_redirect_mismatch(response, server_metadata, params, registered_redirect_uri, client_info)
 
           validate_token_response!(response, "Token exchange")
           parse_token_response(response)
@@ -45,12 +47,11 @@ module RubyLLM
           params = {
             grant_type: "client_credentials",
             client_id: client_info.client_id,
-            client_secret: client_info.client_secret,
             scope: scope,
             resource: server_url
           }.compact
 
-          response = post_token_exchange(server_metadata, params)
+          response = post_token_exchange(server_metadata, params, client_info)
           validate_token_response!(response, "Token exchange")
           parse_token_response(response)
         end
@@ -67,7 +68,7 @@ module RubyLLM
           logger.debug("Refreshing access token")
 
           params = build_refresh_params(client_info, token, server_url)
-          response = post_token_refresh(server_metadata, params)
+          response = post_token_refresh(server_metadata, params, client_info)
 
           # Return nil on error responses
           return nil if response.is_a?(HTTPX::ErrorResponse)
@@ -100,7 +101,7 @@ module RubyLLM
         # @param server_url [String] MCP server URL
         # @return [Hash] token exchange parameters
         def build_auth_code_params(client_info, code, pkce, redirect_uri, server_url)
-          params = {
+          {
             grant_type: "authorization_code",
             code: code,
             redirect_uri: redirect_uri,
@@ -108,9 +109,6 @@ module RubyLLM
             code_verifier: pkce.code_verifier,
             resource: server_url
           }
-
-          add_client_secret_if_needed(params, client_info)
-          params
         end
 
         # Build parameters for token refresh
@@ -119,49 +117,52 @@ module RubyLLM
         # @param server_url [String] MCP server URL
         # @return [Hash] refresh parameters
         def build_refresh_params(client_info, token, server_url)
-          params = {
+          {
             grant_type: "refresh_token",
             refresh_token: token.refresh_token,
             client_id: client_info.client_id,
             resource: server_url
           }
-
-          add_client_secret_if_needed(params, client_info)
-          params
         end
 
-        # Add client secret to params if needed
-        # @param params [Hash] token request parameters
-        # @param client_info [ClientInfo] client info
-        def add_client_secret_if_needed(params, client_info)
+        # Apply client authentication per RFC 6749 §2.3
+        # Supports "client_secret_post" (secret in body), "client_secret_basic" (HTTP Basic),
+        # and "none" (public client, no secret sent).
+        # @param params [Hash] token request form parameters (mutated in place)
+        # @param headers [Hash] HTTP headers (mutated in place)
+        # @param client_info [ClientInfo] client info with secret and auth method
+        def apply_client_auth!(params, headers, client_info)
           return unless client_info.client_secret
-          return unless client_info.metadata.token_endpoint_auth_method == "client_secret_post"
 
-          params[:client_secret] = client_info.client_secret
+          case client_info.metadata&.token_endpoint_auth_method
+          when "client_secret_post"
+            params[:client_secret] = client_info.client_secret
+          when "client_secret_basic"
+            credentials = Base64.strict_encode64("#{client_info.client_id}:#{client_info.client_secret}")
+            headers["Authorization"] = "Basic #{credentials}"
+          end
         end
 
         # Post token exchange request
         # @param server_metadata [ServerMetadata] server metadata
         # @param params [Hash] form parameters
+        # @param client_info [ClientInfo, nil] client info for authentication
         # @return [HTTPX::Response] HTTP response
-        def post_token_exchange(server_metadata, params)
-          http_client.post(
-            server_metadata.token_endpoint,
-            headers: { "Content-Type" => "application/x-www-form-urlencoded" },
-            form: params
-          )
+        def post_token_exchange(server_metadata, params, client_info = nil)
+          headers = { "Content-Type" => "application/x-www-form-urlencoded" }
+          apply_client_auth!(params, headers, client_info) if client_info
+          http_client.post(server_metadata.token_endpoint, headers:, form: params)
         end
 
         # Post token refresh request
         # @param server_metadata [ServerMetadata] server metadata
         # @param params [Hash] form parameters
+        # @param client_info [ClientInfo, nil] client info for authentication
         # @return [HTTPX::Response] HTTP response
-        def post_token_refresh(server_metadata, params)
-          response = http_client.post(
-            server_metadata.token_endpoint,
-            headers: { "Content-Type" => "application/x-www-form-urlencoded" },
-            form: params
-          )
+        def post_token_refresh(server_metadata, params, client_info = nil)
+          headers = { "Content-Type" => "application/x-www-form-urlencoded" }
+          apply_client_auth!(params, headers, client_info) if client_info
+          response = http_client.post(server_metadata.token_endpoint, headers:, form: params)
 
           if response.is_a?(HTTPX::ErrorResponse)
             logger.warn("Token refresh failed: #{response.error&.message || 'Request failed'}")
@@ -176,8 +177,9 @@ module RubyLLM
         # @param server_metadata [ServerMetadata] server metadata
         # @param params [Hash] exchange parameters
         # @param registered_redirect_uri [String] registered redirect URI
+        # @param client_info [ClientInfo] client info for authentication
         # @return [HTTPX::Response] response (possibly retried)
-        def retry_if_redirect_mismatch(response, server_metadata, params, registered_redirect_uri)
+        def retry_if_redirect_mismatch(response, server_metadata, params, registered_redirect_uri, client_info)
           # Don't retry on error responses
           return response if response.is_a?(HTTPX::ErrorResponse)
           return response if response.status == 200
@@ -188,7 +190,7 @@ module RubyLLM
 
           logger.warn("Redirect URI mismatch, retrying with: #{redirect_hint[:expected]}")
           params[:redirect_uri] = redirect_hint[:expected]
-          post_token_exchange(server_metadata, params)
+          post_token_exchange(server_metadata, params, client_info)
         end
 
         # Validate token response

@@ -146,6 +146,54 @@ RSpec.describe RubyLLM::MCP::Auth::ClientRegistrar do
       end
     end
 
+    context "when server omits token_endpoint_auth_method but returns client_secret" do
+      let(:registration_response) do
+        {
+          "client_id" => "test_client_id",
+          "client_secret" => "test_secret",
+          "redirect_uris" => [redirect_uri]
+        }
+      end
+
+      it "defaults to client_secret_post" do
+        result = registrar.register(server_url, server_metadata, :authorization_code, redirect_uri, scope)
+
+        expect(result.metadata.token_endpoint_auth_method).to eq("client_secret_post")
+      end
+    end
+
+    context "when server omits both token_endpoint_auth_method and client_secret" do
+      let(:registration_response) do
+        {
+          "client_id" => "test_client_id",
+          "redirect_uris" => [redirect_uri]
+        }
+      end
+
+      it "defaults to none for public clients" do
+        result = registrar.register(server_url, server_metadata, :authorization_code, redirect_uri, scope)
+
+        expect(result.metadata.token_endpoint_auth_method).to eq("none")
+      end
+    end
+
+    context "when server explicitly returns token_endpoint_auth_method" do
+      let(:registration_response) do
+        {
+          "client_id" => "test_client_id",
+          "client_secret" => "test_secret",
+          "redirect_uris" => [redirect_uri],
+          "token_endpoint_auth_method" => "client_secret_post"
+        }
+      end
+
+      it "uses the server-provided value" do
+        result = registrar.register(server_url, server_metadata, :authorization_code, redirect_uri, scope)
+
+        expect(result.metadata.token_endpoint_auth_method).to eq("client_secret_post")
+      end
+    end
+
     context "when server changes redirect_uri" do
       let(:registration_response) do
         {
