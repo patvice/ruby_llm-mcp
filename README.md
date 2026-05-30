@@ -54,6 +54,24 @@ chat.with_tools(*client.tools)
 puts chat.ask("Find Ruby files modified today and summarize what changed.")
 ```
 
+If your Ruby or Rails app routes model calls through [Tuning Engines](https://www.tuningengines.com/), configure RubyLLM's OpenAI-compatible endpoint first and keep the MCP workflow unchanged:
+
+```ruby
+RubyLLM.configure do |config|
+  config.openai_api_key = ENV.fetch("TUNING_ENGINES_API_KEY")
+  config.openai_api_base = "https://api.tuningengines.com/v1"
+end
+
+chat = RubyLLM.chat(
+  model: ENV.fetch("TUNING_ENGINES_MODEL", "gpt-4.1-mini"),
+  provider: :openai,
+  assume_model_exists: true
+)
+chat.with_tools(*client.tools)
+```
+
+This lets Tuning Engines handle centralized model routing, policy controls, MCP/tool audit logs, traces, approvals, and cost visibility while RubyLLM::MCP continues to manage the MCP client connection.
+
 ```ruby
 # Resources
 resource = client.resource("release_notes")
