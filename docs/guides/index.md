@@ -15,6 +15,7 @@ This section contains advanced implementation guidance.
 ## Rails Integration
 
 - **[Rails Integration]({% link guides/rails-integration.md %})** - Integrate RubyLLM MCP in Rails apps
+- **[Governed MCP Workflows]({% link guides/governed-mcp-workflows.md %})** - Route MCP workflows through a governed OpenAI-compatible endpoint
 
 ## OAuth
 - **[OAuth]({% link guides/oauth.md %})** {: .label .label-green } 1.0 - OAuth 2.1 support with PKCE and browser authentication
