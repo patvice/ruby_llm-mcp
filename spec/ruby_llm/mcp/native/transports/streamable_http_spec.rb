@@ -70,6 +70,35 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     end
   end
 
+  describe "#handle_success_response" do
+    let(:response) { instance_double(HTTPX::Response) }
+
+    before do
+      allow(response).to receive(:respond_to?).with(:headers).and_return(true)
+      allow(response).to receive(:respond_to?).with(:body).and_return(true)
+      allow(response).to receive_messages(
+        headers: { "content-type" => "application/json" },
+        body: '{"ok":true}'
+      )
+    end
+
+    it "ignores a non-envelope JSON body in the response to a notification" do
+      result = transport.send(
+        :handle_success_response, response, nil, { "method" => "notifications/initialized" }
+      )
+
+      expect(result).to be_nil
+    end
+
+    it "still validates the envelope in the response to a request" do
+      expect do
+        transport.send(
+          :handle_success_response, response, 1, { "method" => "tools/list", "id" => 1 }
+        )
+      end.to raise_error(RubyLLM::MCP::Errors::TransportError, /Invalid JSON-RPC envelope/)
+    end
+  end
+
   describe "protocol version negotiation" do
     it "successfully initializes and negotiates protocol version" do
       client.start
@@ -791,9 +820,11 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
             }.to_json
           )
 
-        # Request without ID should be handled properly (notification)
+        # A request without ID is a notification: the response body is ignored,
+        # but the session id header is still captured
         result = transport.request({ "method" => "test" }, wait_for_response: false)
-        expect(result.session_id).to eq(session_id)
+        expect(result).to be_nil
+        expect(transport.session_id).to eq(session_id)
       end
 
       it "handles very large response gracefully" do

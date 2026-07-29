@@ -439,6 +439,11 @@ module RubyLLM
               start_sse_stream if sse_fallback_available?
               nil
             elsif content_type&.include?("application/json")
+              # Notifications have no request_id and nothing waits on their response. The spec says
+              # servers respond to them with 202 and no body, but some return 200 with `body: { ok: true }`
+              # that is not a JSON-RPC envelope, but still a success response.
+              return if request_id.nil?
+
               response_body = response.respond_to?(:body) ? response.body.to_s : "{}"
               if response_body == "null" # Fix related to official MCP Ruby SDK implementation
                 response_body = "{}"
@@ -447,11 +452,9 @@ module RubyLLM
               json_response = parse_and_validate_http_response(response_body)
               result = RubyLLM::MCP::Result.new(json_response, session_id: @session_id)
 
-              if request_id
-                @pending_mutex.synchronize do
-                  queue = @pending_requests.delete(request_id.to_s)
-                  queue&.push(result)
-                end
+              @pending_mutex.synchronize do
+                queue = @pending_requests.delete(request_id.to_s)
+                queue&.push(result)
               end
 
               result
