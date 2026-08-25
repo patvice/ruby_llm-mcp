@@ -274,7 +274,6 @@ module RubyLLM
             headers["mcp-session-id"] = @session_id if @session_id
             headers["mcp-protocol-version"] = @protocol_version if @protocol_version
             headers["X-CLIENT-ID"] = @client_id
-            headers["Origin"] = @url.to_s
 
             if @oauth_provider
               RubyLLM::MCP.logger.debug "OAuth provider present, attempting to get token..."

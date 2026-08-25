@@ -1069,6 +1069,27 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     end
   end
 
+  describe "Origin header" do
+    it "does not send an Origin header by default" do
+      headers = transport.send(:build_common_headers)
+
+      expect(headers).not_to have_key("Origin")
+    end
+
+    it "keeps an Origin header explicitly provided by the caller" do
+      transport = described_class.new(
+        url: TestServerManager::HTTP_SERVER_URL,
+        request_timeout: 5000,
+        coordinator: mock_coordinator,
+        options: { headers: { "Origin" => "https://example.com" } }
+      )
+
+      headers = transport.send(:build_common_headers)
+
+      expect(headers["Origin"]).to eq("https://example.com")
+    end
+  end
+
   describe "OAuth integration" do
     let(:server_url) { "http://localhost:3000/mcp" }
     let(:storage) { RubyLLM::MCP::Auth::MemoryStorage.new }
