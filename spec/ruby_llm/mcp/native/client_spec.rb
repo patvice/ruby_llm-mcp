@@ -23,6 +23,23 @@ RSpec.describe RubyLLM::MCP::Native::Client do
     )
   end
 
+  describe "#stop" do
+    it "releases the per-client human-in-the-loop registry even when transport teardown fails" do
+      client = build_client
+      owner_id = client.registry_owner_id
+      transport = instance_double(RubyLLM::MCP::Native::Transport)
+      allow(transport).to receive(:close).and_raise(StandardError, "teardown failed")
+      client.instance_variable_set(:@transport, transport)
+
+      expect(RubyLLM::MCP::Handlers::HumanInTheLoopRegistry)
+        .to receive(:release).with(owner_id).and_call_original
+
+      expect { client.stop }.to raise_error(StandardError, /teardown failed/)
+
+      expect(client.instance_variable_get(:@transport)).to be_nil
+    end
+  end
+
   describe "#execute_tool" do
     it "fails closed when callback returns non-normalized decision" do
       client = build_client(human_callback: ->(_name, _params) { true })

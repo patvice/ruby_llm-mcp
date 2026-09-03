@@ -124,6 +124,7 @@ module RubyLLM
 
         def stop
           @transport&.close
+        ensure
           @capabilities = nil
           @transport = nil
           @task_registry = Native::TaskRegistry.new
