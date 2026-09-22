@@ -50,9 +50,13 @@ module RubyLLM
         "#{@adapter.client.name}: #{@name}"
       end
 
-      def params_schema
+      # RubyLLM 2.0 renamed the Tool schema hook from params_schema to
+      # parameters_schema. The old name stays as an alias: it is part of this
+      # gem's own surface (see #to_h) and callers may read it directly.
+      def parameters_schema
         @normalized_input_schema
       end
+      alias params_schema parameters_schema
 
       def execute(**params)
         result = @adapter.execute_tool(

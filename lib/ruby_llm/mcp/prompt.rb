@@ -92,7 +92,7 @@ module RubyLLM
 
           RubyLLM::Message.new(
             role: message["role"],
-            content: content
+            **content.to_message_arguments
           )
         end
       end

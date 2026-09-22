@@ -52,7 +52,7 @@ module RubyLLM
           def create_message(message)
             role = message["role"]
             content = create_content_for_message(message["content"])
-            RubyLLM::Message.new({ role: role, content: content })
+            RubyLLM::Message.new({ role: role, **content.to_message_arguments })
           end
 
           # Create content object for message
@@ -74,7 +74,7 @@ module RubyLLM
           def system_message
             RubyLLM::Message.new({
                                    role: "system",
-                                   content: MCP::Content.new(text: sample.system_prompt)
+                                   **MCP::Content.new(text: sample.system_prompt).to_message_arguments
                                  })
           end
         end

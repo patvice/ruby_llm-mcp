@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# Simple test tool class using base RubyLLM::Parameter
+# Simple test tool class using the base RubyLLM::Tool parameter DSL
 class SimpleMultiplyTool < RubyLLM::Tool
   description "Multiply two numbers together"
 
-  param :x, type: :number, desc: "First number", required: true
-  param :y, type: :number, desc: "Second number", required: true
+  parameter :x, type: :number, description: "First number", required: true
+  parameter :y, type: :number, description: "Second number", required: true
 
   def execute(x:, y:) # rubocop:disable Naming/MethodParameterName
     (x * y).to_s

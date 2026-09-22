@@ -32,7 +32,7 @@ RSpec.describe RubyLLM::Chat do
       context "with #{model_config[:provider]}/#{model_config[:model]}" do
         describe "with_tools" do
           it "adds tools to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             chat.with_tools(*client.tools)
 
             response = chat.ask("Can you add 1 and 2?")
@@ -40,7 +40,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "adds a select amount of tools" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             weather_tools = client.tools.select { |tool| tool.name.include?("weather") }
 
             chat.with_tools(*weather_tools)
@@ -54,18 +54,18 @@ RSpec.describe RubyLLM::Chat do
 
         describe "with_tool" do
           it "adds a tool to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             tool = client.tool("list_messages")
-            chat.with_tool(tool)
+            chat.with_tools(tool)
 
             response = chat.ask("Can you pull messages for ruby channel and let me know what they say?")
             expect(response.content).to include("Ruby is a great language")
           end
 
           it "can you a complex tool" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             tool = client.tool("fetch_site")
-            chat.with_tool(tool)
+            chat.with_tools(tool)
 
             prompt = "Can you fetch the website https://www.example.com/ and see if the site say what they do?"
             response = chat.ask(prompt)
@@ -75,7 +75,7 @@ RSpec.describe RubyLLM::Chat do
 
         describe "with_resources" do
           it "adds multiple resources to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             text_resources = client.resources.select { |resource| resource.mime_type&.include?("text") }
             chat.with_resources(*text_resources)
 
@@ -84,7 +84,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "adds binary resources to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             binary_resources = client.resources.select do |resource|
               resource.mime_type&.include?("image")
             end
@@ -97,7 +97,7 @@ RSpec.describe RubyLLM::Chat do
 
         describe "with_resource" do
           it "adds a single text resource to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             resource = client.resource("test.txt")
             chat.with_resource(resource)
 
@@ -106,7 +106,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "adds a markdown resource to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             resource = client.resource("my.md")
             chat.with_resource(resource)
 
@@ -115,7 +115,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "adds an image resource to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             resource = client.resource("dog.png")
             chat.with_resource(resource)
 
@@ -126,7 +126,7 @@ RSpec.describe RubyLLM::Chat do
 
         describe "mixed parameter types" do
           it "handles both RubyLLM::Parameter and MCP::Parameter tools in same chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             mcp_tool = client.tool("add")
 
             chat.with_tools(SimpleMultiplyTool, mcp_tool)
@@ -147,7 +147,7 @@ RSpec.describe RubyLLM::Chat do
       context "with #{model_config[:provider]}/#{model_config[:model]}" do
         describe "with_resource_template" do
           it "adds resource templates to the chat and uses them" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             template = client.resource_templates.first
             chat.with_resource_template(template, arguments: { name: "Alice" })
 
@@ -156,7 +156,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "handles template arguments correctly" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             template = client.resource_template("greeting")
             chat.with_resource_template(template, arguments: { name: "Bob" })
 
@@ -174,7 +174,7 @@ RSpec.describe RubyLLM::Chat do
       context "with #{model_config[:provider]}/#{model_config[:model]}" do
         describe "ask_prompt" do
           it "handles prompts when available" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             prompts = client.prompts
 
             prompt = prompts.first
@@ -183,14 +183,14 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "get one prompts by name" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             prompt = client.prompt("poem_of_the_day")
             response = chat.ask_prompt(prompt)
             expect(response.content).to include("poem")
           end
 
           it "handles prompts with arguments" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             prompt = client.prompt("specific_language_greeting")
             response = chat.ask_prompt(prompt, arguments: { name: "John", language: "Spanish" })
             expect(response.content).to include("John")
@@ -199,7 +199,7 @@ RSpec.describe RubyLLM::Chat do
 
         describe "with_prompt" do
           it "adds prompt to the chat when available" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             prompts = client.prompts
 
             prompt = prompts.first
@@ -209,7 +209,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "adds one prompt by name to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             prompt = client.prompt("poem_of_the_day")
             chat.with_prompt(prompt)
             response = chat.ask("Please provide the content from the prompt.")
@@ -217,7 +217,7 @@ RSpec.describe RubyLLM::Chat do
           end
 
           it "adds prompt with arguments to the chat" do
-            chat = RubyLLM.chat(model: model_config[:model])
+            chat = ChatBuilder.build(model_config)
             prompt = client.prompt("specific_language_greeting")
             chat.with_prompt(prompt, arguments: { name: "Alice", language: "French" })
             response = chat.ask("Please use the prompt to create a greeting.")

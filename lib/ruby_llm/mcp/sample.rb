@@ -192,7 +192,7 @@ module RubyLLM
         role = message["role"]
         content = create_content_for_message(message["content"])
 
-        RubyLLM::Message.new({ role: role, content: content })
+        RubyLLM::Message.new({ role: role, **content.to_message_arguments })
       end
 
       def create_content_for_message(content)

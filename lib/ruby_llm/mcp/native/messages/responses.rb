@@ -89,7 +89,7 @@ module RubyLLM
           end
 
           def format_content(content)
-            if content.is_a?(RubyLLM::Content)
+            if content.is_a?(RubyLLM::MCP::Content)
               if content.text.none? && content.attachments.any?
                 attachment = content.attachments.first
                 { type: attachment.type, data: attachment.content, mimeType: attachment.mime_type }
