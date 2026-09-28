@@ -206,7 +206,7 @@ module RubyLLM
             )
           end
 
-          return if issuer == expected_issuer
+          return if uris_match?(issuer, expected_issuer)
           return warn_legacy_issuer_mismatch(expected_issuer, issuer, source_url) unless enforce_issuer_match
 
           raise Errors::TransportError.new(
@@ -242,12 +242,30 @@ module RubyLLM
             )
           end
 
-          return if resource == expected_resource
+          return if uris_match?(resource, expected_resource)
 
           raise Errors::TransportError.new(
             message: "Resource metadata fetch failed: resource '#{resource}' did not match expected resource " \
                      "'#{expected_resource}' for #{source_url}"
           )
+        end
+
+        # @param uri_a [String] first URI
+        # @param uri_b [String] second URI
+        # @return [Boolean] whether the URIs are equivalent
+        def uris_match?(uri_a, uri_b)
+          uri_a == uri_b || normalize_empty_path(uri_a) == normalize_empty_path(uri_b)
+        end
+
+        # @param uri_string [String] URI to normalize
+        # @return [String] URI with an empty http(s) path rewritten to "/"
+        def normalize_empty_path(uri_string)
+          uri = URI.parse(uri_string)
+          return uri_string unless uri.is_a?(URI::HTTP) && uri.host && uri.path.to_s.empty?
+
+          uri_string.sub(%r{\Ahttps?://[^/?#]*}i) { |authority| "#{authority}/" }
+        rescue URI::InvalidURIError
+          uri_string
         end
       end
     end

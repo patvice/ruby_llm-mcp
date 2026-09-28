@@ -286,6 +286,103 @@ RSpec.describe RubyLLM::MCP::Auth::Discoverer do
       end
     end
 
+    context "when a delegated authorization server issuer has a trailing slash mismatch" do
+      let(:resource_response) do
+        {
+          "resource" => "https://mcp.example.com/api",
+          "authorization_servers" => ["https://auth.example.com/"]
+        }
+      end
+      let(:metadata_response) do
+        {
+          "issuer" => "https://auth.example.com",
+          "authorization_endpoint" => "https://auth.example.com/authorize",
+          "token_endpoint" => "https://auth.example.com/token"
+        }
+      end
+
+      before do
+        allow(http_client).to receive(:get).and_return(httpx_error_response("Not found"))
+
+        resource_resp = instance_double(HTTPX::Response, status: 200, body: resource_response.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://mcp.example.com/.well-known/oauth-protected-resource/api")
+          .and_return(resource_resp)
+
+        metadata_resp = instance_double(HTTPX::Response, status: 200, body: metadata_response.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://auth.example.com/.well-known/oauth-authorization-server")
+          .and_return(metadata_resp)
+      end
+
+      it "accepts the delegated issuer instead of falling back to default endpoints" do
+        result = discoverer.discover(server_url)
+
+        expect(result.issuer).to eq("https://auth.example.com")
+      end
+    end
+
+    context "when protected resource metadata has a trailing slash against an empty-path server URL" do
+      let(:server_url) { "https://mcp.example.com" }
+      let(:resource_response) do
+        {
+          "resource" => "https://mcp.example.com/",
+          "authorization_servers" => ["https://auth.example.com"]
+        }
+      end
+      let(:metadata_response) do
+        {
+          "issuer" => "https://auth.example.com",
+          "authorization_endpoint" => "https://auth.example.com/authorize",
+          "token_endpoint" => "https://auth.example.com/token"
+        }
+      end
+
+      before do
+        allow(http_client).to receive(:get).and_return(httpx_error_response("Not found"))
+
+        resource_resp = instance_double(HTTPX::Response, status: 200, body: resource_response.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://mcp.example.com/.well-known/oauth-protected-resource")
+          .and_return(resource_resp)
+
+        metadata_resp = instance_double(HTTPX::Response, status: 200, body: metadata_response.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://auth.example.com/.well-known/oauth-authorization-server")
+          .and_return(metadata_resp)
+      end
+
+      it "accepts the delegated issuer instead of falling back to default endpoints" do
+        result = discoverer.discover(server_url)
+
+        expect(result.issuer).to eq("https://auth.example.com")
+      end
+    end
+
+    context "when authorization server metadata issuer has a non-root path mismatch" do
+      let(:server_url) { "https://auth.example.com/tenant1" }
+
+      before do
+        allow(http_client).to receive(:get).and_return(httpx_error_response("Not found"))
+
+        trailing_slash_resp = instance_double(HTTPX::Response, status: 200, body: {
+          "issuer" => "https://auth.example.com/tenant1/",
+          "authorization_endpoint" => "https://auth.example.com/tenant1/authorize",
+          "token_endpoint" => "https://auth.example.com/tenant1/token"
+        }.to_json)
+        allow(http_client).to receive(:get)
+          .with("https://auth.example.com/.well-known/oauth-authorization-server/tenant1")
+          .and_return(trailing_slash_resp)
+      end
+
+      it "still rejects it and falls back to default endpoints" do
+        result = discoverer.discover(server_url)
+
+        expect(result.issuer).to eq("https://auth.example.com")
+        expect(result.authorization_endpoint).to eq("https://auth.example.com/authorize")
+      end
+    end
+
     context "when authorization server metadata issuer does not match expected issuer" do
       let(:resource_response) do
         {
