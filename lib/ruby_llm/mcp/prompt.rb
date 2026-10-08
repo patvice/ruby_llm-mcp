@@ -92,7 +92,7 @@ module RubyLLM
 
           RubyLLM::Message.new(
             role: message["role"],
-            content: content
+            **content.message_options
           )
         end
       end
@@ -110,7 +110,7 @@ module RubyLLM
         when "text"
           MCP::Content.new(text: content["text"])
         when "image", "audio"
-          attachment = MCP::Attachment.new(content["content"], content["mime_type"])
+          attachment = MCP::Attachment.new(content["data"], content["mimeType"])
           MCP::Content.new(text: nil, attachments: [attachment])
         when "resource"
           resource = Resource.new(adapter, content["resource"])

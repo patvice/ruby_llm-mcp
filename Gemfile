@@ -4,6 +4,8 @@ source "https://rubygems.org"
 
 gemspec
 
+gem "ruby_llm", ENV.fetch("RUBY_LLM_VERSION", "~> 1.9")
+
 group :development do
   if RUBY_VERSION >= "3.1.0"
     gem "mcp", "~> 0.7"

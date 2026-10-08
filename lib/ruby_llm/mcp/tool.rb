@@ -54,6 +54,8 @@ module RubyLLM
         @normalized_input_schema
       end
 
+      alias parameters_schema params_schema
+
       def execute(**params)
         result = @adapter.execute_tool(
           name: @mcp_name,
@@ -84,14 +86,14 @@ module RubyLLM
 
           # Return structured content as JSON - this is the authoritative, schema-validated data
           # The LLM needs the structured data to give accurate responses
-          return create_content_for_message({ "type" => "text", "text" => structured_content.to_json })
+          return MCP::Content.new(text: structured_content.to_json).to_ruby_llm
         end
 
-        if text_values.empty?
-          create_content_for_message(content.first)
-        else
-          create_content_for_message({ "type" => "text", "text" => text_values })
-        end
+        contents = content.filter_map { |block| create_content_for_message(block) }
+        MCP::Content.new(
+          text: contents.filter_map(&:text).join("\n"),
+          attachments: contents.flat_map(&:attachments)
+        ).to_ruby_llm
       end
 
       def to_h
@@ -108,8 +110,10 @@ module RubyLLM
       private
 
       def create_content_for_message(content)
+        return MCP::Content.new(text: content.to_s) unless content.is_a?(Hash)
+
         case content["type"]
-        when "text"
+        when "text", nil
           MCP::Content.new(text: content["text"])
         when "image", "audio"
           attachment = MCP::Attachment.new(content["data"], content["mimeType"])

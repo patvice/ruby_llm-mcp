@@ -14,6 +14,11 @@ RubyLLM::MCP is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 
 Use MCP tools, resources, and prompts from your RubyLLM chats over `stdio`, streamable HTTP, or SSE.
 
+Supports RubyLLM 1.9 and later, including RubyLLM 2.x. Tools return `MCP::Content` on
+RubyLLM 1.x and native strings or arrays of strings and attachments on RubyLLM 2.x.
+Resources still expose `MCP::Content` through `to_content`; use `resource.include(chat)`
+to add their text and attachments to a chat on either version.
+
 **Protocol support:** Fully supports MCP spec `2025-06-18` (stable), with draft spec `2026-01-26` available.
 
 ## RubyLLM::MCP Out of the Box

@@ -56,7 +56,7 @@ module RubyLLM
               id: id,
               result: {
                 role: message.role,
-                content: format_content(message.content),
+                content: format_message_content(message),
                 model: model,
                 stopReason: stop_reason
               }
@@ -88,19 +88,26 @@ module RubyLLM
             }
           end
 
-          def format_content(content)
-            if content.is_a?(RubyLLM::Content)
-              if content.text.none? && content.attachments.any?
-                attachment = content.attachments.first
-                { type: attachment.type, data: attachment.content, mimeType: attachment.mime_type }
-              else
-                { type: "text", text: content.text }
-              end
+          def format_message_content(message)
+            content = message.content
+            attachments = if !defined?(RubyLLM::Content) && message.is_a?(RubyLLM::Message)
+                            message.attachments
+                          else
+                            []
+                          end
+            if defined?(RubyLLM::Content) && content.is_a?(RubyLLM::Content)
+              attachments = content.attachments
+              content = content.text
+            end
+
+            if content.to_s.empty? && attachments.any?
+              attachment = attachments.first
+              { type: attachment.type, data: attachment.encoded, mimeType: attachment.mime_type }
             else
               { type: "text", text: content }
             end
           end
-          private_class_method :format_content
+          private_class_method :format_message_content
 
           def snake_to_camel(str)
             parts = str.split("_")

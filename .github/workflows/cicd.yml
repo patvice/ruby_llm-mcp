@@ -6,6 +6,23 @@ on:
   pull_request:
 
 jobs:
+  ruby_llm_compatibility:
+    name: RubyLLM ${{ matrix.ruby_llm }} compatibility
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby_llm: ["~> 1.9.0", "~> 1.0", "~> 2.0"]
+    env:
+      RUBY_LLM_VERSION: ${{ matrix.ruby_llm }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      - name: Check RubyLLM integration without external services
+        run: bundle exec rspec --options /dev/null spec/ruby_llm/mcp/ruby_llm_compatibility_spec.rb
+
   test:
     name: Ruby Tests
     runs-on: ubuntu-latest
