@@ -206,7 +206,7 @@ module RubyLLM
             )
           end
 
-          return if issuer == expected_issuer
+          return if uris_match?(issuer, expected_issuer)
           return warn_legacy_issuer_mismatch(expected_issuer, issuer, source_url) unless enforce_issuer_match
 
           raise Errors::TransportError.new(
@@ -242,12 +242,23 @@ module RubyLLM
             )
           end
 
-          return if resource == expected_resource
+          return if uris_match?(resource, expected_resource)
 
           raise Errors::TransportError.new(
             message: "Resource metadata fetch failed: resource '#{resource}' did not match expected resource " \
                      "'#{expected_resource}' for #{source_url}"
           )
+        end
+
+        # Compares URIs after RFC 3986 6.2.3 scheme-based normalization, so an empty
+        # path matches "/", and scheme/host case and default ports are ignored.
+        # @param uri_a [String] first URI
+        # @param uri_b [String] second URI
+        # @return [Boolean] whether the URIs are equivalent
+        def uris_match?(uri_a, uri_b)
+          URI.parse(uri_a).normalize == URI.parse(uri_b).normalize
+        rescue URI::InvalidURIError
+          uri_a == uri_b
         end
       end
     end
