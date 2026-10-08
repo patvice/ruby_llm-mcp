@@ -160,7 +160,7 @@ class TestServerManager
     end
 
     def port_open?(port, host = "127.0.0.1")
-      Socket.tcp(host, port, connect_timeout: 1).close
+      TCPSocket.new(host, port, connect_timeout: 1).close
       true
     rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
       false
@@ -202,10 +202,14 @@ class TestServerManager
       end
     end
 
+    # TCPSocket.new is used instead of Socket.tcp because Socket.tcp(connect_timeout:)
+    # on Ruby <= 4.0.6 returns a socket for a refused connection on Darwin (the retry
+    # connect(2) answers EISCONN, ruby-core Bug #22223), which made this readiness
+    # check a no-op and let the first spec race the fixture server boot.
     def wait_for_port(port, host = "127.0.0.1", timeout = 15)
       with_timeout(timeout) do
         loop do
-          Socket.tcp(host, port, connect_timeout: 1).close
+          TCPSocket.new(host, port, connect_timeout: 1).close
           break
         rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
           sleep 0.1
