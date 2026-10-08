@@ -250,22 +250,15 @@ module RubyLLM
           )
         end
 
+        # Compares URIs after RFC 3986 6.2.3 scheme-based normalization, so an empty
+        # path matches "/", and scheme/host case and default ports are ignored.
         # @param uri_a [String] first URI
         # @param uri_b [String] second URI
         # @return [Boolean] whether the URIs are equivalent
         def uris_match?(uri_a, uri_b)
-          uri_a == uri_b || normalize_empty_path(uri_a) == normalize_empty_path(uri_b)
-        end
-
-        # @param uri_string [String] URI to normalize
-        # @return [String] URI with an empty http(s) path rewritten to "/"
-        def normalize_empty_path(uri_string)
-          uri = URI.parse(uri_string)
-          return uri_string unless uri.is_a?(URI::HTTP) && uri.host && uri.path.to_s.empty?
-
-          uri_string.sub(%r{\Ahttps?://[^/?#]*}i) { |authority| "#{authority}/" }
+          URI.parse(uri_a).normalize == URI.parse(uri_b).normalize
         rescue URI::InvalidURIError
-          uri_string
+          uri_a == uri_b
         end
       end
     end

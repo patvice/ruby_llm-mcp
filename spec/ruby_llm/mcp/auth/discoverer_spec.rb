@@ -570,6 +570,39 @@ RSpec.describe RubyLLM::MCP::Auth::Discoverer do
     end
   end
 
+  describe "#uris_match?" do
+    def uris_match?(uri_a, uri_b)
+      discoverer.send(:uris_match?, uri_a, uri_b)
+    end
+
+    it "treats an empty path and a root path as equal" do
+      expect(uris_match?("https://auth.example.com/", "https://auth.example.com")).to be(true)
+    end
+
+    it "ignores scheme and host case" do
+      expect(uris_match?("HTTPS://Auth.Example.com", "https://auth.example.com/")).to be(true)
+    end
+
+    it "ignores an explicit default port" do
+      expect(uris_match?("https://auth.example.com:443", "https://auth.example.com")).to be(true)
+    end
+
+    it "rejects a trailing slash on a non-root path" do
+      expect(uris_match?("https://auth.example.com/tenant1/", "https://auth.example.com/tenant1")).to be(false)
+    end
+
+    it "rejects a different host, port or scheme" do
+      expect(uris_match?("https://evil.example.com", "https://auth.example.com")).to be(false)
+      expect(uris_match?("https://auth.example.com:8443", "https://auth.example.com")).to be(false)
+      expect(uris_match?("http://auth.example.com", "https://auth.example.com")).to be(false)
+    end
+
+    it "falls back to exact comparison for unparseable URIs" do
+      expect(uris_match?("not a uri", "not a uri")).to be(true)
+      expect(uris_match?("not a uri", "https://auth.example.com")).to be(false)
+    end
+  end
+
   def httpx_error_response(message)
     error = StandardError.new(message)
     response = instance_double(HTTPX::ErrorResponse, error: error)
