@@ -33,6 +33,20 @@ RSpec.describe RubyLLM::MCP::Native::Transports::StreamableHTTP do
     allow(logger).to receive(:info)
   end
 
+  describe "#close" do
+    it "runs the remaining cleanup steps and re-raises when session termination fails" do
+      allow(transport).to receive(:terminate_session)
+        .and_raise(RubyLLM::MCP::Errors::TransportError.new(message: "session termination failed", code: nil))
+      expect(transport).to receive(:cleanup_sse_resources).and_call_original
+      expect(transport).to receive(:cleanup_connection).and_call_original
+
+      expect { transport.close }
+        .to raise_error(RubyLLM::MCP::Errors::TransportError, /session termination failed/)
+
+      expect(transport.instance_variable_get(:@connection)).to be_nil
+    end
+  end
+
   describe "#handle_oauth_authorization_error" do
     let(:response) { instance_double(HTTPX::Response) }
 

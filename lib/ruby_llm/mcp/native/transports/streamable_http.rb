@@ -135,6 +135,7 @@ module RubyLLM
 
           def close
             terminate_session
+          ensure
             cleanup_sse_resources
             cleanup_connection
           end
