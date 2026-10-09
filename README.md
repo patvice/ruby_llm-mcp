@@ -209,6 +209,10 @@ end
 - [Rails Integration](https://rubyllm-mcp.com/guides/rails-integration.html)
 - [Adapters and transports](https://rubyllm-mcp.com/guides/adapters.html)
 
+## Examples
+
+- [Parallel Search MCP](examples/parallel_search/README.md): search the web and fetch page excerpts without API keys.
+
 ## Contributing
 
 Issues and pull requests are welcome at [patvice/ruby_llm-mcp](https://github.com/patvice/ruby_llm-mcp).
